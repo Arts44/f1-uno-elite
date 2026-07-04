@@ -400,11 +400,12 @@ export function renderGrid(cards){
       log('cardGrid parent display:', grid.parentElement ? grid.parentElement.style.display : 'N/A');
       log('cardGrid parent height:', grid.parentElement ? grid.parentElement.offsetHeight : 'N/A');
     }
-    // Force display grid and parent
+    // Force display grid and parent — but never un-hide the collection
+    // view while another view (badges/stats/settings) is active
     grid.style.display = 'grid';
     grid.style.visibility = 'visible';
     grid.style.opacity = '1';
-    if(grid.parentElement) {
+    if(grid.parentElement && currentView === 'collection') {
       grid.parentElement.style.display = 'block';
       grid.parentElement.style.visibility = 'visible';
     }

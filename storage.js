@@ -15,6 +15,7 @@ import {
   manualBadges, autoBadgeUnlocked,
   setManualBadges, setAutoBadgeUnlocked, saveManualBadges
 } from './badges.js';
+import { noteChange, markBackupDone } from './backup.js';
 
 /* ── Versioning & season-scoped keys ── */
 const STORAGE_VERSION = 2;
@@ -71,7 +72,10 @@ export function loadData(){
     if(loginThemeIcon) loginThemeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
   }
 }
-export function saveData(){ localStorage.setItem(_storageKey('owned'), JSON.stringify(coll)); }
+export function saveData(){
+  localStorage.setItem(_storageKey('owned'), JSON.stringify(coll));
+  noteChange(); // backup reminder bookkeeping (backup.js)
+}
 
 export function getTypeData(cardId, typeId){
   return (coll[cardId]&&coll[cardId][typeId]) || {owned:false,wishlist:false,doubles:false,favorite:false,qty:0};
@@ -124,14 +128,20 @@ export function cardRarity(card){
 }
 
 /* ══════════════════════════════════════════════════════════ EXPORT */
-export function exportCollection(){
-  const data = {
+// Single source of truth for the export/backup payload —
+// used by both the JSON file export and the backup code (backup.js).
+export function collectionSnapshot(){
+  return {
     season: _currentSeason,
     exportDate: new Date().toISOString(),
     owned: coll,
     manualBadges: manualBadges,
     autoBadges: autoBadgeUnlocked
   };
+}
+
+export function exportCollection(){
+  const data = collectionSnapshot();
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -142,6 +152,7 @@ export function exportCollection(){
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+  markBackupDone(); // resets the backup reminder (backup.js)
   showToast(t('toast.exported'));
 }
 
@@ -166,7 +177,7 @@ export function _handleImportFile(file){
   reader.readAsText(file);
 }
 
-function _showImportDialog(data){
+export function _showImportDialog(data){
   const overlay = document.createElement('div');
   overlay.className='import-dialog-overlay';
   overlay.innerHTML=`

@@ -5,7 +5,8 @@
 import { log } from './logger.js';
 import { t, LANGS, getLang, setLang } from './i18n.js';
 import { switchView, showToast, toggleTheme, currentView, setCurrentView } from './render.js';
-import { triggerImport } from './storage.js';
+import { triggerImport, collectionSnapshot, _showImportDialog } from './storage.js';
+import { generateBackupCode, decodeBackupCode, markBackupDone } from './backup.js';
 import { initApp } from './app.js';
 
 // PIN storage helpers (localStorage-based, SHA-256 hashed)
@@ -419,6 +420,30 @@ export function renderSettings(){
         </div>
         <button class="setv-btn" data-action="exportCollection">${t('s.export_btn')}</button>
       </div>
+      <div class="setv-row">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.bkcode')}</div>
+          <div class="setv-row-sub">${t('s.bkcode_sub')}</div>
+        </div>
+        <button class="setv-btn" id="backupCodeBtn">${t('s.bkcode_btn')}</button>
+      </div>
+      <div class="setv-row" id="backupCodeArea" style="display:none;flex-direction:column;align-items:stretch;gap:8px;">
+        <textarea id="backupCodeOut" readonly rows="4" style="width:100%;resize:vertical;font-family:monospace;font-size:11px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--tx1);"></textarea>
+        <div class="pin-form-error" id="backupCodeWarn"></div>
+        <button class="setv-btn" id="backupCopyBtn">${t('bk.copy')}</button>
+      </div>
+      <div class="setv-row">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.bkrestore')}</div>
+          <div class="setv-row-sub">${t('s.bkrestore_sub')}</div>
+        </div>
+        <button class="setv-btn" id="restoreCodeBtn">${t('s.bkrestore_btn')}</button>
+      </div>
+      <div class="setv-row" id="restoreCodeArea" style="display:none;flex-direction:column;align-items:stretch;gap:8px;">
+        <textarea id="restoreCodeIn" rows="4" placeholder="${t('bk.placeholder')}" style="width:100%;resize:vertical;font-family:monospace;font-size:11px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--tx1);"></textarea>
+        <div class="pin-form-error" id="restoreCodeError"></div>
+        <button class="setv-btn" id="restoreApplyBtn">${t('bk.apply')}</button>
+      </div>
     </div>
 
     ${pinOn ? `
@@ -477,6 +502,48 @@ export function renderSettings(){
 
   el.querySelector('#importBtn')?.addEventListener('click', triggerImport);
   el.querySelector('#settingsLockBtn')?.addEventListener('click', lockApp);
+
+  // — Backup code (device-to-device, no file) —
+  el.querySelector('#backupCodeBtn')?.addEventListener('click', async ()=>{
+    const area = el.querySelector('#backupCodeArea');
+    const out = el.querySelector('#backupCodeOut');
+    const warn = el.querySelector('#backupCodeWarn');
+    try {
+      const { code, tooBig } = await generateBackupCode(collectionSnapshot());
+      out.value = code;
+      warn.textContent = tooBig ? t('bk.too_big') : '';
+      area.style.display = 'flex';
+      markBackupDone();
+    } catch(e){
+      warn.textContent = t('bk.invalid');
+      area.style.display = 'flex';
+    }
+  });
+  el.querySelector('#backupCopyBtn')?.addEventListener('click', async ()=>{
+    const out = el.querySelector('#backupCodeOut');
+    try {
+      await navigator.clipboard.writeText(out.value);
+    } catch(e){
+      out.focus(); out.select();
+      document.execCommand('copy');
+    }
+    showToast(t('bk.copied'));
+  });
+  el.querySelector('#restoreCodeBtn')?.addEventListener('click', ()=>{
+    const area = el.querySelector('#restoreCodeArea');
+    area.style.display = area.style.display === 'none' ? 'flex' : 'none';
+  });
+  el.querySelector('#restoreApplyBtn')?.addEventListener('click', async ()=>{
+    const input = el.querySelector('#restoreCodeIn');
+    const errEl = el.querySelector('#restoreCodeError');
+    errEl.textContent = '';
+    try {
+      const data = await decodeBackupCode(input.value);
+      _showImportDialog(data); // existing merge/replace dialog
+    } catch(e){
+      errEl.textContent = e.message || t('bk.invalid');
+    }
+  });
 
   const langSel = el.querySelector('#langSel');
   if(langSel) langSel.addEventListener('change', e=>setLang(e.target.value));
