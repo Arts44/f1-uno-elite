@@ -22,6 +22,7 @@ import {
   _bindViewerBrowseBtn, isViewerModeAllowed, isSetupDone, isPinEnabled,
   setAuthenticated
 } from './pin.js';
+import { maybeHandleBackupHash } from './backup.js';
 
 export function initApp() {
   log('Initialisation de l\'app...');
@@ -60,6 +61,10 @@ export function initApp() {
     });
 
     log('App initialisée, coll contient:', Object.keys(coll).length, 'cartes');
+
+    // If the app was opened from a scanned QR / shared #backup= link,
+    // trigger the existing restore (merge/replace) dialog.
+    maybeHandleBackupHash();
   });
 }
 

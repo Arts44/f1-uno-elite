@@ -1137,6 +1137,13 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sv-axis-label{font-size:10px;fill:var(--tx3);font-family:var(--font-b);}
 .sv-note{font-size:10px;color:var(--tx3);margin-top:6px;}
 
+/* BACKUP QR */
+.bk-qr-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;}
+.bk-qr{width:220px;max-width:100%;background:#fff;padding:10px;border-radius:10px;box-shadow:var(--sh-sm);}
+.bk-qr svg{display:block;width:100%;height:auto;}
+.bk-qr-hint{font-size:11px;color:var(--tx3);text-align:center;line-height:1.4;}
+.bk-qr-hint.bk-qr-warn{color:var(--orange);font-weight:600;}
+
 /* SETTINGS VIEW */
 .settings-view{display:none;padding:24px 24px 90px;overflow-y:auto;height:100%;width:100%;}
 .settings-view.active{display:block;}

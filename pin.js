@@ -6,7 +6,7 @@ import { log } from './logger.js';
 import { t, LANGS, getLang, setLang } from './i18n.js';
 import { switchView, showToast, toggleTheme, currentView, setCurrentView } from './render.js';
 import { triggerImport, collectionSnapshot, _showImportDialog } from './storage.js';
-import { generateBackupCode, decodeBackupCode, markBackupDone } from './backup.js';
+import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg } from './backup.js';
 import { initApp } from './app.js';
 
 // PIN storage helpers (localStorage-based, SHA-256 hashed)
@@ -430,7 +430,14 @@ export function renderSettings(){
       <div class="setv-row" id="backupCodeArea" style="display:none;flex-direction:column;align-items:stretch;gap:8px;">
         <textarea id="backupCodeOut" readonly rows="4" style="width:100%;resize:vertical;font-family:monospace;font-size:11px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--tx1);"></textarea>
         <div class="pin-form-error" id="backupCodeWarn"></div>
-        <button class="setv-btn" id="backupCopyBtn">${t('bk.copy')}</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="setv-btn" id="backupCopyBtn">${t('bk.copy')}</button>
+          <button class="setv-btn" id="backupQrBtn">${t('bk.show_qr')}</button>
+        </div>
+        <div class="bk-qr-wrap" id="backupQrWrap" style="display:none;">
+          <div class="bk-qr" id="backupQr" aria-label="${t('bk.qr_alt')}"></div>
+          <div class="bk-qr-hint" id="backupQrHint">${t('bk.qr_hint')}</div>
+        </div>
       </div>
       <div class="setv-row">
         <div class="setv-row-left">
@@ -528,6 +535,25 @@ export function renderSettings(){
       document.execCommand('copy');
     }
     showToast(t('bk.copied'));
+  });
+  el.querySelector('#backupQrBtn')?.addEventListener('click', ()=>{
+    const out = el.querySelector('#backupCodeOut');
+    const wrap = el.querySelector('#backupQrWrap');
+    const qrBox = el.querySelector('#backupQr');
+    const hint = el.querySelector('#backupQrHint');
+    if(!out.value) return;
+    if(wrap.style.display !== 'none'){ wrap.style.display = 'none'; return; }
+    const { svg, tooBig } = makeBackupQrSvg(buildBackupLink(out.value));
+    if(tooBig){
+      qrBox.innerHTML = '';
+      hint.textContent = t('bk.qr_too_big');
+      hint.classList.add('bk-qr-warn');
+    } else {
+      qrBox.innerHTML = svg;
+      hint.textContent = t('bk.qr_hint');
+      hint.classList.remove('bk-qr-warn');
+    }
+    wrap.style.display = 'flex';
   });
   el.querySelector('#restoreCodeBtn')?.addEventListener('click', ()=>{
     const area = el.querySelector('#restoreCodeArea');

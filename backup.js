@@ -8,12 +8,21 @@
    Code format:  F1U1.<base64url>  (deflate-raw compressed)
                  F1U0.<base64url>  (uncompressed fallback)
    ══════════════════════════════════════════════════════════ */
+import { log } from './logger.js';
 import { t } from './i18n.js';
 import { showToast } from './render.js';
+import { encodeBinary, toSvg, Ecc } from './qrcodegen.js';
+import { _showImportDialog } from './storage.js';
 
 // Above this size the code is impractical to paste into a link/QR —
 // the UI then steers the user to the existing JSON file export.
 export const MAX_CODE_CHARS = 4000;
+
+// A QR is only reliably scannable up to a moderate density. We cap the
+// QR version (25 → 117×117 modules); a link that doesn't fit is NOT
+// rendered as an unreadable QR — the UI falls back to the text code /
+// JSON export instead.
+const MAX_QR_VERSION = 25;
 
 /* ── base64url helpers ── */
 function bytesToB64url(bytes){
@@ -75,6 +84,48 @@ export async function decodeBackupCode(input){
   if(data.season !== undefined && !Number.isInteger(data.season))
     throw new Error(t('bk.invalid'));
   return data;
+}
+
+/* ══════════════════════════════════════════════════════════
+   QR CODE — scan-to-transfer (encodes a #backup= link so the
+   target device opens the app and restores automatically).
+   ══════════════════════════════════════════════════════════ */
+// Build an absolute link that reopens THIS deployment with the code in
+// the hash. Uses origin + pathname so it works under a sub-folder
+// (e.g. GitHub Pages); query/hash are stripped first.
+export function buildBackupLink(code){
+  const base = location.origin + location.pathname;
+  return `${base}#backup=${code}`;
+}
+
+// Returns { svg } on success, or { tooBig: true } when the link exceeds
+// the scannable QR capacity. Dark-on-white for contrast in any theme.
+export function makeBackupQrSvg(link){
+  try {
+    const qr = encodeBinary(new TextEncoder().encode(link), Ecc.LOW, 1, MAX_QR_VERSION);
+    return { svg: toSvg(qr, { border: 4, dark: '#111111', light: '#ffffff' }), version: qr.version };
+  } catch(e){
+    log('QR too big for link length', link.length, e && e.message);
+    return { tooBig: true };
+  }
+}
+
+// Startup: if the URL carries a #backup= code, decode it and open the
+// existing merge/replace import dialog, then strip the hash so a reload
+// doesn't re-trigger it. Called from initApp() once data is loaded.
+export async function maybeHandleBackupHash(){
+  const hash = location.hash || '';
+  if(!/#backup=/.test(hash)) return false;
+  // Clear the hash immediately (before await) so it can't fire twice
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+  try {
+    const data = await decodeBackupCode(hash);
+    _showImportDialog(data);
+    return true;
+  } catch(e){
+    showToast(t('bk.invalid'));
+    return false;
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
