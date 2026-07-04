@@ -63,7 +63,7 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 ### User experience
 - **Internationalisation (i18n)**: 7 languages — 🇬🇧 English, 🇫🇷 French, 🇪🇸 Spanish, 🇨🇳 Chinese, 🇮🇹 Italian, 🇳🇱 Dutch, 🇩🇪 German.
 - **Light / dark theme**, persisted and applied before render to avoid a flash of the wrong theme.
-- **Responsive design** with a bottom tab bar (Collection / Badges / Stats / Settings).
+- **Responsive design** from small phones (~320 px) to desktop — including the top bar, where the search field shrinks and secondary badges hide instead of overlapping — with a bottom tab bar (Collection / Badges / Stats / Settings).
 - **Inline SVG circuit outlines** on Grand Prix cards.
 - Accessibility care (ARIA roles, `aria-live` regions, keyboard navigation, PIN keypad support).
 
@@ -81,7 +81,7 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 | **Crypto** | Web Crypto API (SHA-256 for the PIN); `CompressionStream` for backup codes |
 | **Data** | Static JSON files (+ an embedded JS copy for the offline fallback) |
 | **Fonts** | Google Fonts (Syne, DM Sans, Racing Sans One, Orbitron) |
-| **External assets** | F1/UNO logos and images (Wikimedia) |
+| **External assets** | F1/UNO logos (Wikimedia), team logos & driver photos (formula1.com) |
 
 > The only tooling dependency is **esbuild** (a `devDependency` in `package.json`); the app itself ships **no runtime dependencies**.
 
@@ -137,7 +137,7 @@ Then open **http://localhost:8000/** (i.e. `index.html`).
 ### Install as an app (PWA) & offline use
 - On the **first load** over http/https, `app.js` registers the Service Worker, which precaches the app shell. From the **next load** on, the page itself is served from cache and the app works **fully offline** (a reload after the first visit is enough to be under Service Worker control).
 - Your browser will offer to **install** the app (install icon in the address bar on desktop Chrome/Edge, "Add to Home Screen" on mobile). It then runs standalone with its own icon.
-- Note for maintainers: assets are served **cache-first**, so after changing any shell file, bump `SW_VERSION` in `sw.js` — the new worker re-precaches everything and drops the old cache on activation.
+- Note for maintainers: assets are served **cache-first**, so after changing any shell file, bump `SW_VERSION` in `sw.js` — the new worker re-precaches everything (bypassing the browser HTTP cache, so it always fetches the current files) and drops the old cache on activation.
 - The Service Worker does not register on `file://` (the `'serviceWorker' in navigator` guard skips it) — that's expected; serve over HTTP.
 
 ### Move your collection to another device (backup code)
