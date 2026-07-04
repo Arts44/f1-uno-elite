@@ -38,6 +38,10 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 
 ### Stats
 - **Dashboard**: overall progress, breakdown by rarity, team, category and card type, with completion rates.
+- **Progression over time**: a pure-SVG line chart of owned cards per day. One point is recorded per day on each collection change (`history.js`, capped at 365 points). With fewer than two points it shows a "the curve will build over time" message instead of an empty graph.
+  > ⚠️ **The history only starts the day this feature was installed.** Past progress cannot be reconstructed — there is no back-fill — so the curve begins empty and grows from your first change onward.
+- **Highlights**: your **rarest owned card** and the card with the **most total copies**, computed live from the current collection (empty collection shows a friendly placeholder). "Last added" is intentionally not shown — no per-card timestamp is stored.
+- **Rarity chart**: a pure-SVG donut of owned cards by rarity, using the rarity colours from the metadata, with a legend.
 
 ### Multi-season
 - **Season selector** in the header. The listed seasons are **2025** plus any season already present in your `localStorage` (i.e. seasons you have saved data for). Switching season loads the matching `data/cards-<year>.json`.
@@ -57,6 +61,7 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 ### Data & backup
 - **JSON export / import** of the collection (merge or replace on import).
 - **Backup code** (device-to-device, no file, no server): generate a short code (collection compressed with `CompressionStream` and base64url-encoded), copy it, paste it on another device to restore — with the same merge/replace choice as the file import. Codes also work embedded in a link (`…#backup=<code>`). Everything stays client-side.
+- **QR code transfer**: the backup code can also be shown as a **QR code** (encoding the `…#backup=<code>` link). Scan it with the target device to open the app and trigger the restore automatically — no typing, no camera scanner built into the app, no backend. Generated locally with a vendored QR encoder (no CDN). If the collection is too large to fit a reliably-scannable QR, the UI shows a fallback message pointing to the text code or JSON export instead of an unreadable QR.
 - **Backup reminder**: after 30 saved changes or 14 days without a backup, a toast nudges you to export or generate a code.
 - **Offline embedded fallback** (`data-embedded.js`): if the JSON files cannot be fetched, the app boots from data baked into the page.
 
@@ -79,11 +84,12 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 | **Storage** | Browser `localStorage` |
 | **Offline / PWA** | Service Worker (versioned precache, cache-first shell, runtime cache for external assets) + Web App Manifest |
 | **Crypto** | Web Crypto API (SHA-256 for the PIN); `CompressionStream` for backup codes |
+| **QR** | `qrcodegen.js` — vendored QR encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), **MIT**), trimmed to byte-mode + SVG output |
 | **Data** | Static JSON files (+ an embedded JS copy for the offline fallback) |
 | **Fonts** | Google Fonts (Syne, DM Sans, Racing Sans One, Orbitron) |
 | **External assets** | F1/UNO logos (Wikimedia), team logos & driver photos (formula1.com) |
 
-> The only tooling dependency is **esbuild** (a `devDependency` in `package.json`); the app itself ships **no runtime dependencies**.
+> **No npm/CDN runtime dependencies.** The only tooling dependency is **esbuild** (a `devDependency` in `package.json`). One third-party source file is *vendored* into the repo — `qrcodegen.js`, the QR encoder by Project Nayuki (MIT, provenance and licence noted in the file header) — so QR generation works fully offline without pulling anything at runtime.
 
 ---
 
@@ -140,11 +146,13 @@ Then open **http://localhost:8000/** (i.e. `index.html`).
 - Note for maintainers: assets are served **cache-first**, so after changing any shell file, bump `SW_VERSION` in `sw.js` — the new worker re-precaches everything (bypassing the browser HTTP cache, so it always fetches the current files) and drops the old cache on activation.
 - The Service Worker does not register on `file://` (the `'serviceWorker' in navigator` guard skips it) — that's expected; serve over HTTP.
 
-### Move your collection to another device (backup code)
-1. On the source device: **Settings → Backup code → 🔑 Generate**, then **Copy the code**.
-2. Send the code to yourself however you like (it's compressed + base64url, typically a few hundred characters; nothing is uploaded anywhere).
-3. On the target device: **Settings → Restore from code → 📋 Paste a code**, paste, **✓ Restore**, then choose **merge** or **replace** in the dialog (same flow as the JSON file import).
-4. If your collection ever grows too large for a practical code (> 4 000 characters), the UI tells you and points you to the **JSON file export** instead.
+### Move your collection to another device (backup code / QR)
+1. On the source device: **Settings → Backup code → 🔑 Generate**, then either **Copy the code** or **📱 QR code**.
+2. Transfer it:
+   - **By code**: send the text code to yourself (it's compressed + base64url, typically a few hundred characters; nothing is uploaded anywhere) and, on the target device, **Settings → Restore from code → 📋 Paste a code**.
+   - **By QR**: scan the displayed QR with the target device — it opens the app via a `#backup=` link and starts the restore automatically.
+3. Either way, choose **merge** or **replace** in the dialog (same flow as the JSON file import).
+4. If your collection is too large for a practical code (> 4 000 characters) or a reliably-scannable QR, the UI tells you and points you to the **JSON file export** instead.
 
 ### Adding a new season
 1. Create `data/cards-2026.json` with the same structure as `cards-2025.json`.
@@ -172,11 +180,13 @@ F1/
 ├── i18n.js               # Languages, t(), applyLanguage()
 ├── data.js               # Static DB constants + JSON loaders + season switching
 ├── storage.js            # localStorage, collection state, card/rarity helpers, import/export
-├── backup.js             # Backup code: compress/encode, decode/validate, backup reminder
+├── backup.js             # Backup code + QR (compress/encode, decode/validate, #backup= link, reminder)
+├── qrcodegen.js          # Vendored QR encoder (Project Nayuki, MIT) — byte mode + SVG
+├── history.js            # Daily owned-count snapshots for the Stats progression curve
 ├── badges.js             # Badge evaluation/rendering + user titles
-├── stats.js              # updateStats() + renderStats()
+├── stats.js              # updateStats() + renderStats() (incl. progression curve, highlights, donut)
 ├── render.js             # Grid, sidebar, filters, modal, search, views, toast
-├── pin.js                # Auth/PIN, viewer & admin modes, settings screen
+├── pin.js                # Auth/PIN, viewer & admin modes, settings screen (backup + QR UI)
 │
 ├── app.bundle.js         # Generated esbuild bundle (+ app.bundle.js.map)
 ├── package.json          # esbuild build/dev scripts + devDependency
@@ -209,7 +219,7 @@ F1/
 | Version | Keys | Description |
 |---|---|---|
 | v1 | `f1uno_v3`, `f1uno_badges`, `f1uno_auto_badges` | Old format (no season scope) |
-| v2 | `f1uno_owned_2025`, `f1uno_badges_2025`, `f1uno_auto_badges_2025` | Season-scoped format |
+| v2 | `f1uno_owned_2025`, `f1uno_badges_2025`, `f1uno_auto_badges_2025`, `f1uno_history_2025` | Season-scoped format (incl. the Stats progression history) |
 
 Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_title`, `f1uno_version`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), and backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`). Migration v1 → v2 runs automatically on first load.
 
@@ -220,10 +230,10 @@ Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_title`, `f1uno_ver
 The following is **not yet implemented** and is the main remaining work:
 
 ### Optional cloud sync (Supabase / Firebase / Gist / Drive) — *automatic cross-device sync*
-**Why:** the no-backend MVP is done — backup reminder plus a shareable **backup code** to restore on another device (see Features). What's still missing is *automatic* synchronisation: today, moving progress between devices is a manual copy/paste step.
+**Why:** the no-backend MVP is done — backup reminder plus a shareable **backup code / QR** to restore on another device (see Features). What's still missing is *automatic* synchronisation: today, moving progress between devices is a manual step (copy/paste a code or scan a QR).
 **Idea:** an optional, opt-in encrypted backup to the user's own storage (Drive/Dropbox/a gist) or a lightweight backend (Supabase/Firebase). Requires API keys/accounts, so it stays out of the default client-only build.
 
-> Already shipped, not part of the roadmap: ES-module split of the former monolith, `DEBUG`-gated logging, esbuild production bundle, **installable offline PWA** (manifest + service worker), and **device-to-device backup codes**.
+> Already shipped, not part of the roadmap: ES-module split of the former monolith, `DEBUG`-gated logging, esbuild production bundle, **installable offline PWA** (manifest + service worker), **device-to-device backup codes + QR transfer**, and the **enriched Stats view** (progression curve, highlights, rarity donut).
 
 ---
 
