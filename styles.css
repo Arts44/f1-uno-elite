@@ -257,7 +257,10 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0;position:sticky;top:0;z-index:100;box-shadow:var(--sh-sm);}
 .header-inner{display:flex;align-items:center;height:64px;padding:0 12px;gap:8px;position:relative;}
 .header-left{flex:0 0 auto;display:flex;justify-content:center;align-items:center;}
-.header-right{flex:1;display:flex;justify-content:flex-end;align-items:center;gap:6px;min-width:0;}
+/* flex:1 0 auto — grows to keep the badges right-aligned, but NEVER
+   shrinks below its content (children are nowrap/flex-shrink:0):
+   the search field is the only element allowed to shrink. */
+.header-right{flex:1 0 auto;display:flex;justify-content:flex-end;align-items:center;gap:6px;}
 .logo{display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none;}
 .logo-duo{display:flex;align-items:center;gap:0;flex-shrink:0;}
 .logo-f1 img{height:28px;width:auto;display:block;}
@@ -266,7 +269,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .logo-text{font-family:var(--font-d);font-weight:800;font-size:18px;letter-spacing:-0.5px;color:var(--tx1);}
 .logo-sub{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;}
 .search-wrap{flex:1;min-width:0;max-width:320px;height:40px;background:var(--surface2);border:1.5px solid transparent;border-radius:12px;display:flex;align-items:center;padding:0 16px 0 40px;position:relative;}
-.search-input{width:100%;height:100%;background:transparent;border:none;font-family:var(--font-b);font-size:14px;outline:none;transition:var(--ease);}
+.search-input{width:100%;min-width:0;height:100%;background:transparent;border:none;font-family:var(--font-b);font-size:14px;outline:none;transition:var(--ease);}
 .search-wrap:focus-within{background:var(--surface);border-color:var(--red);box-shadow:0 0 0 3px rgba(232,0,45,0.1);}
 .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--tx3);pointer-events:none;}
 .search-dd{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--sh-lg);overflow:hidden;z-index:200;max-height:320px;overflow-y:auto;display:none;}
@@ -287,7 +290,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .stat-pill.champions{background:var(--purple-s);color:var(--purple);border:1px solid var(--purple-m);}
 .header-title{display:flex;align-items:center;gap:4px;flex-shrink:0;white-space:nowrap;}
 .header-title .ht-icon{font-size:14px;}
-.header-title span{font-size:12px;font-weight:600;}
+.header-title span{font-size:12px;font-weight:600;max-width:130px;overflow:hidden;text-overflow:ellipsis;}
 .season-pills{display:flex;gap:4px;flex-shrink:0;}
 .season-pill{padding:4px 8px;border-radius:100px;font-size:10px;font-weight:500;background:var(--surface2);color:var(--tx2);border:1px solid var(--border);cursor:pointer;transition:var(--ease);white-space:nowrap;}
 .season-pill:hover{border-color:var(--red);color:var(--red);}
@@ -1139,16 +1142,28 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .season-pill:hover{background:var(--surface2);color:var(--tx1);}
 .season-pill.active{background:var(--red);color:white;border-color:var(--red);}
 
-/* MOBILE HEADER BREAKPOINT */
+/* MOBILE HEADER BREAKPOINT — nothing may overlap down to 320px:
+   title + season pills hidden, logos shrunk, search padding tightened
+   so the field can shrink to the small remaining space and stay usable. */
 @media(max-width:640px){
   .header-inner{gap:6px;padding:0 8px;}
   .header-left{flex:0 0 auto;}
   .header-right{gap:4px;}
-  .search-wrap{max-width:200px;}
-  .header-title{display:none;}
-  .season-pills{display:none;}
+  .search-wrap{max-width:200px;padding:0 10px 0 30px;}
+  .search-wrap .search-icon{left:8px;}
+  .logo-f1 img,.logo-uno img{height:20px;}
+  .logo-x{margin:0 2px;font-size:12px;}
+  /* .header prefix: outranks the later duplicate .header-title
+     rule (same specificity, later source order) further down */
+  .header .header-title{display:none;}
+  .header .season-pills{display:none;}
   .stat-pill{padding:4px 8px;font-size:10px;}
   .sidebar-toggle-btn{width:36px;height:36px;}
+}
+/* Very narrow screens: drop the informational count pill so the
+   search field keeps a usable width (~120px at 320px viewport). */
+@media(max-width:400px){
+  .header .stat-pill.displayed{display:none;}
 }
 
 /* RETIRED BADGE */
