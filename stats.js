@@ -2,11 +2,12 @@
    STATS — live header/counter updates + stats view rendering
    ══════════════════════════════════════════════════════════ */
 import { t } from './i18n.js';
-import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, TEAM_COLORS, AUTO_BADGES } from './data.js';
+import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES } from './data.js';
 import {
   getTypeData, cardOwned, cardWishlist, cardDoubles, cardMissing, cardFavorite,
-  cardRarity, variantRarity
+  cardRarity, variantRarity, cardTotalQty
 } from './storage.js';
+import { getHistory } from './history.js';
 import { loadManualBadges, isAutoBadgeUnlocked, manualBadges, renderBadges, updateUserTitle } from './badges.js';
 import { currentView } from './render.js';
 
@@ -211,6 +212,88 @@ export function renderStats(){
     return svRow(`<span style="color:${rar.color}">★</span>`, `<span style="color:${rar.color}">${t('rar.'+rKey)}</span>`, ownedAtRar, reachable, rarPct);
   }).join('');
 
+  // — Cartes phares (highlights) — computed from current data only.
+  // "Last added card" is deliberately omitted: no per-card timestamp
+  // is stored, and we don't invent data.
+  const ownedCards = CARDS_DB.filter(c=>cardOwned(c.id));
+  let featuredHtml;
+  if(ownedCards.length === 0){
+    featuredHtml = `<div class="sv-empty-note">${t('st.empty_coll')}</div>`;
+  } else {
+    const rarest = ownedCards.reduce((b,c)=> (RARITY_ORDER[cardRarity(c)]||0) > (RARITY_ORDER[cardRarity(b)]||0) ? c : b);
+    const most = ownedCards.reduce((b,c)=> cardTotalQty(c.id) > cardTotalQty(b.id) ? c : b);
+    const rr = RARITIES[cardRarity(rarest)]||{};
+    featuredHtml = `<div class="sv-feat-grid">
+      <div class="sv-feat-card">
+        <div class="sv-feat-label">${t('st.feat_rarest')}</div>
+        <div class="sv-feat-name">${CATS[rarest.category]?.emoji||'🃏'} #${rarest.id} ${rarest.name}</div>
+        <div class="sv-feat-sub" style="color:${rr.color||'var(--tx2)'}">${t('rar.'+cardRarity(rarest))} ${'★'.repeat(rr.stars||1)}</div>
+      </div>
+      <div class="sv-feat-card">
+        <div class="sv-feat-label">${t('st.feat_most_copies')}</div>
+        <div class="sv-feat-name">${CATS[most.category]?.emoji||'🃏'} #${most.id} ${most.name}</div>
+        <div class="sv-feat-sub">📦 ×${cardTotalQty(most.id)}</div>
+      </div>
+    </div>`;
+  }
+
+  // — Donut SVG: owned cards by rarity (colors from RARITIES metadata) —
+  const donutData = RARITY_KEYS
+    .map(k => ({k, n: ownedCards.filter(c=>cardRarity(c)===k).length, color:(RARITIES[k]||{}).color||'#888'}))
+    .filter(d => d.n > 0);
+  let donutHtml = '';
+  if(donutData.length){
+    const R = 40, C = 2*Math.PI*R;
+    let offset = 0;
+    const segs = donutData.map(d => {
+      const len = d.n/ownedCards.length*C;
+      const s = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${d.color}" stroke-width="16" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
+      offset += len;
+      return s;
+    }).join('');
+    const legend = donutData.map(d =>
+      `<div class="sv-leg-item"><span class="sv-leg-dot" style="background:${d.color}"></span>${t('rar.'+d.k)}<span class="sv-leg-n">${d.n}</span></div>`
+    ).join('');
+    donutHtml = `<div class="sv-donut-row">
+      <svg class="sv-donut" viewBox="0 0 120 120" role="img" aria-label="${t('st.chart_rarity')}">
+        ${segs}
+        <text x="60" y="57" text-anchor="middle" class="sv-donut-big">${ownedCards.length}</text>
+        <text x="60" y="72" text-anchor="middle" class="sv-donut-small">${t('st.history_owned')}</text>
+      </svg>
+      <div class="sv-legend">${legend}</div>
+    </div>`;
+  }
+
+  // — Progression curve (data recorded by history.js on each save;
+  //   read-only here, no computation in this hot path) —
+  const hist = getHistory();
+  let histHtml;
+  if(hist.length < 2){
+    histHtml = `<div class="sv-empty-note">${t('st.history_empty')}</div>`;
+  } else {
+    const W=600, H=200, PL=34, PR=12, PT=14, PB=26;
+    const t0 = new Date(hist[0].date).getTime();
+    const t1 = new Date(hist[hist.length-1].date).getTime();
+    const span = Math.max(1, t1 - t0);
+    const maxY = Math.max(1, ...hist.map(p=>p.owned));
+    const px = p => PL + (new Date(p.date).getTime()-t0)/span*(W-PL-PR);
+    const py = p => PT + (1 - p.owned/maxY)*(H-PT-PB);
+    const pts = hist.map(p=>`${px(p).toFixed(1)},${py(p).toFixed(1)}`).join(' ');
+    const lastP = hist[hist.length-1];
+    histHtml = `<svg class="sv-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${t('st.history')}">
+      <line x1="${PL}" y1="${PT}" x2="${W-PR}" y2="${PT}" class="sv-grid"/>
+      <line x1="${PL}" y1="${H-PB}" x2="${W-PR}" y2="${H-PB}" class="sv-axis"/>
+      <polygon points="${PL},${H-PB} ${pts} ${W-PR},${H-PB}" class="sv-area"/>
+      <polyline points="${pts}" class="sv-line"/>
+      <circle cx="${px(lastP).toFixed(1)}" cy="${py(lastP).toFixed(1)}" r="4" class="sv-dot"/>
+      <text x="${PL-6}" y="${PT+4}" text-anchor="end" class="sv-axis-label">${maxY}</text>
+      <text x="${PL-6}" y="${H-PB+4}" text-anchor="end" class="sv-axis-label">0</text>
+      <text x="${PL}" y="${H-8}" class="sv-axis-label">${hist[0].date.slice(5)}</text>
+      <text x="${W-PR}" y="${H-8}" text-anchor="end" class="sv-axis-label">${lastP.date.slice(5)}</text>
+    </svg>`;
+  }
+  histHtml += `<div class="sv-note">${t('st.history_note')}</div>`;
+
   el.innerHTML = `
     <div class="sv-title">${t('st.title')}</div>
 
@@ -235,9 +318,16 @@ export function renderStats(){
       <div class="sv-card exemplaires"><div class="sv-card-value">${totalExemplaires}</div><div class="sv-card-label">${t('st.copies')}</div></div>
     </div>
 
+    <div class="sv-section-title">${t('st.featured')}</div>
+    ${featuredHtml}
+
     ${catRows   ? `<div class="sv-section-title">${t('st.by_cat')}</div><div class="sv-rows-block">${catRows}</div>`:''}
     ${typeRows  ? `<div class="sv-section-title">${t('st.by_type')}</div><div class="sv-rows-block">${typeRows}</div>`:''}
     ${teamRows  ? `<div class="sv-section-title">${t('st.by_team')}</div><div class="sv-rows-block">${teamRows}</div>`:''}
     ${rarityRows? `<div class="sv-section-title">${t('st.by_rarity')}</div><div class="sv-rows-block">${rarityRows}</div>`:''}
+    ${donutHtml ? `<div class="sv-section-title">${t('st.chart_rarity')}</div>${donutHtml}`:''}
+
+    <div class="sv-section-title">${t('st.history')}</div>
+    ${histHtml}
   `;
 }

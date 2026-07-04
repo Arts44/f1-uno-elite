@@ -16,6 +16,7 @@ import {
   setManualBadges, setAutoBadgeUnlocked, saveManualBadges
 } from './badges.js';
 import { noteChange, markBackupDone } from './backup.js';
+import { recordHistoryPoint } from './history.js';
 
 /* ── Versioning & season-scoped keys ── */
 const STORAGE_VERSION = 2;
@@ -74,7 +75,8 @@ export function loadData(){
 }
 export function saveData(){
   localStorage.setItem(_storageKey('owned'), JSON.stringify(coll));
-  noteChange(); // backup reminder bookkeeping (backup.js)
+  noteChange();         // backup reminder bookkeeping (backup.js)
+  recordHistoryPoint(); // daily progression snapshot (history.js)
 }
 
 export function getTypeData(cardId, typeId){
