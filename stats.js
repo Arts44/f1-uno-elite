@@ -1,0 +1,243 @@
+/* ══════════════════════════════════════════════════════════
+   STATS — live header/counter updates + stats view rendering
+   ══════════════════════════════════════════════════════════ */
+import { t } from './i18n.js';
+import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, TEAM_COLORS, AUTO_BADGES } from './data.js';
+import {
+  getTypeData, cardOwned, cardWishlist, cardDoubles, cardMissing, cardFavorite,
+  cardRarity, variantRarity
+} from './storage.js';
+import { loadManualBadges, isAutoBadgeUnlocked, manualBadges, renderBadges, updateUserTitle } from './badges.js';
+import { currentView } from './render.js';
+
+export function updateStats(){
+  const total=CARDS_DB.length;
+  const owned=CARDS_DB.filter(c=>cardOwned(c.id)).length;
+  const wish=CARDS_DB.filter(c=>cardWishlist(c.id)).length;
+  const doubles=CARDS_DB.filter(c=>cardDoubles(c.id)).length;
+  const missing=CARDS_DB.filter(c=>cardMissing(c.id)).length;
+  const fav=CARDS_DB.filter(c=>cardFavorite(c.id)).length;
+
+  // Calcul du total d'exemplaires (toutes les quantités de tous les types)
+  let totalExemplaires = 0;
+  CARDS_DB.forEach(card => {
+    card.types.forEach(typeId => {
+      const d = getTypeData(card.id, typeId);
+      if (d.owned && d.qty > 0) {
+        totalExemplaires += d.qty;
+      }
+    });
+  });
+
+  // Vérifications de sécurité avant de modifier le DOM
+  const statOwned = document.getElementById('statOwned');
+  if (statOwned) statOwned.textContent=`✓ ${owned} / ${total}`;
+
+  // Mettre à jour la stat possédées dans le header
+  const ownedCount = document.getElementById('ownedCount');
+  if (ownedCount) ownedCount.textContent=`${owned} possédées`;
+
+  const statWish = document.getElementById('statWish');
+  if (statWish) statWish.textContent=`♡ ${wish} wishlist`;
+
+  const statExemplaires = document.getElementById('statExemplaires');
+  if (statExemplaires) statExemplaires.textContent=`📦 ${totalExemplaires} exemplaires`;
+
+  const pct=Math.round((owned/total)*100);
+  const statTotal = document.getElementById('statTotal');
+  if (statTotal) statTotal.textContent=`${pct}%`;
+
+  const cAll = document.getElementById('cAll');
+  if (cAll) cAll.textContent=total;
+
+  const cOwned = document.getElementById('cOwned');
+  if (cOwned) cOwned.textContent=owned;
+
+  const cWish = document.getElementById('cWish');
+  if (cWish) cWish.textContent=wish;
+
+  const cDouble = document.getElementById('cDouble');
+  if (cDouble) cDouble.textContent=doubles;
+
+  const cMissing = document.getElementById('cMissing');
+  if (cMissing) cMissing.textContent=missing;
+
+  const cFav = document.getElementById('cFav');
+  if (cFav) cFav.textContent=fav;
+
+  const progBar = document.getElementById('progBar');
+  if (progBar) progBar.style.width=pct+'%';
+
+  const progTxt = document.getElementById('progTxt');
+  if (progTxt) progTxt.textContent=`${owned} / ${total} cartes`;
+
+  const progPct = document.getElementById('progPct');
+  if (progPct) progPct.textContent=`${pct}%`;
+
+  // Mettre à jour les stats du header
+  const wishCount = document.getElementById('wishCount');
+  if (wishCount) wishCount.textContent=`${wish} wishlist`;
+
+  const totalQty = document.getElementById('totalQty');
+  if (totalQty) totalQty.textContent=`${totalExemplaires} exemplaires`;
+
+  const champFilter = document.getElementById('champFilter');
+  if (champFilter) {
+    const champCount = CARDS_DB.filter(c=>c.champion).length;
+    champFilter.textContent=`🏆 ${champCount} Champions`;
+  }
+
+  // Update badge tab count
+  loadManualBadges();
+  let autoUnlocked = 0;
+  AUTO_BADGES.forEach(b => { if(isAutoBadgeUnlocked(b)) autoUnlocked++; });
+  let manualUnlocked = Object.values(manualBadges).filter(v=>v).length;
+  const badgeCountTab = document.getElementById('badgeCountTab');
+  if(badgeCountTab) badgeCountTab.textContent = `${autoUnlocked+manualUnlocked}/50`;
+  // Refresh active views
+  if(currentView === 'badges') renderBadges();
+  if(currentView === 'stats') renderStats();
+  updateUserTitle();
+}
+
+export function renderStats(){
+  const el = document.getElementById('statsView');
+  if(!el) return;
+
+  // — Générales —
+  const total = CARDS_DB.length;
+  const owned = CARDS_DB.filter(c=>cardOwned(c.id)).length;
+  const wish  = CARDS_DB.filter(c=>cardWishlist(c.id)).length;
+  const doubles = CARDS_DB.filter(c=>cardDoubles(c.id)).length;
+  const missing = CARDS_DB.filter(c=>cardMissing(c.id)).length;
+  const fav = CARDS_DB.filter(c=>cardFavorite(c.id)).length;
+  const champions = CARDS_DB.filter(c=>c.champion).length;
+  const champOwned = CARDS_DB.filter(c=>c.champion && cardOwned(c.id)).length;
+  let totalExemplaires = 0;
+  CARDS_DB.forEach(card => card.types.forEach(typeId => {
+    const d = getTypeData(card.id, typeId);
+    if(d.owned && d.qty > 0) totalExemplaires += d.qty;
+  }));
+  const pct = total > 0 ? Math.round((owned/total)*100) : 0;
+
+  function pctColor(p){
+    // red (hue 0) → orange (hue 25) → green (hue 120), interpolated via HSL
+    const hue = Math.round(p * 1.2); // 0%→0 (red), 50%→60 (yellow), 100%→120 (green)
+    return `hsl(${hue},80%,48%)`;
+  }
+
+  function svRow(icon, name, n, tot, pct){
+    const full = pct === 100;
+    const fillClass = full ? 'sv-mini-fill sv-mini-fill-full' : 'sv-mini-fill';
+    const fillStyle = full ? '' : `background:${pctColor(pct)}`;
+    return `<div class="sv-row${full?' sv-row-full':''}">
+      <div class="sv-row-left"><span class="sv-row-icon">${icon}</span><span class="sv-row-name">${name}</span></div>
+      <div class="sv-row-right">
+        <span class="sv-row-count">${n}<span class="sv-row-total">/${tot}</span></span>
+        <div class="sv-mini-bar"><div class="${fillClass}" style="width:${pct}%;${fillStyle}"></div></div>
+        <span class="sv-full-check">${full?'✓':''}</span>
+      </div>
+    </div>`;
+  }
+
+  // — Par catégorie (+ Champions) —
+  const catIds = Object.keys(CATS);
+  const catRowsArr = catIds.map(catId => {
+    const cat = CATS[catId];
+    const catCards = CARDS_DB.filter(c=>c.category===catId);
+    if(catCards.length === 0) return '';
+    const catOwned = catCards.filter(c=>cardOwned(c.id)).length;
+    return svRow(cat.emoji, t('cat.'+catId), catOwned, catCards.length, Math.round((catOwned/catCards.length)*100));
+  });
+  const champPct = champions > 0 ? Math.round((champOwned/champions)*100) : 0;
+  catRowsArr.push(svRow('🏆', t('st.champions'), champOwned, champions, champPct));
+  const catRows = catRowsArr.join('');
+
+  // — Par type de carte —
+  const typeIds = Object.keys(CARD_TYPES);
+  const typeRows = typeIds.map(typeId => {
+    const ct = CARD_TYPES[typeId];
+    const cardsWithType = CARDS_DB.filter(c=>c.types.includes(typeId));
+    if(cardsWithType.length === 0) return '';
+    const ownedWithType = cardsWithType.filter(c=>{
+      const d = getTypeData(c.id, typeId);
+      return d.owned && (d.qty||0) > 0;
+    }).length;
+    const typePct = Math.round((ownedWithType/cardsWithType.length)*100);
+    // Use vivid mid-gradient color matching the card visual, not the dark metadata color
+    const TYPE_VIVID = {
+      blue:'#1a5fb4', green:'#1e7a35', red:'#cc0000', yellow:'#f5c000',
+      blue_foil:'#4a90d9', green_foil:'#2ecc71', red_foil:'#ff4d4d', yellow_foil:'#ffd000',
+      blue_red_foil:'linear-gradient(135deg,#4a90d9,#cc2233)',
+      green_yellow_foil:'linear-gradient(135deg,#2ecc71,#ffd700)',
+      wild_foil:'conic-gradient(from 0deg,#1e50dc,#14a032,#dc0000,#ffd000,#1e50dc)',
+      nitro_foil:'linear-gradient(135deg,#9B3DFF,#1e50dc,#14a032,#dc0000)',
+      promo_blue:'#0099ff', promo_green:'#00e676', promo_red:'#ff2d55', promo_yellow:'#ffe000'
+    };
+    const bgStyle = TYPE_VIVID[typeId] || ct.color;
+    const isGradient = bgStyle.includes('gradient');
+    const dotStyle = isGradient ? `background:${bgStyle}` : `background:${bgStyle}`;
+    const icon = `<span class="sv-type-dot${ct.foil?' sv-type-dot-foil':''}" style="${dotStyle}"></span>`;
+    return svRow(icon, t('type.'+typeId)||ct.label, ownedWithType, cardsWithType.length, typePct);
+  }).join('');
+
+  // — Par équipe —
+  const TEAM_SHORT = {
+    'Oracle Red Bull Racing':'Red Bull','Scuderia Ferrari HP':'Ferrari','McLaren F1':'McLaren',
+    'Mercedes-AMG Petronas Formula One Team':'Mercedes','Aston Martin Aramco Formula One Team':'Aston Martin',
+    'BWT Alpine F1 Team':'Alpine','MoneyGram Haas F1 Team':'Haas',
+    'Visa Cash App RB Formula One':'RB','Atlassian Williams Racing':'Williams',
+    'Stake F1 Team KICK Sauber':'Sauber'
+  };
+  const teams = [...new Set(CARDS_DB.map(c=>c.team).filter(Boolean))].sort();
+  const teamRows = teams.map(team => {
+    const teamCards = CARDS_DB.filter(c=>c.team===team);
+    if(teamCards.length === 0) return '';
+    const teamOwned = teamCards.filter(c=>cardOwned(c.id)).length;
+    const teamPct = Math.round((teamOwned/teamCards.length)*100);
+    const color = (TEAM_COLORS&&TEAM_COLORS[team]) || 'var(--red)';
+    const dot = `<span class="sv-team-dot" style="background:${color}"></span>`;
+    return svRow(dot, TEAM_SHORT[team]||team, teamOwned, teamCards.length, teamPct);
+  }).join('');
+
+  // — Par rareté —
+  const rarityRows = RARITY_KEYS.map(rKey => {
+    const rar = RARITIES[rKey];
+    if(!rar) return '';
+    const ownedAtRar = CARDS_DB.filter(c => cardOwned(c.id) && cardRarity(c) === rKey).length;
+    const reachable = CARDS_DB.filter(c => c.types.some(t => variantRarity(c,t) === rKey)).length;
+    if(reachable === 0) return '';
+    const rarPct = Math.round((ownedAtRar/reachable)*100);
+    return svRow(`<span style="color:${rar.color}">★</span>`, `<span style="color:${rar.color}">${t('rar.'+rKey)}</span>`, ownedAtRar, reachable, rarPct);
+  }).join('');
+
+  el.innerHTML = `
+    <div class="sv-title">${t('st.title')}</div>
+
+    <div class="sv-progress${pct===100?' sv-progress-full':''}">
+      <div class="sv-prog-hero">
+        <div class="sv-prog-pct-big">${pct}%</div>
+        <div class="sv-prog-text">
+          <div class="sv-prog-title">${pct===100?t('st.complete'):t('st.progress')}</div>
+          <div class="sv-prog-sub">${t('st.sub',{owned,total})}</div>
+        </div>
+      </div>
+      <div class="sv-prog-bar"><div class="sv-prog-fill${pct===100?' sv-prog-fill-full':''}" style="width:${pct}%"></div></div>
+    </div>
+
+    <div class="sv-section-title">${t('st.general')}</div>
+    <div class="sv-cards">
+      <div class="sv-card owned"><div class="sv-card-value">${owned}<span class="sv-card-total">/${total}</span></div><div class="sv-card-label">${t('st.owned')}</div></div>
+      <div class="sv-card wish"><div class="sv-card-value">${wish}</div><div class="sv-card-label">${t('st.wish')}</div></div>
+      <div class="sv-card doubles"><div class="sv-card-value">${doubles}</div><div class="sv-card-label">${t('st.doubles')}</div></div>
+      <div class="sv-card missing"><div class="sv-card-value">${missing}</div><div class="sv-card-label">${t('st.missing')}</div></div>
+      <div class="sv-card fav"><div class="sv-card-value">${fav}</div><div class="sv-card-label">${t('st.fav')}</div></div>
+      <div class="sv-card exemplaires"><div class="sv-card-value">${totalExemplaires}</div><div class="sv-card-label">${t('st.copies')}</div></div>
+    </div>
+
+    ${catRows   ? `<div class="sv-section-title">${t('st.by_cat')}</div><div class="sv-rows-block">${catRows}</div>`:''}
+    ${typeRows  ? `<div class="sv-section-title">${t('st.by_type')}</div><div class="sv-rows-block">${typeRows}</div>`:''}
+    ${teamRows  ? `<div class="sv-section-title">${t('st.by_team')}</div><div class="sv-rows-block">${teamRows}</div>`:''}
+    ${rarityRows? `<div class="sv-section-title">${t('st.by_rarity')}</div><div class="sv-rows-block">${rarityRows}</div>`:''}
+  `;
+}
