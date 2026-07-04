@@ -255,9 +255,9 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 
 /* HEADER */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0;position:sticky;top:0;z-index:100;box-shadow:var(--sh-sm);}
-.header-inner{display:flex;align-items:center;height:64px;padding:0 12px;gap:0;position:relative;}
-.header-left{flex:1;display:flex;justify-content:center;align-items:center;}
-.header-right{flex:1;display:flex;justify-content:center;align-items:center;gap:6px;}
+.header-inner{display:flex;align-items:center;height:64px;padding:0 12px;gap:8px;position:relative;}
+.header-left{flex:0 0 auto;display:flex;justify-content:center;align-items:center;}
+.header-right{flex:1;display:flex;justify-content:flex-end;align-items:center;gap:6px;min-width:0;}
 .logo{display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none;}
 .logo-duo{display:flex;align-items:center;gap:0;flex-shrink:0;}
 .logo-f1 img{height:28px;width:auto;display:block;}
@@ -265,9 +265,9 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .logo-uno img{height:28px;width:auto;display:block;}
 .logo-text{font-family:var(--font-d);font-weight:800;font-size:18px;letter-spacing:-0.5px;color:var(--tx1);}
 .logo-sub{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;}
-.search-wrap{position:absolute;left:50%;transform:translateX(-50%);width:320px;max-width:calc(100% - 320px);}
-.search-input{width:100%;height:40px;background:var(--surface2);border:1.5px solid transparent;border-radius:12px;padding:0 16px 0 40px;font-family:var(--font-b);font-size:14px;outline:none;transition:var(--ease);}
-.search-input:focus{background:var(--surface);border-color:var(--red);box-shadow:0 0 0 3px rgba(232,0,45,0.1);}
+.search-wrap{flex:1;min-width:0;max-width:320px;height:40px;background:var(--surface2);border:1.5px solid transparent;border-radius:12px;display:flex;align-items:center;padding:0 16px 0 40px;position:relative;}
+.search-input{width:100%;height:100%;background:transparent;border:none;font-family:var(--font-b);font-size:14px;outline:none;transition:var(--ease);}
+.search-wrap:focus-within{background:var(--surface);border-color:var(--red);box-shadow:0 0 0 3px rgba(232,0,45,0.1);}
 .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--tx3);pointer-events:none;}
 .search-dd{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--sh-lg);overflow:hidden;z-index:200;max-height:320px;overflow-y:auto;display:none;}
 .search-dd.open{display:block;}
@@ -278,13 +278,20 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sr-name{font-size:13px;font-weight:500;flex:1;}
 .sr-sub{font-size:11px;color:var(--tx3);}
 .header-stats{display:flex;gap:8px;flex-shrink:0;}
-.stat-pill{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:100px;font-size:11px;font-weight:500;transition:var(--ease);}
+.stat-pill{display:flex;align-items:center;gap:5px;padding:6px 10px;border-radius:100px;font-size:11px;font-weight:500;transition:var(--ease);flex-shrink:0;white-space:nowrap;}
 .stat-pill.owned{background:var(--green-s);color:var(--green);border:1px solid var(--green-m);}
 .stat-pill.wish{background:var(--orange-s);color:var(--orange);border:1px solid var(--orange-m);}
 .stat-pill.exemplaires{background:var(--blue-s);color:var(--blue);border:1px solid var(--blue-m);}
 .stat-pill.total{background:var(--surface2);color:var(--tx2);border:1px solid var(--border);}
 .stat-pill.displayed{background:var(--red-s);color:var(--red);border:1px solid var(--red-m);font-weight:600;}
 .stat-pill.champions{background:var(--purple-s);color:var(--purple);border:1px solid var(--purple-m);}
+.header-title{display:flex;align-items:center;gap:4px;flex-shrink:0;white-space:nowrap;}
+.header-title .ht-icon{font-size:14px;}
+.header-title span{font-size:12px;font-weight:600;}
+.season-pills{display:flex;gap:4px;flex-shrink:0;}
+.season-pill{padding:4px 8px;border-radius:100px;font-size:10px;font-weight:500;background:var(--surface2);color:var(--tx2);border:1px solid var(--border);cursor:pointer;transition:var(--ease);white-space:nowrap;}
+.season-pill:hover{border-color:var(--red);color:var(--red);}
+.season-pill.active{background:var(--red-s);color:var(--red);border-color:var(--red-m);}
 .header-lock {
   background: none;
   border: 1px solid var(--border);
@@ -1127,10 +1134,22 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .setv-toggle.on::after{transform:translateX(20px);}
 
 /* SEASON PILLS */
-.season-pills{display:flex;gap:4px;margin-left:8px;align-items:center;}
-.season-pill{padding:4px 12px;border-radius:100px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-b);font-size:11px;font-weight:700;color:var(--tx2);cursor:pointer;transition:var(--ease);letter-spacing:0.5px;}
+.season-pills{display:flex;gap:4px;align-items:center;}
+.season-pill{padding:4px 12px;border-radius:100px;border:1.5px solid var(--border);background:transparent;font-family:var(--font-b);font-size:11px;font-weight:700;color:var(--tx2);cursor:pointer;transition:var(--ease);letter-spacing:0.5px;white-space:nowrap;}
 .season-pill:hover{background:var(--surface2);color:var(--tx1);}
 .season-pill.active{background:var(--red);color:white;border-color:var(--red);}
+
+/* MOBILE HEADER BREAKPOINT */
+@media(max-width:640px){
+  .header-inner{gap:6px;padding:0 8px;}
+  .header-left{flex:0 0 auto;}
+  .header-right{gap:4px;}
+  .search-wrap{max-width:200px;}
+  .header-title{display:none;}
+  .season-pills{display:none;}
+  .stat-pill{padding:4px 8px;font-size:10px;}
+  .sidebar-toggle-btn{width:36px;height:36px;}
+}
 
 /* RETIRED BADGE */
 .retired-badge{display:inline-block;font-size:8px;font-weight:800;letter-spacing:0.5px;padding:1px 5px;border-radius:4px;background:rgba(139,0,0,0.15);color:#8b0000;margin-left:4px;vertical-align:middle;text-transform:uppercase;font-family:var(--font-b);}
