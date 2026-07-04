@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "build": "esbuild app.js --bundle --format=iife --outfile=app.bundle.js --global-name=F1App --minify --sourcemap",
+    "dev": "esbuild app.js --bundle --format=iife --outfile=app.bundle.js --global-name=F1App --sourcemap --watch"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
+  }
+}

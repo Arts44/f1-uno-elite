@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="app.title">F1 UNO Élite — Collection</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#E8002D">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=Racing+Sans+One&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script>(function(){try{var t=localStorage.getItem('f1uno_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+</head>
+<body>
+<!-- LOGIN SCREEN -->
+<div id="login-screen" role="dialog" aria-label="" data-i18n-aria="login.screen" aria-modal="true">
+  <div class="login-box">
+    <div class="login-duo">
+      <div class="login-f1"><img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" alt="Logo F1"></div>
+      <span class="login-x" aria-hidden="true">×</span>
+      <div class="login-uno"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="Logo UNO"></div>
+    </div>
+    <button class="theme-switch" id="loginThemeSwitch" type="button" aria-label="" data-i18n-aria="theme.toggle" data-action="toggleTheme">
+      <span class="theme-icon" id="loginThemeIcon" aria-hidden="true">🌙</span>
+    </button>
+    <label class="pin-label" for="pin-keypad" data-i18n="login.pin">PIN Code</label>
+    <div class="pin-dots" id="pin-dots" role="status" aria-live="polite" aria-label="" data-i18n-aria="login.pin_input">
+      <div class="pin-dot" id="dot-0" aria-hidden="true"></div>
+      <div class="pin-dot" id="dot-1" aria-hidden="true"></div>
+      <div class="pin-dot" id="dot-2" aria-hidden="true"></div>
+      <div class="pin-dot" id="dot-3" aria-hidden="true"></div>
+    </div>
+    <div class="pin-keypad" id="pin-keypad" role="group" aria-label="Clavier numérique">
+      <button class="pin-key" data-digit="1" type="button">1</button>
+      <button class="pin-key" data-digit="2" type="button">2</button>
+      <button class="pin-key" data-digit="3" type="button">3</button>
+      <button class="pin-key" data-digit="4" type="button">4</button>
+      <button class="pin-key" data-digit="5" type="button">5</button>
+      <button class="pin-key" data-digit="6" type="button">6</button>
+      <button class="pin-key" data-digit="7" type="button">7</button>
+      <button class="pin-key" data-digit="8" type="button">8</button>
+      <button class="pin-key" data-digit="9" type="button">9</button>
+      <button class="pin-key del" data-action="pinDel" type="button" aria-label="" data-i18n-aria="login.delete">⌫</button>
+      <button class="pin-key zero" data-digit="0" type="button">0</button>
+    </div>
+    <div class="pin-error-msg" id="pin-error" role="alert" aria-live="assertive"></div>
+    <button class="viewer-browse-btn" id="viewerBrowseBtn" type="button" style="display:none" data-i18n="login.browse">👁 Parcourir</button>
+  </div>
+</div>
+<input type="file" id="importFileInput" accept=".json" style="display:none">
+
+<div class="bga bga1" aria-hidden="true"></div><div class="bga bga2" aria-hidden="true"></div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+<!-- FLOATING SIDEBAR -->
+<nav class="floating-sidebar" id="floating-sidebar" role="navigation" aria-label="Filtres de collection">
+  <div class="sidebar-header">
+    <div class="sidebar-title" data-i18n="filter.title">🎯 Filters &amp; Sort</div>
+    <button class="sidebar-close" id="sidebarClose" type="button" aria-label="" data-i18n-aria="filter.close">✕</button>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-title" data-i18n="filter.search_title">🔍 Search</div>
+    <div class="sidebar-search-wrap">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input type="search" class="search-input" id="sidebarSearchInput" placeholder="Search a card..." aria-label="Search a card" data-i18n-placeholder="filter.search">
+    </div>
+  </div>
+
+  <!-- STATUS FILTERS -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-header">
+      <div class="sidebar-section-title" data-i18n="filter.status">📊 Status</div>
+      <button class="sidebar-toggle-btn-small" data-action="toggleSection" data-section="status" id="status-toggle" type="button">▶</button>
+    </div>
+    <div class="filter-pills" id="sidebarStatusPills" role="group"></div>
+  </div>
+
+  <!-- CATEGORY FILTERS -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-header">
+      <div class="sidebar-section-title" data-i18n="filter.cat">🏁 Category</div>
+      <button class="sidebar-toggle-btn-small" data-action="toggleSection" data-section="categories" id="categories-toggle" type="button">▼</button>
+    </div>
+    <div class="filter-pills" id="sidebarCatPills" role="group"></div>
+  </div>
+
+  <!-- TYPE FILTERS -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-header">
+      <div class="sidebar-section-title" data-i18n="filter.type">🎴 Card type</div>
+      <button class="sidebar-toggle-btn-small" data-action="toggleSection" data-section="types" id="types-toggle" type="button">▼</button>
+    </div>
+    <div class="filter-pills" id="sidebarTypePills" role="group"></div>
+  </div>
+
+  <!-- RARITY FILTERS -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-header">
+      <div class="sidebar-section-title" data-i18n="filter.rarity">⭐ Rarity</div>
+      <button class="sidebar-toggle-btn-small" data-action="toggleSection" data-section="rarities" id="rarities-toggle" type="button">▼</button>
+    </div>
+    <div class="filter-pills" id="sidebarRarPills" role="group"></div>
+  </div>
+
+  <!-- YEAR FILTER -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-header">
+      <div class="sidebar-section-title" data-i18n="filter.year">📅 Year</div>
+      <button class="sidebar-toggle-btn-small" data-action="toggleSection" data-section="year" id="year-toggle" type="button">▶</button>
+    </div>
+    <div class="filter-pills" id="sidebarYearPills" role="group"></div>
+  </div>
+
+  <!-- SORT OPTIONS -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-title" data-i18n="filter.sort">📋 Sort</div>
+    <label for="sidebarSortSel" class="sr-only">Sort by</label>
+    <select class="sort-sel" id="sidebarSortSel">
+      <option value="number" data-i18n="sort.num">Card #</option>
+      <option value="name" data-i18n="sort.name">Name</option>
+      <option value="rarity_desc" data-i18n="sort.rar_desc">Rarity ↓</option>
+      <option value="rarity_asc" data-i18n="sort.rar_asc">Rarity ↑</option>
+      <option value="category" data-i18n="sort.cat">Category</option>
+    </select>
+  </div>
+
+  <!-- FAVORITES TOGGLE -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-title" data-i18n="filter.fav">❤️ Favorites</div>
+    <button id="sidebarFavToggleBtn" class="sidebar-action-btn" data-action="toggleFavoriteFirst" type="button" aria-pressed="false">
+      <span aria-hidden="true">❤️ <span data-i18n="filter.pin">Pin</span></span>
+      <span id="sidebarFavToggleState" data-i18n="fav.off">Off</span>
+    </button>
+  </div>
+
+  <!-- CHAMPIONS TOGGLE -->
+  <div class="sidebar-section">
+    <div class="sidebar-section-title" data-i18n="filter.champs">🏆 Champions</div>
+    <button class="sidebar-action-btn" id="sidebarChampFilter" data-action="toggleChampionFilter" type="button" aria-pressed="false">
+      <span aria-hidden="true">🏆 <span data-i18n="filter.pin">Pin</span></span><span id="sidebarChampState" data-i18n="fav.off">Off</span>
+    </button>
+  </div>
+
+  <!-- RESET BUTTON -->
+  <div class="sidebar-section">
+    <button class="reset-btn" data-action="resetFilters" type="button" data-i18n="filter.reset">↺ Reset</button>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<header class="header" role="banner">
+  <div class="header-inner">
+    <button class="sidebar-toggle-btn" id="sidebar-toggle" type="button" aria-label="" data-i18n-aria="filter.open" aria-expanded="false">☰</button>
+    <div class="header-left">
+      <a class="logo" href="#" aria-label="" data-i18n-aria="app.home">
+        <div class="logo-duo">
+          <div class="logo-f1"><img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" alt="Logo F1"></div>
+          <span class="logo-x" aria-hidden="true">×</span>
+          <div class="logo-uno"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="Logo UNO"></div>
+        </div>
+      </a>
+    </div>
+    <div class="search-wrap" role="search">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input type="search" class="search-input" id="searchInput" placeholder="" data-i18n-placeholder="header.search" aria-label="" data-i18n-aria="header.search_aria" autocomplete="off">
+      <div class="search-dd" id="searchDD" role="listbox" aria-label="" data-i18n-aria="header.search_results"></div>
+    </div>
+    <div class="header-right">
+      <div class="header-title" id="headerTitle"></div>
+      <div class="season-pills" id="seasonPills" role="tablist" aria-label="Sélection de saison"></div>
+      <div class="stat-pill displayed" id="displayedCount" aria-label="" data-i18n-aria="header.displayed_aria">0 affichées</div>
+    </div>
+  </div>
+</header>
+
+<!-- APP -->
+<div class="app" id="app-wrapper">
+  <main class="main" id="collectionView" role="tabpanel" aria-label="Collection de cartes">
+    <div class="card-grid" id="cardGrid" role="list" aria-label="Grille de cartes"></div>
+  </main>
+  <section class="badges-view" id="badgesView" role="tabpanel" aria-label="" data-i18n-aria="b.view">
+    <div class="badges-header">
+      <div class="badges-title" data-i18n="b.title">🏅 My Badges</div>
+      <div class="badges-progress-wrap">
+        <div class="badges-progress-text"><span id="badgesUnlockedCount">0</span> <span id="badgesUnlockedLabel" data-i18n="b.unlocked">/ 50 unlocked</span></div>
+        <div class="badges-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="50"><div class="badges-progress-fill" id="badgesProgressFill"></div></div>
+      </div>
+    </div>
+    <div class="user-title-wrap" id="userTitleCard"></div>
+    <div class="badges-section">
+      <div class="badges-section-title"><span data-i18n="b.auto">🤖 Automatic badges</span> <span class="badge-count" id="autoBadgeCount">0/25</span><button class="badge-reset-select-btn" id="badgeResetSelectBtn" data-action="enterRemoveBadgeMode" type="button"><span data-i18n="b.remove">↺ Remove</span></button></div>
+      <div class="badges-grid" id="autoBadgesGrid" role="list"></div>
+    </div>
+    <div class="badges-section">
+      <div class="badges-section-title"><span data-i18n="b.manual">✋ Manual badges</span> <span class="badge-count" id="manualBadgeCount">0/25</span></div>
+      <div class="badges-grid" id="manualBadgesGrid" role="list"></div>
+    </div>
+  </section>
+  <section class="stats-view" id="statsView" role="tabpanel" aria-label="" data-i18n-aria="st.view"></section>
+  <section class="settings-view" id="settingsView" role="tabpanel" aria-label="" data-i18n-aria="s.view"></section>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="" data-i18n-aria="nav.main">
+  <div class="bottom-nav-pill">
+    <button class="bn-tab active" data-action="switchView" data-view="collection" type="button">
+      <span class="bn-icon">🃏</span>
+      <span class="bn-label" data-i18n="nav.collection">Collection</span>
+    </button>
+    <button class="bn-tab" data-action="switchView" data-view="badges" type="button">
+      <span class="bn-icon">🏅</span>
+      <span class="bn-label" data-i18n="nav.badges">Badges</span>
+    </button>
+    <button class="bn-tab" data-action="switchView" data-view="stats" type="button">
+      <span class="bn-icon">📊</span>
+      <span class="bn-label" data-i18n="nav.stats">Stats</span>
+    </button>
+    <button class="bn-tab" data-action="switchView" data-view="settings" type="button">
+      <span class="bn-icon">⚙️</span>
+      <span class="bn-label" data-i18n="nav.settings">Settings</span>
+    </button>
+  </div>
+</nav>
+
+<!-- MODAL -->
+<div class="mo" id="mo" role="dialog" aria-modal="true" aria-label="" data-i18n-aria="m.modal">
+  <div class="modal">
+    <div class="modal-visual tv-blue" id="moVis">
+      <button class="modal-close" id="modalCloseBtn" type="button" aria-label="" data-i18n-aria="m.close">✕</button>
+      <div id="moEmoji" aria-hidden="true"></div>
+    </div>
+    <div class="modal-body">
+      <div class="mo-num" id="moNum"></div>
+      <div class="mo-name" id="moName"></div>
+      <div class="mo-team" id="moTeam"></div>
+      <div class="mo-tags" id="moTags"></div>
+      <div class="mo-desc" id="moDesc"></div>
+      <div class="mo-info-row" id="moInfo"></div>
+      <div class="mo-variants-title" data-i18n="m.copies">My copies by type</div>
+      <div class="mo-type-rows" id="moTypeRows" role="list" aria-label="" data-i18n-aria="m.types_list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="data-embedded.js"></script>
+<script src="translations.js"></script>
+<script src="card-descriptions.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
