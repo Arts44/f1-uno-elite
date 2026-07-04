@@ -1,0 +1,383 @@
+{
+  "cardTypes": {
+    "blue": {
+      "id": "blue",
+      "label": "Blue",
+      "icon": "🔵",
+      "css": "tv-blue",
+      "foil": false,
+      "color": "#1a3a6b"
+    },
+    "green": {
+      "id": "green",
+      "label": "Green",
+      "icon": "🟢",
+      "css": "tv-green",
+      "foil": false,
+      "color": "#0d4a1f"
+    },
+    "red": {
+      "id": "red",
+      "label": "Red",
+      "icon": "🔴",
+      "css": "tv-red",
+      "foil": false,
+      "color": "#cc0000"
+    },
+    "yellow": {
+      "id": "yellow",
+      "label": "Yellow",
+      "icon": "🟡",
+      "css": "tv-yellow",
+      "foil": false,
+      "color": "#ffd000"
+    },
+    "blue_foil": {
+      "id": "blue_foil",
+      "label": "Blue Foil",
+      "icon": "✦",
+      "css": "tv-blue_foil",
+      "foil": true,
+      "color": "#2d6abf"
+    },
+    "green_foil": {
+      "id": "green_foil",
+      "label": "Green Foil",
+      "icon": "✦",
+      "css": "tv-green_foil",
+      "foil": true,
+      "color": "#1a8c3a"
+    },
+    "red_foil": {
+      "id": "red_foil",
+      "label": "Red Foil",
+      "icon": "✦",
+      "css": "tv-red_foil",
+      "foil": true,
+      "color": "#ff4d4d"
+    },
+    "yellow_foil": {
+      "id": "yellow_foil",
+      "label": "Yellow Foil",
+      "icon": "✦",
+      "css": "tv-yellow_foil",
+      "foil": true,
+      "color": "#fff3b0"
+    },
+    "blue_red_foil": {
+      "id": "blue_red_foil",
+      "label": "Blue and Red Foil",
+      "icon": "◈",
+      "css": "tv-blue_red_foil",
+      "foil": true,
+      "color": "#4a2080"
+    },
+    "green_yellow_foil": {
+      "id": "green_yellow_foil",
+      "label": "Green and Yellow Foil",
+      "icon": "◈",
+      "css": "tv-green_yellow_foil",
+      "foil": true,
+      "color": "#3a6000"
+    },
+    "wild_foil": {
+      "id": "wild_foil",
+      "label": "Wild Foil",
+      "icon": "🃏",
+      "css": "tv-wild_foil",
+      "foil": true,
+      "color": "#0a0a0a"
+    },
+    "nitro_foil": {
+      "id": "nitro_foil",
+      "label": "Nitro Foil",
+      "icon": "❋",
+      "css": "tv-nitro_foil",
+      "foil": true,
+      "color": "#7b2fbe"
+    },
+    "promo_blue": {
+      "id": "promo_blue",
+      "label": "Promo Blue",
+      "icon": "★",
+      "css": "tv-promo-blue",
+      "foil": true,
+      "color": "#1a3a6b"
+    },
+    "promo_green": {
+      "id": "promo_green",
+      "label": "Promo Green",
+      "icon": "★",
+      "css": "tv-promo-green",
+      "foil": true,
+      "color": "#0d4a1f"
+    },
+    "promo_red": {
+      "id": "promo_red",
+      "label": "Promo Red",
+      "icon": "★",
+      "css": "tv-promo-red",
+      "foil": true,
+      "color": "#cc0000"
+    },
+    "promo_yellow": {
+      "id": "promo_yellow",
+      "label": "Promo Yellow",
+      "icon": "★",
+      "css": "tv-promo-yellow",
+      "foil": true,
+      "color": "#ffd000"
+    }
+  },
+  "typeBadgeRarity": {
+    "blue": "common",
+    "green": "common",
+    "red": "common",
+    "yellow": "common",
+    "blue_foil": "rare",
+    "green_foil": "rare",
+    "red_foil": "rare",
+    "yellow_foil": "rare",
+    "blue_red_foil": "epic",
+    "green_yellow_foil": "epic",
+    "wild_foil": "legendary",
+    "nitro_foil": "mythic",
+    "promo_blue": "ultra",
+    "promo_green": "ultra",
+    "promo_red": "ultra",
+    "promo_yellow": "ultra"
+  },
+  "rarityKeys": [
+    "common",
+    "rare",
+    "epic",
+    "legendary",
+    "mythic",
+    "ultra",
+    "cosmic",
+    "divine"
+  ],
+  "rarityOrder": {
+    "common": 0,
+    "rare": 1,
+    "epic": 2,
+    "legendary": 3,
+    "mythic": 4,
+    "ultra": 5,
+    "cosmic": 6,
+    "divine": 7
+  },
+  "rarities": {
+    "common": {
+      "label": "Commune",
+      "color": "#8E8E93",
+      "stars": 1
+    },
+    "rare": {
+      "label": "Rare",
+      "color": "#007AFF",
+      "stars": 2
+    },
+    "epic": {
+      "label": "Épique",
+      "color": "#AF52DE",
+      "stars": 3
+    },
+    "legendary": {
+      "label": "Légendaire",
+      "color": "#FF9500",
+      "stars": 4
+    },
+    "mythic": {
+      "label": "Mythique",
+      "color": "#34C759",
+      "stars": 5
+    },
+    "ultra": {
+      "label": "Ultra rare",
+      "color": "#FF2D55",
+      "stars": 6
+    },
+    "cosmic": {
+      "label": "Cosmique",
+      "color": "#7C3AED",
+      "stars": 7
+    },
+    "divine": {
+      "label": "Divin",
+      "color": "#FACC15",
+      "stars": 8
+    }
+  },
+  "categories": {
+    "pilote": {
+      "label": "Pilote",
+      "emoji": "🏎️"
+    },
+    "reserve": {
+      "label": "Pilote de réserve",
+      "emoji": "🔧"
+    },
+    "directeur": {
+      "label": "Directeur",
+      "emoji": "🎯"
+    },
+    "gp": {
+      "label": "Grand Prix",
+      "emoji": "🏁"
+    }
+  },
+  "driverNumbers": {
+    "Alex Albon": {
+      "n": 23,
+      "cls": "dn-alb"
+    },
+    "Fernando Alonso": {
+      "n": 14,
+      "cls": "dn-alo"
+    },
+    "Kimi Antonelli": {
+      "n": 12,
+      "cls": "dn-ant"
+    },
+    "Oliver Bearman": {
+      "n": 87,
+      "cls": "dn-bea"
+    },
+    "Gabriel Bortoleto": {
+      "n": 5,
+      "cls": "dn-bor"
+    },
+    "Franco Colapinto": {
+      "n": 43,
+      "cls": "dn-col"
+    },
+    "Jack Doohan": {
+      "n": 61,
+      "cls": "dn-doo"
+    },
+    "Pierre Gasly": {
+      "n": 10,
+      "cls": "dn-gas"
+    },
+    "Isack Hadjar": {
+      "n": 6,
+      "cls": "dn-had"
+    },
+    "Lewis Hamilton": {
+      "n": 44,
+      "cls": "dn-ham"
+    },
+    "Nico Hülkenberg": {
+      "n": 27,
+      "cls": "dn-hul"
+    },
+    "Liam Lawson": {
+      "n": 30,
+      "cls": "dn-law"
+    },
+    "Charles Leclerc": {
+      "n": 16,
+      "cls": "dn-lec"
+    },
+    "Lando Norris": {
+      "n": 4,
+      "cls": "dn-nor"
+    },
+    "Esteban Ocon": {
+      "n": 31,
+      "cls": "dn-oco"
+    },
+    "Oscar Piastri": {
+      "n": 81,
+      "cls": "dn-pia"
+    },
+    "George Russell": {
+      "n": 63,
+      "cls": "dn-rus"
+    },
+    "Carlos Sainz": {
+      "n": 55,
+      "cls": "dn-sai"
+    },
+    "Lance Stroll": {
+      "n": 18,
+      "cls": "dn-str"
+    },
+    "Yuki Tsunoda": {
+      "n": 22,
+      "cls": "dn-tsu"
+    },
+    "Max Verstappen": {
+      "n": 1,
+      "cls": "dn-ver"
+    }
+  },
+  "teamColors": {
+    "Oracle Red Bull Racing": "#3671C6",
+    "Scuderia Ferrari HP": "#E8002D",
+    "McLaren F1": "#FF8000",
+    "Mercedes-AMG Petronas Formula One Team": "#27F4D2",
+    "Aston Martin Aramco Formula One Team": "#229971",
+    "BWT Alpine F1 Team": "#FF87BC",
+    "MoneyGram Haas F1 Team": "#B6BABD",
+    "Visa Cash App RB Formula One": "#6692FF",
+    "Atlassian Williams Racing": "#64C4FF",
+    "Stake F1 Team KICK Sauber": "#52E252"
+  },
+  "teamLogos": {
+    "Oracle Red Bull Racing": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/red%20bull%20racing.png",
+    "Scuderia Ferrari HP": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/ferrari.png",
+    "McLaren F1": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/mclaren.png",
+    "Mercedes-AMG Petronas Formula One Team": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/mercedes.png",
+    "Aston Martin Aramco Formula One Team": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/aston%20martin.png",
+    "BWT Alpine F1 Team": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/alpine.png",
+    "MoneyGram Haas F1 Team": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/haas.png",
+    "Visa Cash App RB Formula One": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/rb.png",
+    "Atlassian Williams Racing": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/williams.png",
+    "Stake F1 Team KICK Sauber": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/kick%20sauber.png"
+  },
+  "driverImages": {
+    "Max Verstappen": "https://www.formula1.com/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png.transform/1col/image.png",
+    "Lewis Hamilton": "https://www.formula1.com/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/1col/image.png",
+    "Charles Leclerc": "https://www.formula1.com/content/dam/fom-website/drivers/C/CHALEC01_Charles_Leclerc/chalec01.png.transform/1col/image.png",
+    "Lando Norris": "https://www.formula1.com/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png.transform/1col/image.png",
+    "Carlos Sainz": "https://www.formula1.com/content/dam/fom-website/drivers/C/CARSAI01_Carlos_Sainz/carsai01.png.transform/1col/image.png",
+    "Oscar Piastri": "https://www.formula1.com/content/dam/fom-website/drivers/O/OSCPIA01_Oscar_Piastri/oscpia01.png.transform/1col/image.png",
+    "George Russell": "https://www.formula1.com/content/dam/fom-website/drivers/G/GEORUS01_George_Russell/georus01.png.transform/1col/image.png",
+    "Fernando Alonso": "https://www.formula1.com/content/dam/fom-website/drivers/F/FERALO01_Fernando_Alonso/feralo01.png.transform/1col/image.png",
+    "Pierre Gasly": "https://www.formula1.com/content/dam/fom-website/drivers/P/PIEGAS01_Pierre_Gasly/piegas01.png.transform/1col/image.png",
+    "Esteban Ocon": "https://www.formula1.com/content/dam/fom-website/drivers/E/ESTOCO01_Esteban_Ocon/estoco01.png.transform/1col/image.png",
+    "Alex Albon": "https://www.formula1.com/content/dam/fom-website/drivers/A/ALEALB01_Alexander_Albon/alealb01.png.transform/1col/image.png",
+    "Yuki Tsunoda": "https://www.formula1.com/content/dam/fom-website/drivers/Y/YUKTSU01_Yuki_Tsunoda/yuktsu01.png.transform/1col/image.png",
+    "Lance Stroll": "https://www.formula1.com/content/dam/fom-website/drivers/L/LANSTR01_Lance_Stroll/lanstr01.png.transform/1col/image.png",
+    "Nico Hülkenberg": "https://www.formula1.com/content/dam/fom-website/drivers/N/NICHUL01_Nico_Hulkenberg/nichul01.png.transform/1col/image.png",
+    "Kimi Antonelli": "https://media.formula1.com/image/upload/fom-website/drivers/K/KIMANT01_Kimi_Antonelli/kimant01.png",
+    "Oliver Bearman": "https://www.formula1.com/content/dam/fom-website/drivers/O/OLIBEA01_Oliver_Bearman/olibea01.png.transform/1col/image.png",
+    "Gabriel Bortoleto": "https://www.formula1.com/content/dam/fom-website/drivers/G/GABBOR01_Gabriel_Bortoleto/gabbor01.png.transform/1col/image.png",
+    "Franco Colapinto": "https://www.formula1.com/content/dam/fom-website/drivers/F/FRACOL01_Franco_Colapinto/fracol01.png.transform/1col/image.png",
+    "Jack Doohan": "https://www.formula1.com/content/dam/fom-website/drivers/J/JACDOO01_Jack_Doohan/jacdoo01.png.transform/1col/image.png",
+    "Isack Hadjar": "https://www.formula1.com/content/dam/fom-website/drivers/I/ISAHAD01_Isack_Hadjar/isahad01.png.transform/1col/image.png",
+    "Liam Lawson": "https://www.formula1.com/content/dam/fom-website/drivers/L/LIALAW01_Liam_Lawson/lialaw01.png.transform/1col/image.png"
+  },
+  "teamLogoBg": {
+    "Oracle Red Bull Racing": "rgba(255,255,255,1)",
+    "Visa Cash App RB Formula One": "rgba(20,52,203,0.95)",
+    "MoneyGram Haas F1 Team": "rgba(255,255,255,0.92)",
+    "Stake F1 Team KICK Sauber": "rgba(255,255,255,0.92)",
+    "Atlassian Williams Racing": "rgba(255,255,255,0.92)",
+    "Mercedes-AMG Petronas Formula One Team": "rgba(255,255,255,0.92)",
+    "McLaren F1": "rgba(255,255,255,0.92)",
+    "Aston Martin Aramco Formula One Team": "rgba(255,255,255,0.92)"
+  },
+  "teamLogoNoeffects": [
+    "MoneyGram Haas F1 Team",
+    "Stake F1 Team KICK Sauber"
+  ],
+  "roleBaseRarity": {
+    "pilote": "legendary",
+    "reserve": "epic",
+    "directeur": "epic",
+    "gp": "legendary"
+  }
+}
