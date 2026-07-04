@@ -312,3 +312,16 @@ if(!isSetupDone()){
   log('PIN enabled - login screen should be visible');
 }
 // else: PIN enabled — login screen already visible in HTML, user enters PIN normally
+
+/* ══════════════════════════════════════════════════════════
+   SERVICE WORKER — offline support (PWA)
+   Only registers over http/https; silently skipped on file://
+   (the guard below is false there), which is expected.
+   ══════════════════════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => log('Service worker registered, scope:', reg.scope))
+      .catch(err => console.error('Service worker registration failed:', err));
+  });
+}
