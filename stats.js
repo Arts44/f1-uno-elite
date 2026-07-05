@@ -223,13 +223,13 @@ export function renderStats(){
     const rarest = ownedCards.reduce((b,c)=> (RARITY_ORDER[cardRarity(c)]||0) > (RARITY_ORDER[cardRarity(b)]||0) ? c : b);
     const most = ownedCards.reduce((b,c)=> cardTotalQty(c.id) > cardTotalQty(b.id) ? c : b);
     const rr = RARITIES[cardRarity(rarest)]||{};
-    featuredHtml = `<div class="sv-feat-grid">
-      <div class="sv-feat-card">
+    featuredHtml = `<div class="sv-feat">
+      <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_rarest')}</div>
         <div class="sv-feat-name">${CATS[rarest.category]?.emoji||'🃏'} #${rarest.id} ${rarest.name}</div>
         <div class="sv-feat-sub" style="color:${rr.color||'var(--tx2)'}">${t('rar.'+cardRarity(rarest))} ${'★'.repeat(rr.stars||1)}</div>
       </div>
-      <div class="sv-feat-card">
+      <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_most_copies')}</div>
         <div class="sv-feat-name">${CATS[most.category]?.emoji||'🃏'} #${most.id} ${most.name}</div>
         <div class="sv-feat-sub">📦 ×${cardTotalQty(most.id)}</div>
@@ -318,14 +318,21 @@ export function renderStats(){
       <div class="sv-card exemplaires"><div class="sv-card-value">${totalExemplaires}</div><div class="sv-card-label">${t('st.copies')}</div></div>
     </div>
 
-    <div class="sv-section-title">${t('st.featured')}</div>
-    ${featuredHtml}
+    <div class="sv-summary">
+      <div class="sv-summary-panel">
+        <div class="sv-section-title sv-sub">${t('st.featured')}</div>
+        ${featuredHtml}
+      </div>
+      ${donutHtml ? `<div class="sv-summary-panel">
+        <div class="sv-section-title sv-sub">${t('st.chart_rarity')}</div>
+        ${donutHtml}
+      </div>`:''}
+    </div>
 
     ${catRows   ? `<div class="sv-section-title">${t('st.by_cat')}</div><div class="sv-rows-block">${catRows}</div>`:''}
     ${typeRows  ? `<div class="sv-section-title">${t('st.by_type')}</div><div class="sv-rows-block">${typeRows}</div>`:''}
     ${teamRows  ? `<div class="sv-section-title">${t('st.by_team')}</div><div class="sv-rows-block">${teamRows}</div>`:''}
     ${rarityRows? `<div class="sv-section-title">${t('st.by_rarity')}</div><div class="sv-rows-block">${rarityRows}</div>`:''}
-    ${donutHtml ? `<div class="sv-section-title">${t('st.chart_rarity')}</div>${donutHtml}`:''}
 
     <div class="sv-section-title">${t('st.history')}</div>
     ${histHtml}

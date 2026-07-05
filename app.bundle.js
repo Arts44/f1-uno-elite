@@ -41,13 +41,13 @@ var F1App=(()=>{var dt=Object.defineProperty;var Qn=Object.getOwnPropertyDescrip
         <div class="sv-mini-bar"><div class="${R}" style="width:${L}%;${we}"></div></div>
         <span class="sv-full-check">${M?"\u2713":""}</span>
       </div>
-    </div>`}let y=Object.keys(Z).map(g=>{let w=Z[g],x=m.filter(L=>L.category===g);if(x.length===0)return"";let A=x.filter(L=>$(L.id)).length;return f(w.emoji,a("cat."+g),A,x.length,Math.round(A/x.length*100))}),E=l>0?Math.round(u/l*100):0;y.push(f("\u{1F3C6}",a("st.champions"),u,l,E));let F=y.join(""),ye=Object.keys(k).map(g=>{let w=k[g],x=m.filter(_e=>_e.types.includes(g));if(x.length===0)return"";let A=x.filter(_e=>{let Ie=_(_e.id,g);return Ie.owned&&(Ie.qty||0)>0}).length,L=Math.round(A/x.length*100),R={blue:"#1a5fb4",green:"#1e7a35",red:"#cc0000",yellow:"#f5c000",blue_foil:"#4a90d9",green_foil:"#2ecc71",red_foil:"#ff4d4d",yellow_foil:"#ffd000",blue_red_foil:"linear-gradient(135deg,#4a90d9,#cc2233)",green_yellow_foil:"linear-gradient(135deg,#2ecc71,#ffd700)",wild_foil:"conic-gradient(from 0deg,#1e50dc,#14a032,#dc0000,#ffd000,#1e50dc)",nitro_foil:"linear-gradient(135deg,#9B3DFF,#1e50dc,#14a032,#dc0000)",promo_blue:"#0099ff",promo_green:"#00e676",promo_red:"#ff2d55",promo_yellow:"#ffe000"}[g]||w.color,lt=R.includes("gradient")?`background:${R}`:`background:${R}`,je=`<span class="sv-type-dot${w.foil?" sv-type-dot-foil":""}" style="${lt}"></span>`;return f(je,a("type."+g)||w.label,A,x.length,L)}).join(""),S={"Oracle Red Bull Racing":"Red Bull","Scuderia Ferrari HP":"Ferrari","McLaren F1":"McLaren","Mercedes-AMG Petronas Formula One Team":"Mercedes","Aston Martin Aramco Formula One Team":"Aston Martin","BWT Alpine F1 Team":"Alpine","MoneyGram Haas F1 Team":"Haas","Visa Cash App RB Formula One":"RB","Atlassian Williams Racing":"Williams","Stake F1 Team KICK Sauber":"Sauber"},O=[...new Set(m.map(g=>g.team).filter(Boolean))].sort().map(g=>{let w=m.filter(R=>R.team===g);if(w.length===0)return"";let x=w.filter(R=>$(R.id)).length,A=Math.round(x/w.length*100),M=`<span class="sv-team-dot" style="background:${xe&&xe[g]||"var(--red)"}"></span>`;return f(M,S[g]||g,x,w.length,A)}).join(""),le=ie.map(g=>{let w=W[g];if(!w)return"";let x=m.filter(M=>$(M.id)&&D(M)===g).length,A=m.filter(M=>M.types.some(R=>ve(M,R)===g)).length;if(A===0)return"";let L=Math.round(x/A*100);return f(`<span style="color:${w.color}">\u2605</span>`,`<span style="color:${w.color}">${a("rar."+g)}</span>`,x,A,L)}).join(""),te=m.filter(g=>$(g.id)),he;if(te.length===0)he=`<div class="sv-empty-note">${a("st.empty_coll")}</div>`;else{let g=te.reduce((A,L)=>(N[D(L)]||0)>(N[D(A)]||0)?L:A),w=te.reduce((A,L)=>me(L.id)>me(A.id)?L:A),x=W[D(g)]||{};he=`<div class="sv-feat-grid">
-      <div class="sv-feat-card">
+    </div>`}let y=Object.keys(Z).map(g=>{let w=Z[g],x=m.filter(L=>L.category===g);if(x.length===0)return"";let A=x.filter(L=>$(L.id)).length;return f(w.emoji,a("cat."+g),A,x.length,Math.round(A/x.length*100))}),E=l>0?Math.round(u/l*100):0;y.push(f("\u{1F3C6}",a("st.champions"),u,l,E));let F=y.join(""),ye=Object.keys(k).map(g=>{let w=k[g],x=m.filter(_e=>_e.types.includes(g));if(x.length===0)return"";let A=x.filter(_e=>{let Ie=_(_e.id,g);return Ie.owned&&(Ie.qty||0)>0}).length,L=Math.round(A/x.length*100),R={blue:"#1a5fb4",green:"#1e7a35",red:"#cc0000",yellow:"#f5c000",blue_foil:"#4a90d9",green_foil:"#2ecc71",red_foil:"#ff4d4d",yellow_foil:"#ffd000",blue_red_foil:"linear-gradient(135deg,#4a90d9,#cc2233)",green_yellow_foil:"linear-gradient(135deg,#2ecc71,#ffd700)",wild_foil:"conic-gradient(from 0deg,#1e50dc,#14a032,#dc0000,#ffd000,#1e50dc)",nitro_foil:"linear-gradient(135deg,#9B3DFF,#1e50dc,#14a032,#dc0000)",promo_blue:"#0099ff",promo_green:"#00e676",promo_red:"#ff2d55",promo_yellow:"#ffe000"}[g]||w.color,lt=R.includes("gradient")?`background:${R}`:`background:${R}`,je=`<span class="sv-type-dot${w.foil?" sv-type-dot-foil":""}" style="${lt}"></span>`;return f(je,a("type."+g)||w.label,A,x.length,L)}).join(""),S={"Oracle Red Bull Racing":"Red Bull","Scuderia Ferrari HP":"Ferrari","McLaren F1":"McLaren","Mercedes-AMG Petronas Formula One Team":"Mercedes","Aston Martin Aramco Formula One Team":"Aston Martin","BWT Alpine F1 Team":"Alpine","MoneyGram Haas F1 Team":"Haas","Visa Cash App RB Formula One":"RB","Atlassian Williams Racing":"Williams","Stake F1 Team KICK Sauber":"Sauber"},O=[...new Set(m.map(g=>g.team).filter(Boolean))].sort().map(g=>{let w=m.filter(R=>R.team===g);if(w.length===0)return"";let x=w.filter(R=>$(R.id)).length,A=Math.round(x/w.length*100),M=`<span class="sv-team-dot" style="background:${xe&&xe[g]||"var(--red)"}"></span>`;return f(M,S[g]||g,x,w.length,A)}).join(""),le=ie.map(g=>{let w=W[g];if(!w)return"";let x=m.filter(M=>$(M.id)&&D(M)===g).length,A=m.filter(M=>M.types.some(R=>ve(M,R)===g)).length;if(A===0)return"";let L=Math.round(x/A*100);return f(`<span style="color:${w.color}">\u2605</span>`,`<span style="color:${w.color}">${a("rar."+g)}</span>`,x,A,L)}).join(""),te=m.filter(g=>$(g.id)),he;if(te.length===0)he=`<div class="sv-empty-note">${a("st.empty_coll")}</div>`;else{let g=te.reduce((A,L)=>(N[D(L)]||0)>(N[D(A)]||0)?L:A),w=te.reduce((A,L)=>me(L.id)>me(A.id)?L:A),x=W[D(g)]||{};he=`<div class="sv-feat">
+      <div class="sv-feat-item">
         <div class="sv-feat-label">${a("st.feat_rarest")}</div>
         <div class="sv-feat-name">${Z[g.category]?.emoji||"\u{1F0CF}"} #${g.id} ${g.name}</div>
         <div class="sv-feat-sub" style="color:${x.color||"var(--tx2)"}">${a("rar."+D(g))} ${"\u2605".repeat(x.stars||1)}</div>
       </div>
-      <div class="sv-feat-card">
+      <div class="sv-feat-item">
         <div class="sv-feat-label">${a("st.feat_most_copies")}</div>
         <div class="sv-feat-name">${Z[w.category]?.emoji||"\u{1F0CF}"} #${w.id} ${w.name}</div>
         <div class="sv-feat-sub">\u{1F4E6} \xD7${me(w.id)}</div>
@@ -93,14 +93,21 @@ var F1App=(()=>{var dt=Object.defineProperty;var Qn=Object.getOwnPropertyDescrip
       <div class="sv-card exemplaires"><div class="sv-card-value">${d}</div><div class="sv-card-label">${a("st.copies")}</div></div>
     </div>
 
-    <div class="sv-section-title">${a("st.featured")}</div>
-    ${he}
+    <div class="sv-summary">
+      <div class="sv-summary-panel">
+        <div class="sv-section-title sv-sub">${a("st.featured")}</div>
+        ${he}
+      </div>
+      ${Me?`<div class="sv-summary-panel">
+        <div class="sv-section-title sv-sub">${a("st.chart_rarity")}</div>
+        ${Me}
+      </div>`:""}
+    </div>
 
     ${F?`<div class="sv-section-title">${a("st.by_cat")}</div><div class="sv-rows-block">${F}</div>`:""}
     ${ye?`<div class="sv-section-title">${a("st.by_type")}</div><div class="sv-rows-block">${ye}</div>`:""}
     ${O?`<div class="sv-section-title">${a("st.by_team")}</div><div class="sv-rows-block">${O}</div>`:""}
     ${le?`<div class="sv-section-title">${a("st.by_rarity")}</div><div class="sv-rows-block">${le}</div>`:""}
-    ${Me?`<div class="sv-section-title">${a("st.chart_rarity")}</div>${Me}`:""}
 
     <div class="sv-section-title">${a("st.history")}</div>
     ${C}
