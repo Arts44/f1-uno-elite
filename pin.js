@@ -323,6 +323,22 @@ export function showAdminPinScreen(){
   };
 }
 
+/* ── Font themes (display + body pairs, all self-hosted / OFL).
+   Names are proper nouns, shared across languages. The driver-number
+   identity fonts (Orbitron / Racing Sans One) are NOT part of this. ── */
+const FONT_THEMES = [
+  { id:'circuit',  name:'Circuit',  display:"'Space Grotesk',sans-serif", body:"'Inter',sans-serif" },
+  { id:'sprint',   name:'Sprint',   display:"'Chakra Petch',sans-serif",  body:"'IBM Plex Sans',sans-serif" },
+  { id:'prestige', name:'Prestige', display:"'Fraunces',serif",           body:"'Source Sans 3',sans-serif" },
+  { id:'minimal',  name:'Minimal',  display:"'Manrope',sans-serif",       body:"'Manrope',sans-serif" },
+  { id:'original', name:'Original', display:"'Syne',sans-serif",          body:"'DM Sans',sans-serif" },
+];
+export function getFontTheme(){ return localStorage.getItem('f1uno_font') || 'circuit'; }
+export function setFontTheme(id){
+  localStorage.setItem('f1uno_font', id);
+  document.documentElement.setAttribute('data-font', id);
+}
+
 export function renderSettings(){
   const el = document.getElementById('settingsView');
   if(!el) return;
@@ -357,6 +373,19 @@ export function renderSettings(){
           <div class="setv-row-sub">${t('s.lang_sub')}</div>
         </div>
         <select class="setv-lang-sel" id="langSel">${langOptions}</select>
+      </div>
+      <div class="setv-row" style="flex-direction:column;align-items:stretch;gap:10px;">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.font')}</div>
+          <div class="setv-row-sub">${t('s.font_sub')}</div>
+        </div>
+        <div class="font-picker" id="fontPicker">
+          ${FONT_THEMES.map(f=>`
+          <button class="font-opt${getFontTheme()===f.id?' active':''}" data-font-id="${f.id}" type="button">
+            <span class="font-opt-name" style="font-family:${f.display}">${f.name}</span>
+            <span class="font-opt-sample" style="font-family:${f.body}">Aa Bb 0123 ★</span>
+          </button>`).join('')}
+        </div>
       </div>
     </div>
 
@@ -575,6 +604,14 @@ export function renderSettings(){
 
   const langSel = el.querySelector('#langSel');
   if(langSel) langSel.addEventListener('change', e=>setLang(e.target.value));
+
+  // — Font theme picker: immediate apply (CSS vars) + persistence —
+  el.querySelectorAll('#fontPicker .font-opt').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      setFontTheme(btn.getAttribute('data-font-id'));
+      el.querySelectorAll('#fontPicker .font-opt').forEach(b=>b.classList.toggle('active', b===btn));
+    });
+  });
 }
 
 function _startEnablePin(container){

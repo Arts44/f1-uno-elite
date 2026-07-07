@@ -1,0 +1,27 @@
+Self-hosted fonts — provenance & licenses
+=========================================
+
+All families below are licensed under the SIL Open Font License 1.1
+(OFL-1.1, https://openfontlicense.org), which permits free use,
+redistribution and bundling (the fonts may not be sold on their own).
+Files are the latin-subset WOFF2 builds served by the Google Fonts API
+(fonts.gstatic.com), downloaded 2026-07-07.
+
+File                       Family           Copyright / upstream
+-------------------------  ---------------  ------------------------------------------------------------
+space-grotesk-var.woff2    Space Grotesk    (c) 2020 Florian Karsten — github.com/floriankarsten/space-grotesk
+inter-var.woff2            Inter            (c) 2016 The Inter Project Authors (Rasmus Andersson) — github.com/rsms/inter
+chakra-petch-400.woff2     Chakra Petch     (c) 2018 Cadson Demak — github.com/cadsondemak/chakra-petch
+chakra-petch-600.woff2     Chakra Petch     idem
+chakra-petch-700.woff2     Chakra Petch     idem
+ibm-plex-sans-var.woff2    IBM Plex Sans    (c) 2017 IBM Corp. — github.com/IBM/plex
+fraunces-var.woff2         Fraunces         (c) 2020 Undercase Type — github.com/undercasetype/Fraunces
+source-sans-3-var.woff2    Source Sans 3    (c) 2010-2024 Adobe — github.com/adobe-fonts/source-sans
+manrope-var.woff2          Manrope          (c) 2018 Mikhail Sharanda — github.com/sharanda/manrope
+syne-var.woff2             Syne             (c) 2017 Bonjour Monde (Lucas Descroix) — gitlab.com/bonjour-monde/fonderie/syne-typeface
+dm-sans-var.woff2          DM Sans          (c) 2014-2024 Colophon Foundry / Google — github.com/googlefonts/dm-fonts
+racing-sans-one-400.woff2  Racing Sans One  (c) 2012 Impallari Type — github.com/impallari
+orbitron-var.woff2         Orbitron         (c) 2009 Matt McInerney — github.com/theleagueof/orbitron
+
+The full OFL-1.1 text applies to every family; each upstream repository
+carries its own OFL.txt with the reserved font names.

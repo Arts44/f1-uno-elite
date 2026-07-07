@@ -130,9 +130,11 @@ export function renderStats(){
   const pct = total > 0 ? Math.round((owned/total)*100) : 0;
 
   function pctColor(p){
-    // red (hue 0) → orange (hue 25) → green (hue 120), interpolated via HSL
-    const hue = Math.round(p * 1.2); // 0%→0 (red), 50%→60 (yellow), 100%→120 (green)
-    return `hsl(${hue},80%,48%)`;
+    // Semantic completion steps (theme-aware vars, no muddy HSL midtones):
+    // low = missing red, mid = wishlist amber, high = owned green
+    if(p >= 67) return 'var(--st-owned)';
+    if(p >= 34) return 'var(--st-wish)';
+    return 'var(--st-missing)';
   }
 
   function svRow(icon, name, n, tot, pct){
@@ -272,10 +274,13 @@ export function renderStats(){
           ${reduceMotion ? '' : '<animateTransform attributeName="gradientTransform" type="rotate" from="0 60 60" to="360 60 60" dur="9s" repeatCount="indefinite"/>'}
         </linearGradient>
       </defs>` : '';
+    // 2px surface gap between adjacent segments (skipped for a lone segment)
+    const GAP = donutData.length > 1 ? 2 : 0;
     const segs = donutData.map(d => {
       const len = d.n/ownedCards.length*C;
+      const drawn = Math.max(len - GAP, 0.8);
       const stroke = d.k==='divine' ? 'url(#divineGrad)' : d.color;
-      const s = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${stroke}" stroke-width="16" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
+      const s = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${stroke}" stroke-width="16" stroke-dasharray="${drawn.toFixed(2)} ${(C-drawn).toFixed(2)}" stroke-dashoffset="${(-(offset + GAP/2)).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
       offset += len;
       return s;
     }).join('');

@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v16';
+const SW_VERSION = 'v18';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -19,6 +19,14 @@ const SHELL_ASSETS = [
   'styles.css',
   'manifest.webmanifest',
   'favicon.ico',
+  // Fonts: only the default theme + the driver-number identity fonts are
+  // precached (~100 KB). The other font themes download on first use
+  // (Settings preview / selection) and land in the same cache via the
+  // same-origin cache-on-fetch below — offline once chosen.
+  'fonts/space-grotesk-var.woff2',
+  'fonts/inter-var.woff2',
+  'fonts/orbitron-var.woff2',
+  'fonts/racing-sans-one-400.woff2',
   'icons/icon-192.png',
   'icons/icon-512.png',
   'screenshots/desktop-collection.png',

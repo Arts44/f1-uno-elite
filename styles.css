@@ -1,3 +1,31 @@
+/* ══════════════════════════════════════════════════════════
+   SELF-HOSTED FONTS — fonts/ (WOFF2, latin subset, all SIL OFL,
+   see fonts/LICENSES). No CDN: the app stays fully offline.
+   ══════════════════════════════════════════════════════════ */
+@font-face{font-family:'Space Grotesk';src:url('fonts/space-grotesk-var.woff2') format('woff2');font-weight:300 700;font-display:swap;}
+@font-face{font-family:'Inter';src:url('fonts/inter-var.woff2') format('woff2');font-weight:100 900;font-display:swap;}
+@font-face{font-family:'Chakra Petch';src:url('fonts/chakra-petch-400.woff2') format('woff2');font-weight:400;font-display:swap;}
+@font-face{font-family:'Chakra Petch';src:url('fonts/chakra-petch-600.woff2') format('woff2');font-weight:600;font-display:swap;}
+@font-face{font-family:'Chakra Petch';src:url('fonts/chakra-petch-700.woff2') format('woff2');font-weight:700;font-display:swap;}
+@font-face{font-family:'IBM Plex Sans';src:url('fonts/ibm-plex-sans-var.woff2') format('woff2');font-weight:100 700;font-display:swap;}
+@font-face{font-family:'Fraunces';src:url('fonts/fraunces-var.woff2') format('woff2');font-weight:100 900;font-display:swap;}
+@font-face{font-family:'Source Sans 3';src:url('fonts/source-sans-3-var.woff2') format('woff2');font-weight:200 900;font-display:swap;}
+@font-face{font-family:'Manrope';src:url('fonts/manrope-var.woff2') format('woff2');font-weight:200 800;font-display:swap;}
+@font-face{font-family:'Syne';src:url('fonts/syne-var.woff2') format('woff2');font-weight:400 800;font-display:swap;}
+@font-face{font-family:'DM Sans';src:url('fonts/dm-sans-var.woff2') format('woff2');font-weight:100 1000;font-display:swap;}
+@font-face{font-family:'Racing Sans One';src:url('fonts/racing-sans-one-400.woff2') format('woff2');font-weight:400;font-display:swap;}
+@font-face{font-family:'Orbitron';src:url('fonts/orbitron-var.woff2') format('woff2');font-weight:400 900;font-display:swap;}
+
+/* ── Font themes: --font-d (display) / --font-b (body), selected via
+   data-font on <html> (Settings), persisted as f1uno_font.
+   Driver numbers (.dn-num / .dn-*) keep their own identity fonts and
+   are NOT affected by these variables. ── */
+:root{--font-d:'Space Grotesk',sans-serif;--font-b:'Inter',sans-serif;}
+:root[data-font="sprint"]{--font-d:'Chakra Petch',sans-serif;--font-b:'IBM Plex Sans',sans-serif;}
+:root[data-font="prestige"]{--font-d:'Fraunces',serif;--font-b:'Source Sans 3',sans-serif;}
+:root[data-font="minimal"]{--font-d:'Manrope',sans-serif;--font-b:'Manrope',sans-serif;}
+:root[data-font="original"]{--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;}
+
 :root {
   --bg:#F5F2EE;--surface:#FFFFFF;--surface2:#F0EDE8;--surface3:#E8E4DE;
   --border:rgba(0,0,0,0.08);
@@ -9,8 +37,11 @@
   --blue:#007AFF;--blue-s:#E3F2FD;--blue-m:#BBDEFB;
   --purple:#AF52DE;--purple-s:#F3E5F5;--purple-m:#E1BEE7;
   --r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:32px;
-  --font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;
   --ease:all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);
+  /* Stats semantic accents — palette validated for contrast & CVD
+     separation on the light surface (see Stats view) */
+  --st-owned:#00A94F;--st-wish:#C77F00;--st-doubles:#1D6FF2;
+  --st-missing:#E8002D;--st-fav:#E91E63;--st-copies:#8E24AA;
 }
 
 /* Thème sombre */
@@ -24,6 +55,10 @@
   --orange:#FFB347;--orange-s:#2D241B;--orange-m:#3D342B;
   --blue:#64B5F6;--blue-s:#1B2430;--blue-m:#2B3440;
   --purple:#CE93D8;--purple-s:#2D1B30;--purple-m:#3D2B40;
+  /* Stats semantic accents — dark-mode steps, validated against the
+     dark surface (not an automatic flip of the light set) */
+  --st-owned:#1DAF54;--st-wish:#C08300;--st-doubles:#3D8DEE;
+  --st-missing:#FF3D54;--st-fav:#F0437B;--st-copies:#A257F5;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{font-size:16px;-webkit-font-smoothing:antialiased;}
@@ -553,7 +588,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .driver-number{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;position:relative;z-index:1;gap:2px;}
 .driver-img{width:65%;height:55%;object-fit:contain;object-position:top center;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4));border-radius:var(--r-md);}
 .modal-visual .driver-img{width:55%;height:50%;}
-.dn-num{font-weight:900;color:var(--tc,#fff);text-shadow:0 0 12px var(--tc,#fff),0 0 30px color-mix(in srgb,var(--tc,#fff) 40%,transparent);line-height:1;}
+.dn-num{font-family:'Orbitron',sans-serif;font-weight:900;color:var(--tc,#fff);text-shadow:0 0 12px var(--tc,#fff),0 0 30px color-mix(in srgb,var(--tc,#fff) 40%,transparent);line-height:1;}
 .card-visual .dn-num{font-size:28px;letter-spacing:-1px;}
 .modal-visual .dn-num{font-size:56px;letter-spacing:-2px;}
 .driver-number.no-img .dn-num{font-size:inherit;letter-spacing:inherit;}
@@ -1061,23 +1096,25 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 @media(min-width:700px){.sv-cards{grid-template-columns:repeat(6,1fr);}}
 @media(max-width:400px){.sv-cards{grid-template-columns:repeat(2,1fr);}}
 .sv-card{
-  background:var(--surface);
-  border:1px solid var(--border);
+  position:relative;overflow:hidden;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--acc,transparent) 9%,var(--surface)),var(--surface) 60%);
+  border:1px solid color-mix(in srgb,var(--acc,var(--border)) 28%,var(--border));
   border-radius:var(--r-lg);
   padding:14px 16px 12px;
   display:flex;flex-direction:column;gap:5px;
   box-shadow:var(--sh-sm);
-  border-top-width:3px;
 }
+.sv-card::before{content:'';position:absolute;inset:0 0 auto 0;height:3px;background:var(--acc,var(--tx3));}
 .sv-card-value{font-family:var(--font-d);font-weight:900;font-size:30px;letter-spacing:-1.5px;line-height:1;}
 .sv-card-total{font-size:16px;font-weight:600;color:var(--tx3);}
 .sv-card-label{font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:0.3px;}
-.sv-card.owned{border-top-color:var(--green);}.sv-card.owned .sv-card-value{color:var(--green);}
-.sv-card.wish{border-top-color:var(--orange);}.sv-card.wish .sv-card-value{color:var(--orange);}
-.sv-card.doubles{border-top-color:var(--blue);}.sv-card.doubles .sv-card-value{color:var(--blue);}
-.sv-card.missing{border-top-color:var(--red);}.sv-card.missing .sv-card-value{color:var(--red);}
-.sv-card.fav{border-top-color:#FF3B5C;}.sv-card.fav .sv-card-value{color:#FF3B5C;}
-.sv-card.exemplaires{border-top-color:var(--purple);}.sv-card.exemplaires .sv-card-value{color:var(--purple);}
+.sv-card .sv-card-value{color:var(--acc,var(--tx1));}
+.sv-card.owned{--acc:var(--st-owned);}
+.sv-card.wish{--acc:var(--st-wish);}
+.sv-card.doubles{--acc:var(--st-doubles);}
+.sv-card.missing{--acc:var(--st-missing);}
+.sv-card.fav{--acc:var(--st-fav);}
+.sv-card.exemplaires{--acc:var(--st-copies);}
 
 /* Section titles & rows */
 .sv-section-title{font-family:var(--font-d);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);margin:20px auto 8px;max-width:800px;}
@@ -1310,3 +1347,11 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sr-sub.sr-rar{padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;flex-shrink:0;}
 /* Stats highlight: rarity as a solid chip */
 .sv-feat-sub.sv-feat-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:100px;font-weight:700;margin-top:6px;}
+
+/* ── Font theme picker (Settings) ── */
+.font-picker{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px;width:100%;}
+.font-opt{display:flex;flex-direction:column;gap:2px;align-items:flex-start;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface2);cursor:pointer;transition:var(--ease);text-align:left;}
+.font-opt:hover{border-color:var(--tx3);}
+.font-opt.active{border-color:var(--red);box-shadow:0 0 0 1px var(--red);}
+.font-opt-name{font-size:15px;font-weight:700;color:var(--tx1);}
+.font-opt-sample{font-size:11px;color:var(--tx2);}
