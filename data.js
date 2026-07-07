@@ -59,7 +59,8 @@ function _showDataError(msg){
   setTimeout(() => el.remove(), 8000);
 }
 
-function _applyMetadata(meta){
+// Exported for the test suite (fixture injection) — not used by the UI.
+export function _applyMetadata(meta){
   CARD_TYPES = meta.cardTypes;
   TYPE_BADGE_RARITY = meta.typeBadgeRarity;
   // Visual ladder of the sidebar type pills — independent from the card
@@ -88,7 +89,8 @@ function _applyCircuits(circData){
   }
 }
 
-function _applyBadges(badgesData){
+// Exported for the test suite (fixture injection) — not used by the UI.
+export function _applyBadges(badgesData){
   AUTO_BADGES = badgesData.auto;
   MANUAL_BADGES = badgesData.manual;
 }

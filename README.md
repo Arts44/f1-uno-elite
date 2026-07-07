@@ -134,6 +134,27 @@ Then open **http://localhost:8000/** (i.e. `index.html`).
 
 > `app.bundle.js` is a generated artifact — after editing any `*.js` module, re-run `npm run build` (or keep `npm run dev` running) to refresh it.
 
+### Tests
+
+The unit test suite uses **Node's built-in test runner** (`node --test`) — no test framework is installed, keeping the zero-runtime-dependency promise intact (esbuild remains the only devDependency).
+
+```bash
+npm test             # run the whole suite once
+npm run test:watch   # re-run on file change
+```
+
+Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
+
+**Covered** (logic only, no browser):
+- **Rarity** — `baseCardRarity` / `variantRarity` (foil bonuses, index clamp) / `cardRarity` (best owned variant, qty-0 edge cases), plus the 6-rarity scale integrity in the real metadata and its embedded fallback.
+- **Storage migration** — legacy v1 keys → season-scoped v2 keys, idempotence, no-overwrite, corrupted-data fallback.
+- **Backup codes** — snapshot → compress → base64url round-trip, `#backup=` link format, rejection of corrupted/invalid codes, size threshold (`tooBig`).
+- **Stats** — `computeStats()` aggregates (owned/wishlist/doubles/missing/favorites, copies, %) on a known fixture collection, `rarityTextColor` contrast picks.
+- **Badges** — `evaluateBadgeCondition` for every metric, target clamping, unlock persistence (`isAutoBadgeUnlocked`).
+- **History** — one point per day (same-day updates in place), 365-point cap, corrupted-data fallback.
+
+**Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/animations.
+
 ### First run
 1. On first launch, a setup screen lets you optionally define a **PIN code** (or skip it).
 2. Navigate between **Collection / Badges / Stats / Settings** via the bottom bar.

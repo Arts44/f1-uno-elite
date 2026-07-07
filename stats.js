@@ -11,7 +11,9 @@ import { getHistory } from './history.js';
 import { loadManualBadges, isAutoBadgeUnlocked, manualBadges, renderBadges, updateUserTitle } from './badges.js';
 import { currentView } from './render.js';
 
-export function updateStats(){
+// Pure aggregates over the current CARDS_DB + collection state —
+// extracted from updateStats() (DOM-free, unit-testable).
+export function computeStats(){
   const total=CARDS_DB.length;
   const owned=CARDS_DB.filter(c=>cardOwned(c.id)).length;
   const wish=CARDS_DB.filter(c=>cardWishlist(c.id)).length;
@@ -19,7 +21,7 @@ export function updateStats(){
   const missing=CARDS_DB.filter(c=>cardMissing(c.id)).length;
   const fav=CARDS_DB.filter(c=>cardFavorite(c.id)).length;
 
-  // Calcul du total d'exemplaires (toutes les quantités de tous les types)
+  // Total d'exemplaires (toutes les quantités de tous les types)
   let totalExemplaires = 0;
   CARDS_DB.forEach(card => {
     card.types.forEach(typeId => {
@@ -29,6 +31,13 @@ export function updateStats(){
       }
     });
   });
+
+  const pct=Math.round((owned/total)*100);
+  return { total, owned, wish, doubles, missing, fav, totalExemplaires, pct };
+}
+
+export function updateStats(){
+  const { total, owned, wish, doubles, missing, fav, totalExemplaires, pct } = computeStats();
 
   // Vérifications de sécurité avant de modifier le DOM
   const statOwned = document.getElementById('statOwned');
@@ -44,7 +53,6 @@ export function updateStats(){
   const statExemplaires = document.getElementById('statExemplaires');
   if (statExemplaires) statExemplaires.textContent=`📦 ${totalExemplaires} exemplaires`;
 
-  const pct=Math.round((owned/total)*100);
   const statTotal = document.getElementById('statTotal');
   if (statTotal) statTotal.textContent=`${pct}%`;
 
