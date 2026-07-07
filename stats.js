@@ -209,7 +209,9 @@ export function renderStats(){
     const reachable = CARDS_DB.filter(c => c.types.some(t => variantRarity(c,t) === rKey)).length;
     if(reachable === 0) return '';
     const rarPct = Math.round((ownedAtRar/reachable)*100);
-    return svRow(`<span style="color:${rar.color}">★</span>`, `<span style="color:${rar.color}">${t('rar.'+rKey)}</span>`, ownedAtRar, reachable, rarPct);
+    const divCls = rKey==='divine' ? ' class="rar-divine-text"' : '';
+    const colStyle = rKey==='divine' ? '' : ` style="color:${rar.color}"`;
+    return svRow(`<span${divCls}${colStyle}>★</span>`, `<span${divCls}${colStyle}>${t('rar.'+rKey)}</span>`, ownedAtRar, reachable, rarPct);
   }).join('');
 
   // — Cartes phares (highlights) — computed from current data only.
@@ -227,7 +229,7 @@ export function renderStats(){
       <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_rarest')}</div>
         <div class="sv-feat-name">${CATS[rarest.category]?.emoji||'🃏'} #${rarest.id} ${rarest.name}</div>
-        <div class="sv-feat-sub" style="color:${rr.color||'var(--tx2)'}">${t('rar.'+cardRarity(rarest))} ${'★'.repeat(rr.stars||1)}</div>
+        <div class="sv-feat-sub${cardRarity(rarest)==='divine'?' rar-divine-text':''}" style="${cardRarity(rarest)==='divine'?'':`color:${rr.color||'var(--tx2)'}`}">${t('rar.'+cardRarity(rarest))} ${'★'.repeat(rr.stars||1)}</div>
       </div>
       <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_most_copies')}</div>
@@ -245,17 +247,31 @@ export function renderStats(){
   if(donutData.length){
     const R = 40, C = 2*Math.PI*R;
     let offset = 0;
+    // Divine segment: slowly rotating iridescent SVG gradient (SMIL, no JS
+    // per frame). Static multicolor gradient when the user prefers reduced
+    // motion; d.color stays as the plain fallback for the other rarities.
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const divineDefs = donutData.some(d => d.k==='divine') ? `<defs>
+        <linearGradient id="divineGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="120" y2="120">
+          <stop offset="0" stop-color="#8B5CF6"/><stop offset="0.25" stop-color="#3B82F6"/>
+          <stop offset="0.5" stop-color="#14B8A6"/><stop offset="0.75" stop-color="#FACC15"/>
+          <stop offset="1" stop-color="#F472B6"/>
+          ${reduceMotion ? '' : '<animateTransform attributeName="gradientTransform" type="rotate" from="0 60 60" to="360 60 60" dur="9s" repeatCount="indefinite"/>'}
+        </linearGradient>
+      </defs>` : '';
     const segs = donutData.map(d => {
       const len = d.n/ownedCards.length*C;
-      const s = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${d.color}" stroke-width="16" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
+      const stroke = d.k==='divine' ? 'url(#divineGrad)' : d.color;
+      const s = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${stroke}" stroke-width="16" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
       offset += len;
       return s;
     }).join('');
     const legend = donutData.map(d =>
-      `<div class="sv-leg-item"><span class="sv-leg-dot" style="background:${d.color}"></span>${t('rar.'+d.k)}<span class="sv-leg-n">${d.n}</span></div>`
+      `<div class="sv-leg-item"><span class="sv-leg-dot${d.k==='divine'?' rar-divine-bg':''}" style="${d.k==='divine'?'':`background:${d.color}`}"></span>${t('rar.'+d.k)}<span class="sv-leg-n">${d.n}</span></div>`
     ).join('');
     donutHtml = `<div class="sv-donut-row">
       <svg class="sv-donut" viewBox="0 0 120 120" role="img" aria-label="${t('st.chart_rarity')}">
+        ${divineDefs}
         ${segs}
         <text x="60" y="57" text-anchor="middle" class="sv-donut-big">${ownedCards.length}</text>
         <text x="60" y="72" text-anchor="middle" class="sv-donut-small">${t('st.history_owned')}</text>

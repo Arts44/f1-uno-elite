@@ -127,7 +127,8 @@ export function renderSidebar(){
       if(!r) return;
       const btn=document.createElement('button');
       btn.className='fpill'+(filters.rarity===rid?' active':'');
-      btn.innerHTML=`<span style="width:10px;height:10px;border-radius:50%;background:${r.color};display:inline-block;flex-shrink:0"></span>${t('rar.'+rid)}<span class="fc" style="color:${r.color}">${'★'.repeat(r.stars)}</span>`;
+      const isDivine = rid==='divine';
+      btn.innerHTML=`<span class="${isDivine?'rar-divine-bg':''}" style="width:10px;height:10px;border-radius:50%;${isDivine?'':`background:${r.color};`}display:inline-block;flex-shrink:0"></span>${t('rar.'+rid)}<span class="fc${isDivine?' rar-divine-text':''}" style="${isDivine?'':`color:${r.color}`}">${'★'.repeat(r.stars)}</span>`;
       btn.onclick=()=>{filters.rarity=filters.rarity===rid?null:rid;renderSidebar();applyFilters();};
       frp.appendChild(btn);
     });
@@ -478,7 +479,7 @@ export function renderGrid(cards){
         <div class="card-year">${card.season||2025}</div>
         <div class="card-team">${card.team||''}</div>
         <div class="card-rarity-row">
-          <span class="card-rarity" style="background:${rarity.color}20;color:${rarity.color}">${t('rar.'+cardRarity(card))} ${'★'.repeat(rarity.stars)}</span>
+          <span class="card-rarity${cardRarity(card)==='divine'?' rar-divine-bg':''}" style="${cardRarity(card)==='divine'?'':`background:${rarity.color}20;color:${rarity.color}`}">${t('rar.'+cardRarity(card))} ${'★'.repeat(rarity.stars)}</span>
           <div class="status-chips">
             <div class="schip${isWish?' on':''}" data-s="wishlist" data-action="quickToggle" data-card="${card.id}" data-status="wishlist" title="Wishlist">⭐</div>
             <div class="schip${isFav?' on':''}" data-s="favorite" data-action="quickToggle" data-card="${card.id}" data-status="favorite" title="Favori">❤️</div>
@@ -565,7 +566,7 @@ function _handleSearch(value, otherInput){
       return `<div class="sr-item" data-action="selectCard" data-card="${c.id}">
         <span class="sr-num">#${c.id}</span>
         <span class="sr-name">${catEmoji(c.category)} ${c.name}</span>
-        <span class="sr-sub" style="color:${rarData.color||'var(--tx3)'}">${t('rar.'+rar)||rarData.label||rar}</span>
+        <span class="sr-sub${rar==='divine'?' rar-divine-text':''}" style="${rar==='divine'?'':`color:${rarData.color||'var(--tx3)'}`}">${t('rar.'+rar)||rarData.label||rar}</span>
       </div>`;
     }).join('') || '<div class="sr-item"><span class="sr-name" style="color:var(--tx3)">Aucun résultat</span></div>';
     searchDd.classList.add('open');
@@ -636,7 +637,7 @@ export function openModal(id){
   if(card.champion) addTag('champion',`👑 Champion ${card.championYears.join(', ')}`);
   const tagMap={legend:'⭐ Légende',fan_favorite:'❤️ Fan Favorite',rising_star:'🌟 Rising Star',top_driver:'🎯 Top Driver',legendary:'🔱 Légendaire',prestige:'💫 Prestige',night_race:'🌙 Nuit',high_speed:'⚡ Vitesse'};
   (card.tags||[]).forEach(t=>{if(tagMap[t]) addTag(t,tagMap[t]);});
-  addTag('',`${'★'.repeat(rarity.stars)} ${t('rar.'+cardRarity(card))||rarity.label}`);
+  addTag(cardRarity(card)==='divine'?'rar-divine-text':'',`${'★'.repeat(rarity.stars)} ${t('rar.'+cardRarity(card))||rarity.label}`);
 
   document.getElementById('moDesc').textContent = (typeof window.getCardDesc==='function'?window.getCardDesc(card.name):'')||card.description||'';
 

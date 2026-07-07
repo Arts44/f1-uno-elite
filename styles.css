@@ -1267,3 +1267,33 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .ob-skip:hover{color:var(--tx1);}
 .ob-next{background:var(--red);border:none;color:#fff;font-family:var(--font-b);font-size:13px;font-weight:700;border-radius:100px;padding:9px 24px;cursor:pointer;transition:var(--ease);box-shadow:var(--sh-sm);}
 .ob-next:hover{filter:brightness(1.08);transform:translateY(-1px);}
+
+/* ══════════════════════════════════════════════════════════
+   DIVINE — animated iridescent gradient for the top rarity.
+   Applied via dedicated classes (the metadata color string
+   stays as a plain fallback). One shared keyframe timeline;
+   background-position only (no per-frame JS).
+   ══════════════════════════════════════════════════════════ */
+@keyframes divineShift{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+.rar-divine-bg{
+  background-image:linear-gradient(115deg,#8B5CF6,#3B82F6,#14B8A6,#FACC15,#F472B6,#8B5CF6)!important;
+  background-size:300% 300%!important;
+  color:#fff!important;
+  animation:divineShift 8s ease-in-out infinite;
+}
+.rar-divine-text{
+  background-image:linear-gradient(115deg,#8B5CF6,#3B82F6,#14B8A6,#D99E00,#F472B6,#8B5CF6);
+  background-size:300% 300%;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent;
+  animation:divineShift 8s ease-in-out infinite;
+}
+/* Reduced motion: static iridescent gradient instead of the animation */
+@media (prefers-reduced-motion:reduce){
+  .rar-divine-bg,.rar-divine-text{animation:none;background-position:50% 50%;}
+}
