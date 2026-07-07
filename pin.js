@@ -337,6 +337,22 @@ export function getFontTheme(){ return localStorage.getItem('f1uno_font') || 'ci
 export function setFontTheme(id){
   localStorage.setItem('f1uno_font', id);
   document.documentElement.setAttribute('data-font', id);
+  _ensureFontLoaded(id); // fetch/decode the WOFF2 now so the swap is immediate
+}
+
+// Non-default themes are lazy (only the default pair is precached). Passively
+// relying on the CSS-variable flip to trigger the download can leave freshly
+// picked text on the fallback face until a reflow — so we proactively load the
+// theme's display+body faces at the weights the app uses (body 400, titles 700).
+function _ensureFontLoaded(id){
+  if(!document.fonts || typeof document.fonts.load !== 'function') return;
+  const theme = FONT_THEMES.find(f => f.id === id);
+  if(!theme) return;
+  const families = [...new Set([theme.display, theme.body].map(s => s.split(',')[0].trim()))];
+  families.forEach(fam => {
+    document.fonts.load(`400 1em ${fam}`).catch(()=>{});
+    document.fonts.load(`700 1em ${fam}`).catch(()=>{});
+  });
 }
 
 export function renderSettings(){
