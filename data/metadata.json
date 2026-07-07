@@ -166,27 +166,27 @@
   "rarities": {
     "epic": {
       "label": "Épique",
-      "color": "#AF52DE",
+      "color": "#C026D3",
       "stars": 1
     },
     "legendary": {
       "label": "Légendaire",
-      "color": "#FF9500",
+      "color": "#FF7A00",
       "stars": 2
     },
     "mythic": {
       "label": "Mythique",
-      "color": "#34C759",
+      "color": "#00C853",
       "stars": 3
     },
     "ultra": {
       "label": "Ultra rare",
-      "color": "#FF2D55",
+      "color": "#FF1744",
       "stars": 4
     },
     "cosmic": {
       "label": "Cosmique",
-      "color": "#7C3AED",
+      "color": "#7C4DFF",
       "stars": 5
     },
     "divine": {
