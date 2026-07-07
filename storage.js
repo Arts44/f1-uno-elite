@@ -99,7 +99,8 @@ export function cardTotalQty(id){ const card=CARDS_DB.find(c=>c.id===id); return
 
 export function baseCardRarity(card){
   if(card.champion) return 'mythic';
-  return ROLE_BASE_RARITY[card.category] || 'rare';
+  // 'epic' is the lowest rung of the card rarity scale (rarityKeys)
+  return ROLE_BASE_RARITY[card.category] || 'epic';
 }
 
 export function variantRarity(card,typeId){

@@ -148,8 +148,6 @@
     "promo_yellow": "ultra"
   },
   "rarityKeys": [
-    "common",
-    "rare",
     "epic",
     "legendary",
     "mythic",
@@ -158,14 +156,12 @@
     "divine"
   ],
   "rarityOrder": {
-    "common": 0,
-    "rare": 1,
-    "epic": 2,
-    "legendary": 3,
-    "mythic": 4,
-    "ultra": 5,
-    "cosmic": 6,
-    "divine": 7
+    "epic": 0,
+    "legendary": 1,
+    "mythic": 2,
+    "ultra": 3,
+    "cosmic": 4,
+    "divine": 5
   },
   "rarities": {
     "common": {

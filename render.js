@@ -109,7 +109,7 @@ export function renderSidebar(){
   if (ftp) {
     ftp.innerHTML='';
     Object.values(CARD_TYPES).forEach(ct=>{
-      const r=RARITIES[TYPE_BADGE_RARITY[ct.id]||'rare']||{};
+      const r=RARITIES[TYPE_BADGE_RARITY[ct.id]||'epic']||{};
       const btn=document.createElement('button');
       btn.className='fpill'+(filters.type===ct.id?' active':'');
       btn.innerHTML=`<span style="font-size:14px">${ct.icon}</span>${t('type.'+ct.id)||ct.label}<span class="fc" style="color:${r.color||'#888'}">${'★'.repeat(r.stars||1)}</span>`;
