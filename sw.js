@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v8';
+const SW_VERSION = 'v9';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -18,8 +18,11 @@ const SHELL_ASSETS = [
   'index-dev.html',
   'styles.css',
   'manifest.webmanifest',
+  'favicon.ico',
   'icons/icon-192.png',
   'icons/icon-512.png',
+  'screenshots/desktop-collection.png',
+  'screenshots/mobile-collection.png',
   // Production bundle
   'app.bundle.js',
   // Raw ES modules (dev entry point, index-dev.html)
