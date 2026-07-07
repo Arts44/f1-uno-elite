@@ -4,7 +4,7 @@
 import { DEBUG, log } from './logger.js';
 import { t } from './i18n.js';
 import {
-  CARDS_DB, CARD_TYPES, RARITIES, RARITY_KEYS, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES,
+  CARDS_DB, CARD_TYPES, RARITIES, RARITY_KEYS, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityTextColor,
   CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_LOGOS, DRIVER_IMAGES,
   TEAM_LOGO_BG, TEAM_LOGO_NOEFFECTS
 } from './data.js';
@@ -126,9 +126,12 @@ export function renderSidebar(){
       const r=RARITIES[rid];
       if(!r) return;
       const btn=document.createElement('button');
-      btn.className='fpill'+(filters.rarity===rid?' active':'');
+      btn.className='fpill rar-pill'+(filters.rarity===rid?' active':'');
       const isDivine = rid==='divine';
-      btn.innerHTML=`<span class="${isDivine?'rar-divine-bg':''}" style="width:10px;height:10px;border-radius:50%;${isDivine?'':`background:${r.color};`}display:inline-block;flex-shrink:0"></span>${t('rar.'+rid)}<span class="fc${isDivine?' rar-divine-text':''}" style="${isDivine?'':`color:${r.color}`}">${'★'.repeat(r.stars)}</span>`;
+      // --rarc drives the tinted background/border (CSS color-mix), so the
+      // .active state can still override it cleanly (no inline background)
+      btn.style.setProperty('--rarc', isDivine?'#8B5CF6':r.color);
+      btn.innerHTML=`<span class="${isDivine?'rar-divine-bg':''}" style="width:13px;height:13px;border-radius:4px;${isDivine?'':`background:${r.color};`}display:inline-block;flex-shrink:0"></span>${t('rar.'+rid)}<span class="fc${isDivine?' rar-divine-text':''}" style="${isDivine?'':`color:${r.color}`}">${'★'.repeat(r.stars)}</span>`;
       btn.onclick=()=>{filters.rarity=filters.rarity===rid?null:rid;renderSidebar();applyFilters();};
       frp.appendChild(btn);
     });
@@ -479,7 +482,7 @@ export function renderGrid(cards){
         <div class="card-year">${card.season||2025}</div>
         <div class="card-team">${card.team||''}</div>
         <div class="card-rarity-row">
-          <span class="card-rarity${cardRarity(card)==='divine'?' rar-divine-bg':''}" style="${cardRarity(card)==='divine'?'':`background:${rarity.color}20;color:${rarity.color}`}">${t('rar.'+cardRarity(card))} ${'★'.repeat(rarity.stars)}</span>
+          <span class="card-rarity${cardRarity(card)==='divine'?' rar-divine-bg':''}" style="${cardRarity(card)==='divine'?'':`background:${rarity.color};color:${rarityTextColor(rarity.color)}`}">${t('rar.'+cardRarity(card))} ${'★'.repeat(rarity.stars)}</span>
           <div class="status-chips">
             <div class="schip${isWish?' on':''}" data-s="wishlist" data-action="quickToggle" data-card="${card.id}" data-status="wishlist" title="Wishlist">⭐</div>
             <div class="schip${isFav?' on':''}" data-s="favorite" data-action="quickToggle" data-card="${card.id}" data-status="favorite" title="Favori">❤️</div>
@@ -566,7 +569,7 @@ function _handleSearch(value, otherInput){
       return `<div class="sr-item" data-action="selectCard" data-card="${c.id}">
         <span class="sr-num">#${c.id}</span>
         <span class="sr-name">${catEmoji(c.category)} ${c.name}</span>
-        <span class="sr-sub${rar==='divine'?' rar-divine-text':''}" style="${rar==='divine'?'':`color:${rarData.color||'var(--tx3)'}`}">${t('rar.'+rar)||rarData.label||rar}</span>
+        <span class="sr-sub sr-rar${rar==='divine'?' rar-divine-bg':''}" style="${rar==='divine'?'':`background:${rarData.color||'var(--surface3)'};color:${rarityTextColor(rarData.color)}`}">${t('rar.'+rar)||rarData.label||rar}</span>
       </div>`;
     }).join('') || '<div class="sr-item"><span class="sr-name" style="color:var(--tx3)">Aucun résultat</span></div>';
     searchDd.classList.add('open');
@@ -637,7 +640,13 @@ export function openModal(id){
   if(card.champion) addTag('champion',`👑 Champion ${card.championYears.join(', ')}`);
   const tagMap={legend:'⭐ Légende',fan_favorite:'❤️ Fan Favorite',rising_star:'🌟 Rising Star',top_driver:'🎯 Top Driver',legendary:'🔱 Légendaire',prestige:'💫 Prestige',night_race:'🌙 Nuit',high_speed:'⚡ Vitesse'};
   (card.tags||[]).forEach(t=>{if(tagMap[t]) addTag(t,tagMap[t]);});
-  addTag(cardRarity(card)==='divine'?'rar-divine-text':'',`${'★'.repeat(rarity.stars)} ${t('rar.'+cardRarity(card))||rarity.label}`);
+  { // rarity tag: solid rarity color (divine keeps its animated gradient)
+    const rt=document.createElement('span');
+    rt.className='mtag'+(cardRarity(card)==='divine'?' rar-divine-bg':'');
+    if(cardRarity(card)!=='divine'){ rt.style.background=rarity.color; rt.style.color=rarityTextColor(rarity.color); }
+    rt.textContent=`${'★'.repeat(rarity.stars)} ${t('rar.'+cardRarity(card))||rarity.label}`;
+    tagsEl.appendChild(rt);
+  }
 
   document.getElementById('moDesc').textContent = (typeof window.getCardDesc==='function'?window.getCardDesc(card.name):'')||card.description||'';
 

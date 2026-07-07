@@ -16,6 +16,17 @@ export function setCurrentSeason(season){ _currentSeason = season; }
 export let CARD_TYPES = {};
 export let TYPE_BADGE_RARITY = {};
 export let TYPE_BADGE_STYLES = {};
+
+// Readable text color for a solid chip of the given background color:
+// white or near-black, whichever has the higher WCAG contrast.
+export function rarityTextColor(hex){
+  if(!/^#[0-9a-fA-F]{6}$/.test(hex||'')) return '#fff';
+  const [r,g,b] = [1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255)
+    .map(c=>c<=0.03928 ? c/12.92 : ((c+0.055)/1.055)**2.4);
+  const L = 0.2126*r + 0.7152*g + 0.0722*b;
+  // contrast vs white: 1.05/(L+.05) — vs #141414 (L≈0.0091): (L+.05)/0.0591
+  return (1.05/(L+0.05)) >= ((L+0.05)/0.0591) ? '#fff' : '#141414';
+}
 export let RARITY_KEYS = [];
 export let RARITY_ORDER = {};
 export let RARITIES = {};

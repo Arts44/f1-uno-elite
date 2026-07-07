@@ -2,7 +2,7 @@
    STATS — live header/counter updates + stats view rendering
    ══════════════════════════════════════════════════════════ */
 import { t } from './i18n.js';
-import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES } from './data.js';
+import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, rarityTextColor } from './data.js';
 import {
   getTypeData, cardOwned, cardWishlist, cardDoubles, cardMissing, cardFavorite,
   cardRarity, variantRarity, cardTotalQty
@@ -209,9 +209,14 @@ export function renderStats(){
     const reachable = CARDS_DB.filter(c => c.types.some(t => variantRarity(c,t) === rKey)).length;
     if(reachable === 0) return '';
     const rarPct = Math.round((ownedAtRar/reachable)*100);
-    const divCls = rKey==='divine' ? ' class="rar-divine-text"' : '';
-    const colStyle = rKey==='divine' ? '' : ` style="color:${rar.color}"`;
-    return svRow(`<span${divCls}${colStyle}>★</span>`, `<span${divCls}${colStyle}>${t('rar.'+rKey)}</span>`, ownedAtRar, reachable, rarPct);
+    // solid color dot (same visual weight as team/type rows) + colored label
+    const dot = rKey==='divine'
+      ? '<span class="sv-team-dot rar-divine-bg"></span>'
+      : `<span class="sv-team-dot" style="background:${rar.color}"></span>`;
+    const label = rKey==='divine'
+      ? `<span class="rar-divine-text">${t('rar.'+rKey)}</span>`
+      : `<span style="color:${rar.color}">${t('rar.'+rKey)}</span>`;
+    return svRow(dot, label, ownedAtRar, reachable, rarPct);
   }).join('');
 
   // — Cartes phares (highlights) — computed from current data only.
@@ -229,7 +234,7 @@ export function renderStats(){
       <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_rarest')}</div>
         <div class="sv-feat-name">${CATS[rarest.category]?.emoji||'🃏'} #${rarest.id} ${rarest.name}</div>
-        <div class="sv-feat-sub${cardRarity(rarest)==='divine'?' rar-divine-text':''}" style="${cardRarity(rarest)==='divine'?'':`color:${rr.color||'var(--tx2)'}`}">${t('rar.'+cardRarity(rarest))} ${'★'.repeat(rr.stars||1)}</div>
+        <div class="sv-feat-sub sv-feat-chip${cardRarity(rarest)==='divine'?' rar-divine-bg':''}" style="${cardRarity(rarest)==='divine'?'':`background:${rr.color||'var(--surface3)'};color:${rarityTextColor(rr.color)}`}">${t('rar.'+cardRarity(rarest))} ${'★'.repeat(rr.stars||1)}</div>
       </div>
       <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_most_copies')}</div>
