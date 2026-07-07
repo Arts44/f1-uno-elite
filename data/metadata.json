@@ -164,45 +164,61 @@
     "divine": 5
   },
   "rarities": {
-    "common": {
-      "label": "Commune",
-      "color": "#8E8E93",
-      "stars": 1
-    },
-    "rare": {
-      "label": "Rare",
-      "color": "#007AFF",
-      "stars": 2
-    },
     "epic": {
       "label": "Épique",
       "color": "#AF52DE",
-      "stars": 3
+      "stars": 1
     },
     "legendary": {
       "label": "Légendaire",
       "color": "#FF9500",
-      "stars": 4
+      "stars": 2
     },
     "mythic": {
       "label": "Mythique",
       "color": "#34C759",
-      "stars": 5
+      "stars": 3
     },
     "ultra": {
       "label": "Ultra rare",
       "color": "#FF2D55",
-      "stars": 6
+      "stars": 4
     },
     "cosmic": {
       "label": "Cosmique",
       "color": "#7C3AED",
-      "stars": 7
+      "stars": 5
     },
     "divine": {
       "label": "Divin",
       "color": "#FACC15",
-      "stars": 8
+      "stars": 6
+    }
+  },
+  "typeBadgeStyles": {
+    "common": {
+      "color": "#8E8E93",
+      "stars": 1
+    },
+    "rare": {
+      "color": "#007AFF",
+      "stars": 2
+    },
+    "epic": {
+      "color": "#AF52DE",
+      "stars": 3
+    },
+    "legendary": {
+      "color": "#FF9500",
+      "stars": 4
+    },
+    "mythic": {
+      "color": "#34C759",
+      "stars": 5
+    },
+    "ultra": {
+      "color": "#FF2D55",
+      "stars": 6
     }
   },
   "categories": {

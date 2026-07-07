@@ -4,7 +4,7 @@
 import { DEBUG, log } from './logger.js';
 import { t } from './i18n.js';
 import {
-  CARDS_DB, CARD_TYPES, RARITIES, RARITY_KEYS, RARITY_ORDER, TYPE_BADGE_RARITY,
+  CARDS_DB, CARD_TYPES, RARITIES, RARITY_KEYS, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES,
   CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_LOGOS, DRIVER_IMAGES,
   TEAM_LOGO_BG, TEAM_LOGO_NOEFFECTS
 } from './data.js';
@@ -109,7 +109,7 @@ export function renderSidebar(){
   if (ftp) {
     ftp.innerHTML='';
     Object.values(CARD_TYPES).forEach(ct=>{
-      const r=RARITIES[TYPE_BADGE_RARITY[ct.id]||'epic']||{};
+      const r=TYPE_BADGE_STYLES[TYPE_BADGE_RARITY[ct.id]]||{};
       const btn=document.createElement('button');
       btn.className='fpill'+(filters.type===ct.id?' active':'');
       btn.innerHTML=`<span style="font-size:14px">${ct.icon}</span>${t('type.'+ct.id)||ct.label}<span class="fc" style="color:${r.color||'#888'}">${'★'.repeat(r.stars||1)}</span>`;

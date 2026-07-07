@@ -15,6 +15,7 @@ export function setCurrentSeason(season){ _currentSeason = season; }
 // Metadata-derived tables (populated by _applyMetadata)
 export let CARD_TYPES = {};
 export let TYPE_BADGE_RARITY = {};
+export let TYPE_BADGE_STYLES = {};
 export let RARITY_KEYS = [];
 export let RARITY_ORDER = {};
 export let RARITIES = {};
@@ -50,6 +51,9 @@ function _showDataError(msg){
 function _applyMetadata(meta){
   CARD_TYPES = meta.cardTypes;
   TYPE_BADGE_RARITY = meta.typeBadgeRarity;
+  // Visual ladder of the sidebar type pills — independent from the card
+  // rarity scale (which starts at 'epic' / 1★)
+  TYPE_BADGE_STYLES = meta.typeBadgeStyles;
   RARITY_KEYS = meta.rarityKeys;
   RARITY_ORDER = meta.rarityOrder;
   RARITIES = meta.rarities;
