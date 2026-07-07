@@ -8,6 +8,7 @@ import { switchView, showToast, toggleTheme, currentView, setCurrentView } from 
 import { triggerImport, collectionSnapshot, _showImportDialog } from './storage.js';
 import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg } from './backup.js';
 import { initApp } from './app.js';
+import { maybeShowOnboarding } from './onboarding.js';
 
 // PIN storage helpers (localStorage-based, SHA-256 hashed)
 export function isPinEnabled(){ return localStorage.getItem('f1uno_pin_enabled')==='true'; }
@@ -124,6 +125,7 @@ function _launchApp(){
   if(collectionView) collectionView.style.display='block';
   initApp();
   if(isViewerMode) _applyViewerMode();
+  else maybeShowOnboarding(); // no-op unless very first launch
 }
 
 function _applyViewerMode(){

@@ -1248,3 +1248,22 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .badges-progress-fill{width:0%;}
 .user-title-next{cursor:pointer;}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+/* ══════════════════════════════════════════════════════════
+   ONBOARDING — first-launch intro (3 slides)
+   ══════════════════════════════════════════════════════════ */
+.ob-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;animation:obFade 0.3s ease;}
+.ob-overlay.ob-closing{opacity:0;transition:opacity 0.25s ease;}
+@keyframes obFade{from{opacity:0}to{opacity:1}}
+.ob-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--sh-lg);max-width:360px;width:100%;padding:28px 24px 20px;text-align:center;}
+.ob-icon{font-size:44px;line-height:1;margin-bottom:14px;}
+.ob-title{font-family:var(--font-d);font-weight:800;font-size:20px;color:var(--tx1);margin-bottom:8px;}
+.ob-text{font-size:14px;line-height:1.55;color:var(--tx2);min-height:88px;}
+.ob-dots{display:flex;gap:6px;justify-content:center;margin:14px 0 18px;}
+.ob-dot{width:7px;height:7px;border-radius:50%;background:var(--border);transition:var(--ease);}
+.ob-dot.active{background:var(--red);transform:scale(1.25);}
+.ob-btns{display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.ob-skip{background:none;border:none;color:var(--tx3);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;padding:9px 10px;border-radius:100px;transition:var(--ease);}
+.ob-skip:hover{color:var(--tx1);}
+.ob-next{background:var(--red);border:none;color:#fff;font-family:var(--font-b);font-size:13px;font-weight:700;border-radius:100px;padding:9px 24px;cursor:pointer;transition:var(--ease);box-shadow:var(--sh-sm);}
+.ob-next:hover{filter:brightness(1.08);transform:translateY(-1px);}

@@ -23,6 +23,7 @@ import {
   setAuthenticated
 } from './pin.js';
 import { maybeHandleBackupHash } from './backup.js';
+import { isOnboarded, markOnboarded } from './onboarding.js';
 
 export function initApp() {
   log('Initialisation de l\'app...');
@@ -300,6 +301,10 @@ if(!window._pinEventListenersAttached) {
 log('Setup done:', isSetupDone());
 log('PIN enabled:', isPinEnabled());
 log('Viewer mode allowed:', isViewerModeAllowed());
+
+// Existing installs (setup already done before the onboarding feature
+// shipped) must never see the intro retroactively: flag them silently.
+if(isSetupDone() && !isOnboarded()) markOnboarded();
 
 if(!isSetupDone()){
   // First launch
