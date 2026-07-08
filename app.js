@@ -19,6 +19,7 @@ import {
 } from './badges.js';
 import {
   isViewerMode, pinKey, pinDel, showAdminPinScreen, showSetupScreen,
+  needsLanguageChoice, showLanguageScreen,
   _bindViewerBrowseBtn, isViewerModeAllowed, isSetupDone, isPinEnabled,
   setAuthenticated, applySavedFont
 } from './pin.js';
@@ -311,9 +312,15 @@ log('Viewer mode allowed:', isViewerModeAllowed());
 if(isSetupDone() && !isTutorialSeen()) markTutorialSeen();
 
 if(!isSetupDone()){
-  // First launch
-  log('First launch - showing setup screen');
-  showSetupScreen();
+  // First launch: language choice first (only if none was ever set),
+  // then the PIN setup — which then runs in the chosen language.
+  if(needsLanguageChoice()){
+    log('First launch - showing language screen');
+    showLanguageScreen();
+  } else {
+    log('First launch - showing setup screen');
+    showSetupScreen();
+  }
 } else if(!isPinEnabled()){
   // No PIN — go straight to app
   log('PIN disabled - going straight to app');

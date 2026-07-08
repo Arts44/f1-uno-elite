@@ -143,6 +143,49 @@ function _applyViewerMode(){
   showToast(t('toast.viewer'));
 }
 
+/* ── FIRST-LAUNCH LANGUAGE CHOICE ──
+   Shown BEFORE the PIN setup, only when no language was ever chosen
+   (no f1uno_lang key). Existing installs (setup done) never see it,
+   even if they never touched the Settings language selector. */
+export function needsLanguageChoice(){
+  return !isSetupDone() && !localStorage.getItem('f1uno_lang');
+}
+
+const LANG_FLAGS = {en:'🇬🇧',fr:'🇫🇷',es:'🇪🇸',zh:'🇨🇳',it:'🇮🇹',nl:'🇳🇱',de:'🇩🇪'};
+// The prompt is deliberately shown in ALL 7 languages at once (plus the
+// native language names): the screen is language-neutral by design, so
+// there is no "wrong language flash" before the user chooses.
+const LANG_PROMPTS = ['Choose your language','Choisis ta langue','Elige tu idioma','选择你的语言','Scegli la tua lingua','Kies je taal','Wähle deine Sprache'];
+
+export function showLanguageScreen(){
+  const ls = document.getElementById('login-screen');
+  if(!ls) return;
+  const buttons = Object.entries(LANGS).map(([code,label]) => `
+      <button class="lang-opt" data-lang="${code}" type="button">
+        <span class="lang-flag" aria-hidden="true">${LANG_FLAGS[code]||'🌐'}</span>
+        <span class="lang-name" lang="${code}">${label}</span>
+      </button>`).join('');
+  ls.querySelector('.login-box').innerHTML = `
+    <div class="login-duo">
+      <div class="login-f1"><img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" alt="F1"></div>
+      <span class="login-x">×</span>
+      <div class="login-uno"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="UNO"></div>
+    </div>
+    <div class="lang-globe" aria-hidden="true">🌐</div>
+    <div class="lang-prompt">${LANG_PROMPTS.join(' · ')}</div>
+    <div class="lang-grid" role="group" aria-label="Language">${buttons}</div>`;
+  ls.querySelectorAll('.lang-opt').forEach(btn => btn.addEventListener('click', () => {
+    const code = btn.getAttribute('data-lang');
+    log('language chosen:', code);
+    // Persist only — no full applyLanguage() re-render here: the app is
+    // not initialized yet. The setup screen below renders through t()
+    // in the chosen language, and initApp() applies it to everything.
+    localStorage.setItem('f1uno_lang', code);
+    document.documentElement.lang = code;
+    showSetupScreen();
+  }));
+}
+
 export function showSetupScreen(){
   const ls = document.getElementById('login-screen');
   if(!ls) return;

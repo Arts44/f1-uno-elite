@@ -282,6 +282,20 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .setup-btn.secondary{background:transparent;border:1.5px solid var(--border);color:var(--tx2);}
 .setup-btn.secondary:hover{background:var(--surface2);color:var(--tx1);}
 
+/* ── First-launch language choice ──
+   Language-neutral screen (7 native names + the prompt in all 7),
+   styled like the setup screen; theme-aware through the CSS vars. */
+.lang-globe{font-size:34px;text-align:center;margin:14px 0 2px;line-height:1;}
+.lang-prompt{font-size:11px;color:var(--tx3);text-align:center;line-height:1.7;margin:0 0 18px;}
+.lang-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+.lang-opt{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-md);border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;transition:var(--ease);text-align:left;}
+.lang-opt:hover,.lang-opt:focus-visible{border-color:var(--red);background:var(--surface);transform:translateY(-1px);box-shadow:var(--sh-sm);outline:none;}
+.lang-opt:active{transform:none;}
+.lang-opt:last-child{grid-column:1 / -1;justify-content:center;}
+.lang-flag{font-size:20px;line-height:1;}
+.lang-name{font-family:var(--font-b);font-size:14px;font-weight:600;color:var(--tx1);}
+@media (prefers-reduced-motion:reduce){.lang-opt:hover{transform:none;}}
+
 /* VIEWER MODE */
 body.viewer-mode .card-actions,
 body.viewer-mode [data-action="quickToggle"],
