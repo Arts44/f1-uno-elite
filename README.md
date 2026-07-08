@@ -74,7 +74,7 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 - **Offline embedded fallback** (`data-embedded.js`): if the JSON files cannot be fetched, the app boots from data baked into the page.
 
 ### User experience
-- **First-launch onboarding**: a 3-slide intro (mark cards, navigate the tabs, back up your collection) shown **once** right after setup — a `f1uno_onboarded` flag prevents it from ever reappearing (and existing installs are flagged silently so they never see it retroactively). Skippable, themed for light + dark, translated in all 7 languages.
+- **Interactive tutorial**: a 26-step guided tour (spotlight + bubble) that has you *perform* the real actions — add a card, count doubles, filter, validate/remove badges, read the stats, tour the settings. Runs in a **sandbox**: every change made during the tour is reverted on finish or quit, so your collection is untouched. Two escape hatches on every step (*skip this step* / *quit tutorial*, plus Esc). Auto-starts once after setup (`f1uno_onboarded` flag; existing installs are flagged silently), replayable anytime from Settings. Themed light + dark, translated in all 7 languages.
 - **Internationalisation (i18n)**: 7 languages — 🇬🇧 English, 🇫🇷 French, 🇪🇸 Spanish, 🇨🇳 Chinese, 🇮🇹 Italian, 🇳🇱 Dutch, 🇩🇪 German.
 - **Self-hosted fonts + font picker**: all fonts are bundled locally as WOFF2 (no CDN). **Settings → Font** offers **5 themes** — *Circuit* (default), *Sprint*, *Prestige*, *Minimal*, *Original* — each a display + body pairing, applied instantly and persisted (`f1uno_font`, re-applied before render to avoid a flash). The default pair is precached; the others download on first use and then work offline. **Driver numbers keep their own fixed identity fonts** (Orbitron / Racing Sans One) and are deliberately *not* affected by the picker.
 - **Light / dark theme**, persisted and applied before render to avoid a flash of the wrong theme.
@@ -145,6 +145,15 @@ Then open **http://localhost:8000/** (i.e. `index.html`).
 
 > `app.bundle.js` is a generated artifact — after editing any `*.js` module, re-run `npm run build` (or keep `npm run dev` running) to refresh it.
 
+### Option C — deploy to GitHub Pages
+
+GitHub Pages serves this folder **as-is** (no server-side build), from a sub-path (`https://<user>.github.io/<repo>/`). The app is ready for that:
+
+- **All URLs are relative** — HTML assets, `manifest.webmanifest` (`start_url`/`scope` = `./`), the service-worker registration (`sw.js`, scope = the sub-folder) and its precache list, and every `fetch()` in the code. Nothing starts with `/`, so the app works identically at the domain root, under a sub-path, and on localhost.
+- **The built bundle is committed** (`app.bundle.js` + sourcemap) precisely because Pages runs no `npm` step. Rebuild it before every commit that touches a JS source (`npm run build`); a local git *pre-commit* hook can automate this (rebuild + `git add app.bundle.js*` whenever a staged `*.js` source changed).
+- **Publishing**: push the repo to GitHub, then *Settings → Pages → Source: Deploy from a branch → Branch: `main` / root*. The site appears at `https://<user>.github.io/<repo>/` after a minute or two.
+- **Updates**: the service worker precaches the app shell version-tagged by `SW_VERSION` (in `sw.js`). Bump it on every release — visitors get the new version on their **second** load (first load serves the cached shell while the new worker installs and replaces the old cache).
+
 ### Tests
 
 The unit test suite uses **Node's built-in test runner** (`node --test`) — no test framework is installed, keeping the zero-runtime-dependency promise intact (esbuild remains the only devDependency).
@@ -165,10 +174,10 @@ Tests live in `tests/` (one file per module) and run against small self-containe
 - **History** — one point per day (same-day updates in place), 365-point cap, corrupted-data fallback.
 - **Collector tools** — `missingCards` (incl. the qty-0-owned edge and the wishlist subset), `doublesList` (duplicated types + qty), `tradeList`.
 
-**Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/font-switching/animations, onboarding, and the collector-tools UI (its selection logic *is* covered above).
+**Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/font-switching/animations, the interactive tutorial's DOM engine (its snapshot/restore and step sequence *are* covered), and the collector-tools UI (its selection logic *is* covered above).
 
 ### First run
-1. On first launch, a setup screen lets you optionally define a **PIN code** (or skip it), followed by a short **onboarding** (shown only once).
+1. On first launch, a setup screen lets you optionally define a **PIN code** (or skip it), followed by the **interactive tutorial** (auto-starts only once; replayable from Settings).
 2. Navigate between **Collection / Badges / Stats / Settings** via the bottom bar.
 3. Mark owned variants from a card's detail modal.
 4. Optionally pick a **font theme** and language in **Settings**.
@@ -221,7 +230,7 @@ F1/
 ├── qrcodegen.js          # Vendored QR encoder (Project Nayuki, MIT) — byte mode + SVG
 ├── history.js            # Daily owned-count snapshots for the Stats progression curve
 ├── collector.js          # Missing / doubles / trade-list selection logic (pure, tested)
-├── onboarding.js         # First-launch 3-slide intro (once, f1uno_onboarded flag)
+├── tutorial.js           # Interactive guided tour (sandboxed, auto once, replayable)
 ├── badges.js             # Badge evaluation/rendering + user titles
 ├── stats.js              # computeStats() + updateStats() + renderStats() (progression, highlights, donut)
 ├── render.js             # Grid, sidebar, filters, modal, search, views, toast
@@ -273,7 +282,7 @@ The following is **not yet implemented** and is the main remaining work:
 **Why:** the no-backend MVP is done — backup reminder plus a shareable **backup code / QR** to restore on another device (see Features). What's still missing is *automatic* synchronisation: today, moving progress between devices is a manual step (copy/paste a code or scan a QR).
 **Idea:** an optional, opt-in encrypted backup to the user's own storage (Drive/Dropbox/a gist) or a lightweight backend (Supabase/Firebase). Requires API keys/accounts, so it stays out of the default client-only build.
 
-> Already shipped, not part of the roadmap: ES-module split of the former monolith, `DEBUG`-gated logging, esbuild production bundle, a **`node --test` unit-test suite**, **installable offline PWA** (manifest with maskable icons + screenshots, favicon, service worker), **device-to-device backup codes + QR transfer**, the **enriched Stats view** (progression curve, highlights, rarity donut) with a unified colour redesign, the **6-level rarity system** with the animated iridescent *divine* tier, **self-hosted fonts with a 5-theme picker**, **first-launch onboarding**, and **collector tools** (missing / doubles / trade lists).
+> Already shipped, not part of the roadmap: ES-module split of the former monolith, `DEBUG`-gated logging, esbuild production bundle, a **`node --test` unit-test suite**, **installable offline PWA** (manifest with maskable icons + screenshots, favicon, service worker), **device-to-device backup codes + QR transfer**, the **enriched Stats view** (progression curve, highlights, rarity donut) with a unified colour redesign, the **6-level rarity system** with the animated iridescent *divine* tier, **self-hosted fonts with a 5-theme picker**, the **interactive guided tutorial**, and **collector tools** (missing / doubles / trade lists).
 
 ---
 

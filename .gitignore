@@ -4,3 +4,14 @@
 
 # Dependencies
 node_modules/
+
+# OS cruft
+.DS_Store
+
+# Local-only tool settings (machine-specific permissions)
+.claude/settings.local.json
+
+# NOTE: app.bundle.js and app.bundle.js.map are COMMITTED on purpose —
+# GitHub Pages serves static files only (no npm build step), so the
+# repo must contain the built bundle. Rebuild with `npm run build`
+# before every commit that touches a JS source file.
