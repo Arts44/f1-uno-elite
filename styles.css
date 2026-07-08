@@ -366,7 +366,10 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   height: 100vh;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  z-index: 100;
+  /* Above the sticky header (z 100): with equal z-index the header,
+     later in the DOM, painted OVER the sidebar and its ✕ button
+     could never receive a real click. */
+  z-index: 120;
   transform: translateX(-100%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
@@ -532,7 +535,9 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.5);
-  z-index: 98;
+  /* Just under the sidebar (120) but above the sticky header (100)
+     so the dimmed area — header included — closes the sidebar. */
+  z-index: 110;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s, visibility 0.3s;
@@ -1300,9 +1305,13 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .tut-progress{font-family:var(--font-d);font-weight:700;font-size:10px;letter-spacing:1px;color:var(--tx3);text-transform:uppercase;margin-bottom:6px;}
 .tut-title{font-family:var(--font-d);font-weight:800;font-size:17px;color:var(--tx1);margin-bottom:5px;}
 .tut-text{font-size:13px;line-height:1.5;color:var(--tx2);margin-bottom:12px;}
-.tut-btns{display:flex;justify-content:space-between;align-items:center;gap:10px;}
-.tut-skip{background:none;border:none;color:var(--tx3);font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer;padding:8px 8px;border-radius:100px;transition:var(--ease);}
-.tut-skip:hover{color:var(--tx1);}
+.tut-btns{display:flex;justify-content:flex-end;align-items:center;gap:8px;flex-wrap:wrap;}
+/* Two clearly distinct escape hatches on every step:
+   quit = plain text link (leaves + restores), skip-step = outlined chip. */
+.tut-quit{background:none;border:none;color:var(--tx3);font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer;padding:8px 6px;border-radius:100px;transition:var(--ease);margin-right:auto;}
+.tut-quit:hover{color:var(--red);}
+.tut-skip-step{background:none;border:1px solid var(--border);color:var(--tx2);font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer;padding:7px 14px;border-radius:100px;transition:var(--ease);}
+.tut-skip-step:hover{border-color:var(--tx3);color:var(--tx1);}
 .tut-next{background:var(--red);border:none;color:#fff;font-family:var(--font-b);font-size:13px;font-weight:700;border-radius:100px;padding:8px 22px;cursor:pointer;transition:var(--ease);box-shadow:var(--sh-sm);}
 .tut-next:hover{filter:brightness(1.08);transform:translateY(-1px);}
 .tut-hint{font-size:12px;font-weight:600;color:var(--red);display:inline-flex;align-items:center;gap:5px;}
