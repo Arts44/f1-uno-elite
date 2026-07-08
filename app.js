@@ -20,7 +20,7 @@ import {
 import {
   isViewerMode, pinKey, pinDel, showAdminPinScreen, showSetupScreen,
   _bindViewerBrowseBtn, isViewerModeAllowed, isSetupDone, isPinEnabled,
-  setAuthenticated
+  setAuthenticated, applySavedFont
 } from './pin.js';
 import { maybeHandleBackupHash } from './backup.js';
 import { isOnboarded, markOnboarded } from './onboarding.js';
@@ -37,6 +37,9 @@ export function initApp() {
     applyFilters();
     updateStats();
     _renderSeasonPills();
+    // Re-assert the persisted font (inline vars) — robust even if the
+    // stylesheet's [data-font] rules are stale/missing.
+    applySavedFont();
     // Apply saved language on app load (after data is loaded)
     applyLanguage();
     // Load and apply user title

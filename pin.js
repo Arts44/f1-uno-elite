@@ -336,9 +336,33 @@ const FONT_THEMES = [
 export function getFontTheme(){ return localStorage.getItem('f1uno_font') || 'circuit'; }
 export function setFontTheme(id){
   localStorage.setItem('f1uno_font', id);
-  document.documentElement.setAttribute('data-font', id);
+  _applyFontVars(id);
   _ensureFontLoaded(id); // fetch/decode the WOFF2 now so the swap is immediate
 }
+
+// Apply the theme by writing --font-d/--font-b INLINE on <html>, so the font
+// switches even if the stylesheet's :root[data-font=…] rules are missing or
+// stale (e.g. a cache-first SW serving an old styles.css alongside new JS —
+// the exact "attribute changes but vars don't" failure). The data-font
+// attribute is still set for any CSS that hooks off it, but the JS map is the
+// source of truth. Falls back to the CSS default rule for an unknown id.
+function _applyFontVars(id){
+  const el = document.documentElement;
+  el.setAttribute('data-font', id);
+  const theme = FONT_THEMES.find(f => f.id === id);
+  if(theme){
+    el.style.setProperty('--font-d', theme.display);
+    el.style.setProperty('--font-b', theme.body);
+  } else {
+    el.style.removeProperty('--font-d');
+    el.style.removeProperty('--font-b');
+  }
+}
+
+// Re-assert the persisted font on app start (the tiny inline boot script in
+// index*.html already sets it pre-render to avoid a flash; this makes the
+// module the authority and covers the case where the boot script was absent).
+export function applySavedFont(){ _applyFontVars(getFontTheme()); }
 
 // Non-default themes are lazy (only the default pair is precached). Passively
 // relying on the CSS-variable flip to trigger the download can leave freshly
