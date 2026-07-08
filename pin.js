@@ -9,6 +9,8 @@ import { triggerImport, collectionSnapshot, _showImportDialog } from './storage.
 import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg } from './backup.js';
 import { initApp } from './app.js';
 import { maybeShowOnboarding } from './onboarding.js';
+import { missingCards, doublesList, tradeList } from './collector.js';
+import { CATS, CARD_TYPES, CARDS_DB, _currentSeason } from './data.js';
 
 // PIN storage helpers (localStorage-based, SHA-256 hashed)
 export function isPinEnabled(){ return localStorage.getItem('f1uno_pin_enabled')==='true'; }
@@ -379,6 +381,53 @@ function _ensureFontLoaded(id){
   });
 }
 
+/* ── Collector-tools text formatting (shareable lists). Card names are
+   data (never translated); category/rarity/type labels use i18n. ── */
+function _catLabel(cat){ const k='cat.'+cat, l=t(k); return l===k ? (CATS[cat]?.label||cat) : l; }
+function _typeLabel(id){ const k='type.'+id, l=t(k); return l===k ? (CARD_TYPES[id]?.label||id) : l; }
+
+function _groupByCat(rows){
+  const groups = [];
+  Object.keys(CATS).forEach(cat => {
+    const inCat = rows.filter(r => r.category === cat);
+    if(inCat.length) groups.push({ cat, rows: inCat });
+  });
+  rows.filter(r => !CATS[r.category]).forEach(r => {
+    let g = groups.find(g => g.cat === r.category);
+    if(!g){ g = { cat: r.category, rows: [] }; groups.push(g); }
+    g.rows.push(r);
+  });
+  return groups;
+}
+function _missingLine(r){ return `  #${r.id} ${r.name} — ${t('rar.'+r.rarity)}${r.wishlist?' ⭐':''}`; }
+function _doublesLine(r){
+  const types = r.types.map(ty => `${_typeLabel(ty.type)} ×${ty.qty}`).join(', ');
+  return `  #${r.id} ${r.name} — ${types}`;
+}
+function _groupedBlock(rows, lineFn){
+  return _groupByCat(rows).map(g =>
+    `${CATS[g.cat]?.emoji||''} ${_catLabel(g.cat)}\n${g.rows.map(lineFn).join('\n')}`
+  ).join('\n\n');
+}
+function _fmtHead(titleKey){ return `F1 UNO Élite — ${t(titleKey)} (${t('tools.season',{season:_currentSeason})})`; }
+
+function fmtMissing(){
+  const rows = missingCards();
+  const head = `${_fmtHead('tools.missing')}\n${rows.length} / ${CARDS_DB.length}`;
+  return rows.length ? `${head}\n\n${_groupedBlock(rows, _missingLine)}` : `${head}\n\n${t('tools.none')}`;
+}
+function fmtDoubles(){
+  const rows = doublesList();
+  const head = _fmtHead('tools.doubles');
+  return rows.length ? `${head}\n\n${_groupedBlock(rows, _doublesLine)}` : `${head}\n\n${t('tools.none')}`;
+}
+function fmtTrade(){
+  const { want, offer } = tradeList();
+  const wantBlock = want.length ? want.map(_missingLine).join('\n') : '  —';
+  const offerBlock = offer.length ? offer.map(_doublesLine).join('\n') : '  —';
+  return `${_fmtHead('tools.trade')}\n\n🔎 ${t('tools.want')} (${want.length})\n${wantBlock}\n\n🔄 ${t('tools.offer')} (${offer.length})\n${offerBlock}`;
+}
+
 export function renderSettings(){
   const el = document.getElementById('settingsView');
   if(!el) return;
@@ -524,6 +573,22 @@ export function renderSettings(){
       </div>
     </div>
 
+    <div class="setv-section">
+      <div class="setv-section-title">${t('s.tools')}</div>
+      <div class="setv-row" style="flex-direction:column;align-items:stretch;gap:10px;">
+        <div class="setv-row-sub">${t('s.tools_sub')}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="setv-btn" id="toolsMissingBtn">${t('tools.missing')}</button>
+          <button class="setv-btn" id="toolsDoublesBtn">${t('tools.doubles')}</button>
+          <button class="setv-btn" id="toolsTradeBtn">${t('tools.trade')}</button>
+        </div>
+        <div id="toolsArea" style="display:none;flex-direction:column;gap:8px;">
+          <textarea id="toolsOut" readonly rows="8" style="width:100%;resize:vertical;font-family:var(--font-b);font-size:12px;line-height:1.5;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--tx1);white-space:pre-wrap;"></textarea>
+          <button class="setv-btn" id="toolsCopyBtn" style="align-self:flex-start;">${t('tools.copy')}</button>
+        </div>
+      </div>
+    </div>
+
     ${pinOn ? `
     <div class="setv-section">
       <div class="setv-section-title">${t('s.session')}</div>
@@ -640,6 +705,19 @@ export function renderSettings(){
     } catch(e){
       errEl.textContent = e.message || t('bk.invalid');
     }
+  });
+
+  // — Collector tools: generate a shareable text list —
+  const toolsArea = el.querySelector('#toolsArea');
+  const toolsOut = el.querySelector('#toolsOut');
+  const showTools = txt => { toolsOut.value = txt; toolsArea.style.display = 'flex'; };
+  el.querySelector('#toolsMissingBtn')?.addEventListener('click', ()=>showTools(fmtMissing()));
+  el.querySelector('#toolsDoublesBtn')?.addEventListener('click', ()=>showTools(fmtDoubles()));
+  el.querySelector('#toolsTradeBtn')?.addEventListener('click', ()=>showTools(fmtTrade()));
+  el.querySelector('#toolsCopyBtn')?.addEventListener('click', async ()=>{
+    try { await navigator.clipboard.writeText(toolsOut.value); }
+    catch(e){ toolsOut.focus(); toolsOut.select(); document.execCommand('copy'); }
+    showToast(t('tools.copied'));
   });
 
   const langSel = el.querySelector('#langSel');
