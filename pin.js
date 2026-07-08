@@ -8,7 +8,7 @@ import { switchView, showToast, toggleTheme, currentView, setCurrentView } from 
 import { triggerImport, collectionSnapshot, _showImportDialog } from './storage.js';
 import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg } from './backup.js';
 import { initApp } from './app.js';
-import { maybeShowOnboarding } from './onboarding.js';
+import { maybeStartTutorial, startTutorial } from './tutorial.js';
 import { missingCards, doublesList, tradeList } from './collector.js';
 import { CATS, CARD_TYPES, CARDS_DB, _currentSeason } from './data.js';
 
@@ -127,7 +127,7 @@ function _launchApp(){
   if(collectionView) collectionView.style.display='block';
   initApp();
   if(isViewerMode) _applyViewerMode();
-  else maybeShowOnboarding(); // no-op unless very first launch
+  else maybeStartTutorial(); // no-op unless very first launch
 }
 
 function _applyViewerMode(){
@@ -476,6 +476,13 @@ export function renderSettings(){
           </button>`).join('')}
         </div>
       </div>
+      <div class="setv-row">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.replay_tut')}</div>
+          <div class="setv-row-sub">${t('s.replay_tut_sub')}</div>
+        </div>
+        <button class="setv-btn" id="replayTutBtn">${t('s.replay_tut_btn')}</button>
+      </div>
     </div>
 
     <div class="setv-section">
@@ -719,6 +726,8 @@ export function renderSettings(){
     catch(e){ toolsOut.focus(); toolsOut.select(); document.execCommand('copy'); }
     showToast(t('tools.copied'));
   });
+
+  el.querySelector('#replayTutBtn')?.addEventListener('click', ()=> startTutorial());
 
   const langSel = el.querySelector('#langSel');
   if(langSel) langSel.addEventListener('change', e=>setLang(e.target.value));

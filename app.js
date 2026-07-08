@@ -23,7 +23,7 @@ import {
   setAuthenticated, applySavedFont
 } from './pin.js';
 import { maybeHandleBackupHash } from './backup.js';
-import { isOnboarded, markOnboarded } from './onboarding.js';
+import { isTutorialSeen, markTutorialSeen } from './tutorial.js';
 
 export function initApp() {
   log('Initialisation de l\'app...');
@@ -305,9 +305,10 @@ log('Setup done:', isSetupDone());
 log('PIN enabled:', isPinEnabled());
 log('Viewer mode allowed:', isViewerModeAllowed());
 
-// Existing installs (setup already done before the onboarding feature
-// shipped) must never see the intro retroactively: flag them silently.
-if(isSetupDone() && !isOnboarded()) markOnboarded();
+// Existing installs (setup already done before the tutorial shipped)
+// must never get the guided tour auto-launched retroactively: flag them
+// silently. They can still replay it from Settings.
+if(isSetupDone() && !isTutorialSeen()) markTutorialSeen();
 
 if(!isSetupDone()){
   // First launch

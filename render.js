@@ -54,6 +54,7 @@ export function circuitSVG(cardId, size='card'){
 /* ── Collection / filter state ── */
 export let filters = {status:'all', category:null, type:null, rarity:null, year:null, search:'', champions:false};
 export let favoriteFirst = false;
+export function setFavoriteFirst(v){ favoriteFirst = v; } // restore hook (tutorial)
 export let currentCardId = null;
 export let sectionStates = {status: true, categories: true, types: true, rarities: true, year: true}; // false = développé, true = condensé
 export let currentView = 'collection'; // 'collection' | 'badges' | 'stats' | 'settings'
