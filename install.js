@@ -39,8 +39,24 @@ export function detectPlatform(ua, maxTouchPoints = 0){
   return 'other';
 }
 
+// Arc masquerades as Chrome in its UA, but injects --arc-palette-*
+// CSS variables on :root — the reliable way to identify it. Arc has
+// no install icon in its address bar and never fires
+// beforeinstallprompt, so Chrome instructions would point at a
+// nonexistent UI element there.
+export function isArcBrowser(win){
+  const w = win || window;
+  try {
+    return !!getComputedStyle(w.document.documentElement)
+      .getPropertyValue('--arc-palette-title').trim();
+  } catch(e){ return false; }
+}
+
 // Which manual-instruction i18n key fits the platform.
-export function installInstructionKey(platform){
+// opts.arc: Chromium engine identified as Arc → honest redirect message
+// instead of instructions pointing at an address-bar icon Arc lacks.
+export function installInstructionKey(platform, opts = {}){
+  if(platform === 'chromium' && opts.arc) return 'install.ins_arc';
   return {
     ios: 'install.ins_ios',
     mac_safari: 'install.ins_mac',
@@ -95,7 +111,9 @@ export function installRowHTML(){
   } else if(canPromptInstall()){
     action = `<button class="setv-btn install-native-btn" id="installNativeBtn">${t('install.btn')}</button>`;
   } else {
-    const key = installInstructionKey(detectPlatform(navigator.userAgent, navigator.maxTouchPoints || 0));
+    const key = installInstructionKey(
+      detectPlatform(navigator.userAgent, navigator.maxTouchPoints || 0),
+      { arc: isArcBrowser() });
     action = `<div class="install-ins">${t(key)}</div>`;
   }
   return `

@@ -47,6 +47,32 @@ describe('install — instruction key per platform', () => {
     assert.equal(installInstructionKey('other'), 'install.ins_generic');
     assert.equal(installInstructionKey(undefined), 'install.ins_generic');
   });
+
+  test('Arc (Chromium engine, no install icon) gets the honest Arc message', () => {
+    assert.equal(installInstructionKey('chromium', { arc: true }), 'install.ins_arc');
+    // arc flag is only meaningful on the Chromium engine
+    assert.equal(installInstructionKey('mac_safari', { arc: true }), 'install.ins_mac');
+    assert.equal(installInstructionKey('chromium', { arc: false }), 'install.ins_chromium');
+  });
+});
+
+describe('install — Arc detection via --arc-palette-* CSS variables', async () => {
+  const { isArcBrowser } = await import('../install.js');
+  // isArcBrowser reads the global getComputedStyle on win.document —
+  // stub it per assertion (restored after).
+  test('detects Arc when --arc-palette-title is set, not otherwise', () => {
+    const origGCS = globalThis.getComputedStyle;
+    try {
+      globalThis.getComputedStyle = () => ({ getPropertyValue: p => p === '--arc-palette-title' ? '#FFCDD6' : '' });
+      assert.equal(isArcBrowser({ document: { documentElement: {} } }), true);
+      globalThis.getComputedStyle = () => ({ getPropertyValue: () => '' });
+      assert.equal(isArcBrowser({ document: { documentElement: {} } }), false);
+      globalThis.getComputedStyle = () => { throw new Error('no CSSOM'); };
+      assert.equal(isArcBrowser({ document: { documentElement: {} } }), false);
+    } finally {
+      globalThis.getComputedStyle = origGCS;
+    }
+  });
 });
 
 describe('install — standalone detection', () => {
