@@ -225,7 +225,7 @@ F1/
 ├── sw.js                 # Service worker: versioned precache, cache-first shell,
 │                         #   stale-while-revalidate runtime cache for external assets
 ├── favicon.ico           # Favicon (16/32/48, derived from the app icon)
-├── icons/                # App icons (icon-192.png, icon-512.png — any maskable)
+├── icons/                # App icon: icon.svg (source) + icon-192/512.png exports (any maskable)
 ├── screenshots/          # Manifest install screenshots (desktop-* wide, mobile-* narrow)
 ├── fonts/                # Self-hosted WOFF2 (UI + driver-number fonts) + LICENSES (SIL OFL)
 │
