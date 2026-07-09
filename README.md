@@ -1,6 +1,8 @@
 # 🏎️ F1 UNO Élite — Collection Tracker
 
 > A client-side web app for tracking your **F1 UNO Élite** trading-card collection: manage owned cards, doubles, wishlist and favourites, unlock badges, and follow your completion stats — fully offline, with no backend.
+>
+> **Live app:** <https://arts44.github.io/f1-uno-elite/> (GitHub Pages)
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![Vanilla JS](https://img.shields.io/badge/JavaScript-vanilla-f7df1e?logo=javascript&logoColor=black)
@@ -58,6 +60,7 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 - **Service Worker** (`sw.js`): the app shell (HTML, CSS, all JS modules + the bundle, the `data/` JSON files, icons, screenshots, favicon and the default + driver-number fonts) is **precached at install** under a versioned cache and served **cache-first** — after the first visit the app loads and works fully offline.
 - External assets (team/driver images from formula1.com, the Wikimedia F1/UNO logos) are cached at runtime (*stale-while-revalidate*) in a separate cache, so previously-seen images also work offline. **Fonts are self-hosted** and same-origin, so they fall under the shell cache — not an external dependency.
 - Old shell caches are cleaned up automatically when a new Service Worker version activates.
+- **Guided install experience** (`install.js`): on Chrome/Edge/Android the `beforeinstallprompt` event is captured and surfaced as a native **Install** button in Settings plus a discreet, dismissable banner (a refusal is remembered — `f1uno_install_dismissed` — so it never nags). Browsers without the event get **platform-specific manual instructions** (iOS Safari: Share → Add to Home Screen, incl. iPadOS masquerading as macOS; macOS Safari: File → Add to Dock; Chromium: address-bar icon; Android menu; generic fallback) — and **Arc** (which has no install support and hides behind a Chrome UA) is detected via its injected `--arc-palette-*` CSS variables and gets an honest "open this in Chrome/Edge/Safari" message instead of instructions pointing at a nonexistent icon. Everything hides when the app already runs standalone.
 
 ### Collector tools
 - **Shareable lists** generated from the current collection, in **Settings → Collector tools** — to bring to a swap meet or a trade:
@@ -76,6 +79,7 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 ### User experience
 - **Interactive tutorial**: a 26-step guided tour (spotlight + bubble) that has you *perform* the real actions — add a card, count doubles, filter, validate/remove badges, read the stats, tour the settings. Runs in a **sandbox**: every change made during the tour is reverted on finish or quit, so your collection is untouched. Two escape hatches on every step (*skip this step* / *quit tutorial*, plus Esc). Auto-starts once after setup (`f1uno_onboarded` flag; existing installs are flagged silently), replayable anytime from Settings. Themed light + dark, translated in all 7 languages.
 - **Internationalisation (i18n)**: 7 languages — 🇬🇧 English, 🇫🇷 French, 🇪🇸 Spanish, 🇨🇳 Chinese, 🇮🇹 Italian, 🇳🇱 Dutch, 🇩🇪 German.
+- **First-launch language chooser**: before the PIN setup, a language-neutral screen (7 native language names + the prompt shown in all 7 languages at once — no wrong-language flash) lets you pick the language; setup and tutorial then run in it. Shown only when no language was ever chosen; existing installs never see it. The Settings selector remains the normal way to switch later.
 - **Self-hosted fonts + font picker**: all fonts are bundled locally as WOFF2 (no CDN). **Settings → Font** offers **5 themes** — *Circuit* (default), *Sprint*, *Prestige*, *Minimal*, *Original* — each a display + body pairing, applied instantly and persisted (`f1uno_font`, re-applied before render to avoid a flash). The default pair is precached; the others download on first use and then work offline. **Driver numbers keep their own fixed identity fonts** (Orbitron / Racing Sans One) and are deliberately *not* affected by the picker.
 - **Light / dark theme**, persisted and applied before render to avoid a flash of the wrong theme.
 - **Responsive design** from small phones (~320 px) to desktop — including the top bar, where the search field shrinks and secondary badges hide instead of overlapping — with a bottom tab bar (Collection / Badges / Stats / Settings).
@@ -147,12 +151,13 @@ Then open **http://localhost:8000/** (i.e. `index.html`).
 
 ### Option C — deploy to GitHub Pages
 
-GitHub Pages serves this folder **as-is** (no server-side build), from a sub-path (`https://<user>.github.io/<repo>/`). The app is ready for that:
+GitHub Pages serves this folder **as-is** (no server-side build), from a sub-path. This repo **is** deployed that way: **<https://arts44.github.io/f1-uno-elite/>**. What makes it work:
 
 - **All URLs are relative** — HTML assets, `manifest.webmanifest` (`start_url`/`scope` = `./`), the service-worker registration (`sw.js`, scope = the sub-folder) and its precache list, and every `fetch()` in the code. Nothing starts with `/`, so the app works identically at the domain root, under a sub-path, and on localhost.
-- **The built bundle is committed** (`app.bundle.js` + sourcemap) precisely because Pages runs no `npm` step. Rebuild it before every commit that touches a JS source (`npm run build`); a local git *pre-commit* hook can automate this (rebuild + `git add app.bundle.js*` whenever a staged `*.js` source changed).
+- **The built bundle is committed** (`app.bundle.js` + sourcemap) precisely because Pages runs no `npm` step. Rebuild it before every commit that touches a JS source (`npm run build`); a local git *pre-commit* hook automates this in this working copy (rebuild + `git add app.bundle.js*` whenever a staged JS source changed — hooks aren't versioned, so recreate it after a fresh clone).
 - **Publishing**: push the repo to GitHub, then *Settings → Pages → Source: Deploy from a branch → Branch: `main` / root*. The site appears at `https://<user>.github.io/<repo>/` after a minute or two.
 - **Updates**: the service worker precaches the app shell version-tagged by `SW_VERSION` (in `sw.js`). Bump it on every release — visitors get the new version on their **second** load (first load serves the cached shell while the new worker installs and replaces the old cache).
+- **Release routine**: edit sources → `npm run build` (the local pre-commit hook also enforces this) → bump `SW_VERSION` if any precached file changed → commit → `git push`. Pages redeploys automatically in ~1–2 minutes.
 
 ### Tests
 
@@ -173,11 +178,14 @@ Tests live in `tests/` (one file per module) and run against small self-containe
 - **Badges** — `evaluateBadgeCondition` for every metric, target clamping, unlock persistence (`isAutoBadgeUnlocked`).
 - **History** — one point per day (same-day updates in place), 365-point cap, corrupted-data fallback.
 - **Collector tools** — `missingCards` (incl. the qty-0-owned edge and the wishlist subset), `doublesList` (duplicated types + qty), `tradeList`.
+- **Tutorial** — localStorage snapshot/restore round-trip on a non-empty collection (data safety), step-sequence integrity (unique ids, pedagogical order, condition-based close steps, the force-remove badge step).
+- **Install** — platform detection from real user-agent fixtures (iPhone/iPad/iPadOS-desktop/mac Safari/Chrome/Edge/Android/Firefox), instruction-key routing incl. the Arc case, standalone detection.
+- **Language gating** — the first-launch language screen shows only when no language was ever chosen and setup isn't done.
 
 **Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/font-switching/animations, the interactive tutorial's DOM engine (its snapshot/restore and step sequence *are* covered), and the collector-tools UI (its selection logic *is* covered above).
 
 ### First run
-1. On first launch, a setup screen lets you optionally define a **PIN code** (or skip it), followed by the **interactive tutorial** (auto-starts only once; replayable from Settings).
+1. On first launch, a **language chooser** appears first (7 languages), then a setup screen lets you optionally define a **PIN code** (or skip it), followed by the **interactive tutorial** (auto-starts only once; replayable from Settings) — all in the chosen language.
 2. Navigate between **Collection / Badges / Stats / Settings** via the bottom bar.
 3. Mark owned variants from a card's detail modal.
 4. Optionally pick a **font theme** and language in **Settings**.
@@ -185,7 +193,7 @@ Tests live in `tests/` (one file per module) and run against small self-containe
 
 ### Install as an app (PWA) & offline use
 - On the **first load** over http/https, `app.js` registers the Service Worker, which precaches the app shell. From the **next load** on, the page itself is served from cache and the app works **fully offline** (a reload after the first visit is enough to be under Service Worker control).
-- Your browser will offer to **install** the app (install icon in the address bar on desktop Chrome/Edge, "Add to Home Screen" on mobile). It then runs standalone with its own icon.
+- **Settings → Install the app** offers a native **Install** button where the browser supports it (Chrome/Edge/Android; a discreet banner appears too), and correct manual instructions elsewhere (iOS/macOS Safari, Android menu, an honest message in Arc). It then runs standalone with its own icon.
 - Note for maintainers: assets are served **cache-first**, so after changing any shell file, bump `SW_VERSION` in `sw.js` — the new worker re-precaches everything (bypassing the browser HTTP cache, so it always fetches the current files) and drops the old cache on activation.
 - The Service Worker does not register on `file://` (the `'serviceWorker' in navigator` guard skips it) — that's expected; serve over HTTP.
 
@@ -231,6 +239,7 @@ F1/
 ├── history.js            # Daily owned-count snapshots for the Stats progression curve
 ├── collector.js          # Missing / doubles / trade-list selection logic (pure, tested)
 ├── tutorial.js           # Interactive guided tour (sandboxed, auto once, replayable)
+├── install.js            # PWA install helper (native prompt, banner, per-platform/Arc instructions)
 ├── badges.js             # Badge evaluation/rendering + user titles
 ├── stats.js              # computeStats() + updateStats() + renderStats() (progression, highlights, donut)
 ├── render.js             # Grid, sidebar, filters, modal, search, views, toast
@@ -270,7 +279,7 @@ F1/
 | v1 | `f1uno_v3`, `f1uno_badges`, `f1uno_auto_badges` | Old format (no season scope) |
 | v2 | `f1uno_owned_2025`, `f1uno_badges_2025`, `f1uno_auto_badges_2025`, `f1uno_history_2025` | Season-scoped format (incl. the Stats progression history) |
 
-Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), and backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`). Migration v1 → v2 runs automatically on first load.
+Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), and backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`) and `f1uno_install_dismissed` (install banner opt-out). Migration v1 → v2 runs automatically on first load.
 
 ---
 
@@ -278,9 +287,8 @@ Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_titl
 
 The following is **not yet implemented** and is the main remaining work:
 
-### Optional cloud sync (Supabase / Firebase / Gist / Drive) — *automatic cross-device sync*
-**Why:** the no-backend MVP is done — backup reminder plus a shareable **backup code / QR** to restore on another device (see Features). What's still missing is *automatic* synchronisation: today, moving progress between devices is a manual step (copy/paste a code or scan a QR).
-**Idea:** an optional, opt-in encrypted backup to the user's own storage (Drive/Dropbox/a gist) or a lightweight backend (Supabase/Firebase). Requires API keys/accounts, so it stays out of the default client-only build.
+### Optional cloud sync — *decision pending*
+**Status:** a full design document exists — [docs/CLOUD-SYNC-DESIGN.md](docs/CLOUD-SYNC-DESIGN.md) — covering backend options (all compatible with static GitHub Pages hosting), a sync/conflict model reusing the existing merge/replace flow, security/privacy, and a phased implementation plan. **No code has been written**: the honest assessment is that the existing backup code + QR already covers occasional device-to-device transfer, and a real sync only pays off with regular multi-device editing. Implementation awaits an explicit go/no-go decision.
 
 > Already shipped, not part of the roadmap: ES-module split of the former monolith, `DEBUG`-gated logging, esbuild production bundle, a **`node --test` unit-test suite**, **installable offline PWA** (manifest with maskable icons + screenshots, favicon, service worker), **device-to-device backup codes + QR transfer**, the **enriched Stats view** (progression curve, highlights, rarity donut) with a unified colour redesign, the **6-level rarity system** with the animated iridescent *divine* tier, **self-hosted fonts with a 5-theme picker**, the **interactive guided tutorial**, and **collector tools** (missing / doubles / trade lists).
 
