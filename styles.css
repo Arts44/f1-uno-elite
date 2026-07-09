@@ -296,6 +296,22 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .lang-name{font-family:var(--font-b);font-size:14px;font-weight:600;color:var(--tx1);}
 @media (prefers-reduced-motion:reduce){.lang-opt:hover{transform:none;}}
 
+/* ── "Install the app" (PWA) ──
+   Settings row bits + a discreet dismissable banner above the bottom
+   nav (shown only when the native install prompt is available). */
+.install-ok{font-size:13px;font-weight:600;color:var(--tx2);padding:4px 0;}
+.install-ins{font-size:13px;line-height:1.55;color:var(--tx2);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 12px;}
+.install-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;z-index:400;display:flex;align-items:center;gap:10px;max-width:min(480px,calc(100vw - 24px));background:var(--surface);border:1px solid var(--border);border-radius:100px;box-shadow:var(--sh-lg);padding:8px 10px 8px 14px;animation:instIn 0.25s ease;}
+@keyframes instIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+.install-banner-icon{font-size:18px;line-height:1;}
+.install-banner-text{flex:1;font-size:12.5px;font-weight:600;color:var(--tx1);line-height:1.3;}
+@media (max-width:480px){.install-banner{width:calc(100vw - 24px);border-radius:18px;}}
+.install-banner-btn{background:var(--red);border:none;color:#fff;font-family:var(--font-b);font-size:12px;font-weight:700;border-radius:100px;padding:7px 14px;cursor:pointer;transition:var(--ease);white-space:nowrap;}
+.install-banner-btn:hover{filter:brightness(1.08);}
+.install-banner-close{background:none;border:none;color:var(--tx3);font-size:13px;cursor:pointer;padding:6px 8px;border-radius:50%;transition:var(--ease);line-height:1;}
+.install-banner-close:hover{color:var(--tx1);background:var(--surface2);}
+@media (prefers-reduced-motion:reduce){.install-banner{animation:none;}}
+
 /* VIEWER MODE */
 body.viewer-mode .card-actions,
 body.viewer-mode [data-action="quickToggle"],

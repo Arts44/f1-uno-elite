@@ -25,6 +25,11 @@ import {
 } from './pin.js';
 import { maybeHandleBackupHash } from './backup.js';
 import { isTutorialSeen, markTutorialSeen } from './tutorial.js';
+import { initInstall, maybeShowInstallBanner } from './install.js';
+
+// Listen for beforeinstallprompt as early as possible — it can fire
+// before the app is initialized (login screen still visible).
+initInstall();
 
 export function initApp() {
   log('Initialisation de l\'app...');
@@ -70,6 +75,10 @@ export function initApp() {
     // If the app was opened from a scanned QR / shared #backup= link,
     // trigger the existing restore (merge/replace) dialog.
     maybeHandleBackupHash();
+
+    // Install banner: the beforeinstallprompt event may have fired
+    // while the login screen was still up — show it now if relevant.
+    maybeShowInstallBanner();
   });
 }
 

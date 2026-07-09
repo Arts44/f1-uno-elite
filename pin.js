@@ -10,6 +10,7 @@ import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, 
 import { initApp } from './app.js';
 import { maybeStartTutorial, startTutorial } from './tutorial.js';
 import { missingCards, doublesList, tradeList } from './collector.js';
+import { installRowHTML, bindInstallRow } from './install.js';
 import { CATS, CARD_TYPES, CARDS_DB, _currentSeason } from './data.js';
 
 // PIN storage helpers (localStorage-based, SHA-256 hashed)
@@ -528,6 +529,8 @@ export function renderSettings(){
       </div>
     </div>
 
+    ${installRowHTML()}
+
     <div class="setv-section">
       <div class="setv-section-title">${t('s.security')}</div>
       <div class="setv-row">
@@ -771,6 +774,7 @@ export function renderSettings(){
   });
 
   el.querySelector('#replayTutBtn')?.addEventListener('click', ()=> startTutorial());
+  bindInstallRow();
 
   const langSel = el.querySelector('#langSel');
   if(langSel) langSel.addEventListener('change', e=>setLang(e.target.value));
