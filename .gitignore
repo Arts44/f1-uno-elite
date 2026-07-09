@@ -5,6 +5,10 @@
 # Dependencies
 node_modules/
 
+# npm logs
+npm-debug.log*
+package-lock.json.log
+
 # OS cruft
 .DS_Store
 
