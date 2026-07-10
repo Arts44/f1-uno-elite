@@ -321,6 +321,7 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .cloud-msg.err{color:var(--red);}
 [data-theme="dark"] .cloud-msg.ok{color:#1DAF54;}
 .cloud-status{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--tx1);}
+.cloud-actions{display:flex;gap:8px;flex-wrap:wrap;}
 .cloud-dot{width:9px;height:9px;border-radius:50%;background:var(--tx3);flex:none;}
 .cloud-dot.on{background:#00A94F;}
 [data-theme="dark"] .cloud-dot.on{background:#1DAF54;}

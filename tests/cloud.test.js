@@ -6,6 +6,7 @@ import {
   parseSessionFromHash, isSessionExpired, authHeaders,
   loadSession, saveSession, clearSession, SESSION_KEY,
   cloudConfig, isCloudConfigured,
+  decodeJwtSub, buildUpsertRow,
 } from '../cloud.js';
 
 const CFG = { url: 'https://proj.supabase.co', anonKey: 'anon-key-123' };
@@ -77,6 +78,25 @@ describe('cloud — session persistence', () => {
     assert.equal(loadSession(), null);
     localStorage.setItem(SESSION_KEY, JSON.stringify({ access_token: 'AT' }));
     assert.equal(loadSession(), null); // refresh_token missing
+  });
+});
+
+describe('cloud — push payload building', () => {
+  test('decodeJwtSub extracts auth.uid() from the JWT locally', () => {
+    // header.payload.signature with payload {"sub":"user-123","role":"authenticated"}
+    const payload = Buffer.from(JSON.stringify({ sub: 'user-123', role: 'authenticated' }))
+      .toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    assert.equal(decodeJwtSub(`eyJhbGciOiJIUzI1NiJ9.${payload}.sig`), 'user-123');
+  });
+  test('decodeJwtSub is null-safe on garbage', () => {
+    assert.equal(decodeJwtSub('not-a-jwt'), null);
+    assert.equal(decodeJwtSub(''), null);
+  });
+  test('buildUpsertRow shapes the PostgREST row — and never sets updated_at', () => {
+    const snap = { season: 2025, owned: { P1: {} }, manualBadges: {}, autoBadges: {} };
+    const row = buildUpsertRow('user-123', 2025, snap);
+    assert.deepEqual(row, { user_id: 'user-123', season: 2025, data: snap });
+    assert.ok(!('updated_at' in row), 'updated_at is owned by the server trigger');
   });
 });
 

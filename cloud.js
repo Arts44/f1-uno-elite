@@ -14,6 +14,9 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { t } from './i18n.js';
+import { collectionSnapshot, _showImportDialog } from './storage.js';
+import { markBackupDone } from './backup.js';
+import { _currentSeason } from './data.js';
 
 export const SESSION_KEY = 'f1uno_cloud_session';
 
@@ -48,6 +51,22 @@ export function isSessionExpired(session, nowSec){
   if(!session || !session.access_token || !session.expires_at) return true;
   const now = nowSec || Math.floor(Date.now() / 1000);
   return now >= session.expires_at - 60;
+}
+
+// The user id (auth.uid()) is the JWT's `sub` claim — decoded locally,
+// no network round-trip needed to know who we are.
+export function decodeJwtSub(token){
+  try {
+    const payload = token.split('.')[1];
+    const b64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(b64)).sub || null;
+  } catch(e){ return null; }
+}
+
+// PostgREST upsert body for one (user, season) row. Pure for tests.
+// updated_at is intentionally absent: the server trigger owns it.
+export function buildUpsertRow(userId, season, snapshot){
+  return { user_id: userId, season, data: snapshot };
 }
 
 // Headers for GoTrue/PostgREST. Without a user token, the anon key is
@@ -187,6 +206,96 @@ export async function signOut(){
 }
 
 /* ══════════════════════════════════════════════════════════
+   PUSH / PULL (PostgREST /rest/v1/collections)
+   Manual only — nothing runs in the background.
+   ══════════════════════════════════════════════════════════ */
+
+// Errors are thrown as Error(code) with code ∈
+// {'offline','not-signed-in','push-failed','pull-failed','no-data','bad-data'}
+function _requireOnline(){
+  if(typeof navigator !== 'undefined' && navigator.onLine === false) throw new Error('offline');
+}
+async function _requireSession(){
+  const session = await getValidSession();
+  if(!session) throw new Error('not-signed-in');
+  const userId = (session.user && session.user.id) || decodeJwtSub(session.access_token);
+  if(!userId) throw new Error('not-signed-in');
+  return { session, userId };
+}
+
+// Upsert the current season's snapshot. Returns the server updated_at.
+export async function pushCollection(){
+  const cfg = cloudConfig();
+  if(!cfg) throw new Error('not-signed-in');
+  _requireOnline();
+  const { session, userId } = await _requireSession();
+  const row = buildUpsertRow(userId, _currentSeason, collectionSnapshot());
+  const resp = await fetch(`${cfg.url}/rest/v1/collections?on_conflict=user_id,season`, {
+    method: 'POST',
+    cache: 'no-store',
+    headers: {
+      ...authHeaders(cfg, session.access_token),
+      'Prefer': 'resolution=merge-duplicates,return=representation',
+    },
+    body: JSON.stringify([row]),
+  }).catch(() => { throw new Error('offline'); });
+  if(!resp.ok){
+    log('cloud: push failed', resp.status, await resp.text().catch(() => ''));
+    throw new Error('push-failed');
+  }
+  const rows = await resp.json().catch(() => null);
+  const updatedAt = rows && rows[0] && rows[0].updated_at;
+  // A successful cloud push IS a backup: reset the local backup reminder.
+  try { markBackupDone(); } catch(e){}
+  log('cloud: pushed season', _currentSeason, 'updated_at', updatedAt);
+  return updatedAt || null;
+}
+
+// Fetch the cloud snapshot for the current season and hand it to the
+// EXISTING import dialog (merge / replace / cancel) — the local
+// collection is never overwritten silently.
+export async function pullCollection(){
+  const cfg = cloudConfig();
+  if(!cfg) throw new Error('not-signed-in');
+  _requireOnline();
+  const { session } = await _requireSession();
+  const resp = await fetch(
+    `${cfg.url}/rest/v1/collections?season=eq.${_currentSeason}&select=data,updated_at`, {
+    cache: 'no-store',
+    headers: authHeaders(cfg, session.access_token),
+  }).catch(() => { throw new Error('offline'); });
+  if(!resp.ok){
+    log('cloud: pull failed', resp.status, await resp.text().catch(() => ''));
+    throw new Error('pull-failed');
+  }
+  const rows = await resp.json().catch(() => null);
+  if(!Array.isArray(rows)) throw new Error('bad-data');
+  if(rows.length === 0) throw new Error('no-data');
+  const snapshot = rows[0].data;
+  if(!snapshot || typeof snapshot !== 'object' || !snapshot.owned) throw new Error('bad-data');
+  _showImportDialog(snapshot); // merge / replace / cancel — user decides
+  return rows[0].updated_at || null;
+}
+
+// Lightweight metadata read for the "last cloud backup" line.
+export async function fetchCloudMeta(){
+  const cfg = cloudConfig();
+  if(!cfg) return null;
+  const session = await getValidSession();
+  if(!session) return null;
+  try {
+    const resp = await fetch(
+      `${cfg.url}/rest/v1/collections?season=eq.${_currentSeason}&select=updated_at`, {
+      cache: 'no-store',
+      headers: authHeaders(cfg, session.access_token),
+    });
+    if(!resp.ok) return null;
+    const rows = await resp.json();
+    return (Array.isArray(rows) && rows[0] && rows[0].updated_at) || null;
+  } catch(e){ return null; }
+}
+
+/* ══════════════════════════════════════════════════════════
    SETTINGS UI (rendered by pin.js renderSettings)
    ══════════════════════════════════════════════════════════ */
 
@@ -212,6 +321,12 @@ function _cloudAreaHTML(){
         <span class="cloud-dot on" aria-hidden="true"></span>
         <span>${t('cloud.signed_in')} <b>${email}</b></span>
       </div>
+      <div class="setv-row-sub">${t('cloud.last_backup')} <span id="cloudLastBackup">…</span></div>
+      <div class="cloud-actions">
+        <button class="setv-btn" id="cloudPushBtn" type="button">${t('cloud.push_btn')}</button>
+        <button class="setv-btn" id="cloudPullBtn" type="button">${t('cloud.pull_btn')}</button>
+      </div>
+      <div class="cloud-msg" id="cloudSyncMsg" aria-live="polite"></div>
       <div><button class="setv-btn" id="cloudSignOutBtn" type="button">${t('cloud.sign_out')}</button></div>`;
   }
   return `
@@ -265,4 +380,61 @@ export function bindCloudSection(){
       _refreshCloudArea();
     });
   }
+
+  // Signed-in extras: last-backup date + push/pull actions
+  _fillLastBackup();
+  const errKey = e => ({
+    'offline': 'cloud.offline',
+    'not-signed-in': 'cloud.expired',
+    'no-data': 'cloud.no_data',
+    'bad-data': 'cloud.pull_err',
+    'push-failed': 'cloud.push_err',
+    'pull-failed': 'cloud.pull_err',
+  }[e && e.message] || 'cloud.push_err');
+  const msgEl = () => document.getElementById('cloudSyncMsg');
+  const setMsg = (key, cls) => { const m = msgEl(); if(m){ m.textContent = t(key); m.className = 'cloud-msg ' + (cls || ''); } };
+
+  const pushBtn = document.getElementById('cloudPushBtn');
+  if(pushBtn){
+    pushBtn.addEventListener('click', async () => {
+      pushBtn.disabled = true;
+      setMsg('cloud.sending');
+      try {
+        const at = await pushCollection();
+        setMsg('cloud.push_ok', 'ok');
+        _setLastBackup(at);
+      } catch(e){
+        log('cloud: push error', e);
+        setMsg(errKey(e), 'err');
+        if(e.message === 'not-signed-in') _refreshCloudArea(); // session died
+      }
+      pushBtn.disabled = false;
+    });
+  }
+  const pullBtn = document.getElementById('cloudPullBtn');
+  if(pullBtn){
+    pullBtn.addEventListener('click', async () => {
+      pullBtn.disabled = true;
+      setMsg('cloud.sending');
+      try {
+        await pullCollection(); // opens the merge/replace dialog
+        setMsg('cloud.pull_ready', 'ok');
+      } catch(e){
+        log('cloud: pull error', e);
+        setMsg(errKey(e), 'err');
+        if(e.message === 'not-signed-in') _refreshCloudArea();
+      }
+      pullBtn.disabled = false;
+    });
+  }
+}
+
+function _setLastBackup(updatedAt){
+  const el = document.getElementById('cloudLastBackup');
+  if(!el) return;
+  el.textContent = updatedAt ? new Date(updatedAt).toLocaleString() : t('cloud.never');
+}
+function _fillLastBackup(){
+  if(!document.getElementById('cloudLastBackup')) return;
+  fetchCloudMeta().then(_setLastBackup).catch(() => _setLastBackup(null));
 }
