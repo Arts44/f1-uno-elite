@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v27';
+const SW_VERSION = 'v28';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -52,6 +52,7 @@ const SHELL_ASSETS = [
   // Classic global scripts
   'data-embedded.js',
   'translations.js',
+  'cloud-config.js',
   'card-descriptions.js',
   // Data
   'data/metadata.json',
