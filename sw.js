@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v28';
+const SW_VERSION = 'v29';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -49,6 +49,7 @@ const SHELL_ASSETS = [
   'tutorial.js',
   'collector.js',
   'install.js',
+  'cloud.js',
   // Classic global scripts
   'data-embedded.js',
   'translations.js',
@@ -88,6 +89,14 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(req.url);
   const sameOrigin = url.origin === self.location.origin;
+
+  // Cloud API (Supabase): NEVER cached, NEVER served from cache.
+  // Auth and data calls must always hit the network — a cached
+  // /auth/v1/user or /rest/v1 response would be a correctness bug
+  // (stale sessions, stale collections served as fresh).
+  if (url.hostname.endsWith('.supabase.co') || url.hostname.endsWith('.supabase.in')) {
+    return; // fall through to the network, no respondWith
+  }
 
   if (sameOrigin) {
     // App shell & local data: cache-first, network fallback.

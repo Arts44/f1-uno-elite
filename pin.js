@@ -11,6 +11,7 @@ import { initApp } from './app.js';
 import { maybeStartTutorial, startTutorial } from './tutorial.js';
 import { missingCards, doublesList, tradeList } from './collector.js';
 import { installRowHTML, bindInstallRow } from './install.js';
+import { cloudSectionHTML, bindCloudSection } from './cloud.js';
 import { CATS, CARD_TYPES, CARDS_DB, _currentSeason } from './data.js';
 
 // PIN storage helpers (localStorage-based, SHA-256 hashed)
@@ -626,6 +627,8 @@ export function renderSettings(){
       </div>
     </div>
 
+    ${cloudSectionHTML()}
+
     <div class="setv-section">
       <div class="setv-section-title">${t('s.tools')}</div>
       <div class="setv-row" style="flex-direction:column;align-items:stretch;gap:10px;">
@@ -775,6 +778,7 @@ export function renderSettings(){
 
   el.querySelector('#replayTutBtn')?.addEventListener('click', ()=> startTutorial());
   bindInstallRow();
+  bindCloudSection();
 
   const langSel = el.querySelector('#langSel');
   if(langSel) langSel.addEventListener('change', e=>setLang(e.target.value));

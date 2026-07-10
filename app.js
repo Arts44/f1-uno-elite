@@ -26,6 +26,12 @@ import {
 import { maybeHandleBackupHash } from './backup.js';
 import { isTutorialSeen, markTutorialSeen } from './tutorial.js';
 import { initInstall, maybeShowInstallBanner } from './install.js';
+import { handleAuthRedirect } from './cloud.js';
+
+// Magic-link return: if the URL carries a GoTrue #access_token fragment,
+// store the cloud session and clean the URL — before anything else
+// (incl. maybeHandleBackupHash) looks at location.hash.
+handleAuthRedirect();
 
 // Listen for beforeinstallprompt as early as possible — it can fire
 // before the app is initialized (login screen still visible).

@@ -312,6 +312,19 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .install-banner-close:hover{color:var(--tx1);background:var(--surface2);}
 @media (prefers-reduced-motion:reduce){.install-banner{animation:none;}}
 
+/* ── Cloud backup (Settings) ── */
+.cloud-login-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.cloud-email{flex:1;min-width:180px;padding:9px 14px;border-radius:100px;border:1.5px solid var(--border);background:var(--surface2);font-family:var(--font-b);font-size:13px;color:var(--tx1);outline:none;transition:var(--ease);}
+.cloud-email:focus{border-color:var(--red);}
+.cloud-msg{font-size:12.5px;line-height:1.5;color:var(--tx2);min-height:0;}
+.cloud-msg.ok{color:#00A94F;}
+.cloud-msg.err{color:var(--red);}
+[data-theme="dark"] .cloud-msg.ok{color:#1DAF54;}
+.cloud-status{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--tx1);}
+.cloud-dot{width:9px;height:9px;border-radius:50%;background:var(--tx3);flex:none;}
+.cloud-dot.on{background:#00A94F;}
+[data-theme="dark"] .cloud-dot.on{background:#1DAF54;}
+
 /* VIEWER MODE */
 body.viewer-mode .card-actions,
 body.viewer-mode [data-action="quickToggle"],
