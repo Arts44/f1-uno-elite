@@ -19,6 +19,6 @@
    never requires a rebuild — just save, bump nothing, reload.
    ══════════════════════════════════════════════════════════ */
 window.__F1UNO_CLOUD = {
-  url: '',      // ← paste your project URL here
-  anonKey: '',  // ← paste your anon public key here
+  url: 'https://pwyfgnanvgwuznayspot.supabase.co',      // ← paste your project URL here
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3eWZnbmFudmd3dXpuYXlzcG90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjMwMjYsImV4cCI6MjA5OTIzOTAyNn0.hp9gaNojDVZWuIFwVuN9QusLioa4_xrn5JpopHynHxg',  // ← paste your anon public key here
 };
