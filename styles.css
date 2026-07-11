@@ -325,7 +325,7 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 /* OTP code input: the wide letter-spacing is for the TYPED DIGITS —
    the placeholder gets normal spacing (and a short text) so it never
    shows as "c o d e  à  6  c h i f f r" truncated mid-word. */
-.cloud-code{max-width:180px;font-family:var(--font-d);font-weight:700;font-size:16px;letter-spacing:6px;text-align:center;font-variant-numeric:tabular-nums;}
+.cloud-code{max-width:210px;font-family:var(--font-d);font-weight:700;font-size:16px;letter-spacing:6px;text-align:center;font-variant-numeric:tabular-nums;}
 .cloud-code::placeholder{letter-spacing:normal;font-family:var(--font-b);font-weight:400;font-size:13px;color:var(--tx3);}
 .cloud-dot{width:9px;height:9px;border-radius:50%;background:var(--tx3);flex:none;}
 .cloud-dot.on{background:#00A94F;}

@@ -151,6 +151,17 @@ export async function verifyOtpCode(email, code){
   return session;
 }
 
+/* ── OTP input helpers (pure, tested) ──
+   Supabase's "Email OTP Length" is configurable from 6 to 10 digits
+   (this project uses 8!) — the app must never assume 6. Pasted codes
+   may carry spaces ("0371 6217"): strip all whitespace first. */
+export function normalizeOtpInput(value){
+  return String(value || '').replace(/\s+/g, '');
+}
+export function isValidOtpFormat(code){
+  return /^\d{6,10}$/.test(code);
+}
+
 /* ── Send cool-down (anti rate-limit guard) ──
    Supabase throttles auth emails aggressively; a user hammering the
    send button would lock himself out (429). Pure helper is tested. */
@@ -380,7 +391,7 @@ function _cloudAreaHTML(){
       <button class="setv-btn" id="cloudSendBtn" type="button">${t('cloud.send_link')}</button>
     </div>
     <div class="cloud-login-row" id="cloudCodeRow" style="display:none;">
-      <input type="text" class="cloud-email cloud-code" id="cloudCode" placeholder="${t('cloud.code_ph')}" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-label="${t('cloud.code_label')}">
+      <input type="text" class="cloud-email cloud-code" id="cloudCode" placeholder="${t('cloud.code_ph')}" inputmode="numeric" autocomplete="one-time-code" maxlength="10" aria-label="${t('cloud.code_label')}">
       <button class="setv-btn" id="cloudVerifyBtn" type="button">${t('cloud.verify_btn')}</button>
     </div>
     <div class="cloud-msg" id="cloudAuthMsg" aria-live="polite"></div>`;
@@ -459,8 +470,8 @@ export function bindCloudSection(){
     verifyBtn.addEventListener('click', async () => {
       const msg = document.getElementById('cloudAuthMsg');
       const email = (document.getElementById('cloudEmail')?.value || '').trim();
-      const code = (document.getElementById('cloudCode')?.value || '').trim();
-      if(!/^\d{6}$/.test(code)){
+      const code = normalizeOtpInput(document.getElementById('cloudCode')?.value);
+      if(!isValidOtpFormat(code)){
         if(msg){ msg.textContent = t('cloud.code_err'); msg.className = 'cloud-msg err'; }
         return;
       }

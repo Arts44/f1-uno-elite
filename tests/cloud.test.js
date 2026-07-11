@@ -8,6 +8,7 @@ import {
   cloudConfig, isCloudConfigured,
   decodeJwtSub, buildUpsertRow,
   verifyOtpCode, sendCooldownRemaining, SEND_COOLDOWN_MS,
+  normalizeOtpInput, isValidOtpFormat,
 } from '../cloud.js';
 
 const CFG = { url: 'https://proj.supabase.co', anonKey: 'anon-key-123' };
@@ -143,6 +144,25 @@ describe('cloud — OTP code verification (stubbed fetch)', () => {
     try {
       await assert.rejects(() => verifyOtpCode('x@y.zz', '123456'), /rate-limited/);
     } finally { restore(); }
+  });
+});
+
+describe('cloud — OTP input format (server length is configurable, 6–10)', () => {
+  test('accepts 6 to 10 digits — the real-world 8-digit codes included', () => {
+    assert.equal(isValidOtpFormat('123456'), true);    // 6 (Supabase default)
+    assert.equal(isValidOtpFormat('03716217'), true);  // 8 (this project's setting)
+    assert.equal(isValidOtpFormat('1234567890'), true); // 10 (max)
+  });
+  test('rejects too short, too long, and non-digits', () => {
+    assert.equal(isValidOtpFormat('12345'), false);
+    assert.equal(isValidOtpFormat('12345678901'), false);
+    assert.equal(isValidOtpFormat('12a456'), false);
+    assert.equal(isValidOtpFormat(''), false);
+  });
+  test('normalizeOtpInput strips whitespace from pasted codes', () => {
+    assert.equal(normalizeOtpInput(' 0371 6217 '), '03716217');
+    assert.equal(normalizeOtpInput('123\t456'), '123456');
+    assert.equal(normalizeOtpInput(null), '');
   });
 });
 
