@@ -15,6 +15,7 @@
 import { log } from './logger.js';
 import { t } from './i18n.js';
 import { collectionSnapshot, _showImportDialog } from './storage.js';
+import { backupIncludes } from './settings-sync.js';
 import { markBackupDone } from './backup.js';
 import { _currentSeason } from './data.js';
 
@@ -281,7 +282,7 @@ export async function pushCollection(){
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
   const { session, userId } = await _requireSession();
-  const row = buildUpsertRow(userId, _currentSeason, collectionSnapshot());
+  const row = buildUpsertRow(userId, _currentSeason, collectionSnapshot(backupIncludes()));
   const resp = await fetch(`${cfg.url}/rest/v1/collections?on_conflict=user_id,season`, {
     method: 'POST',
     cache: 'no-store',

@@ -17,6 +17,7 @@ import {
 } from './badges.js';
 import { noteChange, markBackupDone } from './backup.js';
 import { recordHistoryPoint } from './history.js';
+import { gatherSettings, applySettings, backupIncludes } from './settings-sync.js';
 
 /* ── Versioning & season-scoped keys ── */
 const STORAGE_VERSION = 2;
@@ -132,19 +133,29 @@ export function cardRarity(card){
 
 /* ══════════════════════════════════════════════════════════ EXPORT */
 // Single source of truth for the export/backup payload —
-// used by both the JSON file export and the backup code (backup.js).
-export function collectionSnapshot(){
-  return {
+// used by the JSON file export, the backup code/QR (backup.js) and
+// the cloud push (cloud.js).
+// `include` optionally adds a `settings` section ({prefs, security} —
+// see settings-sync.js). Without it (or when nothing is gathered) the
+// snapshot is byte-for-byte the historical shape: old readers ignore
+// the extra field, old backups without it import unchanged.
+export function collectionSnapshot(include){
+  const snap = {
     season: _currentSeason,
     exportDate: new Date().toISOString(),
     owned: coll,
     manualBadges: manualBadges,
     autoBadges: autoBadgeUnlocked
   };
+  if(include){
+    const settings = gatherSettings(include);
+    if(settings) snap.settings = settings;
+  }
+  return snap;
 }
 
 export function exportCollection(){
-  const data = collectionSnapshot();
+  const data = collectionSnapshot(backupIncludes());
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -183,10 +194,25 @@ export function _handleImportFile(file){
 export function _showImportDialog(data){
   const overlay = document.createElement('div');
   overlay.className='import-dialog-overlay';
+  // Optional settings restore: only when the backup carries them.
+  // Prefs default CHECKED, security default UNCHECKED — device settings
+  // are never overwritten silently, and restoring a PIN needs an
+  // explicit opt-in next to a plain warning.
+  const hasPrefs = !!(data.settings && data.settings.prefs);
+  const hasSec = !!(data.settings && data.settings.security);
+  const settingsRows = (hasPrefs || hasSec) ? `
+      <div class="import-dialog-settings">
+        ${hasPrefs ? `
+        <label class="import-set-row"><input type="checkbox" id="impSetPrefs" checked> <span>${t('imp.set_prefs')}</span></label>` : ''}
+        ${hasSec ? `
+        <label class="import-set-row"><input type="checkbox" id="impSetSec"> <span>${t('imp.set_sec')}</span></label>
+        <div class="import-sec-warn" id="impSecWarn" style="display:none;">${t('imp.sec_warn')}</div>` : ''}
+      </div>` : '';
   overlay.innerHTML=`
     <div class="import-dialog">
       <div class="import-dialog-title">${t('imp.title')}</div>
       <div class="import-dialog-sub">${t('imp.sub',{season:data.season||'?',date:data.exportDate?new Date(data.exportDate).toLocaleDateString():'?'})}<br>${t('imp.q')}</div>
+      ${settingsRows}
       <div class="import-dialog-btns">
         <button class="import-dialog-btn" id="importMergeBtn">${t('imp.merge')}</button>
         <button class="import-dialog-btn primary" id="importReplaceBtn">${t('imp.replace')}</button>
@@ -194,13 +220,25 @@ export function _showImportDialog(data){
       <button class="import-dialog-btn" id="importCancelBtn" style="margin-top:4px">${t('imp.cancel')}</button>
     </div>`;
   document.body.appendChild(overlay);
+  const secBox = overlay.querySelector('#impSetSec');
+  if(secBox){
+    secBox.addEventListener('change', () => {
+      const warn = overlay.querySelector('#impSecWarn');
+      if(warn) warn.style.display = secBox.checked ? '' : 'none';
+    });
+  }
+  const _choices = () => ({
+    prefs: !!overlay.querySelector('#impSetPrefs')?.checked,
+    security: !!secBox?.checked,
+  });
+  const _finish = mode => {
+    _applyImport(data, mode);
+    if(data.settings) applySettings(data.settings, _choices());
+    overlay.remove();
+  };
   overlay.querySelector('#importCancelBtn').addEventListener('click',()=>overlay.remove());
-  overlay.querySelector('#importReplaceBtn').addEventListener('click',()=>{
-    _applyImport(data,'replace'); overlay.remove();
-  });
-  overlay.querySelector('#importMergeBtn').addEventListener('click',()=>{
-    _applyImport(data,'merge'); overlay.remove();
-  });
+  overlay.querySelector('#importReplaceBtn').addEventListener('click',()=>_finish('replace'));
+  overlay.querySelector('#importMergeBtn').addEventListener('click',()=>_finish('merge'));
 }
 
 function _applyImport(data, mode){

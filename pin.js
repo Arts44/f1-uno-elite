@@ -11,6 +11,7 @@ import { initApp } from './app.js';
 import { maybeStartTutorial, startTutorial } from './tutorial.js';
 import { missingCards, doublesList, tradeList } from './collector.js';
 import { installRowHTML, bindInstallRow } from './install.js';
+import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection } from './cloud.js';
 import { CATS, CARD_TYPES, CARDS_DB, _currentSeason } from './data.js';
 
@@ -580,6 +581,14 @@ export function renderSettings(){
 
     <div class="setv-section">
       <div class="setv-section-title">${t('s.collection')}</div>
+      <div class="setv-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('bk.inc_title')}</div>
+          <div class="setv-row-sub">${t('bk.inc_sub')}</div>
+        </div>
+        <label class="import-set-row"><input type="checkbox" id="bkIncPrefs"${backupIncludes().prefs?' checked':''}> <span>${t('bk.inc_prefs')}</span></label>
+        <label class="import-set-row"><input type="checkbox" id="bkIncSec"${backupIncludes().security?' checked':''}> <span>${t('bk.inc_sec')}</span></label>
+      </div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('s.import')}</div>
@@ -708,7 +717,7 @@ export function renderSettings(){
     const out = el.querySelector('#backupCodeOut');
     const warn = el.querySelector('#backupCodeWarn');
     try {
-      const { code, tooBig } = await generateBackupCode(collectionSnapshot());
+      const { code, tooBig } = await generateBackupCode(collectionSnapshot(backupIncludes()));
       out.value = code;
       warn.textContent = tooBig ? t('bk.too_big') : '';
       area.style.display = 'flex';
@@ -779,6 +788,8 @@ export function renderSettings(){
   el.querySelector('#replayTutBtn')?.addEventListener('click', ()=> startTutorial());
   bindInstallRow();
   bindCloudSection();
+  el.querySelector('#bkIncPrefs')?.addEventListener('change', e => setBackupIncludes({ prefs: e.target.checked }));
+  el.querySelector('#bkIncSec')?.addEventListener('change', e => setBackupIncludes({ security: e.target.checked }));
 
   const langSel = el.querySelector('#langSel');
   if(langSel) langSel.addEventListener('change', e=>setLang(e.target.value));

@@ -331,6 +331,12 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .cloud-dot.on{background:#00A94F;}
 [data-theme="dark"] .cloud-dot.on{background:#1DAF54;}
 
+/* ── Backup content checkboxes (export side + import dialog) ── */
+.import-set-row{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--tx1);cursor:pointer;line-height:1.45;text-align:left;}
+.import-set-row input{margin-top:2px;accent-color:var(--red);flex:none;}
+.import-dialog-settings{display:flex;flex-direction:column;gap:8px;margin:2px 0 14px;text-align:left;}
+.import-sec-warn{font-size:12.5px;line-height:1.5;color:var(--red);background:color-mix(in srgb, var(--red) 10%, transparent);border:1px solid color-mix(in srgb, var(--red) 35%, transparent);border-radius:var(--r-md);padding:8px 10px;}
+
 /* VIEWER MODE */
 body.viewer-mode .card-actions,
 body.viewer-mode [data-action="quickToggle"],
