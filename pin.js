@@ -4,7 +4,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { t, LANGS, getLang, setLang } from './i18n.js';
-import { switchView, showToast, toggleTheme, currentView, setCurrentView } from './render.js';
+import { switchView, showToast, toggleTheme, currentView, setCurrentView, closeMo } from './render.js';
 import { triggerImport, collectionSnapshot, _showImportDialog } from './storage.js';
 import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg } from './backup.js';
 import { initApp } from './app.js';
@@ -272,10 +272,58 @@ function showSetupPinEntry(ls, subtitle){
   };
 }
 
+// Pristine login-box markup, captured at module load BEFORE any boot
+// flow (language chooser / setup wizard) rewrites it — restored on lock
+// so the PIN keypad is always what comes back.
+const _LOGIN_BOX_HTML = (typeof document !== 'undefined'
+  && document.getElementById('login-screen')?.querySelector('.login-box')?.innerHTML) || '';
+
 export function lockApp() {
   if(!isPinEnabled()) return; // no lock if PIN disabled
-  // Simply reload the page instead of showing login screen
-  window.location.reload();
+  log('lockApp: hot lock (no reload)');
+  // 1. Drop every privilege FIRST — the console guard re-arms here.
+  _authenticated = false;
+  isViewerMode = false;
+  pinEntry = '';
+  window._adminOverlayActive = false;
+  window._adminPinCallback = null;
+  // 2. Close anything that could sit above (or leak behind) the lock
+  //    screen: card modal, sidebar, admin overlay, import dialogs.
+  try { closeMo(); } catch(e){}
+  document.getElementById('floating-sidebar')?.classList.remove('open');
+  document.getElementById('sidebar-overlay')?.classList.remove('show');
+  document.getElementById('sidebar-toggle')?.classList.remove('sidebar-open');
+  document.getElementById('admin-pin-overlay')?.remove();
+  document.querySelectorAll('.import-dialog-overlay').forEach(o => o.remove());
+  // Viewer-mode leftovers (the reload used to clear these implicitly)
+  document.body.classList.remove('viewer-mode');
+  const settingsIcon = document.querySelector('.bn-tab[data-view="settings"] .bn-icon');
+  if(settingsIcon) settingsIcon.textContent = '⚙️';
+  // 3. Reset the view so the next unlock starts on a clean collection
+  setCurrentView('collection');
+  try { switchView('collection'); } catch(e){}
+  // 4. Hide the app, restore + show the PIN screen instantly
+  const app = document.getElementById('app-wrapper');
+  if(app) app.style.display = 'none';
+  const ls = document.getElementById('login-screen');
+  if(!ls) return;
+  const box = ls.querySelector('.login-box');
+  if(box && _LOGIN_BOX_HTML){
+    box.innerHTML = _LOGIN_BOX_HTML; // pristine keypad markup
+    // Re-translate the restored static markup (it carries data-i18n)
+    box.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+    box.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'))); });
+    // Keypad digits/delete are document-delegated; only the viewer
+    // browse button has a direct binding → rebind + visibility.
+    _bindViewerBrowseBtn();
+    const vb = document.getElementById('viewerBrowseBtn');
+    if(vb) vb.style.display = isViewerModeAllowed() ? '' : 'none';
+  }
+  updatePinDots();
+  const err = document.getElementById('pin-error');
+  if(err) err.textContent = '';
+  ls.style.display = '';
+  ls.style.opacity = '1';
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -549,18 +597,18 @@ export function renderSettings(){
           <button class="setv-btn" id="showChangePinBtn">${t('s.change_btn')}</button>
         </div>
         <div id="changePinForm" style="display:none;width:100%">
-          <div class="pin-change-form">
+          <form class="pin-change-form" id="changePinFormEl">
             <div class="pin-input-row">
-              <div class="pin-input-label">${t('s.new_pin')}</div>
-              <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" class="pin-mini-input" id="newPinA" placeholder="••••">
+              <label class="pin-input-label" for="newPinA">${t('s.new_pin')}</label>
+              <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" class="pin-mini-input" id="newPinA" placeholder="••••">
             </div>
             <div class="pin-input-row">
-              <div class="pin-input-label">${t('s.confirm_pin')}</div>
-              <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" class="pin-mini-input" id="newPinB" placeholder="••••">
+              <label class="pin-input-label" for="newPinB">${t('s.confirm_pin')}</label>
+              <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" class="pin-mini-input" id="newPinB" placeholder="••••">
             </div>
             <div class="pin-form-error" id="pinChangeError"></div>
-            <button class="pin-save-btn" id="savePinBtn">${t('s.enable_pin')}</button>
-          </div>
+            <button class="pin-save-btn" id="savePinBtn" type="submit">${t('s.enable_pin')}</button>
+          </form>
         </div>
       </div>
       <div class="setv-row">
@@ -687,7 +735,8 @@ export function renderSettings(){
     if(form) form.style.display = form.style.display==='none'?'block':'none';
   });
 
-  el.querySelector('#savePinBtn')?.addEventListener('click', async ()=>{
+  el.querySelector('#changePinFormEl')?.addEventListener('submit', async e=>{
+    e.preventDefault(); // handled in JS — nothing must navigate
     const a = el.querySelector('#newPinA').value;
     const b = el.querySelector('#newPinB').value;
     const errEl = el.querySelector('#pinChangeError');
@@ -808,24 +857,25 @@ function _startEnablePin(container){
     <div class="setv-title">⚙️ <span>${t('nav.settings').replace('⚙️ ','')}</span></div>
     <div class="setv-section">
       <div class="setv-section-title">${t('pin.set_title')}</div>
-      <div class="pin-change-form">
+      <form class="pin-change-form" id="enablePinFormEl">
         <div class="pin-input-row">
-          <div class="pin-input-label">${t('s.new_pin')}</div>
-          <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" class="pin-mini-input" id="enablePinA" placeholder="••••">
+          <label class="pin-input-label" for="enablePinA">${t('s.new_pin')}</label>
+          <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" class="pin-mini-input" id="enablePinA" placeholder="••••">
         </div>
         <div class="pin-input-row">
-          <div class="pin-input-label">${t('s.confirm_pin')}</div>
-          <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" class="pin-mini-input" id="enablePinB" placeholder="••••">
+          <label class="pin-input-label" for="enablePinB">${t('s.confirm_pin')}</label>
+          <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" class="pin-mini-input" id="enablePinB" placeholder="••••">
         </div>
         <div class="pin-form-error" id="enablePinError"></div>
         <div style="display:flex;gap:8px;">
-          <button class="pin-save-btn" id="enablePinSave">Activer le PIN</button>
-          <button class="setv-btn" id="enablePinCancel" style="margin-top:4px">Annuler</button>
+          <button class="pin-save-btn" id="enablePinSave" type="submit">${t('s.enable_pin')}</button>
+          <button class="setv-btn" id="enablePinCancel" type="button" style="margin-top:4px">${t('adm.cancel')}</button>
         </div>
-      </div>
+      </form>
     </div>`;
   container.querySelector('#enablePinCancel').addEventListener('click', renderSettings);
-  container.querySelector('#enablePinSave').addEventListener('click', async ()=>{
+  container.querySelector('#enablePinFormEl').addEventListener('submit', async e=>{
+    e.preventDefault(); // handled in JS — nothing must navigate
     const a = container.querySelector('#enablePinA').value;
     const b = container.querySelector('#enablePinB').value;
     const errEl = container.querySelector('#enablePinError');
