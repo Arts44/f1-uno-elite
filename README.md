@@ -74,6 +74,8 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 - **Backup code** (device-to-device, no file, no server): generate a short code (collection compressed with `CompressionStream` and base64url-encoded), copy it, paste it on another device to restore — with the same merge/replace choice as the file import. Codes also work embedded in a link (`…#backup=<code>`). Everything stays client-side.
 - **QR code transfer**: the backup code can also be shown as a **QR code** (encoding the `…#backup=<code>` link). Scan it with the target device to open the app and trigger the restore automatically — no typing, no camera scanner built into the app, no backend. Generated locally with a vendored QR encoder (no CDN). If the collection is too large to fit a reliably-scannable QR, the UI shows a fallback message pointing to the text code or JSON export instead of an unreadable QR.
 - **Backup reminder**: after 30 saved changes or 14 days without a backup, a toast nudges you to export or generate a code.
+- **Cloud backup (optional, manual)**: sign in with an email OTP code (magic link kept as a browser-side bonus) and push/pull your collection to a **Supabase** table — in **pure REST `fetch()`, no SDK**, so the zero-runtime-dependency rule holds. One row per (user, season), protected by Row Level Security; `updated_at` is server-owned. Pull always goes through the merge/replace dialog — never a silent overwrite. Fully opt-in: with `cloud-config.js` empty the feature is disabled and the app behaves exactly as before. The service worker excludes the Supabase origin entirely (API responses are never cached). A send cool-down + 429 handling prevent locking yourself out of auth emails.
+- **Backup contents (choose what travels)**: every channel (JSON, code, QR, cloud) can optionally include your **preferences** (language, theme, font, title) and — explicit opt-in with a warning — **security** (PIN, viewer mode). On restore, matching checkboxes decide what gets applied; restored preferences apply live without a reload. Old backups without settings import unchanged.
 - **Offline embedded fallback** (`data-embedded.js`): if the JSON files cannot be fetched, the app boots from data baked into the page.
 
 ### User experience
@@ -181,6 +183,8 @@ Tests live in `tests/` (one file per module) and run against small self-containe
 - **Tutorial** — localStorage snapshot/restore round-trip on a non-empty collection (data safety), step-sequence integrity (unique ids, pedagogical order, condition-based close steps, the force-remove badge step).
 - **Install** — platform detection from real user-agent fixtures (iPhone/iPad/iPadOS-desktop/mac Safari/Chrome/Edge/Android/Firefox), instruction-key routing incl. the Arc case, standalone detection.
 - **Language gating** — the first-launch language screen shows only when no language was ever chosen and setup isn't done.
+- **Cloud** — magic-link hash parsing, session expiry margin and persistence, request headers, JWT sub decoding, upsert row shape, OTP verify request (stubbed fetch) incl. wrong-code and 429 paths, OTP input format (6–10 digits, whitespace normalization), send cool-down, configuration gate.
+- **Settings in backups** — gather/apply per category, partial restore choices, backward compatibility (no `settings` field), remembered export choice, key coverage (the cloud session token can never travel).
 
 **Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/font-switching/animations, the interactive tutorial's DOM engine (its snapshot/restore and step sequence *are* covered), and the collector-tools UI (its selection logic *is* covered above).
 
@@ -240,6 +244,8 @@ F1/
 ├── collector.js          # Missing / doubles / trade-list selection logic (pure, tested)
 ├── tutorial.js           # Interactive guided tour (sandboxed, auto once, replayable)
 ├── install.js            # PWA install helper (native prompt, banner, per-platform/Arc instructions)
+├── cloud.js              # Optional Supabase cloud backup — pure REST fetch (OTP auth, push/pull)
+├── settings-sync.js      # Optional settings section in backups (prefs / security categories)
 ├── badges.js             # Badge evaluation/rendering + user titles
 ├── stats.js              # computeStats() + updateStats() + renderStats() (progression, highlights, donut)
 ├── render.js             # Grid, sidebar, filters, modal, search, views, toast
@@ -251,6 +257,7 @@ F1/
 ├── translations.js       # i18n dictionaries (7 languages) → window.__T / window.__BADGE_T
 ├── card-descriptions.js  # Card description texts → window.__CARD_DESC / getCardDesc()
 ├── data-embedded.js      # Embedded data for the offline fallback → window.__F1UNO_EMBEDDED
+├── cloud-config.js       # Supabase URL + anon public key (classic script; empty = cloud disabled)
 ├── extract_data.mjs      # Dev tool: data extraction/generation
 │
 ├── tests/                # node --test suites + fixtures (_setup.js, _fixtures.js)
@@ -279,7 +286,7 @@ F1/
 | v1 | `f1uno_v3`, `f1uno_badges`, `f1uno_auto_badges` | Old format (no season scope) |
 | v2 | `f1uno_owned_2025`, `f1uno_badges_2025`, `f1uno_auto_badges_2025`, `f1uno_history_2025` | Season-scoped format (incl. the Stats progression history) |
 
-Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), and backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`) and `f1uno_install_dismissed` (install banner opt-out). Migration v1 → v2 runs automatically on first load.
+Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), and backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`) `f1uno_install_dismissed` (install banner opt-out), `f1uno_cloud_session` (Supabase session tokens) and `f1uno_backup_inc_prefs`/`f1uno_backup_inc_sec` (remembered backup-contents choice). Migration v1 → v2 runs automatically on first load.
 
 ---
 
@@ -287,10 +294,10 @@ Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_titl
 
 The following is **not yet implemented** and is the main remaining work:
 
-### Optional cloud sync — *decision pending*
-**Status:** a full design document exists — [docs/CLOUD-SYNC-DESIGN.md](docs/CLOUD-SYNC-DESIGN.md) — covering backend options (all compatible with static GitHub Pages hosting), a sync/conflict model reusing the existing merge/replace flow, security/privacy, and a phased implementation plan. **No code has been written**: the honest assessment is that the existing backup code + QR already covers occasional device-to-device transfer, and a real sync only pays off with regular multi-device editing. Implementation awaits an explicit go/no-go decision.
+### Nothing major open
+The last roadmap item — **optional cloud backup** — is now shipped (manual push/pull to Supabase in pure REST, per the validated design in [docs/CLOUD-SYNC-DESIGN.md](docs/CLOUD-SYNC-DESIGN.md); the "minimal push/pull first" recommendation is what was built). Possible future ideas, none committed: automatic background sync, E2E encryption of the cloud payload, a "delete my cloud data" button.
 
-> Already shipped, not part of the roadmap: ES-module split of the former monolith, `DEBUG`-gated logging, esbuild production bundle, a **`node --test` unit-test suite**, **installable offline PWA** (manifest with maskable icons + screenshots, favicon, service worker), **device-to-device backup codes + QR transfer**, the **enriched Stats view** (progression curve, highlights, rarity donut) with a unified colour redesign, the **6-level rarity system** with the animated iridescent *divine* tier, **self-hosted fonts with a 5-theme picker**, the **interactive guided tutorial**, and **collector tools** (missing / doubles / trade lists).
+> Already shipped, not part of the roadmap: ES-module split of the former monolith, `DEBUG`-gated logging, esbuild production bundle, a **`node --test` unit-test suite**, **installable offline PWA** (manifest with maskable icons + screenshots, favicon, service worker), **device-to-device backup codes + QR transfer**, the **enriched Stats view** (progression curve, highlights, rarity donut) with a unified colour redesign, the **6-level rarity system** with the animated iridescent *divine* tier, **self-hosted fonts with a 5-theme picker**, the **interactive guided tutorial**, **collector tools** (missing / doubles / trade lists), the **first-launch language chooser**, the **guided PWA install experience**, the **optional Supabase cloud backup** (pure REST, OTP sign-in, manual push/pull) and **optional settings in backups**.
 
 ---
 

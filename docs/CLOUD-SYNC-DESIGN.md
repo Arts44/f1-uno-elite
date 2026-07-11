@@ -1,9 +1,9 @@
 # Cloud sync — document de conception (AUCUN code écrit)
 
-> **Statut : proposition en attente de décision.** Ce document analyse si un cloud sync
-> optionnel vaut le coup pour F1 UNO Élite, et comment le faire proprement le cas échéant.
-> Rien n'est implémenté ; rien ne le sera sans validation explicite des décisions listées en fin
-> de document.
+> **Statut : IMPLÉMENTÉ** (variante minimaliste recommandée au § 3 : push/pull manuel,
+> Supabase REST pur, lien magique → code OTP après retour d'usage, pas de chiffrement E2E).
+> Voir `cloud.js`, `cloud-config.js` et le README. Ce document est conservé comme trace des
+> options étudiées et des décisions prises.
 
 **Rappel du contexte.** App 100 % statique sur GitHub Pages (aucun serveur à nous), offline-first
 (SW cache-first), zéro dépendance runtime, collection dans `localStorage` scopée par saison.
