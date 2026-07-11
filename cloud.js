@@ -111,13 +111,54 @@ export async function sendMagicLink(email){
     cache: 'no-store',
     headers: authHeaders(cfg),
     body: JSON.stringify({ email, create_user: true }),
-  });
+  }).catch(() => { throw new Error('offline'); });
   if(!resp.ok){
     const body = await resp.text().catch(() => '');
     log('cloud: otp failed', resp.status, body);
-    throw new Error('otp-failed');
+    throw new Error(resp.status === 429 ? 'rate-limited' : 'otp-failed');
   }
   return true;
+}
+
+// Verify the 6-digit code from the email (GoTrue /verify). This is the
+// PRIMARY sign-in path: typing a code works in every context — installed
+// PWA (standalone), plain browser, mobile — unlike the magic link, which
+// always opens in the default browser and never reaches the installed
+// app (and iOS PWAs don't even share localStorage with Safari).
+export async function verifyOtpCode(email, code){
+  const cfg = cloudConfig();
+  if(!cfg) throw new Error('not-configured');
+  const resp = await fetch(`${cfg.url}/auth/v1/verify`, {
+    method: 'POST',
+    cache: 'no-store',
+    headers: authHeaders(cfg),
+    body: JSON.stringify({ type: 'email', email, token: code }),
+  }).catch(() => { throw new Error('offline'); });
+  if(!resp.ok){
+    log('cloud: verify failed', resp.status, await resp.text().catch(() => ''));
+    throw new Error(resp.status === 429 ? 'rate-limited' : 'code-invalid');
+  }
+  const d = await resp.json().catch(() => null);
+  if(!d || !d.access_token || !d.refresh_token) throw new Error('code-invalid');
+  const session = {
+    access_token: d.access_token,
+    refresh_token: d.refresh_token,
+    expires_at: d.expires_at || (Math.floor(Date.now() / 1000) + (d.expires_in || 3600)),
+    user: d.user ? { id: d.user.id, email: d.user.email } : undefined,
+  };
+  saveSession(session);
+  log('cloud: signed in via OTP code as', session.user && session.user.email);
+  return session;
+}
+
+/* ── Send cool-down (anti rate-limit guard) ──
+   Supabase throttles auth emails aggressively; a user hammering the
+   send button would lock himself out (429). Pure helper is tested. */
+export const SEND_COOLDOWN_MS = 60000;
+let _lastOtpSentAt = 0;
+export function sendCooldownRemaining(lastSentAt, now, cooldownMs = SEND_COOLDOWN_MS){
+  if(!lastSentAt) return 0;
+  return Math.max(0, Math.ceil((lastSentAt + cooldownMs - now) / 1000));
 }
 
 // Fetch the user profile (id + email) for a fresh token.
@@ -338,6 +379,10 @@ function _cloudAreaHTML(){
       <input type="email" class="cloud-email" id="cloudEmail" placeholder="${t('cloud.email_ph')}" autocomplete="email" inputmode="email">
       <button class="setv-btn" id="cloudSendBtn" type="button">${t('cloud.send_link')}</button>
     </div>
+    <div class="cloud-login-row" id="cloudCodeRow" style="display:none;">
+      <input type="text" class="cloud-email cloud-code" id="cloudCode" placeholder="${t('cloud.code_ph')}" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-label="${t('cloud.code_label')}">
+      <button class="setv-btn" id="cloudVerifyBtn" type="button">${t('cloud.verify_btn')}</button>
+    </div>
     <div class="cloud-msg" id="cloudAuthMsg" aria-live="polite"></div>`;
 }
 
@@ -346,9 +391,32 @@ function _refreshCloudArea(){
   if(area){ area.innerHTML = _cloudAreaHTML(); bindCloudSection(); }
 }
 
+// Reflect the send cool-down on the button (label countdown, disabled),
+// resilient to re-renders: the interval kills itself when the button is
+// replaced or the countdown ends.
+function _startCooldownUi(sendBtn){
+  const tick = () => {
+    const btn = document.getElementById('cloudSendBtn');
+    if(!btn){ clearInterval(iv); return; }
+    const left = sendCooldownRemaining(_lastOtpSentAt, Date.now());
+    if(left <= 0){
+      btn.disabled = false;
+      btn.textContent = t('cloud.send_link');
+      clearInterval(iv);
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = t('cloud.resend_in', { s: left });
+  };
+  const iv = setInterval(tick, 1000);
+  tick();
+}
+
 export function bindCloudSection(){
   const sendBtn = document.getElementById('cloudSendBtn');
   if(sendBtn){
+    // A cool-down may still be running from before a re-render
+    if(sendCooldownRemaining(_lastOtpSentAt, Date.now()) > 0) _startCooldownUi(sendBtn);
     sendBtn.addEventListener('click', async () => {
       const input = document.getElementById('cloudEmail');
       const msg = document.getElementById('cloudAuthMsg');
@@ -361,14 +429,52 @@ export function bindCloudSection(){
         if(msg){ msg.textContent = t('cloud.offline'); msg.className = 'cloud-msg err'; }
         return;
       }
+      if(sendCooldownRemaining(_lastOtpSentAt, Date.now()) > 0) return; // guard
       sendBtn.disabled = true;
       if(msg){ msg.textContent = t('cloud.sending'); msg.className = 'cloud-msg'; }
       try {
         await sendMagicLink(email);
+        _lastOtpSentAt = Date.now();
+        _startCooldownUi(sendBtn);
+        const codeRow = document.getElementById('cloudCodeRow');
+        if(codeRow){ codeRow.style.display = ''; }
+        const codeInput = document.getElementById('cloudCode');
+        if(codeInput) codeInput.focus();
         if(msg){ msg.textContent = t('cloud.link_sent'); msg.className = 'cloud-msg ok'; }
       } catch(e){
-        if(msg){ msg.textContent = t('cloud.link_error'); msg.className = 'cloud-msg err'; }
-        sendBtn.disabled = false;
+        log('cloud: send failed', e);
+        if(e.message === 'rate-limited'){
+          _lastOtpSentAt = Date.now(); // server said stop: hold the button too
+          _startCooldownUi(sendBtn);
+          if(msg){ msg.textContent = t('cloud.rate_limited'); msg.className = 'cloud-msg err'; }
+        } else {
+          if(msg){ msg.textContent = e.message === 'offline' ? t('cloud.offline') : t('cloud.link_error'); msg.className = 'cloud-msg err'; }
+          sendBtn.disabled = false;
+        }
+      }
+    });
+  }
+  const verifyBtn = document.getElementById('cloudVerifyBtn');
+  if(verifyBtn){
+    verifyBtn.addEventListener('click', async () => {
+      const msg = document.getElementById('cloudAuthMsg');
+      const email = (document.getElementById('cloudEmail')?.value || '').trim();
+      const code = (document.getElementById('cloudCode')?.value || '').trim();
+      if(!/^\d{6}$/.test(code)){
+        if(msg){ msg.textContent = t('cloud.code_err'); msg.className = 'cloud-msg err'; }
+        return;
+      }
+      verifyBtn.disabled = true;
+      if(msg){ msg.textContent = t('cloud.verifying'); msg.className = 'cloud-msg'; }
+      try {
+        await verifyOtpCode(email, code);
+        _refreshCloudArea(); // → signed-in state
+      } catch(e){
+        log('cloud: verify error', e);
+        const key = e.message === 'offline' ? 'cloud.offline'
+                  : e.message === 'rate-limited' ? 'cloud.rate_limited' : 'cloud.code_err';
+        if(msg){ msg.textContent = t(key); msg.className = 'cloud-msg err'; }
+        verifyBtn.disabled = false;
       }
     });
   }

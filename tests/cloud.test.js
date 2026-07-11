@@ -7,6 +7,7 @@ import {
   loadSession, saveSession, clearSession, SESSION_KEY,
   cloudConfig, isCloudConfigured,
   decodeJwtSub, buildUpsertRow,
+  verifyOtpCode, sendCooldownRemaining, SEND_COOLDOWN_MS,
 } from '../cloud.js';
 
 const CFG = { url: 'https://proj.supabase.co', anonKey: 'anon-key-123' };
@@ -97,6 +98,61 @@ describe('cloud — push payload building', () => {
     const row = buildUpsertRow('user-123', 2025, snap);
     assert.deepEqual(row, { user_id: 'user-123', season: 2025, data: snap });
     assert.ok(!('updated_at' in row), 'updated_at is owned by the server trigger');
+  });
+});
+
+describe('cloud — OTP code verification (stubbed fetch)', () => {
+  beforeEach(() => {
+    resetStorage();
+    window.__F1UNO_CLOUD = { url: 'https://p.supabase.co', anonKey: 'anon-k' };
+  });
+  const origFetch = globalThis.fetch;
+  const stub = handler => { globalThis.fetch = handler; };
+  const restore = () => { globalThis.fetch = origFetch; };
+
+  test('valid code: /auth/v1/verify request shape, session stored', async () => {
+    let captured = null;
+    stub(async (url, opts) => {
+      captured = { url: String(url), body: JSON.parse(opts.body), headers: opts.headers, cache: opts.cache };
+      return new Response(JSON.stringify({
+        access_token: 'AT2', refresh_token: 'RT2', expires_in: 3600,
+        user: { id: 'u9', email: 'x@y.zz' },
+      }), { status: 200 });
+    });
+    try {
+      const s = await verifyOtpCode('x@y.zz', '123456');
+      assert.equal(captured.url, 'https://p.supabase.co/auth/v1/verify');
+      assert.deepEqual(captured.body, { type: 'email', email: 'x@y.zz', token: '123456' });
+      assert.equal(captured.cache, 'no-store');
+      assert.equal(captured.headers.apikey, 'anon-k');
+      assert.equal(s.user.email, 'x@y.zz');
+      assert.equal(loadSession().access_token, 'AT2'); // persisted
+    } finally { restore(); }
+  });
+
+  test('wrong code → code-invalid, nothing stored', async () => {
+    stub(async () => new Response('{"error":"invalid"}', { status: 401 }));
+    try {
+      await assert.rejects(() => verifyOtpCode('x@y.zz', '000000'), /code-invalid/);
+      assert.equal(loadSession(), null);
+    } finally { restore(); }
+  });
+
+  test('429 → rate-limited', async () => {
+    stub(async () => new Response('{}', { status: 429 }));
+    try {
+      await assert.rejects(() => verifyOtpCode('x@y.zz', '123456'), /rate-limited/);
+    } finally { restore(); }
+  });
+});
+
+describe('cloud — send cool-down guard', () => {
+  test('counts down from the cooldown and clamps at 0', () => {
+    assert.equal(sendCooldownRemaining(0, 5000), 0);                       // never sent
+    assert.equal(sendCooldownRemaining(1000, 1000), SEND_COOLDOWN_MS / 1000); // just sent
+    assert.equal(sendCooldownRemaining(1000, 31000), 30);                  // halfway
+    assert.equal(sendCooldownRemaining(1000, 1000 + SEND_COOLDOWN_MS), 0); // done
+    assert.equal(sendCooldownRemaining(1000, 999999999), 0);               // long past
   });
 });
 
