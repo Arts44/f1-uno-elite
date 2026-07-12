@@ -15,6 +15,10 @@ import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection } from './cloud.js';
 import { openChangelog } from './update.js';
 import { APP_VERSION } from './changelog.js';
+import {
+  isEncEnabled, unlockSecureStore, enableEncryption, disableEncryption,
+  rekeyEncryption, quarantineEncryptedData
+} from './secure-store.js';
 import { CATS, CARD_TYPES, CARDS_DB, _currentSeason } from './data.js';
 
 // PIN storage helpers (localStorage-based, SHA-256 hashed)
@@ -100,6 +104,17 @@ async function checkPin(opts={}) {
   const stored = getStoredPinHash();
   if (stored && hash === stored) {
     if(opts.onSuccess) { opts.onSuccess(pinEntry); pinEntry=''; return; }
+    // Encrypted store: derive the key and decrypt BEFORE the app boots.
+    // On failure (PIN/data desync, corruption) the ciphertexts are left
+    // untouched and the user gets an explicit way out.
+    if(isEncEnabled()){
+      try {
+        await unlockSecureStore(pinEntry);
+      } catch(e){
+        _handleUnlockDecryptFailure();
+        return;
+      }
+    }
     enterApp(false);
   } else {
     for (let i = 0; i < 4; i++) {
@@ -110,7 +125,24 @@ async function checkPin(opts={}) {
   }
 }
 
+// Decryption failed at unlock: offer to continue with an empty
+// collection so a backup can be restored — the undecryptable data is
+// moved aside (f1uno_enc_orphan_*), never deleted. Cancel keeps the
+// lock screen and every byte as it was.
+function _handleUnlockDecryptFailure(){
+  pinEntry = '';
+  updatePinDots();
+  if(confirm(t('enc.err_unlock'))){
+    quarantineEncryptedData();
+    enterApp(false);
+    showToast(t('enc.quarantined'));
+  }
+}
+
 export function enterApp(viewer=false){
+  // Viewer mode needs readable data, and without a PIN there is no key:
+  // an encrypted store cannot be browsed anonymously.
+  if(viewer && isEncEnabled()){ showToast(t('enc.viewer_blocked')); return; }
   isViewerMode = viewer;
   _authenticated = !viewer;
   pinEntry = '';
@@ -339,6 +371,56 @@ export function _bindViewerBrowseBtn(){
 /* ══════════════════════════════════════════════════════════
    SETTINGS PIN MANAGEMENT
    ══════════════════════════════════════════════════════════ */
+/* ── PIN re-entry overlay ──
+   Same keypad flow as the admin overlay (reuses its id so the global
+   keyboard handler and lockApp cleanup apply), but on success it hands
+   the PIN IN CLEAR to the callback — needed to derive the encryption
+   key, which the stored hash cannot provide. */
+function _askPin(onOk){
+  const overlay = document.createElement('div');
+  overlay.id = 'admin-pin-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;';
+  overlay.innerHTML=`
+    <div class="login-box">
+      <div class="pin-label" style="margin-top:8px">${t('enc.pin_confirm')}</div>
+      <div class="pin-dots">
+        <div class="pin-dot" id="dot-0"></div><div class="pin-dot" id="dot-1"></div>
+        <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
+      </div>
+      <div class="pin-keypad">
+        ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="pin-key" data-digit="${d}" type="button">${d}</button>`).join('')}
+        <button class="pin-key del" data-action="pinDel" type="button">⌫</button>
+        <button class="pin-key zero" data-digit="0" type="button">0</button>
+      </div>
+      <div class="pin-error-msg" id="pin-error"></div>
+      <button style="background:none;border:1.5px solid var(--border);border-radius:100px;color:var(--tx2);font-size:12px;font-weight:600;padding:7px 18px;cursor:pointer;font-family:var(--font-b);margin-top:14px;" id="askPinCancelBtn">${t('adm.cancel')}</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  pinEntry='';
+  const close = ()=>{
+    overlay.remove();
+    pinEntry='';
+    window._adminOverlayActive = false;
+    window._adminPinCallback = null;
+  };
+  overlay.querySelector('#askPinCancelBtn').addEventListener('click', e=>{ e.stopPropagation(); close(); });
+  window._adminOverlayActive = true;
+  window._adminPinCallback = async ()=>{
+    const hash = await sha256(pinEntry);
+    if(hash === getStoredPinHash()){
+      const pin = pinEntry;
+      close();
+      await onOk(pin);
+    } else {
+      for(let i=0;i<4;i++){
+        document.querySelectorAll('#dot-'+i).forEach(d=>{ d.classList.remove('filled'); d.classList.add('error'); });
+      }
+      document.querySelectorAll('#pin-error').forEach(e=>{ e.textContent=t('pin.wrong'); });
+      setTimeout(()=>{ pinEntry=''; updatePinDots(); },700);
+    }
+  };
+}
+
 export function showAdminPinScreen(){
   // When in viewer mode, show a PIN overlay to switch to admin
   const overlay = document.createElement('div');
@@ -615,10 +697,17 @@ export function renderSettings(){
       </div>
       <div class="setv-row">
         <div class="setv-row-left">
-          <div class="setv-row-label">${t('s.viewer')}</div>
-          <div class="setv-row-sub">${t('s.viewer_sub')}</div>
+          <div class="setv-row-label">${t('s.enc')}</div>
+          <div class="setv-row-sub">${isEncEnabled()?t('s.enc_on_sub'):t('s.enc_sub')}</div>
         </div>
-        <button class="setv-toggle${viewerOn?' on':''}" id="viewerToggle"></button>
+        <button class="setv-toggle${isEncEnabled()?' on':''}" id="encToggle"></button>
+      </div>
+      <div class="setv-row">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.viewer')}</div>
+          <div class="setv-row-sub">${isEncEnabled()?t('enc.viewer_blocked'):t('s.viewer_sub')}</div>
+        </div>
+        <button class="setv-toggle${viewerOn?' on':''}" id="viewerToggle"${isEncEnabled()?' disabled style="opacity:0.4;pointer-events:none;"':''}></button>
       </div>` : `
       <div class="setv-row" style="opacity:0.4;pointer-events:none;">
         <div class="setv-row-left">
@@ -738,8 +827,19 @@ export function renderSettings(){
   // — Bindings —
   el.querySelector('#pinToggle')?.addEventListener('click', async ()=>{
     if(pinOn){
-      // Disable PIN: confirm
+      // Disable PIN: confirm — and decrypt everything back to clear
+      // FIRST (no PIN = no key: encrypted data would become unreachable).
       if(!confirm(t('pin.disable'))) return;
+      if(isEncEnabled()){
+        try {
+          await disableEncryption();
+          showToast(t('enc.off_done'));
+        } catch(e){
+          console.error('encryption disable failed — PIN kept enabled', e);
+          showToast(t('enc.err_generic'));
+          return;
+        }
+      }
       localStorage.setItem('f1uno_pin_enabled','false');
       localStorage.removeItem('f1uno_pin_hash');
     } else {
@@ -763,6 +863,17 @@ export function renderSettings(){
     if(!/^\d{4}$/.test(a)){ errEl.textContent=t('pin.digits'); return; }
     if(a !== b){ errEl.textContent=t('pin.mismatch'); return; }
     const hash = await sha256(a);
+    // Re-encrypt under the new PIN BEFORE the hash is replaced: if the
+    // re-key fails, the old PIN must still open the old ciphertexts.
+    if(isEncEnabled()){
+      try {
+        await rekeyEncryption(a);
+      } catch(e){
+        console.error('re-key failed — PIN unchanged', e);
+        errEl.textContent = t('enc.err_generic');
+        return;
+      }
+    }
     localStorage.setItem('f1uno_pin_hash', hash);
     errEl.textContent='';
     el.querySelector('#changePinForm').style.display='none';
@@ -775,6 +886,31 @@ export function renderSettings(){
     localStorage.setItem('f1uno_viewer_enabled', viewerOn?'false':'true');
     renderSettings();
     showToast(viewerOn?t('toast.viewer_off'):t('toast.viewer_on'));
+  });
+
+  // — Local data encryption (needs the PIN in clear to derive the key,
+  //   so enabling re-asks it on the keypad) —
+  el.querySelector('#encToggle')?.addEventListener('click', ()=>{
+    if(isEncEnabled()){
+      if(!confirm(t('enc.off_confirm'))) return;
+      disableEncryption()
+        .then(()=>{ renderSettings(); showToast(t('enc.off_done')); })
+        .catch(e=>{ console.error('encryption disable failed', e); showToast(t('enc.err_generic')); });
+    } else {
+      // The warning is the contract: forgotten PIN = unrecoverable local
+      // data, so back up first. Explicit confirmation required.
+      if(!confirm(t('enc.warn'))) return;
+      _askPin(async pin => {
+        try {
+          await enableEncryption(pin);
+          renderSettings();
+          showToast(t('enc.on_done'));
+        } catch(e){
+          console.error('encryption enable failed — data left in clear', e);
+          showToast(t('enc.err_generic'));
+        }
+      });
+    }
   });
 
   el.querySelector('#importBtn')?.addEventListener('click', triggerImport);

@@ -18,6 +18,7 @@ import {
 import { noteChange, markBackupDone } from './backup.js';
 import { recordHistoryPoint } from './history.js';
 import { gatherSettings, applySettings, backupIncludes } from './settings-sync.js';
+import { secureGet, secureSet } from './secure-store.js';
 
 /* ── Versioning & season-scoped keys ── */
 const STORAGE_VERSION = 2;
@@ -51,7 +52,7 @@ export let coll = {};
 export function loadData(){
   _migrateStorage();
   try{
-    const s=localStorage.getItem(_storageKey('owned'));
+    const s=secureGet(_storageKey('owned'));
     log('localStorage key:', _storageKey('owned'));
     log('localStorage value:', s);
     if(s) {
@@ -75,7 +76,7 @@ export function loadData(){
   }
 }
 export function saveData(){
-  localStorage.setItem(_storageKey('owned'), JSON.stringify(coll));
+  secureSet(_storageKey('owned'), JSON.stringify(coll));
   noteChange();         // backup reminder bookkeeping (backup.js)
   recordHistoryPoint(); // daily progression snapshot (history.js)
 }

@@ -12,6 +12,7 @@
 import { log } from './logger.js';
 import { CARDS_DB } from './data.js';
 import { _storageKey, cardOwned } from './storage.js';
+import { secureGet, secureSet } from './secure-store.js';
 
 const MAX_POINTS = 365;
 
@@ -24,7 +25,7 @@ function _todayKey(){
 
 export function getHistory(){
   try {
-    const s = localStorage.getItem(_storageKey('history'));
+    const s = secureGet(_storageKey('history'));
     const arr = s ? JSON.parse(s) : [];
     return Array.isArray(arr) ? arr : [];
   } catch(e){
@@ -47,7 +48,7 @@ export function recordHistoryPoint(){
       hist.push({ date: today, owned });
     }
     if(hist.length > MAX_POINTS) hist.splice(0, hist.length - MAX_POINTS);
-    localStorage.setItem(_storageKey('history'), JSON.stringify(hist));
+    secureSet(_storageKey('history'), JSON.stringify(hist));
     log('history point recorded:', today, owned);
   } catch(e){
     // History is best-effort — never let it break a save

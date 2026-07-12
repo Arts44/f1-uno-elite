@@ -9,6 +9,7 @@ import {
 } from './storage.js';
 import { updateStats } from './stats.js';
 import { showToast } from './render.js';
+import { secureGet, secureSet } from './secure-store.js';
 
 export let manualBadges = {};        // { badgeId: true/false }
 export let autoBadgeUnlocked = {};   // { badgeId: true } — persists once unlocked
@@ -82,15 +83,15 @@ export function evaluateBadgeCondition(badge){
 // Load manual badges from localStorage
 export function loadManualBadges(){
   try {
-    const s = localStorage.getItem(_storageKey('badges'));
+    const s = secureGet(_storageKey('badges'));
     if(s) manualBadges = JSON.parse(s);
   } catch(e){ manualBadges = {}; }
   try {
-    const a = localStorage.getItem(_storageKey('auto_badges'));
+    const a = secureGet(_storageKey('auto_badges'));
     if(a) autoBadgeUnlocked = JSON.parse(a);
   } catch(e){ autoBadgeUnlocked = {}; }
 }
-export function saveManualBadges(){ localStorage.setItem(_storageKey('badges'), JSON.stringify(manualBadges)); localStorage.setItem(_storageKey('auto_badges'), JSON.stringify(autoBadgeUnlocked)); }
+export function saveManualBadges(){ secureSet(_storageKey('badges'), JSON.stringify(manualBadges)); secureSet(_storageKey('auto_badges'), JSON.stringify(autoBadgeUnlocked)); }
 
 // Check if auto badge is unlocked (current condition OR previously unlocked)
 export function isAutoBadgeUnlocked(badge){

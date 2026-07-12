@@ -53,9 +53,10 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 
 ### Security & access modes
 - **PIN lock** (4 digits) hashed with **SHA-256** via the Web Crypto API. **Locking is instant ("hot lock", no page reload)**: privileges are dropped first, then every open surface (modal, sidebar, dialogs) is closed and the PIN keypad is restored pristine — unlocking re-initialises the app cleanly.
-- **Viewer mode** (read-only) to share your collection without risking edits; write actions are blocked and an admin PIN screen switches back to full access.
+- **Viewer mode** (read-only) to share your collection without risking edits; write actions are blocked and an admin PIN screen switches back to full access. Viewer mode is **unavailable while local encryption is on** (no PIN = no key).
 - Basic console-bypass protection.
-- > ⚠️ **Honest limit: the PIN is an interface gate, not encryption.** The collection lives unencrypted in `localStorage`, so anyone with physical access to the device can read it through the browser's DevTools regardless of the PIN. The PIN protects against casual edits/peeking, not against a determined person with device access.
+- **Optional local-data encryption** (`secure-store.js`, Settings → Security, requires the PIN): the collection data (owned cards, badges, history) is stored **encrypted in `localStorage`** — AES-GCM-256 with a key derived from the PIN via PBKDF2-SHA-256 (310 000 iterations, random local salt), all native Web Crypto, no library. Enabling shows an explicit warning and requires confirmation + PIN re-entry; the migration verifies every value decrypts back correctly **before** replacing the clear one. Disabling the PIN (or the toggle) decrypts everything back to clear first; changing the PIN re-encrypts under the new key. Backups (JSON, code, QR, cloud) always contain **decrypted** data so they stay usable anywhere. If decryption ever fails at unlock (PIN desync, corruption), the app offers a recovery exit: the undecryptable data is set aside (never deleted) and you can restore a backup.
+- > ⚠️ **Honest limits.** Without encryption, the PIN is an interface gate: the collection lives readable in `localStorage` via DevTools. **With encryption on**, casual reading is blocked — but a 4-digit PIN has only 10 000 combinations, so a determined attacker holding the device can brute-force the key derivation offline. This is protection against opportunistic snooping, not against experts. And a **forgotten PIN makes the local collection unrecoverable** — keep backups.
 
 ### PWA — installable & offline
 - **Web App Manifest** (`manifest.webmanifest`): installable to the home screen / dock (standalone display). Icons 192/512 px declared `any maskable`, plus **screenshots** (a `wide` desktop and a `narrow` mobile capture) so browsers can show the richer install UI. A **favicon** (`favicon.ico`) is served too.
@@ -176,7 +177,7 @@ npm run test:watch   # re-run on file change
 
 **Continuous integration**: a GitHub Action ([.github/workflows/tests.yml](.github/workflows/tests.yml)) runs on every push and pull request to `main` — it executes the full test suite (`npm test` on Node 22), then the production build (`npm run build`), and finally verifies that the **committed `app.bundle.js` is up to date** with the sources (a stale committed bundle would mean the live app doesn't match the code; esbuild is version-pinned and deterministic, so a rebuild-and-diff is reliable). Results appear in the repo's **Actions** tab and as the status badge at the top of this README; a red run on a PR blocks nothing by itself but tells you exactly which step failed and why before it reaches Pages.
 
-The suite currently counts **142 tests, all green** (`npm test`). Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
+The suite currently counts **153 tests, all green** (`npm test`). Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
 
 **Covered** (logic only, no browser):
 - **Rarity** — `baseCardRarity` / `variantRarity` (foil bonuses, index clamp) / `cardRarity` (best owned variant, qty-0 edge cases), plus the 6-rarity scale integrity in the real metadata and its embedded fallback.
@@ -191,6 +192,7 @@ The suite currently counts **142 tests, all green** (`npm test`). Tests live in 
 - **Language gating** — the first-launch language screen shows only when no language was ever chosen and setup isn't done.
 - **Cloud** — magic-link hash parsing, session expiry margin and persistence, request headers, JWT sub decoding, upsert row shape, OTP verify request (stubbed fetch) incl. wrong-code and 429 paths, OTP input format (6–10 digits, whitespace normalization), send cool-down, configuration gate.
 - **Settings in backups** — gather/apply per category, partial restore choices, backward compatibility (no `settings` field), remembered export choice, key coverage (the cloud session token can never travel).
+- **Local encryption** — clear→encrypted migration without loss (round-trip verified per key, non-data keys untouched), fresh-session unlock, wrong-PIN rejection with ciphertexts intact, interrupted-migration tolerance, PIN disable → back to clear, PIN change → re-key, decrypt-failure quarantine (data moved aside, never deleted), passthrough when off.
 - **Updates & changelog** — numeric version comparison (incl. the `1.10 > 1.9` trap), changelog-entry selection since a given version, the "what's new" offer gate (fresh install / same version / rollback → silent), seen-version persistence, changelog data integrity (descending versions, valid dates, all 7 languages on every entry, `APP_VERSION` = newest entry).
 
 **Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/font-switching/animations, the interactive tutorial's DOM engine (its snapshot/restore and step sequence *are* covered), the collector-tools UI (its selection logic *is* covered above), and **real network calls to the Supabase API** — every cloud test stubs `fetch` (no email is ever sent by the suite), so the live auth/push/pull path is verified manually against the real project.
@@ -256,6 +258,7 @@ F1/
 ├── settings-sync.js      # Optional settings section in backups (prefs / security categories)
 ├── update.js             # Automatic updates: SW registration, "reload" banner, what's-new offer
 ├── changelog.js          # Version history (7 languages) — APP_VERSION derives from its newest entry
+├── secure-store.js       # Optional at-rest encryption of collection data (PBKDF2 + AES-GCM, PIN-keyed)
 ├── badges.js             # Badge evaluation/rendering + user titles
 ├── stats.js              # computeStats() + updateStats() + renderStats() (progression, highlights, donut)
 ├── render.js             # Grid, sidebar, filters, modal, search, views, toast
@@ -298,7 +301,7 @@ F1/
 | v1 | `f1uno_v3`, `f1uno_badges`, `f1uno_auto_badges` | Old format (no season scope) |
 | v2 | `f1uno_owned_2025`, `f1uno_badges_2025`, `f1uno_auto_badges_2025`, `f1uno_history_2025` | Season-scoped format (incl. the Stats progression history) |
 
-Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`), `f1uno_install_dismissed` (install banner opt-out), `f1uno_seen_version` (last app version seen — drives the "what's new" offer), `f1uno_cloud_session` (Supabase session tokens — device-local, **never included in any backup**) and `f1uno_backup_inc_prefs`/`f1uno_backup_inc_sec` (remembered backup-contents choice). Migration v1 → v2 runs automatically on first load.
+Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`), `f1uno_install_dismissed` (install banner opt-out), `f1uno_seen_version` (last app version seen — drives the "what's new" offer), encryption keys (`f1uno_enc_enabled`, `f1uno_enc_salt`, `f1uno_enc_check`, plus `f1uno_enc_orphan_*` quarantine slots after a failed decrypt), `f1uno_cloud_session` (Supabase session tokens — device-local, **never included in any backup**) and `f1uno_backup_inc_prefs`/`f1uno_backup_inc_sec` (remembered backup-contents choice). Migration v1 → v2 runs automatically on first load.
 
 ---
 

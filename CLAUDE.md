@@ -158,6 +158,7 @@ Collections/F1/                 ← git root · all commands run here
 ├── settings-sync.js            # Optional settings in backups (prefs / security categories)
 ├── update.js                   # Auto-updates: SW registration, reload banner, what's-new offer
 ├── changelog.js                # Version history ×7 languages — APP_VERSION = newest entry
+├── secure-store.js             # Optional at-rest encryption (PBKDF2+AES-GCM, PIN-keyed) of collection data
 │
 │  ── Classic scripts (NOT bundled · loaded before modules · set window.__ globals) ──
 ├── translations.js             # window.__T / window.__BADGE_T (7 languages)
