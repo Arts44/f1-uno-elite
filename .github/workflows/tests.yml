@@ -1,0 +1,45 @@
+# CI — protects main: unit tests + production build + committed-bundle freshness.
+# Runs on every push and pull request targeting main. All three steps must
+# pass; a red run means the change would ship a regression to GitHub Pages.
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node >= 18 is required for the built-in test runner (node --test)
+      # and the global CompressionStream used by the backup-code tests.
+      # 22 matches the maintainer's local version.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install (esbuild, the only devDependency)
+        run: npm ci
+
+      - name: Unit tests (node --test)
+        run: npm test
+
+      - name: Production build (esbuild)
+        run: npm run build
+
+      # app.bundle.js is a COMMITTED artifact (GitHub Pages runs no build):
+      # a stale bundle means the live app doesn't match the sources. esbuild
+      # is pinned by package-lock.json and its output is deterministic, so
+      # rebuilding in CI and diffing is reliable. If this fails: run
+      # `npm run build` locally and commit the regenerated bundle.
+      - name: Committed bundle is up to date
+        run: |
+          git diff --exit-code -- app.bundle.js app.bundle.js.map || {
+            echo '::error::app.bundle.js is stale — run `npm run build` and commit the regenerated bundle.'
+            exit 1
+          }

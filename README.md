@@ -4,6 +4,7 @@
 >
 > **Live app:** <https://arts44.github.io/f1-uno-elite/> (GitHub Pages)
 
+[![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![Vanilla JS](https://img.shields.io/badge/JavaScript-vanilla-f7df1e?logo=javascript&logoColor=black)
 ![ES Modules](https://img.shields.io/badge/ES%20modules-yes-blue)
@@ -173,7 +174,9 @@ npm test             # run the whole suite once
 npm run test:watch   # re-run on file change
 ```
 
-The suite currently counts **141 tests, all green** (`npm test`). Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
+**Continuous integration**: a GitHub Action ([.github/workflows/tests.yml](.github/workflows/tests.yml)) runs on every push and pull request to `main` — it executes the full test suite (`npm test` on Node 22), then the production build (`npm run build`), and finally verifies that the **committed `app.bundle.js` is up to date** with the sources (a stale committed bundle would mean the live app doesn't match the code; esbuild is version-pinned and deterministic, so a rebuild-and-diff is reliable). Results appear in the repo's **Actions** tab and as the status badge at the top of this README; a red run on a PR blocks nothing by itself but tells you exactly which step failed and why before it reaches Pages.
+
+The suite currently counts **142 tests, all green** (`npm test`). Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
 
 **Covered** (logic only, no browser):
 - **Rarity** — `baseCardRarity` / `variantRarity` (foil bonuses, index clamp) / `cardRarity` (best owned variant, qty-0 edge cases), plus the 6-rarity scale integrity in the real metadata and its embedded fallback.
