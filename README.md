@@ -51,9 +51,10 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 - Progress is **scoped per season** in `localStorage`, with automatic migration from the old un-scoped format (v1 → v2).
 
 ### Security & access modes
-- **PIN lock** (4 digits) hashed with **SHA-256** via the Web Crypto API.
+- **PIN lock** (4 digits) hashed with **SHA-256** via the Web Crypto API. **Locking is instant ("hot lock", no page reload)**: privileges are dropped first, then every open surface (modal, sidebar, dialogs) is closed and the PIN keypad is restored pristine — unlocking re-initialises the app cleanly.
 - **Viewer mode** (read-only) to share your collection without risking edits; write actions are blocked and an admin PIN screen switches back to full access.
 - Basic console-bypass protection.
+- > ⚠️ **Honest limit: the PIN is an interface gate, not encryption.** The collection lives unencrypted in `localStorage`, so anyone with physical access to the device can read it through the browser's DevTools regardless of the PIN. The PIN protects against casual edits/peeking, not against a determined person with device access.
 
 ### PWA — installable & offline
 - **Web App Manifest** (`manifest.webmanifest`): installable to the home screen / dock (standalone display). Icons 192/512 px declared `any maskable`, plus **screenshots** (a `wide` desktop and a `narrow` mobile capture) so browsers can show the richer install UI. A **favicon** (`favicon.ico`) is served too.
@@ -74,7 +75,7 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 - **Backup code** (device-to-device, no file, no server): generate a short code (collection compressed with `CompressionStream` and base64url-encoded), copy it, paste it on another device to restore — with the same merge/replace choice as the file import. Codes also work embedded in a link (`…#backup=<code>`). Everything stays client-side.
 - **QR code transfer**: the backup code can also be shown as a **QR code** (encoding the `…#backup=<code>` link). Scan it with the target device to open the app and trigger the restore automatically — no typing, no camera scanner built into the app, no backend. Generated locally with a vendored QR encoder (no CDN). If the collection is too large to fit a reliably-scannable QR, the UI shows a fallback message pointing to the text code or JSON export instead of an unreadable QR.
 - **Backup reminder**: after 30 saved changes or 14 days without a backup, a toast nudges you to export or generate a code.
-- **Cloud backup (optional, manual)**: sign in with an email OTP code (magic link kept as a browser-side bonus) and push/pull your collection to a **Supabase** table — in **pure REST `fetch()`, no SDK**, so the zero-runtime-dependency rule holds. One row per (user, season), protected by Row Level Security; `updated_at` is server-owned. Pull always goes through the merge/replace dialog — never a silent overwrite. Fully opt-in: with `cloud-config.js` empty the feature is disabled and the app behaves exactly as before. The service worker excludes the Supabase origin entirely (API responses are never cached). A send cool-down + 429 handling prevent locking yourself out of auth emails.
+- **Cloud backup (optional, manual)**: sign in with an email **OTP code** — the primary path because a magic link opens the default browser, not an installed PWA (the link is kept as a browser-side bonus). The app is **length-agnostic**: it accepts 6–10 digits (Supabase's "Email OTP Length" is configurable in that range) with whitespace normalisation. Note for self-hosters: the Supabase *Magic Link* email template must contain the `{{ .Token }}` variable for the code to appear in the mail, and customising that template requires a **custom SMTP** sender. Push/pull your collection to a **Supabase** table — in **pure REST `fetch()`, no SDK**, so the zero-runtime-dependency rule holds. One row per (user, season), protected by Row Level Security; `updated_at` is server-owned. Pull always goes through the merge/replace dialog — never a silent overwrite. Fully opt-in: with `cloud-config.js` empty the feature is disabled and the app behaves exactly as before. The service worker excludes the Supabase origin entirely (API responses are never cached). A send cool-down + 429 handling prevent locking yourself out of auth emails.
 - **Backup contents (choose what travels)**: every channel (JSON, code, QR, cloud) can optionally include your **preferences** (language, theme, font, title) and — explicit opt-in with a warning — **security** (PIN, viewer mode). On restore, matching checkboxes decide what gets applied; restored preferences apply live without a reload. Old backups without settings import unchanged.
 - **Offline embedded fallback** (`data-embedded.js`): if the JSON files cannot be fetched, the app boots from data baked into the page.
 
@@ -170,7 +171,7 @@ npm test             # run the whole suite once
 npm run test:watch   # re-run on file change
 ```
 
-Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
+The suite currently counts **130 tests, all green** (`npm test`). Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
 
 **Covered** (logic only, no browser):
 - **Rarity** — `baseCardRarity` / `variantRarity` (foil bonuses, index clamp) / `cardRarity` (best owned variant, qty-0 edge cases), plus the 6-rarity scale integrity in the real metadata and its embedded fallback.
@@ -186,7 +187,7 @@ Tests live in `tests/` (one file per module) and run against small self-containe
 - **Cloud** — magic-link hash parsing, session expiry margin and persistence, request headers, JWT sub decoding, upsert row shape, OTP verify request (stubbed fetch) incl. wrong-code and 429 paths, OTP input format (6–10 digits, whitespace normalization), send cool-down, configuration gate.
 - **Settings in backups** — gather/apply per category, partial restore choices, backward compatibility (no `settings` field), remembered export choice, key coverage (the cloud session token can never travel).
 
-**Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/font-switching/animations, the interactive tutorial's DOM engine (its snapshot/restore and step sequence *are* covered), and the collector-tools UI (its selection logic *is* covered above).
+**Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/font-switching/animations, the interactive tutorial's DOM engine (its snapshot/restore and step sequence *are* covered), the collector-tools UI (its selection logic *is* covered above), and **real network calls to the Supabase API** — every cloud test stubs `fetch` (no email is ever sent by the suite), so the live auth/push/pull path is verified manually against the real project.
 
 ### First run
 1. On first launch, a **language chooser** appears first (7 languages), then a setup screen lets you optionally define a **PIN code** (or skip it), followed by the **interactive tutorial** (auto-starts only once; replayable from Settings) — all in the chosen language.
@@ -229,7 +230,8 @@ F1/
 ├── sw.js                 # Service worker: versioned precache, cache-first shell,
 │                         #   stale-while-revalidate runtime cache for external assets
 ├── favicon.ico           # Favicon (16/32/48, derived from the app icon)
-├── icons/                # App icon: icon.svg (source) + icon-192/512.png exports (any maskable)
+├── icons/                # App icon "the card fan" (red bg): icon.svg (source of truth)
+│                         #   + icon-192/512.png exports (any maskable, fan inside the safe zone)
 ├── screenshots/          # Manifest install screenshots (desktop-* wide, mobile-* narrow)
 ├── fonts/                # Self-hosted WOFF2 (UI + driver-number fonts) + LICENSES (SIL OFL)
 │
@@ -261,6 +263,8 @@ F1/
 ├── extract_data.mjs      # Dev tool: data extraction/generation
 │
 ├── tests/                # node --test suites + fixtures (_setup.js, _fixtures.js)
+├── docs/
+│   └── CLOUD-SYNC-DESIGN.md  # Cloud-sync design doc (options studied, decisions taken)
 ├── LICENSE               # MIT
 └── data/
     ├── metadata.json     # Static config (types, rarities, teams, drivers…)
@@ -286,16 +290,21 @@ F1/
 | v1 | `f1uno_v3`, `f1uno_badges`, `f1uno_auto_badges` | Old format (no season scope) |
 | v2 | `f1uno_owned_2025`, `f1uno_badges_2025`, `f1uno_auto_badges_2025`, `f1uno_history_2025` | Season-scoped format (incl. the Stats progression history) |
 
-Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), and backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`) `f1uno_install_dismissed` (install banner opt-out), `f1uno_cloud_session` (Supabase session tokens) and `f1uno_backup_inc_prefs`/`f1uno_backup_inc_sec` (remembered backup-contents choice). Migration v1 → v2 runs automatically on first load.
+Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`), `f1uno_install_dismissed` (install banner opt-out), `f1uno_cloud_session` (Supabase session tokens — device-local, **never included in any backup**) and `f1uno_backup_inc_prefs`/`f1uno_backup_inc_sec` (remembered backup-contents choice). Migration v1 → v2 runs automatically on first load.
 
 ---
 
 ## 🔮 Roadmap
 
-The following is **not yet implemented** and is the main remaining work:
-
 ### Nothing major open
-The last roadmap item — **optional cloud backup** — is now shipped (manual push/pull to Supabase in pure REST, per the validated design in [docs/CLOUD-SYNC-DESIGN.md](docs/CLOUD-SYNC-DESIGN.md); the "minimal push/pull first" recommendation is what was built). Possible future ideas, none committed: automatic background sync, E2E encryption of the cloud payload, a "delete my cloud data" button.
+The last roadmap item — **optional cloud backup** — is now shipped (manual push/pull to Supabase in pure REST, per the validated design in [docs/CLOUD-SYNC-DESIGN.md](docs/CLOUD-SYNC-DESIGN.md); the "minimal push/pull first" recommendation is what was built).
+
+### Ideas — not committed
+None of these is planned or in progress; they are noted so they don't get lost:
+- **Automatic background sync** (pull at launch, debounced push) instead of manual push/pull.
+- **E2E encryption** of the cloud payload with a passphrase (AES-GCM via WebCrypto) — the server would only ever see ciphertext, at the cost of unrecoverable backups if the passphrase is lost.
+- A **"delete my cloud data"** button (today: sign out locally; deletion goes through the Supabase dashboard).
+- **2026 season** dataset (`data/cards-2026.json`) once the cards exist — the multi-season plumbing is already in place.
 
 > Already shipped, not part of the roadmap: ES-module split of the former monolith, `DEBUG`-gated logging, esbuild production bundle, a **`node --test` unit-test suite**, **installable offline PWA** (manifest with maskable icons + screenshots, favicon, service worker), **device-to-device backup codes + QR transfer**, the **enriched Stats view** (progression curve, highlights, rarity donut) with a unified colour redesign, the **6-level rarity system** with the animated iridescent *divine* tier, **self-hosted fonts with a 5-theme picker**, the **interactive guided tutorial**, **collector tools** (missing / doubles / trade lists), the **first-launch language chooser**, the **guided PWA install experience**, the **optional Supabase cloud backup** (pure REST, OTP sign-in, manual push/pull) and **optional settings in backups**.
 
