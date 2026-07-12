@@ -13,6 +13,8 @@ import { missingCards, doublesList, tradeList } from './collector.js';
 import { installRowHTML, bindInstallRow } from './install.js';
 import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection } from './cloud.js';
+import { openChangelog } from './update.js';
+import { APP_VERSION } from './changelog.js';
 import { CATS, CARD_TYPES, CARDS_DB, _currentSeason } from './data.js';
 
 // PIN storage helpers (localStorage-based, SHA-256 hashed)
@@ -702,6 +704,24 @@ export function renderSettings(){
       </div>
     </div>
 
+    <div class="setv-section">
+      <div class="setv-section-title">${t('s.about')}</div>
+      <div class="setv-row">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.version')}</div>
+          <div class="setv-row-sub">F1 UNO Élite — Collection Tracker</div>
+        </div>
+        <span class="setv-version">${APP_VERSION}</span>
+      </div>
+      <div class="setv-row">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('upd.whatsnew')}</div>
+          <div class="setv-row-sub">${t('s.changelog_sub')}</div>
+        </div>
+        <button class="setv-btn" id="changelogBtn">${t('s.changelog_btn')}</button>
+      </div>
+    </div>
+
     ${pinOn ? `
     <div class="setv-section">
       <div class="setv-section-title">${t('s.session')}</div>
@@ -759,6 +779,7 @@ export function renderSettings(){
 
   el.querySelector('#importBtn')?.addEventListener('click', triggerImport);
   el.querySelector('#settingsLockBtn')?.addEventListener('click', lockApp);
+  el.querySelector('#changelogBtn')?.addEventListener('click', () => openChangelog());
 
   // — Backup code (device-to-device, no file) —
   el.querySelector('#backupCodeBtn')?.addEventListener('click', async ()=>{

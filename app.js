@@ -27,6 +27,7 @@ import { maybeHandleBackupHash } from './backup.js';
 import { isTutorialSeen, markTutorialSeen } from './tutorial.js';
 import { initInstall, maybeShowInstallBanner } from './install.js';
 import { handleAuthRedirect } from './cloud.js';
+import { initUpdateFlow, maybeOfferWhatsNew } from './update.js';
 
 // Magic-link return: if the URL carries a GoTrue #access_token fragment,
 // store the cloud session and clean the URL — before anything else
@@ -85,6 +86,10 @@ export function initApp() {
     // Install banner: the beforeinstallprompt event may have fired
     // while the login screen was still up — show it now if relevant.
     maybeShowInstallBanner();
+
+    // Just updated to a newer version? Offer (never impose) the
+    // "what's new" changelog. Idempotent — safe on unlock re-inits.
+    maybeOfferWhatsNew();
   });
 }
 
@@ -350,14 +355,10 @@ if(!isSetupDone()){
 // else: PIN enabled — login screen already visible in HTML, user enters PIN normally
 
 /* ══════════════════════════════════════════════════════════
-   SERVICE WORKER — offline support (PWA)
-   Only registers over http/https; silently skipped on file://
-   (the guard below is false there), which is expected.
+   SERVICE WORKER — offline support (PWA) + automatic updates.
+   update.js registers sw.js, watches for a new waiting worker
+   (→ "new version — reload" banner), and re-checks periodically
+   so installed PWAs that stay open still learn about releases.
+   Silently skipped on file:// (guard inside), which is expected.
    ══════════════════════════════════════════════════════════ */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => log('Service worker registered, scope:', reg.scope))
-      .catch(err => console.error('Service worker registration failed:', err));
-  });
-}
+initUpdateFlow();

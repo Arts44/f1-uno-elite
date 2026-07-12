@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v35';
+const SW_VERSION = 'v37';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -51,6 +51,8 @@ const SHELL_ASSETS = [
   'install.js',
   'cloud.js',
   'settings-sync.js',
+  'update.js',
+  'changelog.js',
   // Classic global scripts
   'data-embedded.js',
   'translations.js',
@@ -70,8 +72,18 @@ self.addEventListener('install', event => {
       // always precaches the CURRENT files from the server, never stale
       // heuristically-cached copies.
       .then(cache => cache.addAll(SHELL_ASSETS.map(u => new Request(u, { cache: 'reload' }))))
-      .then(() => self.skipWaiting())
+      // NO automatic skipWaiting: the new SW parks in "waiting" so the
+      // page can show a "new version — reload" banner instead of having
+      // the shell swapped under a running app. The page promotes it
+      // explicitly with the SKIP_WAITING message below; if the banner is
+      // ignored, the waiting SW activates naturally on the next cold
+      // start (all clients closed).
   );
+});
+
+// Promotion requested by the page (update banner click).
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {

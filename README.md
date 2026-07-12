@@ -61,6 +61,8 @@ The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework a
 - **Service Worker** (`sw.js`): the app shell (HTML, CSS, all JS modules + the bundle, the `data/` JSON files, icons, screenshots, favicon and the default + driver-number fonts) is **precached at install** under a versioned cache and served **cache-first** — after the first visit the app loads and works fully offline.
 - External assets (team/driver images from formula1.com, the Wikimedia F1/UNO logos) are cached at runtime (*stale-while-revalidate*) in a separate cache, so previously-seen images also work offline. **Fonts are self-hosted** and same-origin, so they fall under the shell cache — not an external dependency.
 - Old shell caches are cleaned up automatically when a new Service Worker version activates.
+- **Automatic updates** (`update.js`): when a new version is deployed, the service worker downloads it in the background and parks it in the *waiting* state; the app then shows a **discreet "new version available — Reload" banner**. One click promotes the new worker (`SKIP_WAITING` message) and reloads the page — the user is up to date with zero technical steps, and the versioned precache guarantees the new shell **and the new `data/*.json`** are fetched fresh (the old cache is deleted on activation, nothing stale survives). If the banner is ignored, the waiting worker activates naturally on the next cold start. Because an **installed PWA** can stay open for days without a navigation (the browser then never re-checks `sw.js` on its own), the app also calls `registration.update()` whenever it returns to the foreground and hourly while it stays open.
+- **In-app changelog & app version** (`changelog.js`): a version history translated in all 7 languages. After an update is applied, a non-intrusive "App updated!" banner offers to see **what's new** (only the entries that device actually missed); the full history is available anytime from **Settings → About**, which also shows the app version. The app version **is** the newest changelog entry (`APP_VERSION` is derived from it), so adding an entry *is* the version bump — nothing can drift.
 - **Guided install experience** (`install.js`): on Chrome/Edge/Android the `beforeinstallprompt` event is captured and surfaced as a native **Install** button in Settings plus a discreet, dismissable banner (a refusal is remembered — `f1uno_install_dismissed` — so it never nags). Browsers without the event get **platform-specific manual instructions** (iOS Safari: Share → Add to Home Screen, incl. iPadOS masquerading as macOS; macOS Safari: File → Add to Dock; Chromium: address-bar icon; Android menu; generic fallback) — and **Arc** (which has no install support and hides behind a Chrome UA) is detected via its injected `--arc-palette-*` CSS variables and gets an honest "open this in Chrome/Edge/Safari" message instead of instructions pointing at a nonexistent icon. Everything hides when the app already runs standalone.
 
 ### Collector tools
@@ -159,8 +161,8 @@ GitHub Pages serves this folder **as-is** (no server-side build), from a sub-pat
 - **All URLs are relative** — HTML assets, `manifest.webmanifest` (`start_url`/`scope` = `./`), the service-worker registration (`sw.js`, scope = the sub-folder) and its precache list, and every `fetch()` in the code. Nothing starts with `/`, so the app works identically at the domain root, under a sub-path, and on localhost.
 - **The built bundle is committed** (`app.bundle.js` + sourcemap) precisely because Pages runs no `npm` step. Rebuild it before every commit that touches a JS source (`npm run build`); a local git *pre-commit* hook automates this in this working copy (rebuild + `git add app.bundle.js*` whenever a staged JS source changed — hooks aren't versioned, so recreate it after a fresh clone).
 - **Publishing**: push the repo to GitHub, then *Settings → Pages → Source: Deploy from a branch → Branch: `main` / root*. The site appears at `https://<user>.github.io/<repo>/` after a minute or two.
-- **Updates**: the service worker precaches the app shell version-tagged by `SW_VERSION` (in `sw.js`). Bump it on every release — visitors get the new version on their **second** load (first load serves the cached shell while the new worker installs and replaces the old cache).
-- **Release routine**: edit sources → `npm run build` (the local pre-commit hook also enforces this) → bump `SW_VERSION` if any precached file changed → commit → `git push`. Pages redeploys automatically in ~1–2 minutes.
+- **Updates**: the service worker precaches the app shell version-tagged by `SW_VERSION` (in `sw.js`). Bump it on every release — returning visitors get an in-app **"new version — Reload" banner** as soon as the new worker has downloaded (on their next visit, or within the hour in an already-open installed PWA); one click applies it. Ignored banners resolve themselves on the next cold start.
+- **Release routine**: edit sources → **add a `CHANGELOG` entry in `changelog.js`** (new version number + date + the changes in all 7 languages — this IS the app-version bump) → `npm run build` (the local pre-commit hook also enforces this) → bump `SW_VERSION` if any precached file changed (for a release, it always did) → commit → `git push`. Pages redeploys automatically in ~1–2 minutes.
 
 ### Tests
 
@@ -171,7 +173,7 @@ npm test             # run the whole suite once
 npm run test:watch   # re-run on file change
 ```
 
-The suite currently counts **130 tests, all green** (`npm test`). Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
+The suite currently counts **141 tests, all green** (`npm test`). Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
 
 **Covered** (logic only, no browser):
 - **Rarity** — `baseCardRarity` / `variantRarity` (foil bonuses, index clamp) / `cardRarity` (best owned variant, qty-0 edge cases), plus the 6-rarity scale integrity in the real metadata and its embedded fallback.
@@ -186,6 +188,7 @@ The suite currently counts **130 tests, all green** (`npm test`). Tests live in 
 - **Language gating** — the first-launch language screen shows only when no language was ever chosen and setup isn't done.
 - **Cloud** — magic-link hash parsing, session expiry margin and persistence, request headers, JWT sub decoding, upsert row shape, OTP verify request (stubbed fetch) incl. wrong-code and 429 paths, OTP input format (6–10 digits, whitespace normalization), send cool-down, configuration gate.
 - **Settings in backups** — gather/apply per category, partial restore choices, backward compatibility (no `settings` field), remembered export choice, key coverage (the cloud session token can never travel).
+- **Updates & changelog** — numeric version comparison (incl. the `1.10 > 1.9` trap), changelog-entry selection since a given version, the "what's new" offer gate (fresh install / same version / rollback → silent), seen-version persistence, changelog data integrity (descending versions, valid dates, all 7 languages on every entry, `APP_VERSION` = newest entry).
 
 **Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/font-switching/animations, the interactive tutorial's DOM engine (its snapshot/restore and step sequence *are* covered), the collector-tools UI (its selection logic *is* covered above), and **real network calls to the Supabase API** — every cloud test stubs `fetch` (no email is ever sent by the suite), so the live auth/push/pull path is verified manually against the real project.
 
@@ -248,6 +251,8 @@ F1/
 ├── install.js            # PWA install helper (native prompt, banner, per-platform/Arc instructions)
 ├── cloud.js              # Optional Supabase cloud backup — pure REST fetch (OTP auth, push/pull)
 ├── settings-sync.js      # Optional settings section in backups (prefs / security categories)
+├── update.js             # Automatic updates: SW registration, "reload" banner, what's-new offer
+├── changelog.js          # Version history (7 languages) — APP_VERSION derives from its newest entry
 ├── badges.js             # Badge evaluation/rendering + user titles
 ├── stats.js              # computeStats() + updateStats() + renderStats() (progression, highlights, donut)
 ├── render.js             # Grid, sidebar, filters, modal, search, views, toast
@@ -290,7 +295,7 @@ F1/
 | v1 | `f1uno_v3`, `f1uno_badges`, `f1uno_auto_badges` | Old format (no season scope) |
 | v2 | `f1uno_owned_2025`, `f1uno_badges_2025`, `f1uno_auto_badges_2025`, `f1uno_history_2025` | Season-scoped format (incl. the Stats progression history) |
 
-Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`), `f1uno_install_dismissed` (install banner opt-out), `f1uno_cloud_session` (Supabase session tokens — device-local, **never included in any backup**) and `f1uno_backup_inc_prefs`/`f1uno_backup_inc_sec` (remembered backup-contents choice). Migration v1 → v2 runs automatically on first load.
+Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`), `f1uno_install_dismissed` (install banner opt-out), `f1uno_seen_version` (last app version seen — drives the "what's new" offer), `f1uno_cloud_session` (Supabase session tokens — device-local, **never included in any backup**) and `f1uno_backup_inc_prefs`/`f1uno_backup_inc_sec` (remembered backup-contents choice). Migration v1 → v2 runs automatically on first load.
 
 ---
 
