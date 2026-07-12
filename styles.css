@@ -697,98 +697,92 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .modal-visual .team-logo{max-width:60%;max-height:50%;}
 #moEmoji{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
 /* Type backgrounds */
-.tv-blue{background:linear-gradient(135deg,#1a3a6b,#2d6abf,#1a3a6b);}
-.tv-green{background:linear-gradient(135deg,#0d4a1f,#1a8c3a,#0d4a1f);}
-.tv-red{background:linear-gradient(135deg,#5a0000,#cc0000,#5a0000);}
-.tv-yellow{background:linear-gradient(135deg,#6b5200,#ffd000,#6b5200);}
-.tv-blue_foil{background:linear-gradient(135deg,#1a3a6b,#4a90d9,#7ec8ff,#4a90d9,#1a3a6b);background-size:200% 200%;animation:prismatic 3s linear infinite;}
-.tv-green_foil{background:linear-gradient(135deg,#0d4a1f,#2ecc71,#a8ffb0,#2ecc71,#0d4a1f);background-size:200% 200%;animation:prismatic 3s linear infinite;}
-.tv-red_foil{background:linear-gradient(135deg,#5a0000,#ff4d4d,#ffd0d0,#ff4d4d,#5a0000);background-size:200% 200%;animation:prismatic 3s linear infinite;}
-.tv-yellow_foil{background:linear-gradient(135deg,#6b5200,#ffd000,#fff3b0,#ffd000,#6b5200);background-size:200% 200%;animation:prismatic 3s linear infinite;}
-.tv-blue_red_foil{background:linear-gradient(135deg,#1a3a6b,#8b1a2b,#4a90d9,#cc2233,#1a3a6b);background-size:200% 200%;animation:prismatic 2.5s linear infinite;}
-.tv-green_yellow_foil{background:linear-gradient(135deg,#0d4a1f,#8b8000,#2ecc71,#ffd700,#0d4a1f);background-size:200% 200%;animation:prismatic 2.5s linear infinite;}
+/* ── TYPE VISUALS — "Soie vive" (P5) ──
+   One shared mechanic, no seams, cheap on 101 cards:
+   - BASE: rich STATIC depth (two radial light/dark plates over a
+     diagonal gradient). No animation at all on plain types.
+   - FOIL: the same base + ONE bright band that glides across
+     periodically, always the same direction, constant speed
+     (background-position on a transparent-edged overlay — the only
+     animated thing, shared keyframes, GPU-friendly).
+   - DUAL: the two hues FUSE through a deep blend at the junction
+     (no white line), same standard foil band on top.
+   - Hierarchy stays readable: plain < foil < dual < nitro/promo < wild. */
+.tv-blue{background:radial-gradient(120% 150% at 25% -15%,#4a90d9 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#081426 0%,transparent 60%),linear-gradient(135deg,#1a3a6b,#0a1830);}
+.tv-green{background:radial-gradient(120% 150% at 25% -15%,#2ecc71 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#03230d 0%,transparent 60%),linear-gradient(135deg,#0d4a1f,#052912);}
+.tv-red{background:radial-gradient(120% 150% at 25% -15%,#ff5040 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#2e0000 0%,transparent 60%),linear-gradient(135deg,#a30808,#4d0000);}
+.tv-yellow{background:radial-gradient(120% 150% at 25% -15%,#ffe14d 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#453400 0%,transparent 60%),linear-gradient(135deg,#d9ae00,#6b5200);}
+.tv-blue_foil{background:radial-gradient(120% 150% at 25% -15%,#7ec2ff 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#081426 0%,transparent 60%),linear-gradient(135deg,#2d6abf,#0a1830);}
+.tv-green_foil{background:radial-gradient(120% 150% at 25% -15%,#5ee694 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#03230d 0%,transparent 60%),linear-gradient(135deg,#1a8c3a,#052912);}
+.tv-red_foil{background:radial-gradient(120% 150% at 25% -15%,#ff7a6e 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#2e0000 0%,transparent 60%),linear-gradient(135deg,#cc1010,#4d0000);}
+.tv-yellow_foil{background:radial-gradient(120% 150% at 25% -15%,#ffefa0 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#453400 0%,transparent 60%),linear-gradient(135deg,#ffd000,#6b5200);}
+/* duals: chromatic fusion at the junction (blue→violet→red / green→chartreuse→yellow) */
+.tv-blue_red_foil{background:radial-gradient(130% 150% at 12% -15%,rgba(74,144,217,0.85) 0%,transparent 52%),radial-gradient(130% 150% at 92% 118%,rgba(224,64,80,0.8) 0%,transparent 52%),linear-gradient(115deg,#153a75 0%,#1d4f9c 36%,#5c2f8e 50%,#a01020 64%,#6e0812 100%);}
+.tv-green_yellow_foil{background:radial-gradient(130% 150% at 12% -15%,rgba(46,204,113,0.85) 0%,transparent 52%),radial-gradient(130% 150% at 92% 118%,rgba(255,208,0,0.75) 0%,transparent 52%),linear-gradient(115deg,#0d4a1f 0%,#1a8c3a 36%,#7a9a1a 50%,#c7a800 64%,#6b5200 100%);}
+/* the ONE calm foil band — same effect for simple foils AND duals,
+   scoped to the visual areas so it never washes over card text */
+.card-visual.tv-blue_foil::after,.card-visual.tv-green_foil::after,.card-visual.tv-red_foil::after,.card-visual.tv-yellow_foil::after,
+.card-visual.tv-blue_red_foil::after,.card-visual.tv-green_yellow_foil::after,
+.modal-visual.tv-blue_foil::after,.modal-visual.tv-green_foil::after,.modal-visual.tv-red_foil::after,.modal-visual.tv-yellow_foil::after,
+.modal-visual.tv-blue_red_foil::after,.modal-visual.tv-green_yellow_foil::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,244,235,0.5) 47.5%,rgba(255,255,255,0.92) 50%,rgba(255,244,235,0.5) 52.5%,transparent 60%);
+  background-size:300% 100%;
+  animation:tv-sheen 3.8s linear infinite;
+}
+@keyframes tv-sheen{0%{background-position:0% 0;}100%{background-position:-300% 0;}}
+/* Whole-card foil washes are now deep: pin the body text color per type
+   (independent of theme) so legibility never depends on the wash.
+   Dark washes -> white text; golden washes -> near-black text. */
+.card.tv-blue_foil .card-num,.card.tv-blue_foil .card-name,.card.tv-blue_foil .card-year,.card.tv-blue_foil .card-team,
+.card.tv-green_foil .card-num,.card.tv-green_foil .card-name,.card.tv-green_foil .card-year,.card.tv-green_foil .card-team,
+.card.tv-red_foil .card-num,.card.tv-red_foil .card-name,.card.tv-red_foil .card-year,.card.tv-red_foil .card-team,
+.card.tv-blue_red_foil .card-num,.card.tv-blue_red_foil .card-name,.card.tv-blue_red_foil .card-year,.card.tv-blue_red_foil .card-team,
+.card.tv-promo-blue .card-num,.card.tv-promo-blue .card-name,.card.tv-promo-blue .card-year,.card.tv-promo-blue .card-team,
+.card.tv-promo-green .card-num,.card.tv-promo-green .card-name,.card.tv-promo-green .card-year,.card.tv-promo-green .card-team,
+.card.tv-promo-red .card-num,.card.tv-promo-red .card-name,.card.tv-promo-red .card-year,.card.tv-promo-red .card-team{color:#FFFFFF !important;}
+.card.tv-yellow_foil .card-num,.card.tv-yellow_foil .card-name,.card.tv-yellow_foil .card-year,.card.tv-yellow_foil .card-team,
+.card.tv-promo-yellow .card-num,.card.tv-promo-yellow .card-name,.card.tv-promo-yellow .card-year,.card.tv-promo-yellow .card-team,
+.card.tv-green_yellow_foil .card-num,.card.tv-green_yellow_foil .card-name,.card.tv-green_yellow_foil .card-year,.card.tv-green_yellow_foil .card-team{color:#141414 !important;}
 /* Base de la carte — fond noir, effet sur toute la carte */
-.card.tv-nitro_foil {
-  background: #080808;
-  position: relative;
-  overflow: hidden;
-  animation: nitro-glow 4s linear infinite;
+/* NITRO — the violet tier between duals and wild: deep violet base,
+   its grid identity kept as a subtle overlay, and the standard foil
+   band running FASTER (nitro = speed). Whole-card class keeps a glassy
+   body + white text since the base is dark. */
+.tv-nitro_foil{background:radial-gradient(120% 150% at 25% -15%,#a55cff 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#0e0318 0%,transparent 60%),linear-gradient(135deg,#5b1fa8,#1c0836);}
+.card-visual.tv-nitro_foil::before,.modal-visual.tv-nitro_foil::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);
+  background-size:20px 20px;
 }
-
-/* Faisceaux lumineux rotatifs sur toute la carte */
-.card.tv-nitro_foil::before {
-  content: '';
-  position: absolute;
-  inset: -100%;
-  background: conic-gradient(
-    from 0deg,
-    transparent           0deg,
-    rgba(30,80,220,0.75)  50deg,
-    transparent           90deg,
-    rgba(20,160,50,0.75)  140deg,
-    transparent           180deg,
-    rgba(220,0,0,0.75)    230deg,
-    transparent           270deg,
-    rgba(255,208,0,0.75)  320deg,
-    transparent           360deg
-  );
-  animation: nitro-spin 4s linear infinite;
-  pointer-events: none;
-  z-index: 0;
+.card-visual.tv-nitro_foil::after,.modal-visual.tv-nitro_foil::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;
+  background:linear-gradient(105deg,transparent 40%,rgba(224,190,255,0.55) 47.5%,rgba(255,255,255,0.95) 50%,rgba(224,190,255,0.55) 52.5%,transparent 60%);
+  background-size:300% 100%;animation:tv-sheen 2.6s linear infinite;
 }
-
-/* Quadrillage stylé par-dessus */
-.card.tv-nitro_foil::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: 
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* La partie visuelle devient transparente pour laisser passer l'effet */
-.card-visual.tv-nitro_foil {
-  background: transparent !important;
-  position: relative;
-  z-index: 1;
-}
-.card-visual.tv-nitro_foil::before {
-  display: none !important;
-}
-
-/* Le corps de la carte semi-transparent pour voir l'effet en dessous */
-.card.tv-nitro_foil .card-body {
-  background: rgba(8,8,8,0.70);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  position: relative;
-  z-index: 1;
-}
-/* Force white text for nitro foil cards in both themes */
+.card.tv-nitro_foil .card-body{background:rgba(10,3,20,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);position:relative;z-index:1;}
 .card.tv-nitro_foil .dn-num,
 .card.tv-nitro_foil .card-name,
 .card.tv-nitro_foil .card-team,
 .card.tv-nitro_foil .card-year,
-.card.tv-nitro_foil .card-num,
-.card.tv-nitro_foil .card-rarity {
-  color: #FFFFFF !important;
+.card.tv-nitro_foil .card-num{color:#FFFFFF !important;}
+
+/* PROMOS — deep type hue + a flowing GOLD band + gold liner. */
+.tv-promo-blue{background:radial-gradient(120% 150% at 25% -15%,#4a90d9 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#02101f 0%,transparent 60%),linear-gradient(135deg,#0b2a55,#04101f);}
+.tv-promo-green{background:radial-gradient(120% 150% at 25% -15%,#2ecc71 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#01180a 0%,transparent 60%),linear-gradient(135deg,#08471c,#02180b);}
+.tv-promo-red{background:radial-gradient(120% 150% at 25% -15%,#ff4d5e 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#1f0004 0%,transparent 60%),linear-gradient(135deg,#8f0413,#33000a);}
+.tv-promo-yellow{background:radial-gradient(120% 150% at 25% -15%,#ffe14d 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#241a00 0%,transparent 60%),linear-gradient(135deg,#9a7a00,#453400);}
+.card-visual.tv-promo-blue,.card-visual.tv-promo-green,.card-visual.tv-promo-red,.card-visual.tv-promo-yellow,
+.modal-visual.tv-promo-blue,.modal-visual.tv-promo-green,.modal-visual.tv-promo-red,.modal-visual.tv-promo-yellow{
+  box-shadow:inset 0 0 0 2px rgba(255,205,90,0.78),inset 0 0 22px rgba(255,150,70,0.32);
 }
-.card.tv-nitro_foil .card-rarity {
-  background: rgba(255,255,255,0.15);
+.card-visual.tv-promo-blue::after,.card-visual.tv-promo-green::after,.card-visual.tv-promo-red::after,.card-visual.tv-promo-yellow::after,
+.modal-visual.tv-promo-blue::after,.modal-visual.tv-promo-green::after,.modal-visual.tv-promo-red::after,.modal-visual.tv-promo-yellow::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,209,102,0.6) 46%,#fff2cc 50%,rgba(255,209,102,0.6) 54%,transparent 62%);
+  background-size:300% 100%;animation:tv-sheen 3s linear infinite;
 }
-.tv-promo-blue{background:linear-gradient(135deg,#001a33,#003366,#0066cc,#0099ff,#00ccff,#00ffcc,#0099ff,#0066cc,#003366,#001a33);background-size:400% 400%;animation:promo-dramatic 2s ease-in-out infinite;position:relative;box-shadow:0 0 30px rgba(0,153,255,0.6),inset 0 0 30px rgba(0,153,255,0.3);}
-.tv-promo-blue::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,0.5) 0%,transparent 60%);pointer-events:none;animation:promo-pulse 1.5s ease-in-out infinite alternate;}
-.tv-promo-green{background:linear-gradient(135deg,#002200,#004400,#00ff00,#66ff66,#aaffaa,#66ff66,#00ff00,#004400,#002200);background-size:400% 400%;animation:promo-dramatic 2s ease-in-out infinite;position:relative;box-shadow:0 0 30px rgba(0,255,0,0.6),inset 0 0 30px rgba(0,255,0,0.3);}
-.tv-promo-green::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,0.5) 0%,transparent 60%);pointer-events:none;animation:promo-pulse 1.5s ease-in-out infinite alternate;}
-.tv-promo-red{background:linear-gradient(135deg,#330000,#660000,#ff0000,#ff6666,#ffaaaa,#ff6666,#ff0000,#660000,#330000);background-size:400% 400%;animation:promo-dramatic 2s ease-in-out infinite;position:relative;box-shadow:0 0 30px rgba(255,0,0,0.6),inset 0 0 30px rgba(255,0,0,0.3);}
-.tv-promo-red::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,0.5) 0%,transparent 60%);pointer-events:none;animation:promo-pulse 1.5s ease-in-out infinite alternate;}
-.tv-promo-yellow{background:linear-gradient(135deg,#332200,#664400,#ffcc00,#ffee66,#ffffaa,#ffee66,#ffcc00,#664400,#332200);background-size:400% 400%;animation:promo-dramatic 2s ease-in-out infinite;position:relative;box-shadow:0 0 30px rgba(255,204,0,0.6),inset 0 0 30px rgba(255,204,0,0.3);}
-.tv-promo-yellow::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,0.5) 0%,transparent 60%);pointer-events:none;animation:promo-pulse 1.5s ease-in-out infinite alternate;}
-/* Base de la carte — fond noir, effet sur toute la carte */
+
 .card.tv-wild_foil {
   background: #080808;
   position: relative;
@@ -863,18 +857,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .card.tv-wild_foil .card-rarity {
   background: rgba(255,255,255,0.15);
 }
-@keyframes prismatic{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
-@keyframes nitro-glow {
-  0%   { box-shadow: 0 0 18px rgba(30,80,220,0.6),  0 8px 32px rgba(0,0,0,0.7); }
-  25%  { box-shadow: 0 0 18px rgba(20,160,50,0.6),  0 8px 32px rgba(0,0,0,0.7); }
-  50%  { box-shadow: 0 0 18px rgba(220,0,0,0.6),    0 8px 32px rgba(0,0,0,0.7); }
-  75%  { box-shadow: 0 0 18px rgba(255,208,0,0.6),  0 8px 32px rgba(0,0,0,0.7); }
-  100% { box-shadow: 0 0 18px rgba(30,80,220,0.6),  0 8px 32px rgba(0,0,0,0.7); }
-}
-@keyframes nitro-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
+
 @keyframes wild-glow {
   0%   { box-shadow: 0 0 18px rgba(30,80,220,0.6),  0 8px 32px rgba(0,0,0,0.7); }
   25%  { box-shadow: 0 0 18px rgba(20,160,50,0.6),  0 8px 32px rgba(0,0,0,0.7); }
@@ -887,8 +870,6 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   to   { transform: rotate(360deg); }
 }
 
-@keyframes promo-dramatic{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
-@keyframes promo-pulse{0%{opacity:0.3;transform:scale(0.95);}100%{opacity:0.7;transform:scale(1.05);}}
 .crown{position:absolute;top:6px;left:7px;font-size:13px;}
 .replacement-icon{position:absolute;top:6px;right:6px;font-size:11px;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;padding:3px 6px;border-radius:8px;font-weight:600;letter-spacing:0.2px;backdrop-filter:blur(2px);box-shadow:0 2px 6px rgba(255,107,53,0.3);z-index:2;}
 .type-badge{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;padding:2px 6px;border-radius:5px;background:rgba(0,0,0,0.55);color:white;letter-spacing:0.2px;backdrop-filter:blur(2px);}
@@ -949,10 +930,8 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    modal header re-creates the exact same treatment at its own scale.
    Simple foils, dual foils and promos need nothing here: their .tv-*
    classes are element-generic and apply to .modal-visual directly. */
-.modal-visual.tv-wild_foil,
-.modal-visual.tv-nitro_foil{background:#080808;}
-.modal-visual.tv-wild_foil::before,
-.modal-visual.tv-nitro_foil::before{
+.modal-visual.tv-wild_foil{background:#080808;}
+.modal-visual.tv-wild_foil::before{
   content:'';position:absolute;inset:-100%;pointer-events:none;z-index:0;
   background:conic-gradient(
     from 0deg,
@@ -968,24 +947,14 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   );
   animation:wild-spin 4s linear infinite;
 }
-/* Wild keeps its glossy sheen, nitro its grid overlay — like the cards */
 .modal-visual.tv-wild_foil::after{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
   background:linear-gradient(135deg,rgba(255,255,255,0.10) 0%,transparent 40%,rgba(255,255,255,0.05) 100%);
 }
-.modal-visual.tv-nitro_foil::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size:20px 20px;
-}
-/* Content (driver number, image, circuit) stays above the beams */
-.modal-visual.tv-wild_foil > *,
-.modal-visual.tv-nitro_foil > *{position:relative;z-index:1;}
+.modal-visual.tv-wild_foil > *{position:relative;z-index:1;}
 @media (prefers-reduced-motion:reduce){
-  .modal-visual.tv-wild_foil::before,
-  .modal-visual.tv-nitro_foil::before{animation:none;transform:rotate(45deg);}
+  .modal-visual.tv-wild_foil::before{animation:none;transform:rotate(45deg);}
+  .card-visual[class*="tv-"]::after,.modal-visual[class*="tv-"]::after{animation:none;background-position:50% 0;}
 }
 .modal-visual.tv-green_yellow{background:linear-gradient(135deg,#0d4a1f,#8b8000,#2ecc71,#ffd700,#0d4a1f);}
 .modal-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:var(--ease);z-index:5;}

@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.4.0',
+    date: '2026-07-12',
+    changes: {
+      en: [
+        'A fresh look for every card type: deep, calm backgrounds; one clean light streak gliding across the foils; fused colours on dual foils; a golden flow on promos — the hierarchy reads at a glance. Wild Foil is untouched.',
+      ],
+      fr: [
+        'Nouveau look pour tous les types de cartes : fonds profonds et calmes, un unique reflet lumineux qui glisse sur les foils, couleurs fusionnées sur les doubles foils, flux doré sur les promos — la hiérarchie se lit d’un coup d’œil. Le Wild Foil ne change pas.',
+      ],
+      es: [
+        'Nuevo aspecto para todos los tipos de carta: fondos profundos y serenos, un único destello de luz que se desliza por los foils, colores fusionados en los dobles foils, flujo dorado en las promos — la jerarquía se lee de un vistazo. El Wild Foil no cambia.',
+      ],
+      zh: [
+        '所有卡牌类型焕然一新：深邃沉稳的底色，箔卡上滑过的单道光泽，双箔卡的色彩融合，促销卡的金色流光——稀有层级一目了然。Wild Foil 保持不变。',
+      ],
+      it: [
+        'Nuovo look per tutti i tipi di carta: sfondi profondi e calmi, un unico riflesso di luce che scorre sui foil, colori fusi sui doppi foil, flusso dorato sulle promo — la gerarchia si legge a colpo d’occhio. Il Wild Foil resta invariato.',
+      ],
+      nl: [
+        'Een nieuwe look voor elk kaarttype: diepe, rustige achtergronden; één zuivere lichtstreep die over de foils glijdt; versmolten kleuren op dubbele foils; een gouden stroom op promo’s — de hiërarchie lees je in één oogopslag. Wild Foil blijft onaangeroerd.',
+      ],
+      de: [
+        'Ein frischer Look für jeden Kartentyp: tiefe, ruhige Hintergründe; ein einzelner Lichtstreif, der über die Foils gleitet; verschmolzene Farben bei Dual-Foils; ein goldener Fluss bei Promos — die Hierarchie ist auf einen Blick lesbar. Wild Foil bleibt unverändert.',
+      ],
+    },
+  },
+  {
     version: '1.3.0',
     date: '2026-07-12',
     changes: {
