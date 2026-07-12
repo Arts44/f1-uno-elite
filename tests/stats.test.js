@@ -1,6 +1,7 @@
 import './_setup.js';
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
 import { loadData } from '../storage.js';
@@ -45,13 +46,29 @@ describe('rarityTextColor', () => {
     assert.equal(rarityTextColor('#C026D3'), '#fff');  // epic fuchsia
     assert.equal(rarityTextColor('#7C4DFF'), '#fff');  // cosmic violet
   });
-  test('picks near-black on bright colors', () => {
-    assert.equal(rarityTextColor('#FF7A00'), '#141414'); // legendary orange
-    assert.equal(rarityTextColor('#00C853'), '#141414'); // mythic emerald
+  test('still picks near-black when a color is too bright for white', () => {
+    assert.equal(rarityTextColor('#FF7A00'), '#141414'); // the OLD legendary orange
+    assert.equal(rarityTextColor('#00C853'), '#141414'); // the OLD mythic emerald
   });
   test('invalid input falls back to white', () => {
     assert.equal(rarityTextColor(undefined), '#fff');
     assert.equal(rarityTextColor('red'), '#fff');
     assert.equal(rarityTextColor('#12345'), '#fff');
+  });
+  // Design invariant: every non-divine rarity chip is white-on-color, with
+  // WCAG AA contrast for small text (>= 4.5:1). If a future palette tweak
+  // brightens a rarity past what white can bear, this fails loudly.
+  test('every shipped rarity color takes white text at >= 4.5:1', () => {
+    const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
+    const whiteContrast = hex => {
+      const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+        .map(c => c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+      return 1.05 / (0.2126 * r + 0.7152 * g + 0.0722 * b + 0.05);
+    };
+    for(const [key, r] of Object.entries(meta.rarities)){
+      if(key === 'divine') continue; // animated gradient, own treatment
+      assert.equal(rarityTextColor(r.color), '#fff', `${key} (${r.color}) must take white text`);
+      assert.ok(whiteContrast(r.color) >= 4.5, `${key} (${r.color}): white contrast ${whiteContrast(r.color).toFixed(2)}:1 < 4.5`);
+    }
   });
 });

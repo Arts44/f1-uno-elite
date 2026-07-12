@@ -171,17 +171,17 @@
     },
     "legendary": {
       "label": "Légendaire",
-      "color": "#FF7A00",
+      "color": "#C25500",
       "stars": 2
     },
     "mythic": {
       "label": "Mythique",
-      "color": "#00C853",
+      "color": "#00873B",
       "stars": 3
     },
     "ultra": {
       "label": "Ultra rare",
-      "color": "#FF1744",
+      "color": "#E4002B",
       "stars": 4
     },
     "cosmic": {
