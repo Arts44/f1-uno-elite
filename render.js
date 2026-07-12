@@ -622,9 +622,11 @@ export function openModal(id){
   const vis=document.getElementById('moVis');
   let ct=null;
   if(bestType){
+    // The modal mirrors the grid: same tv-<type> class, full effect.
+    // (It used to strip the _foil suffix, which mapped nitro/wild/dual
+    // foils onto classes that don't exist → dull default background.)
     ct=CARD_TYPES[bestType];
-    const modalCss=ct.css.replace(/_foil$/, '').replace(/_foil(?=\s|$)/,'');
-    vis.className=`modal-visual ${bestType==='wild_foil'?ct.css:(ct.foil?modalCss:ct.css)}`;
+    vis.className=`modal-visual ${ct.css}`;
   } else {
     vis.className='modal-visual not-owned';
   }
