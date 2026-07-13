@@ -13,7 +13,7 @@ import { missingCards, doublesList, tradeList } from './collector.js';
 import { installRowHTML, bindInstallRow } from './install.js';
 import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection } from './cloud.js';
-import { openChangelog } from './update.js';
+import { openChangelog, checkForUpdatesNow, isUpdateCheckSupported } from './update.js';
 import { APP_VERSION } from './changelog.js';
 import {
   isEncEnabled, unlockSecureStore, enableEncryption, disableEncryption,
@@ -809,6 +809,14 @@ export function renderSettings(){
         </div>
         <button class="setv-btn" id="changelogBtn">${t('s.changelog_btn')}</button>
       </div>
+      ${isUpdateCheckSupported() ? `
+      <div class="setv-row">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.check_upd')}</div>
+          <div class="setv-row-sub" id="checkUpdMsg">${t('s.check_upd_sub')}</div>
+        </div>
+        <button class="setv-btn" id="checkUpdBtn">${t('upd.check_btn')}</button>
+      </div>` : ''}
     </div>
 
     ${pinOn ? `
@@ -916,6 +924,31 @@ export function renderSettings(){
   el.querySelector('#importBtn')?.addEventListener('click', triggerImport);
   el.querySelector('#settingsLockBtn')?.addEventListener('click', lockApp);
   el.querySelector('#changelogBtn')?.addEventListener('click', () => openChangelog());
+
+  // — Manual update check: reuses the automatic mechanism; if a new
+  //   version is found, the existing "reload" banner takes over —
+  el.querySelector('#checkUpdBtn')?.addEventListener('click', async () => {
+    const btn = el.querySelector('#checkUpdBtn');
+    const msg = el.querySelector('#checkUpdMsg');
+    if(!btn || btn.disabled) return;
+    btn.disabled = true;
+    msg.textContent = t('upd.checking');
+    const outcome = await checkForUpdatesNow();
+    const MSG_KEYS = {
+      uptodate: 'upd.uptodate',
+      found: 'upd.found_msg',
+      offline: 'upd.check_err',
+      error: 'upd.check_err',
+      cooldown: 'upd.cooldown',
+      unsupported: 'upd.check_err',
+    };
+    msg.textContent = t(MSG_KEYS[outcome] || 'upd.check_err');
+    // Short cooldown against rapid-fire checks; the message then resets.
+    setTimeout(() => {
+      if(el.querySelector('#checkUpdMsg')) el.querySelector('#checkUpdMsg').textContent = t('s.check_upd_sub');
+      if(el.querySelector('#checkUpdBtn')) el.querySelector('#checkUpdBtn').disabled = false;
+    }, 6000);
+  });
 
   // — Backup code (device-to-device, no file) —
   el.querySelector('#backupCodeBtn')?.addEventListener('click', async ()=>{

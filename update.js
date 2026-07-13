@@ -97,6 +97,52 @@ export function applyUpdate(){
   }
 }
 
+/* ── Manual update check (Settings → About) ──
+   Reuses the same registration and the same banner flow as the
+   automatic detection — no parallel mechanism. */
+export const MANUAL_CHECK_COOLDOWN_MS = 30000;
+let _lastManualCheck = 0;
+
+export function isUpdateCheckSupported(){
+  return typeof navigator !== 'undefined' && 'serviceWorker' in navigator;
+}
+
+// Pure, unit-tested: maps an observed state to the user-facing outcome.
+export function resolveUpdateCheck({ supported, registered, online, installing, waiting, error }){
+  if(!supported || !registered) return 'unsupported';
+  if(!online) return 'offline';
+  if(error) return 'error';
+  if(installing || waiting) return 'found';
+  return 'uptodate';
+}
+
+// Pure, unit-tested: ms left before another manual check is allowed.
+export function manualCheckCooldownRemaining(now, last, cooldownMs = MANUAL_CHECK_COOLDOWN_MS){
+  return Math.max(0, last + cooldownMs - now);
+}
+
+export async function checkForUpdatesNow(){
+  if(!isUpdateCheckSupported() || !_reg) return 'unsupported';
+  if(!navigator.onLine) return 'offline';
+  if(manualCheckCooldownRemaining(Date.now(), _lastManualCheck) > 0) return 'cooldown';
+  _lastManualCheck = Date.now();
+  let error = false;
+  try {
+    await _reg.update();
+  } catch(e){
+    error = true;
+    log('manual update check failed:', e);
+  }
+  const outcome = resolveUpdateCheck({
+    supported: true, registered: true, online: navigator.onLine,
+    installing: !!_reg.installing, waiting: !!_reg.waiting, error,
+  });
+  // A new worker already parked in waiting: re-offer the banner right
+  // away (the updatefound path only fires while it installs).
+  if(outcome === 'found' && _reg.waiting && navigator.serviceWorker.controller) _showUpdateBanner();
+  return outcome;
+}
+
 function _removeUpdateBanner(){
   const b = document.getElementById('updateBanner');
   if(b) b.remove();

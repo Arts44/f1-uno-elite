@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.6.0',
+    date: '2026-07-13',
+    changes: {
+      en: [
+        'New "Check for updates" button in Settings → About: look for a new version on demand — if one is online, the usual reload banner takes over; otherwise you get a clear "You are up to date ✓".',
+      ],
+      fr: [
+        'Nouveau bouton « Vérifier les mises à jour » dans Réglages → À propos : cherche une nouvelle version à la demande — s’il y en a une en ligne, le bandeau habituel prend le relais ; sinon un « Tu es à jour ✓ » clair te rassure.',
+      ],
+      es: [
+        'Nuevo botón «Buscar actualizaciones» en Ajustes → Acerca de: busca una nueva versión cuando quieras — si hay una en línea, el aviso habitual toma el relevo; si no, un claro «Estás al día ✓» te tranquiliza.',
+      ],
+      zh: [
+        '设置 → 关于中新增“检查更新”按钮：随时主动查找新版本——如有新版本上线，熟悉的重新加载横幅会接管；否则会明确显示“已是最新版本 ✓”。',
+      ],
+      it: [
+        'Nuovo pulsante «Controlla gli aggiornamenti» in Impostazioni → Informazioni: cerca una nuova versione su richiesta — se ce n’è una online, il consueto banner prende il testimone; altrimenti un chiaro «Sei aggiornato ✓» ti rassicura.',
+      ],
+      nl: [
+        'Nieuwe knop “Controleren op updates” in Instellingen → Over: zoek op aanvraag naar een nieuwe versie — staat er een online, dan neemt de vertrouwde herlaadbanner het over; anders stelt een duidelijke “Je bent up-to-date ✓” je gerust.',
+      ],
+      de: [
+        'Neuer Knopf „Nach Updates suchen“ in Einstellungen → Über: suche auf Wunsch nach einer neuen Version — gibt es eine, übernimmt das gewohnte Neuladen-Banner; andernfalls beruhigt dich ein klares „Du bist auf dem neuesten Stand ✓“.',
+      ],
+    },
+  },
+  {
     version: '1.5.0',
     date: '2026-07-13',
     changes: {

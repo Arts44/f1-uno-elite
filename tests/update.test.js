@@ -7,6 +7,7 @@ import {
 } from '../changelog.js';
 import {
   lastSeenVersion, markVersionSeen, shouldOfferWhatsNew,
+  resolveUpdateCheck, manualCheckCooldownRemaining, MANUAL_CHECK_COOLDOWN_MS,
 } from '../update.js';
 
 const LANG_CODES = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
@@ -104,5 +105,35 @@ describe('changelog — data integrity', () => {
     assert.deepEqual(changesFor(entry, 'fr'), entry.changes.fr);
     assert.deepEqual(changesFor(entry, 'xx'), entry.changes.en);
     assert.deepEqual(changesFor(null, 'fr'), []);
+  });
+});
+
+describe('update — manual check (resolveUpdateCheck)', () => {
+  const base = { supported: true, registered: true, online: true, installing: false, waiting: false, error: false };
+  test('maps every observed state to the right outcome', () => {
+    assert.equal(resolveUpdateCheck({ ...base }), 'uptodate');
+    assert.equal(resolveUpdateCheck({ ...base, waiting: true }), 'found');
+    assert.equal(resolveUpdateCheck({ ...base, installing: true }), 'found');
+    assert.equal(resolveUpdateCheck({ ...base, online: false }), 'offline');
+    assert.equal(resolveUpdateCheck({ ...base, error: true }), 'error');
+    assert.equal(resolveUpdateCheck({ ...base, supported: false }), 'unsupported');
+    assert.equal(resolveUpdateCheck({ ...base, registered: false }), 'unsupported');
+  });
+  test('precedence: unsupported > offline > error > found', () => {
+    assert.equal(resolveUpdateCheck({ ...base, supported: false, online: false, error: true, waiting: true }), 'unsupported');
+    assert.equal(resolveUpdateCheck({ ...base, online: false, error: true, waiting: true }), 'offline');
+    assert.equal(resolveUpdateCheck({ ...base, error: true, waiting: true }), 'error');
+  });
+});
+
+describe('update — manual check cooldown', () => {
+  test('counts down and clamps at zero', () => {
+    assert.equal(manualCheckCooldownRemaining(1000, 1000, 30000), 30000); // just checked
+    assert.equal(manualCheckCooldownRemaining(16000, 1000, 30000), 15000);
+    assert.equal(manualCheckCooldownRemaining(31000, 1000, 30000), 0);    // expired
+    assert.equal(manualCheckCooldownRemaining(99999, 1000, 30000), 0);    // long after
+  });
+  test('uses the exported default cooldown', () => {
+    assert.equal(manualCheckCooldownRemaining(0, 0), MANUAL_CHECK_COOLDOWN_MS);
   });
 });
