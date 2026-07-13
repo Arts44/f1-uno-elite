@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.5.0',
+    date: '2026-07-13',
+    changes: {
+      en: [
+        'The card detail view is framed cleanly again: close button back in its corner, visual clipped to the rounded frame, and the Wild effect covers the whole header at every angle.',
+        'Type visuals now stay in the top area: the card body (name, team, buttons) keeps its neutral background — and the golden border on promos is gone.',
+      ],
+      fr: [
+        'La fiche d’une carte retrouve un cadre impeccable : bouton de fermeture à sa place, visuel bien contenu dans les coins arrondis, et effet Wild qui couvre tout le bandeau sous tous les angles.',
+        'Les visuels de type restent désormais dans la zone du haut : le corps de la carte (nom, équipe, boutons) garde son fond neutre — et le liseré doré des promos disparaît.',
+      ],
+      es: [
+        'La ficha de una carta vuelve a estar bien encuadrada: botón de cierre en su sitio, visual contenido en el marco redondeado, y el efecto Wild cubre toda la cabecera en cualquier ángulo.',
+        'Los visuales de tipo se quedan ahora en la zona superior: el cuerpo de la carta (nombre, equipo, botones) conserva su fondo neutro — y el borde dorado de las promos desaparece.',
+      ],
+      zh: [
+        '卡牌详情页恢复了整洁的边框：关闭按钮回到角落，视觉效果被圆角框完整裁切，Wild 效果在任何角度都能铺满整个顶部。',
+        '类型视觉效果现在只保留在顶部区域：卡牌主体（名字、车队、按钮）保持中性背景——促销卡的金色描边也已移除。',
+      ],
+      it: [
+        'La scheda di una carta torna a essere inquadrata a dovere: pulsante di chiusura al suo posto, visual contenuto nella cornice arrotondata, ed effetto Wild che copre tutta la testata a ogni angolazione.',
+        'I visual dei tipi restano ora nella zona superiore: il corpo della carta (nome, squadra, pulsanti) mantiene lo sfondo neutro — e il bordo dorato delle promo sparisce.',
+      ],
+      nl: [
+        'De detailweergave van een kaart is weer netjes omkaderd: sluitknop terug op zijn plek, visual keurig binnen het afgeronde kader, en het Wild-effect vult de hele kop onder elke hoek.',
+        'De typevisuals blijven voortaan in de bovenzone: de kaartromp (naam, team, knoppen) behoudt zijn neutrale achtergrond — en de gouden rand op promo’s is weg.',
+      ],
+      de: [
+        'Die Detailansicht einer Karte ist wieder sauber gerahmt: Schließen-Knopf an seinem Platz, Visual sauber im abgerundeten Rahmen, und der Wild-Effekt füllt den Kopfbereich in jedem Winkel.',
+        'Die Typ-Visuals bleiben jetzt im oberen Bereich: der Kartenkörper (Name, Team, Knöpfe) behält seinen neutralen Hintergrund — und der goldene Rand der Promos ist weg.',
+      ],
+    },
+  },
+  {
     version: '1.4.0',
     date: '2026-07-12',
     changes: {

@@ -442,8 +442,10 @@ export function renderGrid(cards){
 
     const el=document.createElement('div');
     let cardClass='card'+(isOwned?' has-owned':'')+(isWish?' has-wishlist':'')+(isFav?' has-favorite':'');
-    // si la meilleure variante possédée est foil, on applique aussi le fond foil à toute la carte
-    if(bestType && CARD_TYPES[bestType] && CARD_TYPES[bestType].foil){
+    // Le visuel de type reste CANTONNÉ à la zone visuelle du haut : le
+    // corps (texte, chips) garde le fond neutre du thème. Seule
+    // exception : la wild foil, dont l'identité pleine-carte est validée.
+    if(bestType === 'wild_foil'){
       cardClass+=` ${CARD_TYPES[bestType].css}`;
     }
     el.className=cardClass;
@@ -466,10 +468,6 @@ export function renderGrid(cards){
       const d=getTypeData(card.id,t);
       return `<span class="owned-tag ${cls}">${ctt.icon}${d.qty>1?' ×'+d.qty:''}</span>`;
     }).join('');
-
-    const footerStyle = bestType && CARD_TYPES[bestType] && CARD_TYPES[bestType].foil
-      ? ` style="background:${ct.color}22;border-top:1px solid ${ct.color}55;"`
-      : '';
 
     el.innerHTML=`
       <div class="card-visual ${bestType?ct.css:''}${!isOwned?' not-owned':''}">

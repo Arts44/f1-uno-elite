@@ -731,19 +731,6 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   animation:tv-sheen 3.8s linear infinite;
 }
 @keyframes tv-sheen{0%{background-position:0% 0;}100%{background-position:-300% 0;}}
-/* Whole-card foil washes are now deep: pin the body text color per type
-   (independent of theme) so legibility never depends on the wash.
-   Dark washes -> white text; golden washes -> near-black text. */
-.card.tv-blue_foil .card-num,.card.tv-blue_foil .card-name,.card.tv-blue_foil .card-year,.card.tv-blue_foil .card-team,
-.card.tv-green_foil .card-num,.card.tv-green_foil .card-name,.card.tv-green_foil .card-year,.card.tv-green_foil .card-team,
-.card.tv-red_foil .card-num,.card.tv-red_foil .card-name,.card.tv-red_foil .card-year,.card.tv-red_foil .card-team,
-.card.tv-blue_red_foil .card-num,.card.tv-blue_red_foil .card-name,.card.tv-blue_red_foil .card-year,.card.tv-blue_red_foil .card-team,
-.card.tv-promo-blue .card-num,.card.tv-promo-blue .card-name,.card.tv-promo-blue .card-year,.card.tv-promo-blue .card-team,
-.card.tv-promo-green .card-num,.card.tv-promo-green .card-name,.card.tv-promo-green .card-year,.card.tv-promo-green .card-team,
-.card.tv-promo-red .card-num,.card.tv-promo-red .card-name,.card.tv-promo-red .card-year,.card.tv-promo-red .card-team{color:#FFFFFF !important;}
-.card.tv-yellow_foil .card-num,.card.tv-yellow_foil .card-name,.card.tv-yellow_foil .card-year,.card.tv-yellow_foil .card-team,
-.card.tv-promo-yellow .card-num,.card.tv-promo-yellow .card-name,.card.tv-promo-yellow .card-year,.card.tv-promo-yellow .card-team,
-.card.tv-green_yellow_foil .card-num,.card.tv-green_yellow_foil .card-name,.card.tv-green_yellow_foil .card-year,.card.tv-green_yellow_foil .card-team{color:#141414 !important;}
 /* Base de la carte — fond noir, effet sur toute la carte */
 /* NITRO — the violet tier between duals and wild: deep violet base,
    its grid identity kept as a subtle overlay, and the standard foil
@@ -760,22 +747,12 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   background:linear-gradient(105deg,transparent 40%,rgba(224,190,255,0.55) 47.5%,rgba(255,255,255,0.95) 50%,rgba(224,190,255,0.55) 52.5%,transparent 60%);
   background-size:300% 100%;animation:tv-sheen 2.6s linear infinite;
 }
-.card.tv-nitro_foil .card-body{background:rgba(10,3,20,0.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);position:relative;z-index:1;}
-.card.tv-nitro_foil .dn-num,
-.card.tv-nitro_foil .card-name,
-.card.tv-nitro_foil .card-team,
-.card.tv-nitro_foil .card-year,
-.card.tv-nitro_foil .card-num{color:#FFFFFF !important;}
 
 /* PROMOS — deep type hue + a flowing GOLD band + gold liner. */
 .tv-promo-blue{background:radial-gradient(120% 150% at 25% -15%,#4a90d9 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#02101f 0%,transparent 60%),linear-gradient(135deg,#0b2a55,#04101f);}
 .tv-promo-green{background:radial-gradient(120% 150% at 25% -15%,#2ecc71 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#01180a 0%,transparent 60%),linear-gradient(135deg,#08471c,#02180b);}
 .tv-promo-red{background:radial-gradient(120% 150% at 25% -15%,#ff4d5e 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#1f0004 0%,transparent 60%),linear-gradient(135deg,#8f0413,#33000a);}
 .tv-promo-yellow{background:radial-gradient(120% 150% at 25% -15%,#ffe14d 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#241a00 0%,transparent 60%),linear-gradient(135deg,#9a7a00,#453400);}
-.card-visual.tv-promo-blue,.card-visual.tv-promo-green,.card-visual.tv-promo-red,.card-visual.tv-promo-yellow,
-.modal-visual.tv-promo-blue,.modal-visual.tv-promo-green,.modal-visual.tv-promo-red,.modal-visual.tv-promo-yellow{
-  box-shadow:inset 0 0 0 2px rgba(255,205,90,0.78),inset 0 0 22px rgba(255,150,70,0.32);
-}
 .card-visual.tv-promo-blue::after,.card-visual.tv-promo-green::after,.card-visual.tv-promo-red::after,.card-visual.tv-promo-yellow::after,
 .modal-visual.tv-promo-blue::after,.modal-visual.tv-promo-green::after,.modal-visual.tv-promo-red::after,.modal-visual.tv-promo-yellow::after{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;
@@ -787,6 +764,9 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   background: #080808;
   position: relative;
   overflow: hidden;
+  /* isolate: keeps the composited rotating ::before clipped by the
+     rounded corners (without it the layer can paint past the radius) */
+  isolation: isolate;
   animation: wild-glow 4s linear infinite;
 }
 
@@ -866,8 +846,12 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   100% { box-shadow: 0 0 18px rgba(30,80,220,0.6),  0 8px 32px rgba(0,0,0,0.7); }
 }
 @keyframes wild-spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  /* scale(1.45): a rotating RECTANGLE only covers its container when its
+     inscribed radius exceeds the container's half-diagonal — true for
+     cards, false for the wide modal header. The scale guarantees full
+     coverage at every angle, everywhere, for free (pure transform). */
+  from { transform: rotate(0deg) scale(1.45); }
+  to   { transform: rotate(360deg) scale(1.45); }
 }
 
 .crown{position:absolute;top:6px;left:7px;font-size:13px;}
@@ -922,7 +906,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .mo.open{opacity:1;pointer-events:all;}
 .modal{background:var(--surface);border-radius:var(--r-xl);width:560px;max-width:calc(100vw - 32px);max-height:calc(100vh - 60px);overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.2);transform:scale(0.96) translateY(8px);transition:transform 0.2s cubic-bezier(0.25,0.46,0.45,0.94);}
 .mo.open .modal{transform:scale(1) translateY(0);}
-.modal-visual{height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;position:relative;border-radius:var(--r-xl) var(--r-xl) 0 0;overflow:hidden;}
+.modal-visual{height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;position:relative;border-radius:var(--r-xl) var(--r-xl) 0 0;overflow:hidden;isolation:isolate;}
 .modal-visual.not-owned{background:#3A3A3A;}
 [data-theme="dark"] .modal-visual.not-owned{background:#E0E0E0;}
 /* ── Modal mirrors of the card-scoped effects (wild / nitro) ──
@@ -951,9 +935,10 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
   background:linear-gradient(135deg,rgba(255,255,255,0.10) 0%,transparent 40%,rgba(255,255,255,0.05) 100%);
 }
-.modal-visual.tv-wild_foil > *{position:relative;z-index:1;}
+.modal-visual.tv-wild_foil #moEmoji{position:relative;z-index:1;}
 @media (prefers-reduced-motion:reduce){
-  .modal-visual.tv-wild_foil::before{animation:none;transform:rotate(45deg);}
+  .modal-visual.tv-wild_foil::before,
+  .card.tv-wild_foil::before{animation:none;transform:rotate(45deg) scale(1.45);}
   .card-visual[class*="tv-"]::after,.modal-visual[class*="tv-"]::after{animation:none;background-position:50% 0;}
 }
 .modal-visual.tv-green_yellow{background:linear-gradient(135deg,#0d4a1f,#8b8000,#2ecc71,#ffd700,#0d4a1f);}
