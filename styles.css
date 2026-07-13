@@ -731,13 +731,64 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   animation:tv-sheen 3.8s linear infinite;
 }
 @keyframes tv-sheen{0%{background-position:0% 0;}100%{background-position:-300% 0;}}
+
+/* ── FULL-CARD FOIL WASH (the wild treatment, generalized) ──
+   Every foil card carries its tv- class on the WHOLE card: the base
+   gradient paints once, continuously — the .card-visual goes
+   transparent so there is NO horizontal seam between the visual area
+   and the body. Text sits on a translucent dark panel (wild's recipe);
+   backdrop blur stays exclusive to wild/nitro — a grid full of blurred
+   foils would be costly on mobile, plain translucency reads just as
+   well. Non-foil types keep the neutral body. */
+.card.tv-blue_foil .card-visual,
+.card.tv-green_foil .card-visual,
+.card.tv-red_foil .card-visual,
+.card.tv-yellow_foil .card-visual,
+.card.tv-blue_red_foil .card-visual,
+.card.tv-green_yellow_foil .card-visual,
+.card.tv-nitro_foil .card-visual,
+.card.tv-promo-blue .card-visual,
+.card.tv-promo-green .card-visual,
+.card.tv-promo-red .card-visual,
+.card.tv-promo-yellow .card-visual{background:transparent !important;}
+.card.tv-blue_foil .card-body,
+.card.tv-green_foil .card-body,
+.card.tv-red_foil .card-body,
+.card.tv-yellow_foil .card-body,
+.card.tv-blue_red_foil .card-body,
+.card.tv-green_yellow_foil .card-body,
+.card.tv-nitro_foil .card-body,
+.card.tv-promo-blue .card-body,
+.card.tv-promo-green .card-body,
+.card.tv-promo-red .card-body,
+.card.tv-promo-yellow .card-body{background:rgba(8,8,10,0.62);position:relative;z-index:1;}
+.card.tv-nitro_foil .card-body{background:rgba(8,8,10,0.70);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.card.tv-blue_foil .card-num,.card.tv-blue_foil .card-name,.card.tv-blue_foil .card-year,.card.tv-blue_foil .card-team,
+.card.tv-green_foil .card-num,.card.tv-green_foil .card-name,.card.tv-green_foil .card-year,.card.tv-green_foil .card-team,
+.card.tv-red_foil .card-num,.card.tv-red_foil .card-name,.card.tv-red_foil .card-year,.card.tv-red_foil .card-team,
+.card.tv-yellow_foil .card-num,.card.tv-yellow_foil .card-name,.card.tv-yellow_foil .card-year,.card.tv-yellow_foil .card-team,
+.card.tv-blue_red_foil .card-num,.card.tv-blue_red_foil .card-name,.card.tv-blue_red_foil .card-year,.card.tv-blue_red_foil .card-team,
+.card.tv-green_yellow_foil .card-num,.card.tv-green_yellow_foil .card-name,.card.tv-green_yellow_foil .card-year,.card.tv-green_yellow_foil .card-team,
+.card.tv-nitro_foil .card-num,.card.tv-nitro_foil .card-name,.card.tv-nitro_foil .card-year,.card.tv-nitro_foil .card-team,
+.card.tv-promo-blue .card-num,.card.tv-promo-blue .card-name,.card.tv-promo-blue .card-year,.card.tv-promo-blue .card-team,
+.card.tv-promo-green .card-num,.card.tv-promo-green .card-name,.card.tv-promo-green .card-year,.card.tv-promo-green .card-team,
+.card.tv-promo-red .card-num,.card.tv-promo-red .card-name,.card.tv-promo-red .card-year,.card.tv-promo-red .card-team,
+.card.tv-promo-yellow .card-num,.card.tv-promo-yellow .card-name,.card.tv-promo-yellow .card-year,.card.tv-promo-yellow .card-team{color:#FFFFFF !important;}
+/* nitro mirrors wild fully: its grid identity covers the whole card */
+.card.tv-nitro_foil{isolation:isolate;}
+.card.tv-nitro_foil::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);
+  background-size:20px 20px;
+}
+
 /* Base de la carte — fond noir, effet sur toute la carte */
 /* NITRO — the violet tier between duals and wild: deep violet base,
    its grid identity kept as a subtle overlay, and the standard foil
    band running FASTER (nitro = speed). Whole-card class keeps a glassy
    body + white text since the base is dark. */
 .tv-nitro_foil{background:radial-gradient(120% 150% at 25% -15%,#a55cff 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#0e0318 0%,transparent 60%),linear-gradient(135deg,#5b1fa8,#1c0836);}
-.card-visual.tv-nitro_foil::before,.modal-visual.tv-nitro_foil::before{
+.modal-visual.tv-nitro_foil::before{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
   background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);
   background-size:20px 20px;

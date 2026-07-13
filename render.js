@@ -442,10 +442,12 @@ export function renderGrid(cards){
 
     const el=document.createElement('div');
     let cardClass='card'+(isOwned?' has-owned':'')+(isWish?' has-wishlist':'')+(isFav?' has-favorite':'');
-    // Le visuel de type reste CANTONNÉ à la zone visuelle du haut : le
-    // corps (texte, chips) garde le fond neutre du thème. Seule
-    // exception : la wild foil, dont l'identité pleine-carte est validée.
-    if(bestType === 'wild_foil'){
+    // FOILS (simples, duals, nitro, promos, wild) : le dégradé se
+    // prolonge sur TOUTE la carte (une seule couche continue, le
+    // .card-visual devient transparent) et le texte est posé sur un
+    // encadré noir translucide — le traitement wild, généralisé.
+    // Types NON-foil : visuel en haut, corps neutre du thème.
+    if(bestType && CARD_TYPES[bestType] && CARD_TYPES[bestType].foil){
       cardClass+=` ${CARD_TYPES[bestType].css}`;
     }
     el.className=cardClass;

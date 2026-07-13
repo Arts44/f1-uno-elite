@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.7.0',
+    date: '2026-07-13',
+    changes: {
+      en: [
+        'Foil cards now wear their gradient over the WHOLE card, in one seamless layer — and the text sits on the same translucent dark panel as the Wild Foil, so it stays perfectly readable on every background. Nitro gets the full Wild treatment; plain types keep their neutral body.',
+      ],
+      fr: [
+        'Les cartes foil portent désormais leur dégradé sur TOUTE la carte, en une seule couche sans cassure — et le texte repose sur le même encadré noir translucide que le Wild Foil, parfaitement lisible sur tous les fonds. Le Nitro reçoit le traitement Wild complet ; les types simples gardent leur corps neutre.',
+      ],
+      es: [
+        'Las cartas foil llevan ahora su degradado por TODA la carta, en una sola capa sin cortes — y el texto reposa sobre el mismo panel oscuro translúcido que el Wild Foil, perfectamente legible en cualquier fondo. El Nitro recibe el tratamiento Wild completo; los tipos simples conservan su cuerpo neutro.',
+      ],
+      zh: [
+        '箔卡的渐变现在铺满整张卡牌，浑然一体没有断层——文字置于与 Wild Foil 相同的半透明黑色底板上，在任何背景上都清晰可读。Nitro 获得完整的 Wild 处理；普通类型保持中性卡身。',
+      ],
+      it: [
+        'Le carte foil portano ora il loro gradiente su TUTTA la carta, in un unico strato senza stacchi — e il testo poggia sullo stesso pannello scuro traslucido del Wild Foil, perfettamente leggibile su ogni sfondo. Il Nitro riceve il trattamento Wild completo; i tipi semplici mantengono il corpo neutro.',
+      ],
+      nl: [
+        'Foilkaarten dragen hun verloop nu over de HELE kaart, in één naadloze laag — en de tekst rust op hetzelfde doorschijnende donkere paneel als de Wild Foil, perfect leesbaar op elke achtergrond. Nitro krijgt de volledige Wild-behandeling; gewone types houden hun neutrale romp.',
+      ],
+      de: [
+        'Foil-Karten tragen ihren Verlauf jetzt über die GANZE Karte, in einer nahtlosen Schicht — und der Text ruht auf demselben durchscheinenden dunklen Panel wie die Wild Foil, auf jedem Hintergrund bestens lesbar. Nitro erhält die volle Wild-Behandlung; einfache Typen behalten ihren neutralen Korpus.',
+      ],
+    },
+  },
+  {
     version: '1.6.0',
     date: '2026-07-13',
     changes: {
