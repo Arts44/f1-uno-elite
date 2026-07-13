@@ -374,7 +374,14 @@ export function bestOwnedType(card){
     if(RARITY_ORDER[rT]!==RARITY_ORDER[rBest]){
       return RARITY_ORDER[rT]>RARITY_ORDER[rBest]?t:best;
     }
-    // Same rarity: higher quantity wins, keep current if equal
+    // Same card rarity (e.g. nitro vs wild, both +3): the type-badge
+    // ladder breaks the tie — nitro (mythic) shows over wild
+    // (legendary), promos (ultra) over both.
+    const tbOrder=Object.keys(TYPE_BADGE_STYLES);
+    const tbT=tbOrder.indexOf(TYPE_BADGE_RARITY[t]);
+    const tbBest=tbOrder.indexOf(TYPE_BADGE_RARITY[best]);
+    if(tbT!==tbBest) return tbT>tbBest?t:best;
+    // Same tier: higher quantity wins, keep current if equal
     return qtyT>qtyBest?t:best;
   });
 }

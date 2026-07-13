@@ -762,7 +762,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .card.tv-promo-green .card-body,
 .card.tv-promo-red .card-body,
 .card.tv-promo-yellow .card-body{background:rgba(8,8,10,0.62);position:relative;z-index:1;}
-.card.tv-nitro_foil .card-body{background:rgba(8,8,10,0.70);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+.card.tv-nitro_foil .card-body{background:rgba(8,8,10,0.70);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:3;}
 .card.tv-blue_foil .card-num,.card.tv-blue_foil .card-name,.card.tv-blue_foil .card-year,.card.tv-blue_foil .card-team,
 .card.tv-green_foil .card-num,.card.tv-green_foil .card-name,.card.tv-green_foil .card-year,.card.tv-green_foil .card-team,
 .card.tv-red_foil .card-num,.card.tv-red_foil .card-name,.card.tv-red_foil .card-year,.card.tv-red_foil .card-team,
@@ -779,7 +779,14 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    exclusive, drawn with the card's own border so it hugs the 24px
    rounded corners perfectly (no extra layer, no square-cut corner). */
 .card.tv-blue_foil,.card.tv-green_foil,.card.tv-red_foil,.card.tv-yellow_foil,
-.card.tv-blue_red_foil,.card.tv-green_yellow_foil,.card.tv-nitro_foil{border-color:transparent;}
+.card.tv-blue_red_foil,.card.tv-green_yellow_foil,.card.tv-wild_foil{
+  border-color:transparent;
+  /* the wash paints UNDER the transparent border by default
+     (background-clip:border-box) — that thin ring of raw gradient WAS
+     the colored edge. Clip to the padding box: no wash under the
+     border, no ring. */
+  background-clip:padding-box;
+}
 .card.tv-promo-blue,.card.tv-promo-green,.card.tv-promo-red,.card.tv-promo-yellow{
   border-color:rgba(255,205,90,0.85);
   box-shadow:inset 0 0 14px rgba(255,180,60,0.22), var(--sh-sm);
@@ -791,29 +798,13 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 }
 
 /* nitro mirrors wild fully: its grid identity covers the whole card */
-.card.tv-nitro_foil{isolation:isolate;}
-.card.tv-nitro_foil::before{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);
-  background-size:20px 20px;
-}
+
 
 /* Base de la carte — fond noir, effet sur toute la carte */
 /* NITRO — the violet tier between duals and wild: deep violet base,
    its grid identity kept as a subtle overlay, and the standard foil
    band running FASTER (nitro = speed). Whole-card class keeps a glassy
    body + white text since the base is dark. */
-.tv-nitro_foil{background:radial-gradient(120% 150% at 25% -15%,#a55cff 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#0e0318 0%,transparent 60%),linear-gradient(135deg,#5b1fa8,#1c0836);}
-.modal-visual.tv-nitro_foil::before{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
-  background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);
-  background-size:20px 20px;
-}
-.card-visual.tv-nitro_foil::after,.modal-visual.tv-nitro_foil::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;
-  background:linear-gradient(105deg,transparent 40%,rgba(224,190,255,0.55) 47.5%,rgba(255,255,255,0.95) 50%,rgba(224,190,255,0.55) 52.5%,transparent 60%);
-  background-size:300% 100%;animation:tv-sheen 2.6s linear infinite;
-}
 
 /* PROMOS — deep type hue + a flowing GOLD band + gold liner. */
 .tv-promo-blue{background:radial-gradient(120% 150% at 25% -15%,#4a90d9 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#02101f 0%,transparent 60%),linear-gradient(135deg,#0b2a55,#04101f);}
@@ -827,8 +818,71 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   background-size:300% 100%;animation:tv-sheen 3s linear infinite;
 }
 
+/* ══ NITRO FOIL — like the real card: the DRIVER pops out in relief.
+   Background = the wild recipe at FULL brightness (same beam alphas,
+   same speed) + wild's glossy sheen baked into the base + a luminous
+   inner rim (the light-catching edge). Nitro's own identity: the grid
+   is INVISIBLE at rest — it only lights up inside the mauve reflection
+   band that sweeps by occasionally (the light literally reveals it:
+   the grid lives in a layer clipped by an animated mask that IS the
+   band). Cheap: transform-only beams, one masked layer, static
+   drop-shadow relief. */
+.card.tv-nitro_foil,
+.modal-visual.tv-nitro_foil{
+  background:
+    linear-gradient(135deg,rgba(255,255,255,0.10) 0%,transparent 40%,rgba(255,255,255,0.05) 100%),
+    #080808;
+  background-clip:padding-box;
+  position:relative;overflow:hidden;isolation:isolate;
+}
+/* nitro's edge: promo-style MAUVE border (the card's own border, hugs
+   the rounded corners) + wild's reflective halo, IDENTICAL (same
+   wild-glow animation, same timing). */
+.card.tv-nitro_foil{border-color:rgba(200,140,255,0.85);animation:wild-glow 4s linear infinite;}
+.card.tv-nitro_foil .dn-num,
+.modal-visual.tv-nitro_foil .dn-num{color:#FFFFFF !important;}
+.modal-visual.tv-nitro_foil{box-shadow:inset 0 0 0 2px rgba(200,140,255,0.85), inset 0 0 18px rgba(180,110,255,0.3);}
+.card.tv-nitro_foil::before,
+.modal-visual.tv-nitro_foil::before{
+  content:'';position:absolute;inset:-100%;pointer-events:none;z-index:0;
+  background:conic-gradient(
+    from 0deg,
+    transparent            0deg,
+    rgba(30,80,220,0.75)  50deg,
+    transparent            90deg,
+    rgba(20,160,50,0.75)  140deg,
+    transparent            180deg,
+    rgba(220,0,0,0.75)    230deg,
+    transparent            270deg,
+    rgba(255,208,0,0.75)  320deg,
+    transparent            360deg
+  );
+  animation:wild-spin 4s linear infinite;
+}
+/* the revealed grid: mauve glow + grid lines, clipped by the moving
+   light band (mask) — nothing is visible outside the band's passage */
+.card.tv-nitro_foil::after,
+.modal-visual.tv-nitro_foil::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:
+    linear-gradient(rgba(215,170,255,0.22),rgba(215,170,255,0.22)),
+    linear-gradient(180deg,rgba(240,215,255,0.8) 0 1px,transparent 1px 20px),
+    linear-gradient(90deg,rgba(240,215,255,0.8) 0 1px,transparent 1px 20px);
+  background-size:100% 100%,20px 20px,20px 20px;
+  -webkit-mask-image:linear-gradient(105deg,transparent 40%,#000 47%,#000 53%,transparent 60%);
+  mask-image:linear-gradient(105deg,transparent 40%,#000 47%,#000 53%,transparent 60%);
+  -webkit-mask-size:300% 100%;mask-size:300% 100%;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  animation:nitro-sweep 7s linear infinite;
+}
+@keyframes nitro-sweep{
+  0%{-webkit-mask-position:-50% 0;mask-position:-50% 0;}
+  22%{-webkit-mask-position:150% 0;mask-position:150% 0;}
+  100%{-webkit-mask-position:150% 0;mask-position:150% 0;}
+}
 .card.tv-wild_foil {
   background: #080808;
+  background-clip: padding-box; /* nothing under the transparent border */
   position: relative;
   overflow: hidden;
   /* isolate: keeps the composited rotating ::before clipped by the
@@ -1005,7 +1059,11 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .modal-visual.tv-wild_foil #moEmoji{position:relative;z-index:1;}
 @media (prefers-reduced-motion:reduce){
   .modal-visual.tv-wild_foil::before,
-  .card.tv-wild_foil::before{animation:none;transform:rotate(45deg) scale(1.45);}
+  .card.tv-wild_foil::before,
+  .card.tv-nitro_foil::before,
+  .modal-visual.tv-nitro_foil::before{animation:none;transform:rotate(45deg) scale(1.45);}
+  .card.tv-nitro_foil::after,
+  .modal-visual.tv-nitro_foil::after{animation:none;-webkit-mask-position:50% 0;mask-position:50% 0;}
   .card-visual[class*="tv-"]::after,.modal-visual[class*="tv-"]::after{animation:none;background-position:50% 0;}
 }
 .modal-visual.tv-green_yellow{background:linear-gradient(135deg,#0d4a1f,#8b8000,#2ecc71,#ffd700,#0d4a1f);}

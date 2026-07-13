@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.9.0',
+    date: '2026-07-13',
+    changes: {
+      en: [
+        'Nitro Foil, remade: the same four vivid rotating beams as the Wild, a grid that only lights up when the mauve reflection sweeps by, a luminous mauve border with the Wild’s cycling halo — and it now shows above the Wild when you own both.',
+        'No more colored edges on any foil card — the golden border stays a promo exclusive.',
+      ],
+      fr: [
+        'Nitro Foil refait : les quatre faisceaux tournants aussi vifs que le Wild, un quadrillage qui ne s’illumine qu’au passage du reflet mauve, un bord mauve lumineux avec le halo cyclant du Wild — et il s’affiche désormais au-dessus du Wild quand tu possèdes les deux.',
+        'Plus aucun bord coloré sur les cartes foil — le liseré doré reste l’exclusivité des promos.',
+      ],
+      es: [
+        'Nitro Foil rehecho: los mismos cuatro haces giratorios vivos que el Wild, una cuadrícula que solo se ilumina al paso del reflejo malva, un borde malva luminoso con el halo cíclico del Wild — y ahora se muestra por encima del Wild cuando tienes ambos.',
+        'Se acabaron los bordes de color en las cartas foil — el borde dorado sigue siendo exclusivo de las promos.',
+      ],
+      zh: [
+        'Nitro Foil 重制：与 Wild 同样鲜亮的四色旋转光束，网格只在淡紫反光扫过时点亮，淡紫发光描边配以 Wild 的循环光晕——当你同时拥有两者时，现在优先显示 Nitro。',
+        '所有箔卡不再有彩色描边——金色描边仍为促销卡专属。',
+      ],
+      it: [
+        'Nitro Foil rifatto: gli stessi quattro fasci rotanti vividi del Wild, una griglia che si illumina solo al passaggio del riflesso malva, un bordo malva luminoso con l’alone ciclico del Wild — e ora appare sopra il Wild quando li possiedi entrambi.',
+        'Niente più bordi colorati sulle carte foil — il bordo dorato resta esclusiva delle promo.',
+      ],
+      nl: [
+        'Nitro Foil opnieuw gemaakt: dezelfde vier levendige draaiende lichtbundels als de Wild, een raster dat alleen oplicht wanneer de mauve weerschijn passeert, een lichtgevende mauve rand met de cyclische gloed van de Wild — en hij toont nu boven de Wild wanneer je beide bezit.',
+        'Geen gekleurde randen meer op foilkaarten — de gouden rand blijft exclusief voor promo’s.',
+      ],
+      de: [
+        'Nitro Foil neu gemacht: dieselben vier lebendigen rotierenden Strahlen wie beim Wild, ein Raster, das nur aufleuchtet, wenn der mauvefarbene Widerschein vorbeizieht, ein leuchtender mauvefarbener Rand mit dem zyklischen Halo des Wild — und er wird jetzt über dem Wild angezeigt, wenn du beide besitzt.',
+        'Keine farbigen Ränder mehr auf Foil-Karten — der goldene Rand bleibt den Promos vorbehalten.',
+      ],
+    },
+  },
+  {
     version: '1.8.0',
     date: '2026-07-13',
     changes: {
