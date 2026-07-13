@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.8.0',
+    date: '2026-07-13',
+    changes: {
+      en: [
+        'Visual polish: no more colored edges on foil cards — the golden border is now a promo-card exclusive and hugs the rounded corners perfectly. The Legendary chip wears a richer golden amber.',
+      ],
+      fr: [
+        'Finitions visuelles : plus de bords colorés sur les cartes foil — le liseré doré est désormais réservé aux cartes promo et épouse parfaitement les coins arrondis. La pastille Légendaire passe à un ambre doré plus riche.',
+      ],
+      es: [
+        'Retoques visuales: se acabaron los bordes de color en las cartas foil — el borde dorado es ahora exclusivo de las promos y abraza perfectamente las esquinas redondeadas. El chip Legendaria luce un ámbar dorado más rico.',
+      ],
+      zh: [
+        '视觉细节打磨：箔卡不再有彩色描边——金色描边现为促销卡专属，并完美贴合圆角。“传奇”标签换上更华丽的金琥珀色。',
+      ],
+      it: [
+        'Rifiniture visive: niente più bordi colorati sulle carte foil — il bordo dorato è ora esclusiva delle promo e abbraccia perfettamente gli angoli arrotondati. Il chip Leggendaria veste un ambra dorata più ricca.',
+      ],
+      nl: [
+        'Visuele afwerking: geen gekleurde randen meer op foilkaarten — de gouden rand is nu exclusief voor promokaarten en volgt de afgeronde hoeken perfect. De Legendarisch-chip draagt een rijker goudamber.',
+      ],
+      de: [
+        'Visueller Feinschliff: keine farbigen Ränder mehr auf Foil-Karten — der goldene Rand ist jetzt exklusiv für Promo-Karten und schmiegt sich perfekt an die abgerundeten Ecken. Der Legendär-Chip trägt ein satteres Goldamber.',
+      ],
+    },
+  },
+  {
     version: '1.7.0',
     date: '2026-07-13',
     changes: {

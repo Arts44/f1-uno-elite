@@ -774,6 +774,22 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .card.tv-promo-green .card-num,.card.tv-promo-green .card-name,.card.tv-promo-green .card-year,.card.tv-promo-green .card-team,
 .card.tv-promo-red .card-num,.card.tv-promo-red .card-name,.card.tv-promo-red .card-year,.card.tv-promo-red .card-team,
 .card.tv-promo-yellow .card-num,.card.tv-promo-yellow .card-name,.card.tv-promo-yellow .card-year,.card.tv-promo-yellow .card-team{color:#FFFFFF !important;}
+/* Full-card washes: the card's translucent border reads as a colored
+   ring over a gradient — kill it on foils. The GOLD liner is a promo
+   exclusive, drawn with the card's own border so it hugs the 24px
+   rounded corners perfectly (no extra layer, no square-cut corner). */
+.card.tv-blue_foil,.card.tv-green_foil,.card.tv-red_foil,.card.tv-yellow_foil,
+.card.tv-blue_red_foil,.card.tv-green_yellow_foil,.card.tv-nitro_foil{border-color:transparent;}
+.card.tv-promo-blue,.card.tv-promo-green,.card.tv-promo-red,.card.tv-promo-yellow{
+  border-color:rgba(255,205,90,0.85);
+  box-shadow:inset 0 0 14px rgba(255,180,60,0.22), var(--sh-sm);
+}
+/* modal: same gold liner around the promo visual (inset shadow follows
+   the header's own rounded corners) */
+.modal-visual.tv-promo-blue,.modal-visual.tv-promo-green,.modal-visual.tv-promo-red,.modal-visual.tv-promo-yellow{
+  box-shadow:inset 0 0 0 2px rgba(255,205,90,0.85), inset 0 0 18px rgba(255,180,60,0.25);
+}
+
 /* nitro mirrors wild fully: its grid identity covers the whole card */
 .card.tv-nitro_foil{isolation:isolate;}
 .card.tv-nitro_foil::before{
