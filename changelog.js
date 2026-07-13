@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.9.1',
+    date: '2026-07-13',
+    changes: {
+      en: [
+        'Fixed: adding or removing a copy from a card’s detail view no longer turns the header black — the visual (and the rarity tag) now update instantly and correctly, including back to the base look at zero copies.',
+      ],
+      fr: [
+        'Corrigé : ajouter ou retirer un exemplaire depuis la fiche d’une carte ne rend plus le bandeau noir — le visuel (et la pastille de rareté) se mettent à jour instantanément et correctement, y compris le retour au visuel de base à zéro exemplaire.',
+      ],
+      es: [
+        'Corregido: añadir o quitar un ejemplar desde la ficha de una carta ya no vuelve negra la cabecera — el visual (y la etiqueta de rareza) se actualizan al instante y correctamente, incluido el regreso al aspecto base con cero ejemplares.',
+      ],
+      zh: [
+        '修复：在卡牌详情页添加或移除一张副本不再导致顶部变黑——视觉效果（及稀有度标签）现在会即时正确更新，包括数量归零时恢复基础外观。',
+      ],
+      it: [
+        'Corretto: aggiungere o togliere una copia dalla scheda di una carta non rende più nera la testata — il visual (e l’etichetta di rarità) si aggiornano all’istante e correttamente, incluso il ritorno all’aspetto base a zero copie.',
+      ],
+      nl: [
+        'Opgelost: een exemplaar toevoegen of verwijderen vanuit de detailweergave maakt de kop niet langer zwart — het visuele effect (en het zeldzaamheidslabel) worden nu meteen en correct bijgewerkt, inclusief terugkeer naar de basisweergave bij nul exemplaren.',
+      ],
+      de: [
+        'Behoben: das Hinzufügen oder Entfernen eines Exemplars in der Detailansicht macht den Kopfbereich nicht mehr schwarz — das Visual (und das Seltenheits-Etikett) aktualisieren sich jetzt sofort und korrekt, einschließlich der Rückkehr zum Basis-Look bei null Exemplaren.',
+      ],
+    },
+  },
+  {
     version: '1.9.0',
     date: '2026-07-13',
     changes: {

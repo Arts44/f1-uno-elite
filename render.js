@@ -625,18 +625,7 @@ export function openModal(id){
   if(!card) return;
   currentCardId=id;
 
-  const bestType=bestOwnedType(card);
-  const vis=document.getElementById('moVis');
-  let ct=null;
-  if(bestType){
-    // The modal mirrors the grid: same tv-<type> class, full effect.
-    // (It used to strip the _foil suffix, which mapped nitro/wild/dual
-    // foils onto classes that don't exist → dull default background.)
-    ct=CARD_TYPES[bestType];
-    vis.className=`modal-visual ${ct.css}`;
-  } else {
-    vis.className='modal-visual not-owned';
-  }
+  updateModalVisual(card);
   const rarity=RARITIES[cardRarity(card)];
 
   document.getElementById('moEmoji').innerHTML = card.image ? `<img src="${card.image}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-xl) var(--r-xl) 0 0;">` : (card.category==='gp' && circuitSVG(card.id,'modal') ? circuitSVG(card.id,'modal') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : catEmoji(card.category));
@@ -644,19 +633,7 @@ export function openModal(id){
   document.getElementById('moName').textContent=card.name + (card.category==='pilote'?` ${card.nationality||''}`:'');
   document.getElementById('moTeam').textContent=card.team||'';
 
-  // Tags
-  const tagsEl=document.getElementById('moTags'); tagsEl.innerHTML='';
-  const addTag=(cls,txt)=>{const s=document.createElement('span');s.className=`mtag ${cls}`;s.textContent=txt;tagsEl.appendChild(s);};
-  if(card.champion) addTag('champion',`👑 Champion ${card.championYears.join(', ')}`);
-  const tagMap={legend:'⭐ Légende',fan_favorite:'❤️ Fan Favorite',rising_star:'🌟 Rising Star',top_driver:'🎯 Top Driver',legendary:'🔱 Légendaire',prestige:'💫 Prestige',night_race:'🌙 Nuit',high_speed:'⚡ Vitesse'};
-  (card.tags||[]).forEach(t=>{if(tagMap[t]) addTag(t,tagMap[t]);});
-  { // rarity tag: solid rarity color (divine keeps its animated gradient)
-    const rt=document.createElement('span');
-    rt.className='mtag'+(cardRarity(card)==='divine'?' rar-divine-bg':'');
-    if(cardRarity(card)!=='divine'){ rt.style.background=rarity.color; rt.style.color=rarityTextColor(rarity.color); }
-    rt.textContent=`${'★'.repeat(rarity.stars)} ${t('rar.'+cardRarity(card))||rarity.label}`;
-    tagsEl.appendChild(rt);
-  }
+  _renderModalTags(card);
 
   document.getElementById('moDesc').textContent = (typeof window.getCardDesc==='function'?window.getCardDesc(card.name):'')||card.description||'';
 
@@ -752,6 +729,38 @@ export function renderModalTypes(card){
   }
 }
 
+
+
+/* Modal header tags (champion, card tags, rarity). Factored so a qty
+   change can refresh the RARITY tag live — adding/removing a foil can
+   move the card's rarity while the modal stays open. */
+function _renderModalTags(card){
+  const tagsEl=document.getElementById('moTags');
+  if(!tagsEl) return;
+  tagsEl.innerHTML='';
+  const addTag=(cls,txt)=>{const s=document.createElement('span');s.className=`mtag ${cls}`;s.textContent=txt;tagsEl.appendChild(s);};
+  if(card.champion) addTag('champion',`👑 Champion ${card.championYears.join(', ')}`);
+  const tagMap={legend:'⭐ Légende',fan_favorite:'❤️ Fan Favorite',rising_star:'🌟 Rising Star',top_driver:'🎯 Top Driver',legendary:'🔱 Légendaire',prestige:'💫 Prestige',night_race:'🌙 Nuit',high_speed:'⚡ Vitesse'};
+  (card.tags||[]).forEach(t=>{if(tagMap[t]) addTag(t,tagMap[t]);});
+  const rarity=RARITIES[cardRarity(card)];
+  const rt=document.createElement('span');
+  rt.className='mtag'+(cardRarity(card)==='divine'?' rar-divine-bg':'');
+  if(cardRarity(card)!=='divine'){ rt.style.background=rarity.color; rt.style.color=rarityTextColor(rarity.color); }
+  rt.textContent=`${'★'.repeat(rarity.stars)} ${t('rar.'+cardRarity(card))||rarity.label}`;
+  tagsEl.appendChild(rt);
+}
+
+/* Single source of truth for the modal header visual: the SAME
+   tv-<type> class as the grid, full effect (the old copies of this
+   logic stripped the _foil suffix — mapping nitro/duals onto CSS
+   classes that don't exist → black header after a qty change). */
+function updateModalVisual(card){
+  const vis=document.getElementById('moVis');
+  if(!vis) return;
+  const best=bestOwnedType(card);
+  vis.className = best ? `modal-visual ${CARD_TYPES[best].css}` : 'modal-visual not-owned';
+}
+
 export function toggleMoType(cardId, typeId, status){
   const d=getTypeData(cardId,typeId);
   const newVal=!d[status];
@@ -762,16 +771,8 @@ export function toggleMoType(cardId, typeId, status){
   // update modal visual
   const card=CARDS_DB.find(c=>c.id===cardId);
   renderModalTypes(card);
-  // update header rarity based on best owned
-  const best=bestOwnedType(card);
-  const vis=document.getElementById('moVis');
-  if(best){
-    const ct=CARD_TYPES[best];
-    const modalCss=ct.css.replace(/_foil$/, '').replace(/_foil(?=\s|$)/,'');
-    vis.className=`modal-visual ${best==='wild_foil'?ct.css:(ct.foil?modalCss:ct.css)}`;
-  }else{
-    vis.className='modal-visual not-owned';
-  }
+  updateModalVisual(card);
+  _renderModalTags(card);
   applyFilters();
   showToast(newVal?'✓ Mis à jour':'Retiré');
 }
@@ -790,16 +791,8 @@ export function changeMoQty(cardId, typeId, delta){
   document.querySelector('#moInfo .mib:last-child .mib-v').textContent=cardTotalQty(cardId);
   const card=CARDS_DB.find(c=>c.id===cardId);
   renderModalTypes(card);
-  // update modal visual based on best owned
-  const best=bestOwnedType(card);
-  const vis=document.getElementById('moVis');
-  if(best){
-    const ct=CARD_TYPES[best];
-    const modalCss=ct.css.replace(/_foil$/, '').replace(/_foil(?=\s|$)/,'');
-    vis.className=`modal-visual ${best==='wild_foil'?ct.css:(ct.foil?modalCss:ct.css)}`;
-  }else{
-    vis.className='modal-visual not-owned';
-  }
+  updateModalVisual(card);
+  _renderModalTags(card);
   updateStats(); applyFilters();
 }
 
