@@ -159,6 +159,7 @@ Collections/F1/                 ← git root · all commands run here
 ├── update.js                   # Auto-updates: SW registration, reload banner, what's-new offer
 ├── changelog.js                # Version history ×7 languages — APP_VERSION = newest entry
 ├── secure-store.js             # Optional at-rest encryption (PBKDF2+AES-GCM, PIN-keyed) of collection data
+├── feedback.js                 # In-app feedback → Supabase (REST pur, RLS own-rows, connexion cloud requise)
 │
 │  ── Classic scripts (NOT bundled · loaded before modules · set window.__ globals) ──
 ├── translations.js             # window.__T / window.__BADGE_T (7 languages)
