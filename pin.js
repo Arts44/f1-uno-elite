@@ -13,6 +13,7 @@ import { missingCards, doublesList, tradeList } from './collector.js';
 import { installRowHTML, bindInstallRow } from './install.js';
 import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection } from './cloud.js';
+import { feedbackSectionHTML, bindFeedbackSection } from './feedback.js';
 import { openChangelog, checkForUpdatesNow, isUpdateCheckSupported } from './update.js';
 import { APP_VERSION } from './changelog.js';
 import {
@@ -777,6 +778,8 @@ export function renderSettings(){
 
     ${cloudSectionHTML()}
 
+    ${feedbackSectionHTML()}
+
     <div class="setv-section">
       <div class="setv-section-title">${t('s.tools')}</div>
       <div class="setv-row" style="flex-direction:column;align-items:stretch;gap:10px;">
@@ -1027,6 +1030,7 @@ export function renderSettings(){
   el.querySelector('#replayTutBtn')?.addEventListener('click', ()=> startTutorial());
   bindInstallRow();
   bindCloudSection();
+  bindFeedbackSection();
   el.querySelector('#bkIncPrefs')?.addEventListener('change', e => setBackupIncludes({ prefs: e.target.checked }));
   el.querySelector('#bkIncSec')?.addEventListener('change', e => setBackupIncludes({ security: e.target.checked }));
 

@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.10.0',
+    date: '2026-07-13',
+    changes: {
+      en: [
+        'New "Share your feedback" section in Settings: send a suggestion, a bug report or anything else straight to the maintainer — cloud sign-in required (no anonymous spam), with a character counter and a list of what you already sent.',
+      ],
+      fr: [
+        'Nouvelle section « Donner mon avis » dans les Réglages : envoie une suggestion, un bug ou n’importe quoi d’autre directement au mainteneur — connexion cloud requise (pas de spam anonyme), avec compteur de caractères et la liste de ce que tu as déjà envoyé.',
+      ],
+      es: [
+        'Nueva sección «Compartir mi opinión» en Ajustes: envía una sugerencia, un bug o cualquier otra cosa directamente al mantenedor — se requiere la conexión a la nube (sin spam anónimo), con contador de caracteres y la lista de lo ya enviado.',
+      ],
+      zh: [
+        '设置中新增“提交反馈”区域：把建议、问题报告或任何想法直接发给维护者——需要云端登录（杜绝匿名滥发），带字符计数器，还能查看你已发送的内容。',
+      ],
+      it: [
+        'Nuova sezione «Lascia un feedback» nelle Impostazioni: invia un suggerimento, un bug o qualsiasi altra cosa direttamente al manutentore — accesso cloud richiesto (niente spam anonimo), con contatore di caratteri e l’elenco di ciò che hai già inviato.',
+      ],
+      nl: [
+        'Nieuwe sectie “Feedback geven” in Instellingen: stuur een suggestie, een bug of wat dan ook rechtstreeks naar de beheerder — cloudlogin vereist (geen anonieme spam), met tekenteller en een lijst van wat je al verzond.',
+      ],
+      de: [
+        'Neuer Bereich „Feedback geben“ in den Einstellungen: schicke einen Vorschlag, einen Bug oder alles andere direkt an den Betreuer — Cloud-Anmeldung erforderlich (kein anonymer Spam), mit Zeichenzähler und der Liste des bereits Gesendeten.',
+      ],
+    },
+  },
+  {
     version: '1.9.1',
     date: '2026-07-13',
     changes: {
