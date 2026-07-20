@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.10.1',
+    date: '2026-07-17',
+    changes: {
+      en: [
+        'Internal consistency work on the interface styles — nothing changes on screen, everything gets easier to maintain.',
+      ],
+      fr: [
+        'Travail interne de cohérence sur les styles de l’interface — rien ne change à l’écran, tout devient plus simple à maintenir.',
+      ],
+      es: [
+        'Trabajo interno de coherencia en los estilos de la interfaz — nada cambia en pantalla, todo resulta más fácil de mantener.',
+      ],
+      zh: [
+        '界面样式的内部一致性整理——屏幕上没有任何变化，维护起来更轻松。',
+      ],
+      it: [
+        'Lavoro interno di coerenza sugli stili dell’interfaccia — nulla cambia sullo schermo, tutto diventa più semplice da mantenere.',
+      ],
+      nl: [
+        'Intern consistentiewerk aan de interfacestijlen — er verandert niets op het scherm, alles wordt makkelijker te onderhouden.',
+      ],
+      de: [
+        'Interne Konsistenzarbeit an den Oberflächenstilen — auf dem Bildschirm ändert sich nichts, alles wird leichter zu warten.',
+      ],
+    },
+  },
+  {
     version: '1.10.0',
     date: '2026-07-13',
     changes: {
