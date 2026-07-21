@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.11.1',
+    date: '2026-07-21',
+    changes: {
+      en: [
+        'Fix: the search field no longer shows a permanent red outline — the red focus ring now appears only when navigating with the keyboard.',
+      ],
+      fr: [
+        'Correctif : le champ de recherche n’affiche plus de contour rouge permanent — l’anneau rouge de focus n’apparaît plus qu’en navigation clavier.',
+      ],
+      es: [
+        'Corrección: el campo de búsqueda ya no muestra un contorno rojo permanente — el anillo rojo de foco solo aparece al navegar con el teclado.',
+      ],
+      zh: [
+        '修复：搜索框不再显示常驻的红色边框——红色焦点圆环现在仅在使用键盘导航时出现。',
+      ],
+      it: [
+        'Correzione: il campo di ricerca non mostra più un contorno rosso permanente — l’anello rosso di focus appare solo navigando con la tastiera.',
+      ],
+      nl: [
+        'Fix: het zoekveld toont geen permanente rode rand meer — de rode focusring verschijnt nu alleen bij toetsenbordnavigatie.',
+      ],
+      de: [
+        'Korrektur: das Suchfeld zeigt keinen dauerhaften roten Rahmen mehr — der rote Fokusring erscheint jetzt nur noch bei Tastaturnavigation.',
+      ],
+    },
+  },
+  {
     version: '1.11.0',
     date: '2026-07-18',
     changes: {

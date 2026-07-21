@@ -1600,6 +1600,18 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    halo. Press: gentle push-down. */
 *:focus-visible{outline:2px solid var(--red) !important;outline-offset:2px;}
 *:focus:not(:focus-visible){outline:none;}
+/* Text-entry controls match :focus-visible on ANY focus (spec), so the
+   ring would sit on them permanently while they hold focus (e.g. the
+   search field). They get the app's discreet field treatment instead:
+   thin red border + soft halo — never the outer ring. */
+input:focus-visible,textarea:focus-visible,select:focus-visible{
+  outline:none !important;
+  border-color:var(--red);
+  box-shadow:0 0 0 3px var(--red-glow);
+}
+/* the header search input is borderless — its wrap carries the focus
+   look (existing :focus-within rule); no halo on the inner input */
+.search-wrap .search-input:focus-visible{box-shadow:none;}
 .setv-btn:hover,.fpill:hover,.pin-key:hover,.import-dialog-btn:hover,
 .setv-lang-sel:hover,.sort-sel:hover,#sidebarSortSel:hover,.schip:hover,
 .bn-tab:hover,.qbtn:hover,.lang-opt:hover,.font-opt:hover,.modal-close:hover,
