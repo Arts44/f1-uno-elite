@@ -45,8 +45,8 @@
   --ease:all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);
   /* Stats semantic accents — palette validated for contrast & CVD
      separation on the light surface (see Stats view) */
-  --st-owned:#00A94F;--st-wish:#D6188F;--st-doubles:#1D6FF2;
-  --st-missing:#5B6472;--st-fav:#E8002D;--st-copies:#8E24AA;
+  --st-owned:#00A94F;--st-wish:#EC4899;--st-doubles:#0EA5B5;
+  --st-missing:#E4002B;--st-fav:#F43F5E;--st-copies:#7C4DFF;
   --pr-low:#E8002D;--pr-mid:#C77F00;
 }
 
@@ -63,8 +63,8 @@
   --purple:#CE93D8;--purple-s:#2D1B30;--purple-m:#3D2B40;
   /* Stats semantic accents — dark-mode steps, validated against the
      dark surface (not an automatic flip of the light set) */
-  --st-owned:#1DAF54;--st-wish:#F04FAE;--st-doubles:#3D8DEE;
-  --st-missing:#98A1B0;--st-fav:#FF4757;--st-copies:#A257F5;
+  --st-owned:#1DAF54;--st-wish:#F472B6;--st-doubles:#22C3D6;
+  --st-missing:#FF3D54;--st-fav:#FB7185;--st-copies:#A78BFA;
   --pr-low:#FF3D54;--pr-mid:#C08300;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -1017,7 +1017,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .schip{width:24px;height:24px;border-radius:7px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;transition:var(--ease);background:var(--surface);}
 .schip:hover{transform:scale(1.15);}
 .schip[data-s="owned"].on{background:#E8F5E9;border-color:#34C759;}
-.schip[data-s="wishlist"].on{background:#FCE7F3;border-color:#D6188F;}
+.schip[data-s="wishlist"].on{background:#FCE7F3;border-color:#EC4899;}
 .schip[data-s="doubles"].on{background:#E8F0FE;border-color:#007AFF;}
 .schip[data-s="favorite"].on{background:#FDE8EC;border-color:var(--red);}
 .qty-ctrl{display:flex;align-items:center;gap:var(--space-1);}
@@ -1529,6 +1529,19 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   background-size:300% 300%!important;
   color:#fff!important;
   animation:divineShift 8s ease-in-out infinite;
+}
+/* ── Legendary: white text on a bright gold, made legible by a dark
+   shadow rather than by darkening the gold.
+   DELIBERATE AESTHETIC CHOICE, documented so nobody "fixes" it:
+   #EC9600 only reaches 2.35:1 against plain white, below WCAG AA. The
+   layered shadow below paints a dark halo around every glyph, which is
+   what actually carries the legibility here. Any change to the gold or
+   to this shadow must be re-checked visually at the 10px grid-chip
+   size — the contrast formula alone cannot judge it (see the notes in
+   rarityTextColor(), data.js, and tests/stats.test.js). ── */
+.rar-legendary-bg{
+  color:#fff!important;
+  text-shadow:0 1px 1px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5);
 }
 .rar-divine-text{
   background-image:linear-gradient(115deg,#8B5CF6,#3B82F6,#14B8A6,#D99E00,#F472B6,#8B5CF6);

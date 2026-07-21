@@ -4,7 +4,7 @@
 import { DEBUG, log } from './logger.js';
 import { t } from './i18n.js';
 import {
-  CARDS_DB, CARD_TYPES, RARITIES, RARITY_KEYS, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityTextColor,
+  CARDS_DB, CARD_TYPES, RARITIES, RARITY_KEYS, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityChipClass, rarityChipStyle,
   CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_LOGOS, DRIVER_IMAGES,
   TEAM_LOGO_BG, TEAM_LOGO_NOEFFECTS
 } from './data.js';
@@ -490,7 +490,7 @@ export function renderGrid(cards){
         <div class="card-year">${card.season||2025}</div>
         <div class="card-team">${TEAM_COLORS[card.team]?`<span class="team-dot" style="background:${TEAM_COLORS[card.team]}"></span>`:''}${card.team||''}</div>
         <div class="card-rarity-row">
-          <span class="card-rarity${cardRarity(card)==='divine'?' rar-divine-bg':''}" style="${cardRarity(card)==='divine'?'':`background:${rarity.color};color:${rarityTextColor(rarity.color)}`}">${t('rar.'+cardRarity(card))} ${'★'.repeat(rarity.stars)}</span>
+          <span class="card-rarity${rarityChipClass(cardRarity(card))}" style="${rarityChipStyle(cardRarity(card),rarity.color)}">${t('rar.'+cardRarity(card))} ${'★'.repeat(rarity.stars)}</span>
           <div class="status-chips">
             <div class="schip${isWish?' on':''}" data-s="wishlist" data-action="quickToggle" data-card="${card.id}" data-status="wishlist" title="Wishlist">⭐</div>
             <div class="schip${isFav?' on':''}" data-s="favorite" data-action="quickToggle" data-card="${card.id}" data-status="favorite" title="Favori">❤️</div>
@@ -577,7 +577,7 @@ function _handleSearch(value, otherInput){
       return `<div class="sr-item" data-action="selectCard" data-card="${c.id}">
         <span class="sr-num">#${c.id}</span>
         <span class="sr-name">${catEmoji(c.category)} ${c.name}</span>
-        <span class="sr-sub sr-rar${rar==='divine'?' rar-divine-bg':''}" style="${rar==='divine'?'':`background:${rarData.color||'var(--surface3)'};color:${rarityTextColor(rarData.color)}`}">${t('rar.'+rar)||rarData.label||rar}</span>
+        <span class="sr-sub sr-rar${rarityChipClass(rar)}" style="${rarityChipStyle(rar,rarData.color)}">${t('rar.'+rar)||rarData.label||rar}</span>
       </div>`;
     }).join('') || '<div class="sr-item"><span class="sr-name" style="color:var(--tx3)">Aucun résultat</span></div>';
     searchDd.classList.add('open');
@@ -744,8 +744,8 @@ function _renderModalTags(card){
   (card.tags||[]).forEach(t=>{if(tagMap[t]) addTag(t,tagMap[t]);});
   const rarity=RARITIES[cardRarity(card)];
   const rt=document.createElement('span');
-  rt.className='mtag'+(cardRarity(card)==='divine'?' rar-divine-bg':'');
-  if(cardRarity(card)!=='divine'){ rt.style.background=rarity.color; rt.style.color=rarityTextColor(rarity.color); }
+  rt.className='mtag'+rarityChipClass(cardRarity(card));
+  rt.style.cssText=rarityChipStyle(cardRarity(card),rarity.color);
   rt.textContent=`${'★'.repeat(rarity.stars)} ${t('rar.'+cardRarity(card))||rarity.label}`;
   tagsEl.appendChild(rt);
 }

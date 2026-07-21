@@ -2,7 +2,7 @@
    STATS — live header/counter updates + stats view rendering
    ══════════════════════════════════════════════════════════ */
 import { t } from './i18n.js';
-import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, rarityTextColor } from './data.js';
+import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, rarityChipClass, rarityChipStyle } from './data.js';
 import {
   getTypeData, cardOwned, cardWishlist, cardDoubles, cardMissing, cardFavorite,
   cardRarity, variantRarity, cardTotalQty
@@ -246,7 +246,7 @@ export function renderStats(){
       <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_rarest')}</div>
         <div class="sv-feat-name">${CATS[rarest.category]?.emoji||'🃏'} #${rarest.id} ${rarest.name}</div>
-        <div class="sv-feat-sub sv-feat-chip${cardRarity(rarest)==='divine'?' rar-divine-bg':''}" style="${cardRarity(rarest)==='divine'?'':`background:${rr.color||'var(--surface3)'};color:${rarityTextColor(rr.color)}`}">${t('rar.'+cardRarity(rarest))} ${'★'.repeat(rr.stars||1)}</div>
+        <div class="sv-feat-sub sv-feat-chip${rarityChipClass(cardRarity(rarest))}" style="${rarityChipStyle(cardRarity(rarest),rr.color)}">${t('rar.'+cardRarity(rarest))} ${'★'.repeat(rr.stars||1)}</div>
       </div>
       <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_most_copies')}</div>

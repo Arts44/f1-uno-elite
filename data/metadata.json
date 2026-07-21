@@ -171,12 +171,12 @@
     },
     "legendary": {
       "label": "Légendaire",
-      "color": "#FFB300",
+      "color": "#EC9600",
       "stars": 2
     },
     "mythic": {
       "label": "Mythique",
-      "color": "#00873B",
+      "color": "#00A86B",
       "stars": 3
     },
     "ultra": {
@@ -186,7 +186,7 @@
     },
     "cosmic": {
       "label": "Cosmique",
-      "color": "#7C4DFF",
+      "color": "#5B4BE0",
       "stars": 5
     },
     "divine": {

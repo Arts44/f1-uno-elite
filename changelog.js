@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.13.0',
+    date: '2026-07-21',
+    changes: {
+      en: [
+        'New rarity colours: legendary becomes a vivid gold, mythic a jade green and cosmic a deep indigo — each level is now easier to tell apart at a glance.',
+        'The stats categories are recoloured too: doubles turn cyan, the wishlist pink, favourites a rosy coral.',
+      ],
+      fr: [
+        'Nouvelles couleurs de rareté : légendaire passe en or vif, mythique en vert jade et cosmique en indigo profond — chaque niveau se distingue mieux d’un coup d’œil.',
+        'Les catégories de stats sont recolorées aussi : les doubles passent en cyan, la wishlist en rose, les favoris en corail rosé.',
+      ],
+      es: [
+        'Nuevos colores de rareza: legendaria pasa a un dorado vivo, mítica a verde jade y cósmica a índigo profundo — cada nivel se distingue mejor de un vistazo.',
+        'Las categorías de estadísticas también cambian de color: las repetidas pasan a cian, la wishlist a rosa y los favoritos a coral rosado.',
+      ],
+      zh: [
+        '全新稀有度配色：传奇改为鲜亮金色，神话改为翡翠绿，宇宙改为深靛蓝——各等级一眼即可区分。',
+        '统计分类也重新配色：重复卡改为青色，愿望清单改为粉色，收藏夹改为玫瑰珊瑚色。',
+      ],
+      it: [
+        'Nuovi colori di rarità: leggendaria diventa oro vivo, mitica verde giada e cosmica indaco profondo — ogni livello si distingue meglio a colpo d’occhio.',
+        'Anche le categorie delle statistiche cambiano colore: i doppioni passano al ciano, la wishlist al rosa, i preferiti a un corallo rosato.',
+      ],
+      nl: [
+        'Nieuwe zeldzaamheidskleuren: legendarisch wordt helder goud, mythisch jadegroen en kosmisch diep indigo — elk niveau is nu in één oogopslag te onderscheiden.',
+        'Ook de statistiekcategorieën krijgen nieuwe kleuren: dubbelen worden cyaan, de verlanglijst roze en favorieten rozig koraal.',
+      ],
+      de: [
+        'Neue Seltenheitsfarben: legendär wird leuchtendes Gold, mythisch ein Jadegrün und kosmisch ein tiefes Indigo — jede Stufe lässt sich jetzt auf einen Blick unterscheiden.',
+        'Auch die Statistikkategorien werden umgefärbt: Dubletten werden cyan, die Wunschliste rosa, Favoriten ein rosiges Korall.',
+      ],
+    },
+  },
+  {
     version: '1.12.0',
     date: '2026-07-21',
     changes: {

@@ -17,8 +17,36 @@ export let CARD_TYPES = {};
 export let TYPE_BADGE_RARITY = {};
 export let TYPE_BADGE_STYLES = {};
 
+// ── Rarity chip painting — single source of truth ──
+// Two rarities opt out of the plain "solid background + computed text
+// colour" treatment and are painted by CSS instead:
+//   divine    → animated iridescent gradient (.rar-divine-bg)
+//   legendary → white text on bright gold, made legible by a layered
+//               dark text-shadow (.rar-legendary-bg). Deliberate
+//               aesthetic choice: raw white-on-#EC9600 is only 2.35:1,
+//               so the shadow — not the contrast ratio — carries the
+//               legibility. Don't "fix" it by darkening the gold.
+// Everything else gets rarityTextColor() below.
+const RARITY_CSS_PAINTED = { divine: 'rar-divine-bg', legendary: 'rar-legendary-bg' };
+
+// Extra class for a rarity chip ('' when the chip is painted inline).
+export function rarityChipClass(rarityKey){
+  const cls = RARITY_CSS_PAINTED[rarityKey];
+  return cls ? ' ' + cls : '';
+}
+
+// Inline style for a rarity chip. Divine paints its own background;
+// legendary keeps the solid gold but lets CSS own the text.
+export function rarityChipStyle(rarityKey, hex){
+  if(rarityKey === 'divine') return '';
+  const bg = hex || 'var(--surface3)';
+  if(rarityKey === 'legendary') return `background:${bg}`;
+  return `background:${bg};color:${rarityTextColor(hex)}`;
+}
+
 // Readable text color for a solid chip of the given background color:
 // white or near-black, whichever has the higher WCAG contrast.
+// NOTE: legendary never goes through this — see RARITY_CSS_PAINTED.
 export function rarityTextColor(hex){
   if(!/^#[0-9a-fA-F]{6}$/.test(hex||'')) return '#fff';
   const [r,g,b] = [1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255)
