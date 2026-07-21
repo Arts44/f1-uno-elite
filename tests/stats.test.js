@@ -41,85 +41,57 @@ describe('computeStats aggregates', () => {
   });
 });
 
-describe('rarityTextColor', () => {
-  test('picks white on dark saturated colors', () => {
-    assert.equal(rarityTextColor('#C026D3'), '#fff');  // epic fuchsia
-    assert.equal(rarityTextColor('#7C4DFF'), '#fff');  // cosmic violet
-  });
-  test('still picks near-black when a color is too bright for white', () => {
-    assert.equal(rarityTextColor('#FF7A00'), '#141414'); // the OLD legendary orange
-    assert.equal(rarityTextColor('#00C853'), '#141414'); // the OLD mythic emerald
-  });
-  test('invalid input falls back to white', () => {
+describe('rarity chip painting', () => {
+  // ══════════════════════════════════════════════════════════
+  // DESIGN DECISION — 2026-07-21, taken by the maintainer.
+  // Rarity chips use PLAIN WHITE TEXT on every level, with NO
+  // text-shadow and NO per-rarity dark text. Visual uniformity across
+  // the rarity ladder was chosen over per-chip WCAG AA, knowingly and
+  // explicitly: legendary (#EC9600, ~2.35:1) and mythic (#00A86B,
+  // ~3.08:1) sit below the 4.5:1 AA threshold for small text.
+  //
+  // The old AA assertion is therefore GONE ON PURPOSE — it is not an
+  // oversight and must not be restored without reopening the decision.
+  // The tests below lock the accepted behaviour instead, so that an
+  // accidental drift back to dark text or to a shadow fails loudly.
+  // ══════════════════════════════════════════════════════════
+  test('rarityTextColor always returns white, whatever the background', () => {
+    assert.equal(rarityTextColor('#C026D3'), '#fff');  // dark fuchsia
+    assert.equal(rarityTextColor('#EC9600'), '#fff');  // bright gold — AA exception
+    assert.equal(rarityTextColor('#00A86B'), '#fff');  // jade — AA exception
+    assert.equal(rarityTextColor('#FFFFFF'), '#fff');  // even on pure white
     assert.equal(rarityTextColor(undefined), '#fff');
-    assert.equal(rarityTextColor('red'), '#fff');
-    assert.equal(rarityTextColor('#12345'), '#fff');
+    assert.equal(rarityTextColor('not-a-color'), '#fff');
   });
-  // Design invariant: every rarity chip painted with a flat background
-  // must reach WCAG AA for small text (>= 4.5:1) with the colour
-  // rarityTextColor() picks. Two rarities are exempt because CSS, not
-  // this function, paints them (see rarityChipStyle in data.js):
-  //   divine    — animated iridescent gradient
-  //   legendary — white on bright gold, legibility carried by a layered
-  //               dark text-shadow. Deliberate aesthetic choice: the raw
-  //               ratio is ~2.35:1, so a contrast assertion would be
-  //               meaningless here; the test below pins the mechanism
-  //               instead, and the rendering was validated visually.
-  // Any OTHER rarity drifting into the unreadable band still fails loudly.
-  test('every inline-painted rarity color is legible with its chosen text color', () => {
+
+  test('every shipped rarity takes white text — no exceptions, no dark text', () => {
     const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
-    const lum = hex => {
-      const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
-        .map(c => c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    };
-    const contrast = (bg, fg) => {
-      const [a, b] = [lum(bg), lum(fg)].sort((x, y) => y - x);
-      return (a + 0.05) / (b + 0.05);
-    };
     let checked = 0;
     for(const [key, r] of Object.entries(meta.rarities)){
-      if(key === 'divine' || key === 'legendary') continue; // CSS-painted
-      const fg = rarityTextColor(r.color);
-      assert.ok(fg === '#fff' || fg === '#141414', `${key}: unexpected text color ${fg}`);
-      const c = contrast(r.color, fg === '#fff' ? '#ffffff' : '#141414');
-      assert.ok(c >= 4.5, `${key} (${r.color}) with ${fg}: contrast ${c.toFixed(2)}:1 < 4.5`);
+      if(key === 'divine') continue; // animated gradient, paints itself
+      assert.equal(rarityTextColor(r.color), '#fff', `${key} (${r.color}) must take white text`);
+      assert.equal(rarityChipStyle(key, r.color), `background:${r.color};color:#fff`);
       checked++;
     }
-    assert.equal(checked, 4, 'exactly four rarities are inline-painted (epic, mythic, ultra, cosmic)');
+    assert.equal(checked, 5, 'five rarities are inline-painted (epic, legendary, mythic, ultra, cosmic)');
   });
 
-  // Legendary must keep going through the CSS class that supplies the
-  // white text + dark shadow — never fall back to an inline colour that
-  // would land at 2.35:1 with no shadow to save it.
-  test('legendary and divine are painted by CSS, not by an inline text color', () => {
-    assert.equal(rarityChipClass('legendary'), ' rar-legendary-bg');
+  test('divine is the ONLY rarity painted by CSS', () => {
     assert.equal(rarityChipClass('divine'), ' rar-divine-bg');
-    assert.equal(rarityChipClass('mythic'), '');
-
-    // legendary keeps the gold background but sets no inline color
-    const legend = rarityChipStyle('legendary', '#EC9600');
-    assert.equal(legend, 'background:#EC9600');
-    assert.ok(!/color:/.test(legend), 'legendary must not set an inline text color');
-
-    // divine paints everything itself
     assert.equal(rarityChipStyle('divine', '#FACC15'), '');
-
-    // the others keep the previous behaviour: contrast-driven text colour.
-    // The shipped jade is bright enough that white would only reach
-    // 3.08:1, so it legitimately takes dark text — that is the guard
-    // working, not a regression.
-    assert.equal(rarityChipStyle('mythic', '#00A86B'), 'background:#00A86B;color:#141414');
-    assert.equal(rarityChipStyle('cosmic', '#5B4BE0'), 'background:#5B4BE0;color:#fff');
+    for(const key of ['epic', 'legendary', 'mythic', 'ultra', 'cosmic']){
+      assert.equal(rarityChipClass(key), '', `${key} must not get an extra CSS class`);
+    }
   });
 
-  // The shadow that carries legendary's legibility lives in styles.css;
-  // if it is ever deleted, white-on-gold silently becomes unreadable.
-  test('the legendary chip rule still ships its dark text-shadow', () => {
+  // Inverted on purpose (it used to assert the shadow was PRESENT):
+  // the shadow was removed by the design decision above, and nothing
+  // should quietly bring it back.
+  test('no rarity chip rule ships a text-shadow', () => {
     const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
-    const rule = css.match(/\.rar-legendary-bg\s*\{[^}]*\}/);
-    assert.ok(rule, '.rar-legendary-bg rule is missing from styles.css');
-    assert.ok(/color:#fff!important/.test(rule[0]), 'legendary chip must force white text');
-    assert.ok(/text-shadow:[^;]*rgba\(0,0,0/.test(rule[0]), 'legendary chip must keep a dark text-shadow');
+    assert.ok(!/\.rar-legendary-bg/.test(css), 'the .rar-legendary-bg shadow rule must stay removed');
+    const divine = css.match(/\.rar-divine-bg\s*\{[^}]*\}/);
+    assert.ok(divine, '.rar-divine-bg rule is missing from styles.css');
+    assert.ok(!/text-shadow/.test(divine[0]), 'divine chip must not gain a text-shadow either');
   });
 });

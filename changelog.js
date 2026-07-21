@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.14.0',
+    date: '2026-07-21',
+    changes: {
+      en: [
+        'Rarity labels are now uniformly white on every level, for a cleaner and more consistent look across the whole collection.',
+      ],
+      fr: [
+        'Les libellés de rareté sont désormais uniformément blancs sur tous les niveaux, pour un rendu plus net et plus cohérent sur toute la collection.',
+      ],
+      es: [
+        'Las etiquetas de rareza ahora son uniformemente blancas en todos los niveles, para un aspecto más limpio y coherente en toda la colección.',
+      ],
+      zh: [
+        '各稀有度标签现已统一为白色文字，使整个收藏的视觉更简洁、更一致。',
+      ],
+      it: [
+        'Le etichette di rarità sono ora uniformemente bianche su tutti i livelli, per un aspetto più pulito e coerente su tutta la collezione.',
+      ],
+      nl: [
+        'De zeldzaamheidslabels zijn nu op elk niveau uniform wit, voor een strakker en consistenter beeld in de hele collectie.',
+      ],
+      de: [
+        'Die Seltenheitsbezeichnungen sind jetzt auf allen Stufen einheitlich weiß — für ein klareres, konsistenteres Bild in der ganzen Sammlung.',
+      ],
+    },
+  },
+  {
     version: '1.13.0',
     date: '2026-07-21',
     changes: {

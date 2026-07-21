@@ -18,16 +18,10 @@ export let TYPE_BADGE_RARITY = {};
 export let TYPE_BADGE_STYLES = {};
 
 // ── Rarity chip painting — single source of truth ──
-// Two rarities opt out of the plain "solid background + computed text
-// colour" treatment and are painted by CSS instead:
-//   divine    → animated iridescent gradient (.rar-divine-bg)
-//   legendary → white text on bright gold, made legible by a layered
-//               dark text-shadow (.rar-legendary-bg). Deliberate
-//               aesthetic choice: raw white-on-#EC9600 is only 2.35:1,
-//               so the shadow — not the contrast ratio — carries the
-//               legibility. Don't "fix" it by darkening the gold.
-// Everything else gets rarityTextColor() below.
-const RARITY_CSS_PAINTED = { divine: 'rar-divine-bg', legendary: 'rar-legendary-bg' };
+// Only divine opts out of the plain "solid background + white text"
+// treatment: it is painted by CSS as an animated iridescent gradient
+// (.rar-divine-bg). Every other rarity is painted inline here.
+const RARITY_CSS_PAINTED = { divine: 'rar-divine-bg' };
 
 // Extra class for a rarity chip ('' when the chip is painted inline).
 export function rarityChipClass(rarityKey){
@@ -35,25 +29,28 @@ export function rarityChipClass(rarityKey){
   return cls ? ' ' + cls : '';
 }
 
-// Inline style for a rarity chip. Divine paints its own background;
-// legendary keeps the solid gold but lets CSS own the text.
+// Inline style for a rarity chip. Divine paints itself, everything else
+// is a solid rarity colour with white text.
 export function rarityChipStyle(rarityKey, hex){
   if(rarityKey === 'divine') return '';
-  const bg = hex || 'var(--surface3)';
-  if(rarityKey === 'legendary') return `background:${bg}`;
-  return `background:${bg};color:${rarityTextColor(hex)}`;
+  return `background:${hex || 'var(--surface3)'};color:${rarityTextColor(hex)}`;
 }
 
-// Readable text color for a solid chip of the given background color:
-// white or near-black, whichever has the higher WCAG contrast.
-// NOTE: legendary never goes through this — see RARITY_CSS_PAINTED.
-export function rarityTextColor(hex){
-  if(!/^#[0-9a-fA-F]{6}$/.test(hex||'')) return '#fff';
-  const [r,g,b] = [1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255)
-    .map(c=>c<=0.03928 ? c/12.92 : ((c+0.055)/1.055)**2.4);
-  const L = 0.2126*r + 0.7152*g + 0.0722*b;
-  // contrast vs white: 1.05/(L+.05) — vs #141414 (L≈0.0091): (L+.05)/0.0591
-  return (1.05/(L+0.05)) >= ((L+0.05)/0.0591) ? '#fff' : '#141414';
+// ── Rarity chip text colour: ALWAYS WHITE ──
+// DELIBERATE DESIGN DECISION, 2026-07-21, taken by the maintainer with
+// the accessibility trade-off spelled out and accepted: visual
+// uniformity across the whole rarity ladder outranks per-chip WCAG AA
+// here. Two rarities knowingly fall below the 4.5:1 AA threshold for
+// small text with white on them:
+//     legendary #EC9600 → ~2.35:1
+//     mythic    #00A86B → ~3.08:1
+// No text-shadow, no per-rarity dark text, no automatic contrast
+// switching — those were tried and explicitly rejected. If you are
+// "fixing" this because a linter or an audit flagged it, don't: reopen
+// the decision with the maintainer first. The tests in
+// tests/stats.test.js lock this behaviour in place on purpose.
+export function rarityTextColor(_hex){
+  return '#fff';
 }
 export let RARITY_KEYS = [];
 export let RARITY_ORDER = {};

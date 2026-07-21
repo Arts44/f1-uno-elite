@@ -1530,19 +1530,9 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   color:#fff!important;
   animation:divineShift 8s ease-in-out infinite;
 }
-/* ── Legendary: white text on a bright gold, made legible by a dark
-   shadow rather than by darkening the gold.
-   DELIBERATE AESTHETIC CHOICE, documented so nobody "fixes" it:
-   #EC9600 only reaches 2.35:1 against plain white, below WCAG AA. The
-   layered shadow below paints a dark halo around every glyph, which is
-   what actually carries the legibility here. Any change to the gold or
-   to this shadow must be re-checked visually at the 10px grid-chip
-   size — the contrast formula alone cannot judge it (see the notes in
-   rarityTextColor(), data.js, and tests/stats.test.js). ── */
-.rar-legendary-bg{
-  color:#fff!important;
-  text-shadow:0 1px 1px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5);
-}
+/* Rarity chips carry plain white text on every level, with NO shadow —
+   deliberate design decision (2026-07-21), see rarityTextColor() in
+   data.js for the rationale and the accepted contrast trade-off. */
 .rar-divine-text{
   background-image:linear-gradient(115deg,#8B5CF6,#3B82F6,#14B8A6,#D99E00,#F472B6,#8B5CF6);
   background-size:300% 300%;
