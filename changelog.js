@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.11.0',
+    date: '2026-07-18',
+    changes: {
+      en: [
+        'Cards come alive on hover: a soft red glow, a light sweep across the visual and a subtle zoom of the driver number.',
+        'Cleaner interactions everywhere: keyboard focus now shows a clear red ring (accessibility), buttons gently press down on click.',
+        'Dark theme: cards gain a touch more depth; the team name is easier to read, with a small team-color dot.',
+      ],
+      fr: [
+        'Les cartes s’animent au survol : lueur rouge douce, balayage de lumière sur le visuel et léger zoom du numéro de pilote.',
+        'Interactions plus nettes partout : le focus clavier affiche désormais un anneau rouge clair (accessibilité), les boutons s’enfoncent légèrement au clic.',
+        'Thème sombre : les cartes gagnent en profondeur ; le nom d’écurie est plus lisible, avec une petite pastille à la couleur de l’équipe.',
+      ],
+      es: [
+        'Las cartas cobran vida al pasar el ratón: brillo rojo suave, barrido de luz en el visual y un sutil zoom del número del piloto.',
+        'Interacciones más limpias en todas partes: el foco del teclado muestra ahora un anillo rojo claro (accesibilidad), los botones se hunden ligeramente al hacer clic.',
+        'Tema oscuro: las cartas ganan profundidad; el nombre de la escudería se lee mejor, con un pequeño punto del color del equipo.',
+      ],
+      zh: [
+        '悬停时卡牌更生动：柔和的红色光晕、掠过视觉区的光泽以及车手号码的轻微放大。',
+        '各处交互更清晰：键盘焦点现在显示醒目的红色圆环（无障碍），按钮点击时轻微下沉。',
+        '深色主题：卡牌更有层次感；车队名称更易读，并配有车队配色的小圆点。',
+      ],
+      it: [
+        'Le carte prendono vita al passaggio del mouse: bagliore rosso morbido, spazzata di luce sul visual e un leggero zoom del numero del pilota.',
+        'Interazioni più pulite ovunque: il focus da tastiera mostra ora un chiaro anello rosso (accessibilità), i pulsanti si abbassano leggermente al clic.',
+        'Tema scuro: le carte guadagnano profondità; il nome della scuderia è più leggibile, con un puntino del colore del team.',
+      ],
+      nl: [
+        'Kaarten komen tot leven bij hover: een zachte rode gloed, een lichtstreep over het visuele deel en een subtiele zoom van het rijdersnummer.',
+        'Strakkere interacties overal: toetsenbordfocus toont nu een duidelijke rode ring (toegankelijkheid), knoppen drukken licht in bij het klikken.',
+        'Donker thema: kaarten krijgen meer diepte; de teamnaam is beter leesbaar, met een klein bolletje in de teamkleur.',
+      ],
+      de: [
+        'Karten werden beim Überfahren lebendig: ein weiches rotes Leuchten, ein Lichtstreif über das Visual und ein dezenter Zoom der Fahrernummer.',
+        'Sauberere Interaktionen überall: der Tastaturfokus zeigt jetzt einen klaren roten Ring (Barrierefreiheit), Knöpfe senken sich beim Klick leicht ab.',
+        'Dunkles Thema: Karten bekommen mehr Tiefe; der Teamname ist besser lesbar, mit einem kleinen Punkt in der Teamfarbe.',
+      ],
+    },
+  },
+  {
     version: '1.10.1',
     date: '2026-07-17',
     changes: {

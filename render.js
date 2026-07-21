@@ -488,7 +488,7 @@ export function renderGrid(cards){
         <div class="card-num">#${card.id} ${card.champion?'· 👑':''}</div>
         <div class="card-name">${card.name} ${card.category==='pilote'?card.nationality||'':''} ${card.retired?`<span class="retired-badge">${t('m.retired')}</span>`:''}</div>
         <div class="card-year">${card.season||2025}</div>
-        <div class="card-team">${card.team||''}</div>
+        <div class="card-team">${TEAM_COLORS[card.team]?`<span class="team-dot" style="background:${TEAM_COLORS[card.team]}"></span>`:''}${card.team||''}</div>
         <div class="card-rarity-row">
           <span class="card-rarity${cardRarity(card)==='divine'?' rar-divine-bg':''}" style="${cardRarity(card)==='divine'?'':`background:${rarity.color};color:${rarityTextColor(rarity.color)}`}">${t('rar.'+cardRarity(card))} ${'★'.repeat(rarity.stars)}</span>
           <div class="status-chips">

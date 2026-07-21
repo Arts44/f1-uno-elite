@@ -31,7 +31,7 @@
   --border:rgba(0,0,0,0.08);
   --sh-sm:0 1px 3px rgba(0,0,0,0.06);--sh-md:0 4px 12px rgba(0,0,0,0.08);--sh-lg:0 12px 40px rgba(0,0,0,0.14);
   --tx1:#1A1A1A;--tx2:#6B6B6B;--tx3:#9B9B9B;
-  --red:#E8002D;--red-s:#FFE8EC;--red-m:#FFBEC8;
+  --red:#E8002D;--red-s:#FFE8EC;--red-m:#FFBEC8;--red-glow:rgba(232,0,45,0.18);
   --green:#34C759;--green-s:#E8F5E9;--green-m:#C8E6C9;
   --orange:#FF9500;--orange-s:#FFF3E0;--orange-m:#FFE0B2;
   --blue:#007AFF;--blue-s:#E3F2FD;--blue-m:#BBDEFB;
@@ -55,7 +55,7 @@
   --border:rgba(255,255,255,0.08);
   --sh-sm:0 1px 3px rgba(0,0,0,0.3);--sh-md:0 4px 12px rgba(0,0,0,0.4);--sh-lg:0 12px 40px rgba(0,0,0,0.6);
   --tx1:#FFFFFF;--tx2:#CCCCCC;--tx3:#999999;
-  --red:#FF4757;--red-s:#2D1B1B;--red-m:#3D2B2B;
+  --red:#FF4757;--red-s:#2D1B1B;--red-m:#3D2B2B;--red-glow:rgba(255,71,87,0.22);
   --green:#4CD964;--green-s:#1B2D1B;--green-m:#2B3D2B;
   --orange:#FFB347;--orange-s:#2D241B;--orange-m:#3D342B;
   --blue:#64B5F6;--blue-s:#1B2430;--blue-m:#2B3440;
@@ -1561,3 +1561,83 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .font-opt.active{border-color:var(--red);box-shadow:0 0 0 1px var(--red);}
 .font-opt-name{font-size:15px;font-weight:700;color:var(--tx1);}
 .font-opt-sample{font-size:11px;color:var(--tx2);}
+
+
+/* ══════════════════════════════════════════════════════════
+   CLAUDE DESIGN REFINEMENTS — PHASE 1 (01·02·05·06)
+   Additive layer: nothing here replaces the foil/wild/nitro/divine
+   treatments — it composes on top of them.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 01 · motorsport card hover ──
+   Rest state untouched; on hover: soft red glow under the card, red
+   accent border, a light sweep across the visual, and a micro-zoom of
+   the driver number. The sheen lives on .card-visual::before (free
+   slot — wild hides it, foils use ::after). */
+.card .card-visual::before{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:3;
+  background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,0.16) 50%,transparent 58%);
+  transform:translateX(-160%);
+  transition:transform 0.55s ease;
+}
+.card:hover .card-visual::before{transform:translateX(160%);}
+.card .dn-num{transition:transform 0.25s ease;}
+.card:hover .dn-num{transform:scale(1.06);}
+.card:hover{
+  transform:translateY(-3px);
+  border-color:var(--red);
+  box-shadow:var(--sh-lg), 0 12px 28px -6px var(--red-glow);
+}
+/* foils keep their own borders/halos on hover (gold, mauve, wild) */
+.card[class*="tv-"]:hover{border-color:inherit;}
+.card.tv-promo-blue:hover,.card.tv-promo-green:hover,.card.tv-promo-red:hover,.card.tv-promo-yellow:hover{border-color:rgba(255,205,90,0.85);}
+.card.tv-nitro_foil:hover{border-color:rgba(200,140,255,0.85);}
+
+/* ── 02 · coherent interactive states ──
+   Keyboard focus NEVER disappears: a red ring via :focus-visible
+   everywhere (a11y — outranks the scattered outline:none), the
+   browser-blue outline never shows. Hover: slight darken + soft red
+   halo. Press: gentle push-down. */
+*:focus-visible{outline:2px solid var(--red) !important;outline-offset:2px;}
+*:focus:not(:focus-visible){outline:none;}
+.setv-btn:hover,.fpill:hover,.pin-key:hover,.import-dialog-btn:hover,
+.setv-lang-sel:hover,.sort-sel:hover,#sidebarSortSel:hover,.schip:hover,
+.bn-tab:hover,.qbtn:hover,.lang-opt:hover,.font-opt:hover,.modal-close:hover,
+.install-banner-btn:hover,.setv-toggle:hover{
+  box-shadow:0 0 0 3px var(--red-glow);
+  filter:brightness(0.97);
+}
+button:not(:disabled):active,
+.schip:active,.fpill:active,.bn-tab:active,.qbtn:active,
+.pin-key:active,.setv-btn:active,.lang-opt:active,.font-opt:active{
+  transform:scale(0.955);
+}
+
+/* ── 05 · dark-theme card depth (dark only, plain cards only — the
+   foil washes carry their own treatments and stay untouched) ── */
+[data-theme="dark"] .card:not([class*="tv-"]){
+  border-color:rgba(255,255,255,0.13);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.07), var(--sh-sm);
+}
+[data-theme="dark"] .card:not([class*="tv-"]) .card-visual{
+  box-shadow:inset 0 -14px 18px -14px rgba(0,0,0,0.5);
+}
+[data-theme="dark"] .card:not([class*="tv-"]):hover{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.07), var(--sh-lg), 0 12px 28px -6px var(--red-glow);
+}
+
+/* ── 06 · team-name legibility + team color dot ── */
+.card-team{font-weight:600;letter-spacing:0.1px;}
+.team-dot{
+  display:inline-block;width:7px;height:7px;border-radius:50%;
+  margin-right:5px;vertical-align:0.5px;flex-shrink:0;
+  box-shadow:0 0 0 1px rgba(0,0,0,0.12);
+}
+
+@media (prefers-reduced-motion:reduce){
+  .card .card-visual::before{transition:none;display:none;}
+  .card .dn-num{transition:none;}
+  .card:hover .dn-num{transform:none;}
+  button:not(:disabled):active,.schip:active,.fpill:active,.bn-tab:active,
+  .qbtn:active,.pin-key:active,.setv-btn:active,.lang-opt:active,.font-opt:active{transform:none;}
+}
