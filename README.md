@@ -1,331 +1,136 @@
+🇬🇧 **English** · [🇫🇷 Français](README.fr.md) · [🇪🇸 Español](README.es.md) · [🇨🇳 中文](README.zh.md) · [🇮🇹 Italiano](README.it.md) · [🇳🇱 Nederlands](README.nl.md) · [🇩🇪 Deutsch](README.de.md)
+
 # 🏎️ F1 UNO Élite — Collection Tracker
 
-> A client-side web app for tracking your **F1 UNO Élite** trading-card collection: manage owned cards, doubles, wishlist and favourites, unlock badges, and follow your completion stats — fully offline, with no backend.
->
-> **Live app:** <https://arts44.github.io/f1-uno-elite/> (GitHub Pages)
+**An offline-first, installable trading-card collection tracker built with vanilla JavaScript and zero runtime dependencies — no framework, no SDK, no CDN, no backend required.**
 
 [![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
-![Vanilla JS](https://img.shields.io/badge/JavaScript-vanilla-f7df1e?logo=javascript&logoColor=black)
-![ES Modules](https://img.shields.io/badge/ES%20modules-yes-blue)
-![Build: esbuild](https://img.shields.io/badge/build-esbuild-ffcf00)
 ![PWA](https://img.shields.io/badge/PWA-installable%20%2B%20offline%20%E2%9C%93-brightgreen)
+![Zero runtime deps](https://img.shields.io/badge/runtime%20dependencies-0-blue)
+![Vanilla JS](https://img.shields.io/badge/JavaScript-vanilla-f7df1e?logo=javascript&logoColor=black)
 ![i18n](https://img.shields.io/badge/languages-7-purple)
 
----
+## ▶️ **[Try it live → arts44.github.io/f1-uno-elite](https://arts44.github.io/f1-uno-elite/)**
 
-## 📋 Overview
+It's a **PWA**: install it from your browser and it runs like a native app, fully offline, with its own icon — on desktop and mobile.
 
-**F1 UNO Élite — Collection Tracker** is a 100% client-side single-page app (no application server, no database) that helps a collector track their F1 UNO Élite trading cards. Each card exists in several **types / variants** (Blue, Green, Red, Yellow and their *foil* versions, plus Nitro, Wild, Promo…), and the app lets you record, per variant, whether it is owned, a double, wishlisted or a favourite, with a quantity counter.
+![Collection grid — dark theme](screenshots/grid-desktop-dark.jpg)
 
-All progress is stored **locally in the browser** (`localStorage`), with JSON export / import for backup and transfer between devices.
+| Card detail — animated foil types | Stats dashboard |
+|---|---|
+| ![Card modal](screenshots/modal-dark.jpg) | ![Stats view](screenshots/stats-light.jpg) |
 
-The codebase is plain **HTML / CSS / vanilla JavaScript** with no UI framework and **zero runtime dependencies**. The source is authored as native **ES modules** from a single entry point, `app.js`. For production, those modules are bundled into one classic script (`app.bundle.js`) with **esbuild**; during development the unbundled modules can be loaded directly (see [Installation](#-installation--usage)).
-
----
-
-## ✨ Features
-
-### Collection
-- **Card grid** that can be filtered and sorted (by number, name, rarity, category).
-- **Per-variant tracking**: each card manages its types (Blue, Red, Foil, Nitro…) independently, each with an *owned / double / wishlist / favourite* status and a **quantity**.
-- **Automatic rarity** on a **6-level scale** — `epic · legendary · mythic · ultra · cosmic · divine` (there is no common/rare anymore). A base rarity is derived per role/champion and foils climb the ladder (simple foil +1, dual +2, wild/promo/nitro +3, clamped at divine). The palette is saturated and distinct per level, and the top rarity **divine** renders as a slowly shifting **iridescent animated gradient** (respecting `prefers-reduced-motion`), everywhere its colour appears (chips, labels, stats). The type-pill visual ladder is a separate scale (`typeBadgeStyles`) and is not affected.
-- **Instant search** (with a results dropdown and input debouncing).
-- **Advanced filters** in a floating sidebar: status, category (pilote, reserve, directeur, gp), card type, rarity, year, champions-only, and favourites pinned to the top.
-- **RETIRED badge** shown on cards for drivers who are no longer active.
-
-### Badges & titles
-- **50 badges** split into **automatic** (unlocked from measured conditions: number of cards owned, wishlist, doubles, favourites, completed categories, champions, types…) and **manual** (self-declared, e.g. "I attended a Grand Prix"). Currently **25 automatic + 25 manual**.
-- **Title system** unlocked by badges and milestones, displayed on the profile.
-- Preview of the cards contributing to a badge, plus unlock animations (sparkles/particles).
-
-### Stats
-- **Dashboard**: overall progress, breakdown by rarity, team, category and card type, with completion rates.
-- **Progression over time**: a pure-SVG line chart of owned cards per day. One point is recorded per day on each collection change (`history.js`, capped at 365 points). With fewer than two points it shows a "the curve will build over time" message instead of an empty graph.
-  > ⚠️ **The history only starts the day this feature was installed.** Past progress cannot be reconstructed — there is no back-fill — so the curve begins empty and grows from your first change onward.
-- **Highlights**: your **rarest owned card** and the card with the **most total copies**, computed live from the current collection (empty collection shows a friendly placeholder). "Last added" is intentionally not shown — no per-card timestamp is stored.
-- **Rarity chart**: a pure-SVG donut of owned cards by rarity, using the shared rarity colours (the divine segment gets an animated iridescent gradient), with a legend.
-- **Unified colour design**: the stat tiles carry a clear, vivid semantic palette (owned = green, wishlist = amber, doubles = blue, missing = red, favourites = pink, copies = purple), and everything rarity-related reuses the single rarity palette — contrast-checked in light **and** dark themes.
-
-### Multi-season
-- **Season selector** in the header. The listed seasons are **2025** plus any season already present in your `localStorage` (i.e. seasons you have saved data for). Switching season loads the matching `data/cards-<year>.json`.
-- Progress is **scoped per season** in `localStorage`, with automatic migration from the old un-scoped format (v1 → v2).
-
-### Security & access modes
-- **PIN lock** (4 digits) hashed with **SHA-256** via the Web Crypto API. **Locking is instant ("hot lock", no page reload)**: privileges are dropped first, then every open surface (modal, sidebar, dialogs) is closed and the PIN keypad is restored pristine — unlocking re-initialises the app cleanly.
-- **Viewer mode** (read-only) to share your collection without risking edits; write actions are blocked and an admin PIN screen switches back to full access. Viewer mode is **unavailable while local encryption is on** (no PIN = no key).
-- Basic console-bypass protection.
-- **Optional local-data encryption** (`secure-store.js`, Settings → Security, requires the PIN): the collection data (owned cards, badges, history) is stored **encrypted in `localStorage`** — AES-GCM-256 with a key derived from the PIN via PBKDF2-SHA-256 (310 000 iterations, random local salt), all native Web Crypto, no library. Enabling shows an explicit warning and requires confirmation + PIN re-entry; the migration verifies every value decrypts back correctly **before** replacing the clear one. Disabling the PIN (or the toggle) decrypts everything back to clear first; changing the PIN re-encrypts under the new key. Backups (JSON, code, QR, cloud) always contain **decrypted** data so they stay usable anywhere. If decryption ever fails at unlock (PIN desync, corruption), the app offers a recovery exit: the undecryptable data is set aside (never deleted) and you can restore a backup.
-- > ⚠️ **Honest limits.** Without encryption, the PIN is an interface gate: the collection lives readable in `localStorage` via DevTools. **With encryption on**, casual reading is blocked — but a 4-digit PIN has only 10 000 combinations, so a determined attacker holding the device can brute-force the key derivation offline. This is protection against opportunistic snooping, not against experts. And a **forgotten PIN makes the local collection unrecoverable** — keep backups.
-
-### PWA — installable & offline
-- **Web App Manifest** (`manifest.webmanifest`): installable to the home screen / dock (standalone display). Icons 192/512 px declared `any maskable`, plus **screenshots** (a `wide` desktop and a `narrow` mobile capture) so browsers can show the richer install UI. A **favicon** (`favicon.ico`) is served too.
-- **Service Worker** (`sw.js`): the app shell (HTML, CSS, all JS modules + the bundle, the `data/` JSON files, icons, screenshots, favicon and the default + driver-number fonts) is **precached at install** under a versioned cache and served **cache-first** — after the first visit the app loads and works fully offline.
-- External assets (team/driver images from formula1.com, the Wikimedia F1/UNO logos) are cached at runtime (*stale-while-revalidate*) in a separate cache, so previously-seen images also work offline. **Fonts are self-hosted** and same-origin, so they fall under the shell cache — not an external dependency.
-- Old shell caches are cleaned up automatically when a new Service Worker version activates.
-- **Automatic updates** (`update.js`): when a new version is deployed, the service worker downloads it in the background and parks it in the *waiting* state; the app then shows a **discreet "new version available — Reload" banner**. One click promotes the new worker (`SKIP_WAITING` message) and reloads the page — the user is up to date with zero technical steps, and the versioned precache guarantees the new shell **and the new `data/*.json`** are fetched fresh (the old cache is deleted on activation, nothing stale survives). If the banner is ignored, the waiting worker activates naturally on the next cold start. Because an **installed PWA** can stay open for days without a navigation (the browser then never re-checks `sw.js` on its own), the app also calls `registration.update()` whenever it returns to the foreground and hourly while it stays open.
-- **In-app changelog & app version** (`changelog.js`): a version history translated in all 7 languages. After an update is applied, a non-intrusive "App updated!" banner offers to see **what's new** (only the entries that device actually missed); the full history is available anytime from **Settings → About**, which also shows the app version. The app version **is** the newest changelog entry (`APP_VERSION` is derived from it), so adding an entry *is* the version bump — nothing can drift.
-- **Guided install experience** (`install.js`): on Chrome/Edge/Android the `beforeinstallprompt` event is captured and surfaced as a native **Install** button in Settings plus a discreet, dismissable banner (a refusal is remembered — `f1uno_install_dismissed` — so it never nags). Browsers without the event get **platform-specific manual instructions** (iOS Safari: Share → Add to Home Screen, incl. iPadOS masquerading as macOS; macOS Safari: File → Add to Dock; Chromium: address-bar icon; Android menu; generic fallback) — and **Arc** (which has no install support and hides behind a Chrome UA) is detected via its injected `--arc-palette-*` CSS variables and gets an honest "open this in Chrome/Edge/Safari" message instead of instructions pointing at a nonexistent icon. Everything hides when the app already runs standalone.
-
-### Collector tools
-- **Shareable lists** generated from the current collection, in **Settings → Collector tools** — to bring to a swap meet or a trade:
-  - **Missing cards** — every card you don't own yet, grouped by category, with rarity and a ⭐ mark for wishlisted ones.
-  - **Doubles to trade** — cards flagged as doubles, with the exact duplicated types and copy counts.
-  - **Trade list** — a combined "looking for / offering" sheet.
-- Each is a plain, readable **text** block shown in a box with a **Copy** button (no file, no upload); the selection logic (`collector.js`) is pure and unit-tested.
-
-### Data & backup
-- **JSON export / import** of the collection (merge or replace on import).
-- **Backup code** (device-to-device, no file, no server): generate a short code (collection compressed with `CompressionStream` and base64url-encoded), copy it, paste it on another device to restore — with the same merge/replace choice as the file import. Codes also work embedded in a link (`…#backup=<code>`). Everything stays client-side.
-- **QR code transfer**: the backup code can also be shown as a **QR code** (encoding the `…#backup=<code>` link). Scan it with the target device to open the app and trigger the restore automatically — no typing, no camera scanner built into the app, no backend. Generated locally with a vendored QR encoder (no CDN). If the collection is too large to fit a reliably-scannable QR, the UI shows a fallback message pointing to the text code or JSON export instead of an unreadable QR.
-- **Backup reminder**: after 30 saved changes or 14 days without a backup, a toast nudges you to export or generate a code.
-- **Cloud backup (optional, manual)**: sign in with an email **OTP code** — the primary path because a magic link opens the default browser, not an installed PWA (the link is kept as a browser-side bonus). The app is **length-agnostic**: it accepts 6–10 digits (Supabase's "Email OTP Length" is configurable in that range) with whitespace normalisation. Note for self-hosters: the Supabase *Magic Link* email template must contain the `{{ .Token }}` variable for the code to appear in the mail, and customising that template requires a **custom SMTP** sender. Push/pull your collection to a **Supabase** table — in **pure REST `fetch()`, no SDK**, so the zero-runtime-dependency rule holds. One row per (user, season), protected by Row Level Security; `updated_at` is server-owned. Pull always goes through the merge/replace dialog — never a silent overwrite. Fully opt-in: with `cloud-config.js` empty the feature is disabled and the app behaves exactly as before. The service worker excludes the Supabase origin entirely (API responses are never cached). A send cool-down + 429 handling prevent locking yourself out of auth emails.
-- **In-app feedback (optional, cloud sign-in required)**: a "Share your feedback" section in Settings sends a suggestion/bug/other message straight to a Supabase `feedback` table — pure REST `fetch()`, RLS-protected (a user can only insert and re-read their *own* rows), with the app version and language attached, a 3–1000 character limit mirrored from the SQL constraint, a client cool-down plus a server-side throttle (max 5/hour per user, SQL trigger). The maintainer reads feedback in the Supabase dashboard and receives an **email per new entry** (a `pg_net` trigger calls the Resend API; the API key lives encrypted in the Supabase Vault — never in this repo).
-- **Backup contents (choose what travels)**: every channel (JSON, code, QR, cloud) can optionally include your **preferences** (language, theme, font, title) and — explicit opt-in with a warning — **security** (PIN, viewer mode). On restore, matching checkboxes decide what gets applied; restored preferences apply live without a reload. Old backups without settings import unchanged.
-- **Offline embedded fallback** (`data-embedded.js`): if the JSON files cannot be fetched, the app boots from data baked into the page.
-
-### User experience
-- **Interactive tutorial**: a 26-step guided tour (spotlight + bubble) that has you *perform* the real actions — add a card, count doubles, filter, validate/remove badges, read the stats, tour the settings. Runs in a **sandbox**: every change made during the tour is reverted on finish or quit, so your collection is untouched. Two escape hatches on every step (*skip this step* / *quit tutorial*, plus Esc). Auto-starts once after setup (`f1uno_onboarded` flag; existing installs are flagged silently), replayable anytime from Settings. Themed light + dark, translated in all 7 languages.
-- **Internationalisation (i18n)**: 7 languages — 🇬🇧 English, 🇫🇷 French, 🇪🇸 Spanish, 🇨🇳 Chinese, 🇮🇹 Italian, 🇳🇱 Dutch, 🇩🇪 German.
-- **First-launch language chooser**: before the PIN setup, a language-neutral screen (7 native language names + the prompt shown in all 7 languages at once — no wrong-language flash) lets you pick the language; setup and tutorial then run in it. Shown only when no language was ever chosen; existing installs never see it. The Settings selector remains the normal way to switch later.
-- **Self-hosted fonts + font picker**: all fonts are bundled locally as WOFF2 (no CDN). **Settings → Font** offers **5 themes** — *Circuit* (default), *Sprint*, *Prestige*, *Minimal*, *Original* — each a display + body pairing, applied instantly and persisted (`f1uno_font`, re-applied before render to avoid a flash). The default pair is precached; the others download on first use and then work offline. **Driver numbers keep their own fixed identity fonts** (Orbitron / Racing Sans One) and are deliberately *not* affected by the picker.
-- **Light / dark theme**, persisted and applied before render to avoid a flash of the wrong theme.
-- **Responsive design** from small phones (~320 px) to desktop — including the top bar, where the search field shrinks and secondary badges hide instead of overlapping — with a bottom tab bar (Collection / Badges / Stats / Settings).
-- **Inline SVG circuit outlines** on Grand Prix cards.
-- Accessibility care (ARIA roles, `aria-live` regions, keyboard navigation, PIN keypad support).
+<sub>More captures in [`screenshots/`](screenshots/) — light/dark themes, mobile.</sub>
 
 ---
 
-## 🛠️ Tech & dependencies
+## ✨ What it does
+
+Track a complete **F1 UNO Élite** trading-card collection (101 cards, each in up to 16 variants — base colours, foils, duals, Wild, Nitro, promos):
+
+- 📇 **Full collection management** — owned / doubles / wishlist / favourites, with per-variant quantities, instant search and deep filtering.
+- ✨ **Animated 6-level rarity system** — `epic → legendary → mythic → ultra → cosmic → divine`, computed automatically from the best owned variant; foil cards carry live light-sweep visuals and the top tier renders as a shifting iridescent gradient (all respecting `prefers-reduced-motion`).
+- 📴 **Works fully offline** — the whole app is precached by a service worker; after the first visit, airplane mode changes nothing.
+- 🔄 **Transparent auto-updates** — new versions are detected in the background and applied with one tap on a discreet banner, plus an in-app changelog ("what's new since *your* last version").
+- 🌍 **7 languages** — English, French, Spanish, Chinese, Italian, Dutch, German. Every string, badge and changelog entry.
+- 🎓 **Interactive 26-step tutorial** — a guided tour where you *perform* the real actions, running in a sandbox that reverts every change when it ends.
+- 🏅 **50 badges & titles** — 25 unlocked automatically from measured conditions, 25 self-declared.
+- 📊 **Stats dashboard** — global progress, rarity donut, per-category completion, highlights, and a day-by-day progression curve (pure SVG, no chart library).
+- 🔁 **Backups everywhere** — JSON export/import, a compressed device-to-device **backup code**, the same code as a scannable **QR link**, and an optional **cloud backup** (Supabase).
+- 🔐 **PIN lock, viewer mode & optional encryption** — a 4-digit PIN (SHA-256), a read-only sharing mode, and opt-in at-rest encryption of the collection (PBKDF2 + AES-GCM, keyed off the PIN — native Web Crypto).
+- 🤝 **Collector tools** — printable missing / doubles / trade lists to take to a swap meet.
+- 💬 **In-app feedback** — signed-in users can send suggestions or bug reports straight from Settings.
+
+---
+
+## 🛠️ Tech stack
 
 | Area | Choice |
 |---|---|
-| **Language** | Vanilla JavaScript (ES modules, ES6+), HTML5, CSS3 |
-| **Framework** | None (native DOM, zero runtime dependencies) |
-| **Build** | [esbuild](https://esbuild.github.io/) — bundles `app.js` + the modules into `app.bundle.js` (IIFE, minified, with sourcemap). Optional in dev, where the raw modules run unbundled. |
-| **Storage** | Browser `localStorage` |
-| **Offline / PWA** | Service Worker (versioned precache, cache-first shell, runtime cache for external assets) + Web App Manifest |
-| **Crypto** | Web Crypto API (SHA-256 for the PIN); `CompressionStream` for backup codes |
-| **QR** | `qrcodegen.js` — vendored QR encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), **MIT**), trimmed to byte-mode + SVG output |
-| **Data** | Static JSON files (+ an embedded JS copy for the offline fallback) |
-| **Fonts** | **Self-hosted** WOFF2 (latin subset) in `fonts/`, all **SIL OFL** (see `fonts/LICENSES`) — Space Grotesk, Inter, Chakra Petch, IBM Plex Sans, Fraunces, Source Sans 3, Manrope, Syne, DM Sans (UI themes) + Orbitron & Racing Sans One (driver-number identity) |
-| **Tests** | Node's built-in test runner (`node --test`) — no test framework installed |
-| **External assets** | F1/UNO logos (Wikimedia), team logos & driver photos (formula1.com) |
+| Language | **Vanilla JavaScript** (native ES modules), HTML5, CSS3 — no framework |
+| Runtime dependencies | **Zero.** No npm packages, no CDN, no SDK at runtime |
+| Build | [esbuild](https://esbuild.github.io/) (the *only* devDependency) → one minified IIFE bundle |
+| Offline / PWA | Hand-written Service Worker (versioned precache, cache-first shell) + Web App Manifest |
+| Cloud (optional) | **Supabase over raw REST `fetch()`** — no SDK; OTP email auth, Row Level Security |
+| Crypto | Native **Web Crypto** — SHA-256 (PIN), PBKDF2 + AES-GCM (optional at-rest encryption) |
+| QR codes | Vendored single-file encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
+| Fonts | Self-hosted WOFF2 (SIL OFL) — no Google Fonts request, 5 switchable font themes |
+| Tests | **Node's built-in test runner** (`node --test`) — 166 tests, no test framework |
+| CI | GitHub Actions — tests + build + committed-bundle freshness check on every push/PR |
 
-> **No npm/CDN runtime dependencies.** The only tooling dependency is **esbuild** (a `devDependency` in `package.json`); the test runner is built into Node. Fonts are **self-hosted** locally (no Google Fonts request), each under the SIL Open Font License (`fonts/LICENSES`). One third-party source file is *vendored* into the repo — `qrcodegen.js`, the QR encoder by Project Nayuki (MIT, provenance and licence noted in the file header) — so QR generation works fully offline without pulling anything at runtime.
+**Zero runtime dependencies is a design rule, not an accident.** Everything a framework or SDK would normally provide — rendering, routing between views, i18n, offline caching, auth over REST, encryption, QR generation — is implemented directly on web platform APIs. The app you install is exactly the code in this repo.
 
 ---
 
-## 🚀 Installation & usage
+## 🧗 Technical challenges
 
-### Requirements
-A modern browser **and a local HTTP server**. Node.js is only needed if you want to (re)build the production bundle.
+The problems that actually shaped this codebase, and how they were solved:
 
-> ⚠️ **A local HTTP server is required.** Opening the page directly from the filesystem (`file://`, i.e. double-clicking) does **not** work properly:
-> - the development entry point (`index-dev.html`) loads native **ES modules**, which browsers block over `file://` for CORS/security reasons;
-> - even the bundled `index.html` cannot `fetch()` the `data/*.json` files over `file://`, so it would only ever run in a degraded mode using the **embedded fallback** (`data-embedded.js`) — a single baked-in season, no dynamic data loading.
->
-> Serve the folder over HTTP and everything (module loading, `data/` fetching, season switching) works. The embedded fallback still applies whenever a JSON fetch fails.
+### Offline-first *and* always up to date
+**Problem:** a cache-first service worker makes the app bulletproof offline — and excellent at serving stale code forever. Installed PWAs are worst hit: they can stay open for days without a navigation, so the browser never re-checks the worker on its own.
+**Solution:** the new worker downloads in the background and deliberately parks in the *waiting* state (no auto `skipWaiting`— swapping the shell under a running app is how you corrupt state). The app shows a one-tap "new version — reload" banner that promotes it via a `SKIP_WAITING` message; ignored banners resolve on the next cold start. Installed PWAs additionally call `registration.update()` on every return to the foreground and hourly. The app version is derived from the newest changelog entry, so releasing *is* writing the changelog — version and history cannot drift apart.
 
-### Option A — run from source, no build (development)
+### Email sign-in that survives an installed PWA
+**Problem:** classic magic-link auth breaks in installed PWAs: the link opens in the default browser — a different storage partition — so the session lands where the app isn't.
+**Solution:** authentication uses **email OTP codes** as the primary path: the code is typed into the app itself, so the session is created in the right context every time. The magic link still works as a browser-side bonus. The whole GoTrue flow (send, verify, refresh, expiry margin) is implemented over raw `fetch()` — no Supabase SDK.
 
-Serve the folder and open **`index-dev.html`**, which loads the unbundled ES modules directly:
+### A service worker that never touches the API
+**Problem:** a precaching service worker that intercepts everything will happily serve a cached API response — a silent data-corruption bug that only appears in production.
+**Solution:** the worker excludes the Supabase origin entirely (requests fall through untouched), and cloud calls also send `cache: 'no-store'`. Belt and braces, verified by tests.
+
+### A CSS refactor proven identical, byte for byte
+**Problem:** migrating hundreds of hard-coded spacing values to design tokens with "it looks the same to me" as the only guarantee.
+**Solution:** exact-match substitution only (no rounding to the nearest token), then a proof: resolve every `var()` in both the before and after stylesheets down to pixel values and byte-compare the two — mathematically identical rendering, off-scale values left untouched and inventoried for a later, deliberate pass.
+
+### Feedback with email notifications — without a server
+**Problem:** the maintainer wants an email for each piece of in-app feedback, but there is no backend to send one.
+**Solution:** a Postgres trigger on the `feedback` table calls the Resend API through `pg_net`, entirely inside Supabase. The API key lives encrypted in the Supabase Vault (never in this repo), user content is HTML-escaped, and a failing email can never block the insert. Client-side: a cooldown; server-side: an SQL throttle (max 5/hour per user) enforced by trigger.
+
+### 7 languages with no i18n library
+**Problem:** every user-facing string — UI, badges, tutorial, changelog entries, error messages — in 7 languages, without a framework to enforce discipline.
+**Solution:** a tiny `t()` helper over dictionary files, `data-i18n` attributes for static markup, and unit tests that fail if a changelog entry ever misses one of the 7 languages. English is the declared fallback; a hard project rule says an English-only string is an incomplete change.
+
+### Testing a browser app without a browser
+**Problem:** keeping a zero-dependency promise rules out Jest, Vitest and headless-browser harnesses.
+**Solution:** the logic was factored to be browser-free (rarity math, storage migration, backup encoding, stats, badges, encryption, cloud helpers, update logic…) and is covered by **166 tests on Node's built-in runner** — zero test dependencies, no real network (every cloud test stubs `fetch`). CI also rebuilds the bundle and fails if the committed artifact is stale, so the deployed code provably matches the sources.
+
+---
+
+## 🚀 Getting started
+
+A modern browser and any static HTTP server (`file://` won't do — ES modules and JSON `fetch()` are blocked there).
 
 ```bash
-# With Python
+# Development — no build step, raw ES modules:
 python3 -m http.server 8000
+# → http://localhost:8000/index-dev.html
 
-# or with Node.js
-npx serve .
+# Production bundle:
+npm install     # installs esbuild, the only devDependency
+npm run build   # app.js → app.bundle.js (minified + sourcemap)
+# → http://localhost:8000/  (index.html)
+
+# Tests:
+npm test        # 166 tests, node --test, no framework
 ```
 
-Then open **http://localhost:8000/index-dev.html**.
+### Deployment
 
-### Option B — build the production bundle
-
-`index.html` loads `app.bundle.js`, a single minified IIFE bundle produced by esbuild. Generate it, then serve the folder:
-
-```bash
-npm install          # installs esbuild (the only devDependency)
-npm run build        # bundles app.js -> app.bundle.js (minified + sourcemap)
-# npm run dev        # same, unminified, rebuilt on change (watch mode)
-
-python3 -m http.server 8000
-```
-
-Then open **http://localhost:8000/** (i.e. `index.html`).
-
-> `app.bundle.js` is a generated artifact — after editing any `*.js` module, re-run `npm run build` (or keep `npm run dev` running) to refresh it.
-
-### Option C — deploy to GitHub Pages
-
-GitHub Pages serves this folder **as-is** (no server-side build), from a sub-path. This repo **is** deployed that way: **<https://arts44.github.io/f1-uno-elite/>**. What makes it work:
-
-- **All URLs are relative** — HTML assets, `manifest.webmanifest` (`start_url`/`scope` = `./`), the service-worker registration (`sw.js`, scope = the sub-folder) and its precache list, and every `fetch()` in the code. Nothing starts with `/`, so the app works identically at the domain root, under a sub-path, and on localhost.
-- **The built bundle is committed** (`app.bundle.js` + sourcemap) precisely because Pages runs no `npm` step. Rebuild it before every commit that touches a JS source (`npm run build`); a local git *pre-commit* hook automates this in this working copy (rebuild + `git add app.bundle.js*` whenever a staged JS source changed — hooks aren't versioned, so recreate it after a fresh clone).
-- **Publishing**: push the repo to GitHub, then *Settings → Pages → Source: Deploy from a branch → Branch: `main` / root*. The site appears at `https://<user>.github.io/<repo>/` after a minute or two.
-- **Updates**: the service worker precaches the app shell version-tagged by `SW_VERSION` (in `sw.js`). Bump it on every release — returning visitors get an in-app **"new version — Reload" banner** as soon as the new worker has downloaded (on their next visit, or within the hour in an already-open installed PWA); one click applies it. Ignored banners resolve themselves on the next cold start.
-- **Release routine**: edit sources → **add a `CHANGELOG` entry in `changelog.js`** (new version number + date + the changes in all 7 languages — this IS the app-version bump) → `npm run build` (the local pre-commit hook also enforces this) → bump `SW_VERSION` if any precached file changed (for a release, it always did) → commit → `git push`. Pages redeploys automatically in ~1–2 minutes.
-
-### Tests
-
-The unit test suite uses **Node's built-in test runner** (`node --test`) — no test framework is installed, keeping the zero-runtime-dependency promise intact (esbuild remains the only devDependency).
-
-```bash
-npm test             # run the whole suite once
-npm run test:watch   # re-run on file change
-```
-
-**Continuous integration**: a GitHub Action ([.github/workflows/tests.yml](.github/workflows/tests.yml)) runs on every push and pull request to `main` — it executes the full test suite (`npm test` on Node 22), then the production build (`npm run build`), and finally verifies that the **committed `app.bundle.js` is up to date** with the sources (a stale committed bundle would mean the live app doesn't match the code; esbuild is version-pinned and deterministic, so a rebuild-and-diff is reliable). Results appear in the repo's **Actions** tab and as the status badge at the top of this README; a red run on a PR blocks nothing by itself but tells you exactly which step failed and why before it reaches Pages.
-
-The suite currently counts **166 tests, all green** (`npm test`). Tests live in `tests/` (one file per module) and run against small self-contained fixtures (`tests/_fixtures.js`), not the real `data/` files — except a few assertions that deliberately validate the real `metadata.json` / `data-embedded.js` parity. A minimal browser shim (`tests/_setup.js`) provides `localStorage` and a null-object `document`; no rendering is simulated.
-
-**Covered** (logic only, no browser):
-- **Rarity** — `baseCardRarity` / `variantRarity` (foil bonuses, index clamp) / `cardRarity` (best owned variant, qty-0 edge cases), plus the 6-rarity scale integrity in the real metadata and its embedded fallback.
-- **Storage migration** — legacy v1 keys → season-scoped v2 keys, idempotence, no-overwrite, corrupted-data fallback.
-- **Backup codes** — snapshot → compress → base64url round-trip, `#backup=` link format, rejection of corrupted/invalid codes, size threshold (`tooBig`).
-- **Stats** — `computeStats()` aggregates (owned/wishlist/doubles/missing/favorites, copies, %) on a known fixture collection, `rarityTextColor` contrast picks.
-- **Badges** — `evaluateBadgeCondition` for every metric, target clamping, unlock persistence (`isAutoBadgeUnlocked`).
-- **History** — one point per day (same-day updates in place), 365-point cap, corrupted-data fallback.
-- **Collector tools** — `missingCards` (incl. the qty-0-owned edge and the wishlist subset), `doublesList` (duplicated types + qty), `tradeList`.
-- **Tutorial** — localStorage snapshot/restore round-trip on a non-empty collection (data safety), step-sequence integrity (unique ids, pedagogical order, condition-based close steps, the force-remove badge step).
-- **Install** — platform detection from real user-agent fixtures (iPhone/iPad/iPadOS-desktop/mac Safari/Chrome/Edge/Android/Firefox), instruction-key routing incl. the Arc case, standalone detection.
-- **Language gating** — the first-launch language screen shows only when no language was ever chosen and setup isn't done.
-- **Cloud** — magic-link hash parsing, session expiry margin and persistence, request headers, JWT sub decoding, upsert row shape, OTP verify request (stubbed fetch) incl. wrong-code and 429 paths, OTP input format (6–10 digits, whitespace normalization), send cool-down, configuration gate.
-- **Settings in backups** — gather/apply per category, partial restore choices, backward compatibility (no `settings` field), remembered export choice, key coverage (the cloud session token can never travel).
-- **Local encryption** — clear→encrypted migration without loss (round-trip verified per key, non-data keys untouched), fresh-session unlock, wrong-PIN rejection with ciphertexts intact, interrupted-migration tolerance, PIN disable → back to clear, PIN change → re-key, decrypt-failure quarantine (data moved aside, never deleted), passthrough when off.
-- **Feedback** — message validation (trimmed 3–1000, like the SQL constraint), payload shape and clamping (type fallback, version/lang limits), cool-down, and the full send path against a stubbed `fetch` (201, 401 session expired, the SQL throttle's `rate_limited`, network down) — no real network in the suite.
-- **Updates & changelog** — numeric version comparison (incl. the `1.10 > 1.9` trap), changelog-entry selection since a given version, the "what's new" offer gate (fresh install / same version / rollback → silent), seen-version persistence, changelog data integrity (descending versions, valid dates, all 7 languages on every entry, `APP_VERSION` = newest entry).
-
-**Not covered — tested manually in the browser**: DOM rendering (grid, modal, sidebar, stats views), Service Worker / offline behavior, PWA install, QR code visual output, theming/font-switching/animations, the interactive tutorial's DOM engine (its snapshot/restore and step sequence *are* covered), the collector-tools UI (its selection logic *is* covered above), and **real network calls to the Supabase API** — every cloud test stubs `fetch` (no email is ever sent by the suite), so the live auth/push/pull path is verified manually against the real project.
-
-### First run
-1. On first launch, a **language chooser** appears first (7 languages), then a setup screen lets you optionally define a **PIN code** (or skip it), followed by the **interactive tutorial** (auto-starts only once; replayable from Settings) — all in the chosen language.
-2. Navigate between **Collection / Badges / Stats / Settings** via the bottom bar.
-3. Mark owned variants from a card's detail modal.
-4. Optionally pick a **font theme** and language in **Settings**.
-5. Export your collection to JSON — or generate a **backup code / QR** — from **Settings** regularly to back it up.
-
-### Install as an app (PWA) & offline use
-- On the **first load** over http/https, `app.js` registers the Service Worker, which precaches the app shell. From the **next load** on, the page itself is served from cache and the app works **fully offline** (a reload after the first visit is enough to be under Service Worker control).
-- **Settings → Install the app** offers a native **Install** button where the browser supports it (Chrome/Edge/Android; a discreet banner appears too), and correct manual instructions elsewhere (iOS/macOS Safari, Android menu, an honest message in Arc). It then runs standalone with its own icon.
-- Note for maintainers: assets are served **cache-first**, so after changing any shell file, bump `SW_VERSION` in `sw.js` — the new worker re-precaches everything (bypassing the browser HTTP cache, so it always fetches the current files) and drops the old cache on activation.
-- The Service Worker does not register on `file://` (the `'serviceWorker' in navigator` guard skips it) — that's expected; serve over HTTP.
-
-### Move your collection to another device (backup code / QR)
-1. On the source device: **Settings → Backup code → 🔑 Generate**, then either **Copy the code** or **📱 QR code**.
-2. Transfer it:
-   - **By code**: send the text code to yourself (it's compressed + base64url, typically a few hundred characters; nothing is uploaded anywhere) and, on the target device, **Settings → Restore from code → 📋 Paste a code**.
-   - **By QR**: scan the displayed QR with the target device — it opens the app via a `#backup=` link and starts the restore automatically.
-3. Either way, choose **merge** or **replace** in the dialog (same flow as the JSON file import).
-4. If your collection is too large for a practical code (> 4 000 characters) or a reliably-scannable QR, the UI tells you and points you to the **JSON file export** instead.
-
-### Adding a new season
-1. Create `data/cards-2026.json` with the same structure as `cards-2025.json`.
-2. Update `data/metadata.json` if new teams/drivers appear.
-3. Because the header only lists 2025 plus seasons you already have saved data for, a brand-new season also needs to become reachable in the UI (e.g. once data for it exists in `localStorage`, its pill appears and `switchSeason` fetches the new file).
+The repo deploys **as-is** to GitHub Pages (static, no server build): every URL is relative, so the app runs identically at a domain root, under a sub-path, and on localhost. The built bundle is committed because Pages runs no npm step; CI verifies it never goes stale. Release routine: add a changelog entry (that *is* the version bump) → bump `SW_VERSION` in `sw.js` → build → push. Returning visitors get the update banner.
 
 ---
 
-## 📁 File structure
+## ⚖️ Honest limits
 
-The app source is split into focused **ES modules** loaded from the `app.js` entry point. Three global helper scripts (`data-embedded.js`, `translations.js`, `card-descriptions.js`) are loaded as classic scripts *before* the app, since they expose `window` globals the modules read. For production these modules are bundled by esbuild into `app.bundle.js`.
-
-```
-F1/
-├── index.html            # Production markup; loads the bundled app.bundle.js
-├── index-dev.html        # Dev markup; loads app.js as native ES modules (no build)
-├── styles.css            # Styles (themes, grid, cards, responsive)
-├── manifest.webmanifest  # Web App Manifest (installable PWA, relative start_url/scope)
-├── sw.js                 # Service worker: versioned precache, cache-first shell,
-│                         #   stale-while-revalidate runtime cache for external assets
-├── favicon.ico           # Favicon (16/32/48, derived from the app icon)
-├── icons/                # App icon "the card fan" (red bg): icon.svg (source of truth)
-│                         #   + icon-192/512.png exports (any maskable, fan inside the safe zone)
-├── screenshots/          # Manifest install screenshots (desktop-* wide, mobile-* narrow)
-├── fonts/                # Self-hosted WOFF2 (UI + driver-number fonts) + LICENSES (SIL OFL)
-│
-├── app.js                # ES module entry point: initApp, initEvents, startup, SW registration
-├── logger.js             # DEBUG-gated logger (log()/warn() are no-ops in prod)
-├── i18n.js               # Languages, t(), applyLanguage()
-├── data.js               # Static DB constants + JSON loaders + season switching
-├── storage.js            # localStorage, collection state, card/rarity helpers, import/export
-├── backup.js             # Backup code + QR (compress/encode, decode/validate, #backup= link, reminder)
-├── qrcodegen.js          # Vendored QR encoder (Project Nayuki, MIT) — byte mode + SVG
-├── history.js            # Daily owned-count snapshots for the Stats progression curve
-├── collector.js          # Missing / doubles / trade-list selection logic (pure, tested)
-├── tutorial.js           # Interactive guided tour (sandboxed, auto once, replayable)
-├── install.js            # PWA install helper (native prompt, banner, per-platform/Arc instructions)
-├── cloud.js              # Optional Supabase cloud backup — pure REST fetch (OTP auth, push/pull)
-├── settings-sync.js      # Optional settings section in backups (prefs / security categories)
-├── update.js             # Automatic updates: SW registration, "reload" banner, what's-new offer
-├── changelog.js          # Version history (7 languages) — APP_VERSION derives from its newest entry
-├── secure-store.js       # Optional at-rest encryption of collection data (PBKDF2 + AES-GCM, PIN-keyed)
-├── feedback.js           # In-app feedback to Supabase (REST, RLS own-rows, sign-in required)
-├── badges.js             # Badge evaluation/rendering + user titles
-├── stats.js              # computeStats() + updateStats() + renderStats() (progression, highlights, donut)
-├── render.js             # Grid, sidebar, filters, modal, search, views, toast
-├── pin.js                # Auth/PIN, viewer & admin modes, settings (backup/QR, font picker, collector tools)
-│
-├── app.bundle.js         # Generated esbuild bundle (+ app.bundle.js.map)
-├── package.json          # esbuild build/dev + test scripts, devDependency (esbuild only)
-│
-├── translations.js       # i18n dictionaries (7 languages) → window.__T / window.__BADGE_T
-├── card-descriptions.js  # Card description texts → window.__CARD_DESC / getCardDesc()
-├── data-embedded.js      # Embedded data for the offline fallback → window.__F1UNO_EMBEDDED
-├── cloud-config.js       # Supabase URL + anon public key (classic script; empty = cloud disabled)
-├── extract_data.mjs      # Dev tool: data extraction/generation
-│
-├── tests/                # node --test suites + fixtures (_setup.js, _fixtures.js)
-├── docs/
-│   └── CLOUD-SYNC-DESIGN.md  # Cloud-sync design doc (options studied, decisions taken)
-├── LICENSE               # MIT
-└── data/
-    ├── metadata.json     # Static config (types, rarities, teams, drivers…)
-    ├── cards-2025.json   # 101 cards for the 2025 season
-    ├── circuits.json     # SVG circuit outlines
-    └── badges.json       # 50 badges (25 auto + 25 manual) and their conditions
-```
-
-> **Debug logging** is centralised in `logger.js` behind a `DEBUG` flag (`export const DEBUG = false`). With `DEBUG` off, `log()`/`warn()` are no-ops, so production emits no debug output. Genuine error logging (`console.error`/`console.warn`) is preserved.
-
-### Data formats (summary)
-
-- **`metadata.json`** — `cardTypes`, `rarities`/`rarityKeys`/`rarityOrder` (6 levels: epic…divine), `typeBadgeRarity` + `typeBadgeStyles` (the separate type-pill colour/star ladder), `categories`, `driverNumbers`, `teamColors`, `teamLogos`, `driverImages`, `teamLogoBg`, `teamLogoNoeffects`, `roleBaseRarity`.
-- **`cards-XXXX.json`** — array of cards: `id`, `season`, `number`, `name`, `team`, `category`, `nationality`, `champion`, `championYears`, `description`, `tags`, `types[]`, `retired`.
-- **`badges.json`** — `auto[]` (each with a `condition`: `metric`, `operator`, `value`, optional `typeFilter`) and `manual[]`.
-
-**Available badge condition metrics:** `owned_count`, `wishlist_count`, `doubles_count`, `favorite_count`, `total_qty`, `category_owned`, `champion_owned`, `type_owned`.
-
-### `localStorage` versioning
-
-| Version | Keys | Description |
-|---|---|---|
-| v1 | `f1uno_v3`, `f1uno_badges`, `f1uno_auto_badges` | Old format (no season scope) |
-| v2 | `f1uno_owned_2025`, `f1uno_badges_2025`, `f1uno_auto_badges_2025`, `f1uno_history_2025` | Season-scoped format (incl. the Stats progression history) |
-
-Shared (non-scoped) keys: `f1uno_theme`, `f1uno_lang`, `f1uno_font`, `f1uno_title`, `f1uno_version`, `f1uno_onboarded`, PIN/viewer keys (`f1uno_pin_enabled`, `f1uno_pin_hash`, `f1uno_setup_done`, `f1uno_viewer_enabled`), backup-reminder keys (`f1uno_last_backup`, `f1uno_changes_since_backup`), `f1uno_install_dismissed` (install banner opt-out), `f1uno_seen_version` (last app version seen — drives the "what's new" offer), encryption keys (`f1uno_enc_enabled`, `f1uno_enc_salt`, `f1uno_enc_check`, plus `f1uno_enc_orphan_*` quarantine slots after a failed decrypt), `f1uno_cloud_session` (Supabase session tokens — device-local, **never included in any backup**) and `f1uno_backup_inc_prefs`/`f1uno_backup_inc_sec` (remembered backup-contents choice). Migration v1 → v2 runs automatically on first load.
+- **The PIN is an interface barrier, not strong security.** Without the optional encryption, the collection is readable in `localStorage` via DevTools. With encryption on, casual snooping is blocked — but a 4-digit PIN can be brute-forced offline by someone holding the device. It protects against opportunistic peeking, not experts. A forgotten PIN makes an encrypted local collection unrecoverable — keep backups.
+- **Cloud sign-in runs on a test email domain.** Auth and feedback emails are currently sent through default/test sender domains with tight rate limits — fine for a personal project, not production-grade email delivery. A custom SMTP/domain would lift this.
+- **Progression history has no back-fill** — the stats curve starts the day the feature was installed; there is no per-card timestamp to reconstruct the past from.
 
 ---
 
-## 🔮 Roadmap
-
-### Nothing major open
-The last roadmap item — **optional cloud backup** — is now shipped (manual push/pull to Supabase in pure REST, per the validated design in [docs/CLOUD-SYNC-DESIGN.md](docs/CLOUD-SYNC-DESIGN.md); the "minimal push/pull first" recommendation is what was built).
-
-### Ideas — not committed
-None of these is planned or in progress; they are noted so they don't get lost:
-- **Automatic background sync** (pull at launch, debounced push) instead of manual push/pull.
-- **E2E encryption** of the cloud payload with a passphrase (AES-GCM via WebCrypto) — the server would only ever see ciphertext, at the cost of unrecoverable backups if the passphrase is lost.
-- A **"delete my cloud data"** button (today: sign out locally; deletion goes through the Supabase dashboard).
-- **2026 season** dataset (`data/cards-2026.json`) once the cards exist — the multi-season plumbing is already in place.
-
-> Already shipped, not part of the roadmap: ES-module split of the former monolith, `DEBUG`-gated logging, esbuild production bundle, a **`node --test` unit-test suite**, **installable offline PWA** (manifest with maskable icons + screenshots, favicon, service worker), **device-to-device backup codes + QR transfer**, the **enriched Stats view** (progression curve, highlights, rarity donut) with a unified colour redesign, the **6-level rarity system** with the animated iridescent *divine* tier, **self-hosted fonts with a 5-theme picker**, the **interactive guided tutorial**, **collector tools** (missing / doubles / trade lists), the **first-launch language chooser**, the **guided PWA install experience**, the **optional Supabase cloud backup** (pure REST, OTP sign-in, manual push/pull) and **optional settings in backups**.
-
----
-
-## 📜 License
+## 📜 License & trademarks
 
 Released under the **MIT License** — see [LICENSE](LICENSE). © 2026 Arthur.
 
-> **Trademark note:** "F1" and "UNO", along with team/driver logos and images, are the property of their respective owners. This project is an **unofficial**, personal/educational collection-tracking tool and is not affiliated with, endorsed by, or sponsored by Formula 1, Mattel, or any team.
+> "F1" and "UNO", along with team/driver logos and images, are the property of their respective owners. This is an **unofficial**, personal collection-tracking tool, not affiliated with, endorsed by, or sponsored by Formula 1, Mattel, or any team.
