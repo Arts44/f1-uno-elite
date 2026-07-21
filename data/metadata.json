@@ -171,7 +171,7 @@
     },
     "legendary": {
       "label": "Légendaire",
-      "color": "#A16B00",
+      "color": "#FFB300",
       "stars": 2
     },
     "mythic": {

@@ -55,20 +55,38 @@ describe('rarityTextColor', () => {
     assert.equal(rarityTextColor('red'), '#fff');
     assert.equal(rarityTextColor('#12345'), '#fff');
   });
-  // Design invariant: every non-divine rarity chip is white-on-color, with
-  // WCAG AA contrast for small text (>= 4.5:1). If a future palette tweak
-  // brightens a rarity past what white can bear, this fails loudly.
-  test('every shipped rarity color takes white text at >= 4.5:1', () => {
+  // Design invariant: LEGIBILITY, not a specific text colour. Every
+  // non-divine rarity chip must reach WCAG AA for small text (>= 4.5:1)
+  // with whatever colour rarityTextColor() picks — white on the dark
+  // rarities, near-black on a light one (legendary's bright amber).
+  // A palette tweak landing in the unreadable middle band fails loudly.
+  test('every shipped rarity color is legible with its chosen text color', () => {
     const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
-    const whiteContrast = hex => {
+    const lum = hex => {
       const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
         .map(c => c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-      return 1.05 / (0.2126 * r + 0.7152 * g + 0.0722 * b + 0.05);
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const contrast = (bg, fg) => {
+      const [a, b] = [lum(bg), lum(fg)].sort((x, y) => y - x);
+      return (a + 0.05) / (b + 0.05);
     };
     for(const [key, r] of Object.entries(meta.rarities)){
       if(key === 'divine') continue; // animated gradient, own treatment
-      assert.equal(rarityTextColor(r.color), '#fff', `${key} (${r.color}) must take white text`);
-      assert.ok(whiteContrast(r.color) >= 4.5, `${key} (${r.color}): white contrast ${whiteContrast(r.color).toFixed(2)}:1 < 4.5`);
+      const fg = rarityTextColor(r.color);
+      assert.ok(fg === '#fff' || fg === '#141414', `${key}: unexpected text color ${fg}`);
+      const c = contrast(r.color, fg === '#fff' ? '#ffffff' : '#141414');
+      assert.ok(c >= 4.5, `${key} (${r.color}) with ${fg}: contrast ${c.toFixed(2)}:1 < 4.5`);
+    }
+  });
+
+  // The five dark rarities stay white-on-colour; only legendary flips.
+  test('legendary is the only rarity taking dark text', () => {
+    const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
+    for(const [key, r] of Object.entries(meta.rarities)){
+      if(key === 'divine') continue;
+      const expected = key === 'legendary' ? '#141414' : '#fff';
+      assert.equal(rarityTextColor(r.color), expected, `${key} (${r.color})`);
     }
   });
 });

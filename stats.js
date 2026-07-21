@@ -131,10 +131,12 @@ export function renderStats(){
 
   function pctColor(p){
     // Semantic completion steps (theme-aware vars, no muddy HSL midtones):
-    // low = missing red, mid = wishlist amber, high = owned green
+    // low = red, mid = amber, high = owned green. These are progress
+    // steps, NOT the wishlist/missing categories — they keep their own
+    // --pr-* tokens so recolouring a stat category never shifts them.
     if(p >= 67) return 'var(--st-owned)';
-    if(p >= 34) return 'var(--st-wish)';
-    return 'var(--st-missing)';
+    if(p >= 34) return 'var(--pr-mid)';
+    return 'var(--pr-low)';
   }
 
   function svRow(icon, name, n, tot, pct){

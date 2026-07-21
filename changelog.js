@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.12.0',
+    date: '2026-07-21',
+    changes: {
+      en: [
+        'The legendary rarity gets a brighter, richer gold — far more striking than the old dark amber, and still perfectly readable.',
+        'Wishlist changes colour: it is now magenta instead of gold, so it no longer gets confused with the legendary rarity.',
+        'Stats tiles are clearer: favourites take the app’s red (like the heart on your cards) and missing cards turn a neutral slate — every category now has its own distinct colour.',
+      ],
+      fr: [
+        'La rareté légendaire adopte un or plus vif et plus riche — bien plus éclatant que l’ambre foncé précédent, et toujours parfaitement lisible.',
+        'La wishlist change de couleur : magenta au lieu du doré, elle ne se confond donc plus avec la rareté légendaire.',
+        'Les tuiles de stats sont plus claires : les favoris prennent le rouge de l’app (comme le cœur sur vos cartes) et les manquantes passent en gris ardoise — chaque catégorie a désormais sa couleur propre.',
+      ],
+      es: [
+        'La rareza legendaria estrena un dorado más vivo y rico — mucho más llamativo que el ámbar oscuro anterior, y sigue siendo perfectamente legible.',
+        'La wishlist cambia de color: ahora es magenta en lugar de dorada, así que ya no se confunde con la rareza legendaria.',
+        'Las tarjetas de estadísticas son más claras: los favoritos toman el rojo de la app (como el corazón de tus cartas) y las faltantes pasan a gris pizarra — cada categoría tiene ya su color propio.',
+      ],
+      zh: [
+        '传奇稀有度换上更明亮、更浓郁的金色——比原先的暗琥珀色抢眼得多，且依然清晰易读。',
+        '愿望清单换色：由金色改为洋红色，不再与传奇稀有度混淆。',
+        '统计卡片更清晰：收藏夹采用应用的红色（与卡牌上的爱心一致），缺失卡改为中性石板灰——每个类别现在都有专属颜色。',
+      ],
+      it: [
+        'La rarità leggendaria adotta un oro più vivo e ricco — molto più incisivo del vecchio ambra scuro, e sempre perfettamente leggibile.',
+        'La wishlist cambia colore: ora è magenta anziché dorata, quindi non si confonde più con la rarità leggendaria.',
+        'I riquadri delle statistiche sono più chiari: i preferiti prendono il rosso dell’app (come il cuore sulle tue carte) e le mancanti passano a un grigio ardesia — ogni categoria ha ora un colore tutto suo.',
+      ],
+      nl: [
+        'De legendarische zeldzaamheid krijgt een helderder, rijker goud — veel opvallender dan het oude donkere amber, en nog steeds prima leesbaar.',
+        'De verlanglijst verandert van kleur: nu magenta in plaats van goud, zodat verwarring met de legendarische zeldzaamheid verdwijnt.',
+        'De statistiektegels zijn duidelijker: favorieten krijgen het rood van de app (net als het hartje op je kaarten) en ontbrekende kaarten worden leigrijs — elke categorie heeft nu een eigen kleur.',
+      ],
+      de: [
+        'Die Seltenheit „legendär" erhält ein helleres, satteres Gold — deutlich markanter als das bisherige dunkle Bernstein und weiterhin gut lesbar.',
+        'Die Wunschliste wechselt die Farbe: jetzt Magenta statt Gold, damit sie nicht mehr mit der legendären Seltenheit verwechselt wird.',
+        'Die Statistikkacheln sind klarer: Favoriten übernehmen das Rot der App (wie das Herz auf deinen Karten) und fehlende Karten werden schiefergrau — jede Kategorie hat nun ihre eigene Farbe.',
+      ],
+    },
+  },
+  {
     version: '1.11.1',
     date: '2026-07-21',
     changes: {
