@@ -2,7 +2,7 @@
 
 # 🏎️ F1 UNO Élite — Collection Tracker
 
-**Ein offline-first, installierbarer Sammelkarten-Tracker, gebaut mit Vanilla JavaScript und null Laufzeitabhängigkeiten — kein Framework, kein SDK, kein CDN, kein Backend nötig.**
+**Ein offline-first, installierbarer Sammelkarten-Tracker, gebaut mit Vanilla JavaScript und null Laufzeitabhängigkeiten — kein Framework, kein SDK, kein CDN, kein Backend.**
 
 [![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
@@ -13,34 +13,33 @@
 
 ## ▶️ **[Live ausprobieren → arts44.github.io/f1-uno-elite](https://arts44.github.io/f1-uno-elite/)**
 
-Es ist eine **PWA**: Aus dem Browser heraus installiert läuft sie wie eine native App, vollständig offline, mit eigenem Icon — auf Desktop und Mobilgerät.
+Es ist eine **PWA**: aus dem Browser installiert läuft sie wie eine native App, vollständig offline, mit eigenem Icon — auf Desktop und Mobilgerät.
 
 ![Sammlungsraster — dunkles Theme](screenshots/grid-desktop-dark.jpg)
 
-| Kartendetail — animierte Foil-Typen | Statistik-Dashboard |
+| Kartenansicht — animierte Foil-Typen | Statistik-Dashboard |
 |---|---|
 | ![Kartenmodal](screenshots/modal-dark.jpg) | ![Statistikansicht](screenshots/stats-light.jpg) |
 
-<sub>Weitere Aufnahmen in [`screenshots/`](screenshots/) — helles/dunkles Theme, mobil.</sub>
+<sub>Weitere Aufnahmen in [`screenshots/`](screenshots/) — helles und dunkles Theme, Desktop und mobil.</sub>
 
 ---
 
 ## ✨ Was sie kann
 
-Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten (101 Karten, jede in bis zu 16 Varianten — Grundfarben, Foils, Duals, Wild, Nitro, Promos):
+Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten — 101 Karten, jede in bis zu 16 Varianten (Grundfarben, Foils, Duals, Wild, Nitro, Promos):
 
-- 📇 **Vollständige Sammlungsverwaltung** — im Besitz / Dubletten / Wunschliste / Favoriten, mit Stückzahlen pro Variante, Sofortsuche und umfangreichen Filtern.
-- ✨ **Animiertes 6-stufiges Seltenheitssystem** — `epic → legendary → mythic → ultra → cosmic → divine`, automatisch aus der besten Variante im Besitz berechnet; Foil-Karten tragen bewegte Lichtreflexe, und die höchste Stufe erscheint als wandernder irisierender Verlauf (alles unter Beachtung von `prefers-reduced-motion`).
-- 📴 **Funktioniert komplett offline** — die gesamte App wird von einem Service Worker vorgecacht; nach dem ersten Besuch ändert der Flugmodus nichts mehr.
-- 🔄 **Transparente Auto-Updates** — neue Versionen werden im Hintergrund erkannt und mit einem Tipp auf ein dezentes Banner übernommen, dazu ein integriertes Changelog („was ist neu seit *deiner* letzten Version").
+- 📇 **Vollständige Sammlungsverwaltung** — im Besitz / Dubletten / Wunschliste / Favoriten, Stückzahlen pro Variante, Sofortsuche und umfangreiche Filter.
+- ✨ **Animiertes 6-stufiges Seltenheitssystem** — `epic → legendary → mythic → ultra → cosmic → divine`, berechnet aus der besten Variante im Besitz. Foil-Karten tragen bewegte Lichtreflexe, und die höchste Stufe erscheint als wandernder irisierender Verlauf (alles unter Beachtung von `prefers-reduced-motion`).
+- 📴 **Funktioniert komplett offline** — die gesamte App wird von einem Service Worker vorgecacht; nach dem ersten Besuch ändert der Flugmodus nichts.
+- 🔄 **Transparente Auto-Updates** — neue Versionen werden im Hintergrund erkannt und mit einem Tipp übernommen, dazu ein integriertes Changelog, das zeigt, was sich seit *deiner* letzten Version geändert hat.
 - 🌍 **7 Sprachen** — Englisch, Französisch, Spanisch, Chinesisch, Italienisch, Niederländisch, Deutsch. Jeder Text, jedes Abzeichen, jeder Changelog-Eintrag.
 - 🎓 **Interaktives Tutorial in 26 Schritten** — eine geführte Tour, in der du die echten Aktionen *selbst ausführst*, in einer Sandbox, die am Ende jede Änderung zurücknimmt.
-- 🏅 **50 Abzeichen & Titel** — 25 werden automatisch anhand messbarer Bedingungen freigeschaltet, 25 selbst deklariert.
+- 🏅 **50 Abzeichen und Titel** — 25 automatisch anhand messbarer Bedingungen freigeschaltet, 25 selbst deklariert.
 - 📊 **Statistik-Dashboard** — Gesamtfortschritt, Seltenheits-Donut, Vervollständigung pro Kategorie, Highlights und eine tagesgenaue Fortschrittskurve (pures SVG, keine Chart-Bibliothek).
-- 🔁 **Backups überall** — JSON-Export/-Import, ein komprimierter **Backup-Code** von Gerät zu Gerät, derselbe Code als scanbarer **QR-Code**, und ein optionales **Cloud-Backup** (Supabase).
-- 🔐 **PIN-Sperre, Betrachtermodus & optionale Verschlüsselung** — eine 4-stellige PIN (SHA-256), ein Nur-Lese-Modus zum Teilen, und eine Opt-in-Verschlüsselung der Sammlung im Ruhezustand (PBKDF2 + AES-GCM, aus der PIN abgeleitet — natives Web Crypto).
+- 🔁 **Backups überall** — JSON-Export/-Import, ein komprimierter Backup-Code von Gerät zu Gerät, derselbe Code als scanbarer QR-Code, und optionales Cloud-Backup.
+- 🔐 **PIN-Sperre, Betrachtermodus und optionale Verschlüsselung** — eine 4-stellige PIN (SHA-256), ein Nur-Lese-Modus zum Teilen, und Opt-in-Verschlüsselung der Sammlung im Ruhezustand (PBKDF2 + AES-GCM, aus der PIN abgeleitet).
 - 🤝 **Sammlerwerkzeuge** — Fehl-, Dubletten- und Tauschlisten zum Mitnehmen auf die Tauschbörse.
-- 💬 **Integriertes Feedback** — angemeldete Nutzer senden Vorschläge oder Fehlerberichte direkt aus den Einstellungen.
 
 ---
 
@@ -55,7 +54,7 @@ Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten (101 Karten, jed
 | Cloud (optional) | **Supabase über rohes REST-`fetch()`** — ohne SDK; E-Mail-OTP-Anmeldung, Row Level Security |
 | Krypto | Natives **Web Crypto** — SHA-256 (PIN), PBKDF2 + AES-GCM (optionale Verschlüsselung im Ruhezustand) |
 | QR-Codes | Einbezogener Ein-Datei-Encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
-| Schriften | Selbst gehostete WOFF2 (SIL OFL) — keine Google-Fonts-Anfrage, 5 umschaltbare Schrift-Themes |
+| Schriften | Selbst gehostete WOFF2 (SIL OFL) — keine Google-Fonts-Anfrage, 5 Themes zur Auswahl |
 | Tests | **Nodes eingebauter Test-Runner** (`node --test`) — 166 Tests, kein Test-Framework |
 | CI | GitHub Actions — Tests + Build + Aktualitätsprüfung des committeten Bundles bei jedem Push/PR |
 
@@ -63,37 +62,47 @@ Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten (101 Karten, jed
 
 ---
 
+## 🧱 Die Architektur in Kürze
+
+Der Quellcode besteht aus fokussierten **ES-Modulen** hinter einem einzigen Einstiegspunkt, `app.js`, von esbuild zu einem committeten `app.bundle.js` gebündelt (GitHub Pages führt keinen Build-Schritt aus). Zwei HTML-Einstiegspunkte teilen sich alles Übrige: `index-dev.html` lädt die rohen Module für die Entwicklung, `index.html` lädt das Bundle.
+
+| Schicht | Module |
+|---|---|
+| Zustand & Daten | `storage.js` (localStorage, saisonbezogen, Migration v1→v2), `data.js`, `history.js` |
+| Oberfläche | `render.js` (Raster, Filter, Kartenansicht), `stats.js`, `badges.js`, `pin.js` (Einstellungen) |
+| Plattform | `sw.js` (Precache), `update.js` (Updates), `install.js`, `secure-store.js` |
+| Optionale Cloud | `cloud.js`, `feedback.js`, `settings-sync.js` — alle über rohes REST |
+
+Aktionen laufen über **einen einzigen delegierten Listener** auf `[data-action]` statt über Inline-Handler — was auch den Betrachtermodus möglich macht, da ein einziges `VIEWER_BLOCKED`-Set jeden Schreibzugriff sperrt. Oberflächentext steht nie im Code: er läuft über `t()` gegen Wörterbücher, die alle 7 Sprachen abdecken.
+
+---
+
 ## 🧗 Technische Herausforderungen
 
-Die Probleme, die diesen Code wirklich geprägt haben, und ihre Lösungen:
+Die Probleme, die diesen Code wirklich geprägt haben:
 
 ### Offline-first *und* immer aktuell
-**Problem:** Ein Cache-first-Service-Worker macht die App offline unerschütterlich — und hervorragend darin, für immer veralteten Code auszuliefern. Installierte PWAs trifft es am härtesten: Sie können tagelang ohne Navigation offen bleiben, der Browser prüft den Worker also nie von selbst erneut.
-**Lösung:** Der neue Worker lädt im Hintergrund und parkt bewusst im *waiting*-Zustand (kein automatisches `skipWaiting` — die Shell unter einer laufenden App auszutauschen ist der sichere Weg, ihren Zustand zu zerstören). Die App zeigt ein Ein-Tipp-Banner „neue Version — neu laden", das ihn per `SKIP_WAITING`-Nachricht befördert; ein ignoriertes Banner löst sich beim nächsten Kaltstart von selbst. Installierte PWAs rufen zusätzlich bei jeder Rückkehr in den Vordergrund und stündlich `registration.update()` auf. Die App-Version leitet sich aus dem neuesten Changelog-Eintrag ab: Veröffentlichen *heißt* Changelog schreiben — Version und Historie können nicht auseinanderlaufen.
+Ein Cache-first-Service-Worker macht die App offline unerschütterlich — und hervorragend darin, endlos veralteten Code auszuliefern. Installierte PWAs trifft es am härtesten: Sie können tagelang ohne Navigation offen bleiben, der Browser prüft den Worker also nie erneut.
+**Lösung:** Der neue Worker lädt im Hintergrund und parkt bewusst im *waiting*-Zustand (kein automatisches `skipWaiting` — die Shell unter einer laufenden App auszutauschen ist der sichere Weg, ihren Zustand zu zerstören). Ein Banner befördert ihn mit einem Tipp per `SKIP_WAITING`; ein ignoriertes Banner löst sich beim nächsten Kaltstart von selbst. Installierte PWAs rufen zusätzlich bei jeder Rückkehr in den Vordergrund und stündlich `registration.update()` auf. Die App-Version leitet sich aus dem neuesten Changelog-Eintrag ab: Veröffentlichen *heißt* Changelog schreiben.
 
 ### Eine E-Mail-Anmeldung, die eine installierte PWA übersteht
-**Problem:** Die klassische Magic-Link-Anmeldung bricht in installierten PWAs: Der Link öffnet sich im Standardbrowser — einer anderen Speicherpartition — und die Sitzung landet dort, wo die App nicht ist.
-**Lösung:** Die Authentifizierung nutzt **E-Mail-OTP-Codes** als Hauptweg: Der Code wird in der App selbst eingetippt, die Sitzung entsteht also jedes Mal im richtigen Kontext. Der Magic Link bleibt als Bonus auf Browserseite. Der gesamte GoTrue-Ablauf (Senden, Verifizieren, Refresh, Ablaufmarge) ist mit rohem `fetch()` umgesetzt — ohne Supabase-SDK.
+Die klassische Magic-Link-Anmeldung bricht in installierten PWAs: Der Link öffnet sich im Standardbrowser — einer anderen Speicherpartition — und die Sitzung landet dort, wo die App nicht ist.
+**Lösung:** Die Authentifizierung nutzt **E-Mail-OTP-Codes** als Hauptweg, direkt in der App eingetippt, sodass die Sitzung jedes Mal im richtigen Kontext entsteht. Der gesamte GoTrue-Ablauf ist mit rohem `fetch()` umgesetzt.
 
 ### Ein Service Worker, der die API nie anfasst
-**Problem:** Ein vorcachender Service Worker, der alles abfängt, liefert bereitwillig eine API-Antwort aus dem Cache — ein stiller Datenkorruptions-Bug, der erst in Produktion auftaucht.
-**Lösung:** Der Worker schließt die Supabase-Origin vollständig aus (Anfragen passieren unangetastet), und Cloud-Aufrufe senden zusätzlich `cache: 'no-store'`. Doppelt gesichert, durch Tests verifiziert.
+Ein vorcachender Service Worker, der alles abfängt, liefert bereitwillig eine API-Antwort aus dem Cache — ein stiller Datenkorruptions-Bug, der erst in Produktion auftaucht.
+**Lösung:** Der Worker schließt die Supabase-Origin vollständig aus, und Cloud-Aufrufe senden zusätzlich `cache: 'no-store'`.
 
 ### Ein CSS-Refactoring, Byte für Byte als identisch bewiesen
-**Problem:** Hunderte hartkodierte Abstandswerte auf Design-Tokens migrieren, mit „sieht für mich gleich aus" als einziger Garantie.
-**Lösung:** Ausschließlich exakt passende Ersetzungen (kein Runden auf das nächstgelegene Token), danach ein Beweis: jedes `var()` in Vorher- und Nachher-Stylesheet zu Pixelwerten auflösen und beide Byte für Byte vergleichen — mathematisch identisches Rendering; Werte außerhalb der Skala blieben unangetastet und wurden für einen späteren, bewussten Durchgang inventarisiert.
+Hunderte hartkodierte Abstandswerte auf Tokens migrieren, mit „sieht für mich gleich aus" als einziger Garantie.
+**Lösung:** Ausschließlich exakt passende Ersetzungen, danach ein Beweis — jedes `var()` in Vorher- und Nachher-Stylesheet zu Pixelwerten auflösen und beide Byte für Byte vergleichen. Ein späterer Durchgang benannte die wiederkehrenden Halbschritte, statt 61 Deklarationen allein der Skalenreinheit wegen zu runden.
 
 ### Feedback mit E-Mail-Benachrichtigung — ohne Server
-**Problem:** Der Maintainer möchte für jedes in der App abgegebene Feedback eine E-Mail, aber es gibt kein Backend, das sie verschickt.
-**Lösung:** Ein Postgres-Trigger auf der `feedback`-Tabelle ruft über `pg_net` die Resend-API auf — vollständig innerhalb von Supabase. Der API-Schlüssel liegt verschlüsselt im Supabase Vault (niemals in diesem Repository), Nutzerinhalte werden HTML-escaped, und eine fehlschlagende E-Mail kann den Insert nie blockieren. Clientseitig: ein Cooldown; serverseitig: eine SQL-Drossel (max. 5/Stunde pro Nutzer), per Trigger erzwungen.
-
-### 7 Sprachen ohne i18n-Bibliothek
-**Problem:** Jeder sichtbare Text — Oberfläche, Abzeichen, Tutorial, Changelog-Einträge, Fehlermeldungen — in 7 Sprachen, ohne Framework, das Disziplin erzwingt.
-**Lösung:** Ein kleiner `t()`-Helfer über Wörterbuchdateien, `data-i18n`-Attribute für statisches HTML und Unit-Tests, die fehlschlagen, sobald einem Changelog-Eintrag auch nur eine der 7 Sprachen fehlt. Englisch ist der erklärte Fallback; eine harte Projektregel besagt: Ein Text, den es nur auf Englisch gibt, ist eine unvollständige Änderung.
+**Lösung:** Ein Postgres-Trigger auf der `feedback`-Tabelle ruft über `pg_net` die Resend-API auf — vollständig innerhalb von Supabase. Der API-Schlüssel liegt verschlüsselt im Vault, Nutzerinhalte werden HTML-escaped, und eine fehlschlagende E-Mail kann den Insert nie blockieren.
 
 ### Eine Browser-App ohne Browser testen
-**Problem:** Das Null-Abhängigkeiten-Versprechen schließt Jest, Vitest und Headless-Browser-Gespanne aus.
-**Lösung:** Die Logik wurde browserfrei faktorisiert (Seltenheitsberechnung, Speichermigration, Backup-Kodierung, Statistiken, Abzeichen, Verschlüsselung, Cloud-Helfer, Update-Logik …) und wird von **166 Tests auf Nodes eingebautem Runner** abgedeckt — null Testabhängigkeiten, kein echtes Netzwerk (jeder Cloud-Test stubbt `fetch`). Die CI baut zudem das Bundle neu und schlägt fehl, wenn das committete Artefakt veraltet ist: Der deployte Code stimmt beweisbar mit den Quellen überein.
+Das Null-Abhängigkeiten-Versprechen schließt Jest, Vitest und Headless-Browser-Gespanne aus.
+**Lösung:** Die Logik wurde browserfrei faktorisiert und wird von **166 Tests auf Nodes eingebautem Runner** abgedeckt — keine Testabhängigkeiten, kein echtes Netzwerk. Die CI baut zudem das Bundle neu und schlägt fehl, wenn das committete Artefakt veraltet ist.
 
 ---
 
@@ -111,26 +120,23 @@ npm install     # installiert esbuild, die einzige devDependency
 npm run build   # app.js → app.bundle.js (minifiziert + Sourcemap)
 # → http://localhost:8000/  (index.html)
 
-# Tests:
 npm test        # 166 Tests, node --test, ohne Framework
 ```
 
-### Deployment
-
-Das Repository wird **unverändert** auf GitHub Pages deployt (statisch, kein Server-Build): Alle URLs sind relativ, die App läuft also identisch auf einer Domain-Root, unter einem Unterpfad und auf localhost. Das gebaute Bundle ist committet, weil Pages keinen npm-Schritt ausführt; die CI stellt sicher, dass es nie veraltet. Release-Routine: einen Changelog-Eintrag hinzufügen (das *ist* der Versionssprung) → `SW_VERSION` in `sw.js` erhöhen → bauen → pushen. Wiederkehrende Besucher erhalten das Update-Banner.
+**Deployment.** Das Repository wird unverändert auf GitHub Pages deployt: Alle URLs sind relativ, die App läuft also identisch auf einer Domain-Root, unter einem Unterpfad und auf localhost. Release-Routine: einen Changelog-Eintrag hinzufügen (das *ist* der Versionssprung) → `SW_VERSION` erhöhen → bauen → pushen.
 
 ---
 
 ## ⚖️ Ehrliche Grenzen
 
-- **Die PIN ist eine Oberflächenbarriere, keine starke Sicherheit.** Ohne die optionale Verschlüsselung ist die Sammlung per DevTools im `localStorage` lesbar. Mit aktiver Verschlüsselung ist beiläufiges Schnüffeln blockiert — aber eine 4-stellige PIN lässt sich offline brute-forcen, wenn jemand das Gerät in Händen hält. Das schützt vor Gelegenheitsneugier, nicht vor Experten. Eine vergessene PIN macht eine verschlüsselte lokale Sammlung unwiederbringlich — Backups aufbewahren.
-- **Die Cloud-Anmeldung läuft über eine Test-E-Mail-Domain.** Auth- und Feedback-Mails gehen derzeit über Standard-/Test-Absenderdomains mit engen Limits — für ein persönliches Projekt in Ordnung, keine produktionsreife E-Mail-Zustellung. Ein eigenes SMTP/eigene Domain würde das beheben.
-- **Die Fortschrittshistorie kennt kein Back-fill** — die Statistikkurve beginnt an dem Tag, an dem das Feature installiert wurde; es gibt keinen Zeitstempel pro Karte, um die Vergangenheit zu rekonstruieren.
+- **Die PIN ist eine Oberflächenbarriere, keine starke Sicherheit.** Ohne die optionale Verschlüsselung ist die Sammlung per DevTools im `localStorage` lesbar. Mit aktiver Verschlüsselung ist beiläufiges Schnüffeln blockiert — aber eine 4-stellige PIN lässt sich offline brute-forcen, wenn jemand das Gerät in Händen hält. Eine vergessene PIN macht eine verschlüsselte lokale Sammlung unwiederbringlich.
+- **Die Cloud-Anmeldung läuft über eine Test-E-Mail-Domain**, mit engen Limits — für ein persönliches Projekt in Ordnung, keine produktionsreife Zustellung.
+- **Die Fortschrittshistorie kennt kein Back-fill** — die Statistikkurve beginnt an dem Tag, an dem das Feature installiert wurde.
 
 ---
 
 ## 📜 Lizenz & Marken
 
-Veröffentlicht unter der **MIT-Lizenz** — siehe [LICENSE](LICENSE). © 2026 Arthur.
+Veröffentlicht unter der **MIT-Lizenz** — siehe [LICENSE](LICENSE). © 2026 Arthur — [@Arts44](https://github.com/Arts44).
 
-> „F1" und „UNO" sowie die Logos und Bilder von Teams und Fahrern gehören ihren jeweiligen Eigentümern. Dies ist ein **inoffizielles**, persönliches Werkzeug zur Sammlungsverwaltung — ohne Verbindung zu, Billigung durch oder Sponsoring von Formula 1, Mattel oder irgendeinem Team.
+> **Inoffizielles Fanprojekt, nicht kommerziell.** „F1" und „UNO" sowie die Logos und Bilder von Teams und Fahrern gehören ihren jeweiligen Eigentümern. Dieses Werkzeug steht in keiner Verbindung zu Formula 1, Mattel oder einem Team und wird von ihnen weder unterstützt noch gesponsert.
