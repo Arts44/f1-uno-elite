@@ -637,9 +637,10 @@ export function openModal(id){
 
   document.getElementById('moDesc').textContent = (typeof window.getCardDesc==='function'?window.getCardDesc(card.name):'')||card.description||'';
 
+  // "Card #" and "Category" used to sit here too — both already appear in
+  // the header line above (#005 · PILOTE), so they were pure duplication
+  // competing with the two figures that actually carry information.
   document.getElementById('moInfo').innerHTML=`
-    <div class="mib"><div class="mib-l">${t('mo.card')||'Card'}</div><div class="mib-v">#${card.id}</div></div>
-    <div class="mib"><div class="mib-l">${t('mo.category')||'Category'}</div><div class="mib-v">${catEmoji(card.category)} ${t('cat.'+card.category)||CATS[card.category]?.label||''}</div></div>
     <div class="mib"><div class="mib-l">${t('mo.types_avail')||'Types'}</div><div class="mib-v">${card.types.length} type(s)</div></div>
     <div class="mib"><div class="mib-l">${t('mo.total_copies')||'Total copies'}</div><div class="mib-v" style="color:var(--red)">${cardTotalQty(id)}</div></div>
   `;
@@ -742,12 +743,43 @@ function _renderModalTags(card){
   if(card.champion) addTag('champion',`👑 Champion ${card.championYears.join(', ')}`);
   const tagMap={legend:'⭐ Légende',fan_favorite:'❤️ Fan Favorite',rising_star:'🌟 Rising Star',top_driver:'🎯 Top Driver',legendary:'🔱 Légendaire',prestige:'💫 Prestige',night_race:'🌙 Nuit',high_speed:'⚡ Vitesse'};
   (card.tags||[]).forEach(t=>{if(tagMap[t]) addTag(t,tagMap[t]);});
-  const rarity=RARITIES[cardRarity(card)];
-  const rt=document.createElement('span');
-  rt.className='mtag'+rarityChipClass(cardRarity(card));
-  rt.style.cssText=rarityChipStyle(cardRarity(card),rarity.color);
-  rt.textContent=`${'★'.repeat(rarity.stars)} ${t('rar.'+cardRarity(card))||rarity.label}`;
-  tagsEl.appendChild(rt);
+
+  // Rarity is the card's most structuring attribute, so it gets its own
+  // line right under the identity block instead of being mixed into the
+  // champion/legend tag soup below.
+  const rarEl=document.getElementById('moRarity');
+  if(rarEl){
+    const key=cardRarity(card);
+    const rarity=RARITIES[key];
+    rarEl.innerHTML='';
+    const rt=document.createElement('span');
+    rt.className='mtag mtag-rarity'+rarityChipClass(key);
+    rt.style.cssText=rarityChipStyle(key,rarity.color);
+    rt.textContent=`${'★'.repeat(rarity.stars)} ${t('rar.'+key)||rarity.label}`;
+    rarEl.appendChild(rt);
+  }
+  _renderModalStatus(card);
+}
+
+/* At-a-glance state of the card — owned / doubles / wishlist / favourite.
+   Read-only: the write paths stay on the grid chips and the type cells.
+   Reuses the sidebar's status.* keys, so no new translations. */
+function _renderModalStatus(card){
+  const el=document.getElementById('moStatus');
+  if(!el) return;
+  el.innerHTML='';
+  const states=[
+    ['owned',    '✓',  cardOwned(card.id),    'status.owned'],
+    ['doubles',  '🔄', cardDoubles(card.id),  'status.doubles'],
+    ['wishlist', '⭐', cardWishlist(card.id), 'status.wishlist'],
+    ['favorite', '❤️', cardFavorite(card.id), 'status.fav'],
+  ];
+  states.forEach(([id,icon,on,key])=>{
+    const s=document.createElement('span');
+    s.className=`mo-st${on?' on':''}`;
+    s.textContent=`${icon} ${t(key)||id}`;
+    el.appendChild(s);
+  });
 }
 
 /* Single source of truth for the modal header visual: the SAME

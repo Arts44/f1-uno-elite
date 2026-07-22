@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.15.0',
+    date: '2026-07-22',
+    changes: {
+      en: [
+        'The card sheet is easier to read: rarity now stands on its own line, and a new row shows at a glance whether the card is owned, a double, wishlisted or a favourite.',
+        'The card number and category are no longer repeated further down the sheet, leaving more room for the figures that matter.',
+      ],
+      fr: [
+        'La fiche carte se lit plus facilement : la rareté occupe désormais sa propre ligne, et une nouvelle rangée indique d’un coup d’œil si la carte est possédée, en double, en wishlist ou en favori.',
+        'Le numéro et la catégorie ne sont plus répétés plus bas dans la fiche, ce qui laisse plus de place aux chiffres utiles.',
+      ],
+      es: [
+        'La ficha de carta se lee mejor: la rareza ocupa ahora su propia línea y una nueva fila muestra de un vistazo si la carta está en propiedad, repetida, en la lista de deseos o en favoritos.',
+        'El número y la categoría ya no se repiten más abajo en la ficha, dejando más espacio a las cifras que importan.',
+      ],
+      zh: [
+        '卡牌详情更易阅读：稀有度现已独占一行，新增的状态行让你一眼看清该卡是否已拥有、重复、在愿望清单或收藏夹中。',
+        '卡牌编号与类别不再在详情下方重复出现，为真正有用的数据留出更多空间。',
+      ],
+      it: [
+        'La scheda della carta è più leggibile: la rarità ha ora una riga tutta sua e una nuova fila mostra a colpo d’occhio se la carta è posseduta, doppia, in wishlist o tra i preferiti.',
+        'Numero e categoria non vengono più ripetuti più in basso nella scheda, lasciando più spazio ai dati che contano.',
+      ],
+      nl: [
+        'De kaartfiche leest prettiger: de zeldzaamheid staat nu op een eigen regel en een nieuwe rij toont in één oogopslag of de kaart in bezit, dubbel, op de verlanglijst of favoriet is.',
+        'Nummer en categorie worden niet meer verderop in de fiche herhaald, wat ruimte vrijmaakt voor de cijfers die ertoe doen.',
+      ],
+      de: [
+        'Die Kartenansicht liest sich klarer: die Seltenheit steht jetzt in einer eigenen Zeile, und eine neue Reihe zeigt auf einen Blick, ob die Karte vorhanden, doppelt, auf der Wunschliste oder ein Favorit ist.',
+        'Nummer und Kategorie werden weiter unten nicht mehr wiederholt — mehr Platz für die Zahlen, auf die es ankommt.',
+      ],
+    },
+  },
+  {
     version: '1.14.0',
     date: '2026-07-21',
     changes: {
