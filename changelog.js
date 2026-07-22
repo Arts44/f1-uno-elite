@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.16.0',
+    date: '2026-07-22',
+    changes: {
+      en: [
+        'On phones, the copies grid in the card sheet no longer runs off the edge — the fourth column stays visible.',
+        'Spacing has been harmonised across the app for a steadier, more consistent rhythm.',
+      ],
+      fr: [
+        'Sur téléphone, la grille des exemplaires de la fiche carte ne déborde plus — la quatrième colonne reste visible.',
+        'Les espacements ont été harmonisés dans toute l’app, pour un rythme plus régulier.',
+      ],
+      es: [
+        'En el móvil, la cuadrícula de ejemplares de la ficha ya no se sale del borde: la cuarta columna queda visible.',
+        'Se han armonizado los espaciados en toda la aplicación, para un ritmo más regular.',
+      ],
+      zh: [
+        '在手机上，卡牌详情中的收藏数量网格不再超出边缘——第四列始终可见。',
+        '全应用的间距已统一，视觉节奏更加一致。',
+      ],
+      it: [
+        'Su telefono, la griglia delle copie nella scheda carta non esce più dal bordo: la quarta colonna resta visibile.',
+        'Le spaziature sono state armonizzate in tutta l’app, per un ritmo più regolare.',
+      ],
+      nl: [
+        'Op de telefoon loopt het exemplarenraster in de kaartfiche niet meer buiten beeld — de vierde kolom blijft zichtbaar.',
+        'De witruimte is in de hele app geharmoniseerd, voor een rustiger en consistenter ritme.',
+      ],
+      de: [
+        'Auf dem Telefon läuft das Exemplar-Raster in der Kartenansicht nicht mehr über den Rand — die vierte Spalte bleibt sichtbar.',
+        'Die Abstände wurden in der ganzen App vereinheitlicht, für einen ruhigeren, gleichmäßigeren Rhythmus.',
+      ],
+    },
+  },
+  {
     version: '1.15.0',
     date: '2026-07-22',
     changes: {
