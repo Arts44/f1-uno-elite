@@ -40,7 +40,7 @@
   /* spacing scale (base 4px) + missing shape/size tokens — pure
      refactor: every var resolves to the exact px it replaced */
   --space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;
-  --space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;
+  --space-6:24px;--space-7:28px;--space-8:32px;--space-10:40px;--space-12:48px;
   /* Half-steps: recurring 6/10/14px values in dense areas (chips, cells,
      lists). Named rather than rounded — snapping them to the 4px scale
      would shift 61 declarations by 1-2px for scale purity alone. */
@@ -82,10 +82,14 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:var(--r-pill);}
 
 /* LOGIN SCREEN */
+/* Hidden by default: the pre-paint script in <head> stamps
+   data-boot on <html>, so the right screen is up on the very
+   first frame — no flash in either direction. */
 #login-screen {
+  display: none;
   position: fixed; inset: 0;
   background: var(--bg);
-  display: flex; align-items: center; justify-content: center;
+  align-items: center; justify-content: center;
   z-index: 10000;
   flex-direction: column;
   gap:0;
@@ -1513,6 +1517,8 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sidebar-action-btn #sidebarChampState{font-size:11px;color:var(--tx3);}
 #sidebarChampFilter{border-radius:var(--r-pill);justify-content:center;}
 #app-wrapper{display:none;}
+[data-boot="login"] #login-screen{display:flex;}
+[data-boot="app"] #app-wrapper{display:flex;}
 #sidebar-toggle{margin-right:var(--space-3);}
 .badges-progress-fill{width:0%;}
 .user-title-next{cursor:pointer;}
@@ -1689,4 +1695,33 @@ button:not(:disabled):active,
   .card:hover .dn-num{transform:none;}
   button:not(:disabled):active,.schip:active,.fpill:active,.bn-tab:active,
   .qbtn:active,.pin-key:active,.setv-btn:active,.lang-opt:active,.font-opt:active{transform:none;}
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   BOOT SKELETONS — the grid is the entry view, and initApp()
+   waits on four JSON fetches before it can render anything, so
+   the shell used to sit empty. Skeleton cards keep the layout
+   honest (same geometry as a real card) instead of a spinner.
+   Only shown past ~150ms — see SKELETON_DELAY in render.js —
+   so a fast load never flashes them.
+   ══════════════════════════════════════════════════════════ */
+.sk-card{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);
+  display:flex;flex-direction:column;pointer-events:none;
+}
+.sk-visual{height:150px;}
+.sk-body{padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2);}
+.sk-line{height:10px;border-radius:var(--r-sm);}
+.sk-line.w40{width:40%;} .sk-line.w70{width:70%;} .sk-line.w55{width:55%;}
+.sk-chip{height:18px;width:96px;border-radius:var(--r-sm);margin-top:var(--space-1);}
+.sk-visual,.sk-line,.sk-chip{
+  background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 37%,var(--surface2) 63%);
+  background-size:400% 100%;
+  animation:skShimmer 1.4s ease-in-out infinite;
+}
+@keyframes skShimmer{0%{background-position:100% 50%;}100%{background-position:0 50%;}}
+@media (prefers-reduced-motion:reduce){
+  .sk-visual,.sk-line,.sk-chip{animation:none;background:var(--surface2);}
 }

@@ -7,6 +7,7 @@ import { t, applyLanguage } from './i18n.js';
 import { loadAppData, _renderSeasonPills, switchSeason, CARDS_DB } from './data.js';
 import { loadData, coll, exportCollection, _handleImportFile } from './storage.js';
 import {
+  showGridSkeleton, hideGridSkeleton,
   initSearch, renderSidebar, applyFilters, switchView, toggleSidebar, closeMo,
   toggleTheme, quickToggle, selectCard, changeMoQty, toggleSection,
   toggleFavoriteFirst, toggleChampionFilter, resetFilters, handleGlobalKeyPress, showToast,
@@ -40,7 +41,9 @@ initInstall();
 
 export function initApp() {
   log('Initialisation de l\'app...');
+  showGridSkeleton();          // no-op if the data lands within 150ms
   loadAppData().then(() => {
+    hideGridSkeleton();
     log('Données chargées, CARDS_DB.length:', CARDS_DB.length);
     loadData();
     loadManualBadges();

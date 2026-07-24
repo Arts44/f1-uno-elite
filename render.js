@@ -60,6 +60,45 @@ export let sectionStates = {status: true, categories: true, types: true, raritie
 export let currentView = 'collection'; // 'collection' | 'badges' | 'stats' | 'settings'
 export function setCurrentView(view){ currentView = view; }
 
+
+/* ── Boot skeletons ──────────────────────────────────────────
+   initApp() cannot render the grid until four JSON fetches have
+   landed. Rather than leave an empty shell (or flash a spinner on
+   a warm cache), show skeleton cards — but only if the wait is
+   actually perceptible. Below the threshold nothing is drawn at
+   all, so a fast start stays visually still. */
+const SKELETON_DELAY = 150; // ms — below this, a load reads as instant
+let _skeletonTimer = null;
+
+export function showGridSkeleton(count = 12){
+  const grid = document.getElementById('cardGrid');
+  if(!grid || _skeletonTimer) return;
+  _skeletonTimer = setTimeout(() => {
+    if(grid.children.length) return;            // real cards beat us to it
+    grid.setAttribute('aria-busy', 'true');
+    grid.innerHTML = Array.from({length: count}, () => `
+      <div class="sk-card" aria-hidden="true">
+        <div class="sk-visual"></div>
+        <div class="sk-body">
+          <div class="sk-line w40"></div>
+          <div class="sk-line w70"></div>
+          <div class="sk-line w55"></div>
+          <div class="sk-chip"></div>
+        </div>
+      </div>`).join('');
+    log('grid skeleton shown');
+  }, SKELETON_DELAY);
+}
+
+export function hideGridSkeleton(){
+  clearTimeout(_skeletonTimer);
+  _skeletonTimer = null;
+  const grid = document.getElementById('cardGrid');
+  if(!grid) return;
+  grid.removeAttribute('aria-busy');
+  if(grid.querySelector('.sk-card')) grid.innerHTML = '';
+}
+
 /* ══════════════════════════════════════════════════════════ SIDEBAR */
 export function renderSidebar(){
   // Status - Floating sidebar uniquement

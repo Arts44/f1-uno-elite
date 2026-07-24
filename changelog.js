@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.17.0',
+    date: '2026-07-23',
+    changes: {
+      en: [
+        'Smoother startup: the app no longer flashes the PIN screen for a moment when no PIN is set, and shows loading placeholders instead of an empty page while it starts.',
+        'Fixed the “What’s new” panel, whose text was touching the edges.',
+      ],
+      fr: [
+        'Démarrage plus doux : l’app n’affiche plus brièvement l’écran du code PIN quand aucun PIN n’est défini, et montre des blocs de chargement plutôt qu’une page vide pendant qu’elle démarre.',
+        'Correction du panneau « Nouveautés », dont le texte touchait les bords.',
+      ],
+      es: [
+        'Arranque más suave: la app ya no muestra por un instante la pantalla del PIN cuando no hay PIN configurado, y presenta marcadores de carga en lugar de una página vacía mientras arranca.',
+        'Corregido el panel de «Novedades», cuyo texto tocaba los bordes.',
+      ],
+      zh: [
+        '启动更顺畅：未设置 PIN 码时，应用不再短暂闪现 PIN 界面；启动过程中显示加载占位块，而非空白页面。',
+        '修复了「新功能」面板文字紧贴边缘的问题。',
+      ],
+      it: [
+        'Avvio più fluido: l’app non mostra più per un istante la schermata del PIN quando nessun PIN è impostato, e visualizza segnaposto di caricamento invece di una pagina vuota mentre si avvia.',
+        'Corretto il pannello «Novità», il cui testo toccava i bordi.',
+      ],
+      nl: [
+        'Vloeiendere start: de app toont niet langer even het pinscherm wanneer er geen pincode is ingesteld, en laat laadplaatshouders zien in plaats van een lege pagina tijdens het opstarten.',
+        'Het paneel “Nieuw” hersteld, waarvan de tekst tegen de randen kwam.',
+      ],
+      de: [
+        'Sanfterer Start: die App zeigt nicht mehr kurz den PIN-Bildschirm, wenn keine PIN gesetzt ist, und zeigt beim Starten Ladeplatzhalter statt einer leeren Seite.',
+        'Das Panel „Neuigkeiten“ korrigiert, dessen Text die Ränder berührte.',
+      ],
+    },
+  },
+  {
     version: '1.16.0',
     date: '2026-07-22',
     changes: {
