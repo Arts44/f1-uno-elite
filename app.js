@@ -8,10 +8,8 @@ import { loadAppData, _renderSeasonPills, switchSeason, CARDS_DB } from './data.
 import { loadData, coll, exportCollection, _handleImportFile } from './storage.js';
 import {
   showGridSkeleton, hideGridSkeleton,
-  initSearch, renderSidebar, applyFilters, switchView, toggleSidebar, closeMo,
-  toggleTheme, quickToggle, selectCard, changeMoQty, toggleSection,
-  toggleFavoriteFirst, toggleChampionFilter, resetFilters, handleGlobalKeyPress, showToast,
-  filters, favoriteFirst, sectionStates
+  renderCollection, switchView, closeMo,
+  toggleTheme, quickToggle, changeMoQty, showToast
 } from './render.js';
 import { updateStats } from './stats.js';
 import {
@@ -48,9 +46,7 @@ export function initApp() {
     loadData();
     loadManualBadges();
     initEvents();
-    initSearch();
-    renderSidebar();
-    applyFilters();
+    renderCollection();
     updateStats();
     _renderSeasonPills();
     // Re-assert the persisted font (inline vars) — robust even if the
@@ -60,25 +56,6 @@ export function initApp() {
     applyLanguage();
     // Load and apply user title
     updateUserTitle();
-
-    // Initialiser les états On/Off
-    const sidebarFavToggleState = document.getElementById('sidebarFavToggleState');
-    if (sidebarFavToggleState) sidebarFavToggleState.textContent = favoriteFirst ? t('fav.on') : t('fav.off');
-    const sidebarChampState = document.getElementById('sidebarChampState');
-    if (sidebarChampState) sidebarChampState.textContent = filters.champions ? t('fav.on') : t('fav.off');
-
-    // Initialiser les sections condensées
-    Object.keys(sectionStates).forEach(section => {
-      if (sectionStates[section]) {
-        const sectionElement = document.querySelector(`#${section}-toggle`).closest('.sidebar-section');
-        const toggleBtn = document.getElementById(`${section}-toggle`);
-        if (sectionElement && toggleBtn) {
-          sectionElement.classList.add('collapsed');
-          toggleBtn.classList.add('collapsed');
-          toggleBtn.textContent = '▶';
-        }
-      }
-    });
 
     log('App initialisée, coll contient:', Object.keys(coll).length, 'cartes');
 
@@ -107,7 +84,7 @@ function initEvents(){
     const action = el.getAttribute('data-action');
 
     // Block write actions in viewer mode
-    const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','toggleManualBadge','removeAutoBadge','enterRemoveBadgeMode','toggleFavoriteFirst','toggleChampionFilter','resetFilters','toggleTitlePicker','selectTitle']);
+    const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','toggleManualBadge','removeAutoBadge','enterRemoveBadgeMode','toggleTitlePicker','selectTitle']);
     if(isViewerMode && VIEWER_BLOCKED.has(action)){
       showToast(t('toast.readonly'));
       return;
@@ -118,11 +95,6 @@ function initEvents(){
         const cardId = el.getAttribute('data-card');
         const status = el.getAttribute('data-status');
         quickToggle(cardId, status, e);
-        break;
-      }
-      case 'selectCard': {
-        const cardId = el.getAttribute('data-card');
-        selectCard(cardId);
         break;
       }
       case 'changeMoQty': {
@@ -159,23 +131,6 @@ function initEvents(){
         toggleTitlePicker();
         break;
       }
-      case 'toggleSection': {
-        const section = el.getAttribute('data-section');
-        toggleSection(section);
-        break;
-      }
-      case 'toggleFavoriteFirst': {
-        toggleFavoriteFirst();
-        break;
-      }
-      case 'toggleChampionFilter': {
-        toggleChampionFilter();
-        break;
-      }
-      case 'resetFilters': {
-        resetFilters();
-        break;
-      }
       case 'switchView': {
         const view = el.getAttribute('data-view');
         if(isViewerMode && view === 'settings'){
@@ -209,15 +164,6 @@ function initEvents(){
   });
 
   // ── Static element bindings ──
-  const sidebarToggle = document.getElementById('sidebar-toggle');
-  if(sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
-
-  const sidebarClose = document.getElementById('sidebarClose');
-  if(sidebarClose) sidebarClose.addEventListener('click', toggleSidebar);
-
-  const sidebarOverlay = document.getElementById('sidebar-overlay');
-  if(sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
-
   // Lock button is now in settings page, bound on renderSettings()
 
   const modalCloseBtn = document.getElementById('modalCloseBtn');
@@ -226,25 +172,14 @@ function initEvents(){
   const mo = document.getElementById('mo');
   if(mo) mo.addEventListener('click', e => { if(e.target === mo) closeMo(); });
 
-  const sidebarSortSel = document.getElementById('sidebarSortSel');
-  if(sidebarSortSel) sidebarSortSel.addEventListener('change', applyFilters);
-
-  // ── Touch swipe: modal down → close, sidebar left → close ──
-  let _touchStartY = 0, _touchStartX = 0;
+  // ── Touch swipe: modal down → close ──
+  let _touchStartY = 0;
   const modalEl = document.querySelector('.modal');
   if(modalEl){
     modalEl.addEventListener('touchstart', e => { _touchStartY = e.touches[0].clientY; }, {passive:true});
     modalEl.addEventListener('touchend', e => {
       const dy = e.changedTouches[0].clientY - _touchStartY;
       if(dy > 80) closeMo();
-    }, {passive:true});
-  }
-  const sidebarEl = document.getElementById('floating-sidebar');
-  if(sidebarEl){
-    sidebarEl.addEventListener('touchstart', e => { _touchStartX = e.touches[0].clientX; }, {passive:true});
-    sidebarEl.addEventListener('touchend', e => {
-      const dx = e.changedTouches[0].clientX - _touchStartX;
-      if(dx < -60) toggleSidebar();
     }, {passive:true});
   }
 }
@@ -282,9 +217,6 @@ document.addEventListener('keydown', function(event) {
     document.activeElement.blur();
   }
 });
-
-// Raccourcis clavier globaux
-document.addEventListener('keydown', handleGlobalKeyPress);
 
 /* ══════════════════════════════════════════════════════════
    INIT — startup sequence

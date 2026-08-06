@@ -323,11 +323,8 @@ export function lockApp() {
   window._adminOverlayActive = false;
   window._adminPinCallback = null;
   // 2. Close anything that could sit above (or leak behind) the lock
-  //    screen: card modal, sidebar, admin overlay, import dialogs.
+  //    screen: card modal, admin overlay, import dialogs.
   try { closeMo(); } catch(e){}
-  document.getElementById('floating-sidebar')?.classList.remove('open');
-  document.getElementById('sidebar-overlay')?.classList.remove('show');
-  document.getElementById('sidebar-toggle')?.classList.remove('sidebar-open');
   document.getElementById('admin-pin-overlay')?.remove();
   document.querySelectorAll('.import-dialog-overlay').forEach(o => o.remove());
   // Viewer-mode leftovers (the reload used to clear these implicitly)

@@ -2,20 +2,20 @@
    INTERACTIVE TUTORIAL — a step-by-step guided tour that makes
    the user perform the real actions (spotlight + bubble, waits
    for the action before advancing). Self-navigates between views
-   and opens the modal/sidebar so the targeted element exists.
+   and opens the modal so the targeted element exists.
 
    Pedagogical order: the very first thing taught is HOW TO ADD
    A CARD (open a card → mark a variant owned), then quantities/
-   doubles, quick statuses, filters & search, then the other views.
+   doubles, quick statuses, then the other views.
 
    Robustness: every step shows BOTH a "skip this step" and a
    "quit tutorial" control, so the user can never get stuck.
-   State-change steps (close the sidebar / the modal) advance on
-   the actual state change, whichever way the user triggers it.
+   State-change steps (close the modal) advance on the actual
+   state change, whichever way the user triggers it.
 
    DATA SAFETY: the tour performs real edits, so it snapshots ALL
-   collection-critical localStorage keys + in-memory view/filter
-   state at start, and RESTORES them verbatim on finish OR skip —
+   collection-critical localStorage keys + in-memory view state
+   at start, and RESTORES them verbatim on finish OR skip —
    the user's collection is byte-identical afterwards. Verified
    explicitly on a non-empty collection (see tests + browser).
 
@@ -27,8 +27,7 @@ import { _currentSeason } from './data.js';
 import { loadData } from './storage.js';
 import { loadManualBadges } from './badges.js';
 import {
-  filters, favoriteFirst, setFavoriteFirst, sectionStates, toggleSection,
-  currentView, setCurrentView, switchView, toggleSidebar, closeMo, applyFilters,
+  currentView, setCurrentView, switchView, closeMo, renderCollection,
 } from './render.js';
 import { updateStats } from './stats.js';
 import { applySavedFont } from './pin.js';
@@ -74,46 +73,22 @@ export function applyLocalStorage(snap){
   });
 }
 
-// Full snapshot: localStorage + in-memory view/filter state (browser).
+// Full snapshot: localStorage + in-memory view state (browser).
 function captureState(){
   return {
     ls: captureLocalStorage(tutorialKeys(_currentSeason)),
-    filters: JSON.parse(JSON.stringify(filters)),
-    favoriteFirst,
-    sectionStates: JSON.parse(JSON.stringify(sectionStates)),
     view: currentView,
   };
-}
-
-// Re-apply the collapsed/expanded DOM state of every sidebar section
-// from sectionStates (toggleSection only flips, so sync explicitly).
-function _syncSectionsDom(){
-  Object.keys(sectionStates).forEach(section => {
-    const btn = document.getElementById(`${section}-toggle`);
-    if(!btn) return;
-    const box = btn.closest('.sidebar-section');
-    const collapsed = !!sectionStates[section];
-    if(box) box.classList.toggle('collapsed', collapsed);
-    btn.classList.toggle('collapsed', collapsed);
-    btn.textContent = collapsed ? '▶' : '▼';
-  });
 }
 
 // Restore everything the tour may have changed, then re-render.
 function restoreState(snap){
   if(!snap) return;
   try { closeMo(); } catch(e){}
-  _ensureSidebar(false);
   applyLocalStorage(snap.ls);
   // Re-hydrate in-memory data from the restored localStorage
   try { loadData(); } catch(e){ log('tut restore loadData', e); }
   try { loadManualBadges(); } catch(e){}
-  // Restore filter / view state
-  Object.keys(filters).forEach(k => { delete filters[k]; });
-  Object.assign(filters, snap.filters);
-  setFavoriteFirst(snap.favoriteFirst);
-  Object.assign(sectionStates, snap.sectionStates);
-  _syncSectionsDom();
   // Restore theme / font from the restored prefs
   const theme = snap.ls['f1uno_theme'];
   if(theme) document.documentElement.setAttribute('data-theme', theme);
@@ -123,7 +98,7 @@ function restoreState(snap){
   try { applyLanguage(); } catch(e){ log('tut restore applyLanguage', e); }
   setCurrentView(snap.view);
   try { switchView(snap.view); } catch(e){}
-  try { applyFilters(); updateStats(); } catch(e){}
+  try { renderCollection(); updateStats(); } catch(e){}
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -149,36 +124,20 @@ const firstVisible = sel => [...document.querySelectorAll(sel)].find(_visible) |
 const cards = () => document.querySelectorAll('#collectionView .card, .card');
 const nthCardChip = (n, status) => () => cards()[n]?.querySelector(`[data-action="quickToggle"][data-status="${status}"]`);
 
-function _isSidebarOpen(){
-  const sb = document.getElementById('floating-sidebar');
-  return !!sb && sb.classList.contains('open');
-}
 function _isModalOpen(){
   const mo = document.getElementById('mo');
   return !!mo && mo.classList.contains('open');
 }
-function _ensureSidebar(open){
-  if(_isSidebarOpen() !== open){ try { toggleSidebar(); } catch(e){} }
-}
-// Expand a collapsed sidebar section so its pills are visible
-// (all sections start collapsed → a hidden pill is never a valid target).
-function _ensureSectionOpen(section){
-  if(sectionStates[section]){ try { toggleSection(section); } catch(e){} }
-}
-function _clearSearch(){
-  const si = document.getElementById('searchInput');
-  if(si && si.value !== ''){ si.value = ''; si.dispatchEvent(new Event('input', { bubbles: true })); }
-}
 
 export const TUTORIAL_STEPS = [
   { id: 'welcome', observe: true,
-    ensure: async () => { switchView('collection'); _ensureSidebar(false); try { closeMo(); } catch(e){} } },
+    ensure: async () => { switchView('collection'); try { closeMo(); } catch(e){} } },
 
   // ── 1. The core gesture: add a card to the collection ──
   // Cards open via a direct onclick (no data-action), so the step
   // validates on the actual state change: the detail modal opening.
   { id: 'open_card',
-    ensure: async () => { _clearSearch(); _ensureSidebar(false); },
+    ensure: async () => { switchView('collection'); },
     target: () => cards()[0],
     action: { type: 'condition', check: () => _isModalOpen() } },
 
@@ -206,36 +165,8 @@ export const TUTORIAL_STEPS = [
     target: nthCardChip(1, 'wishlist'),
     action: { type: 'dataAction', name: 'quickToggle' } },
 
-  // ── 3. Finding cards: filters + search ──
-  { id: 'sidebar_open',
-    ensure: async () => { switchView('collection'); _ensureSidebar(false); },
-    target: '#sidebar-toggle',
-    action: { type: 'click', selector: '#sidebar-toggle' } },
-
-  { id: 'filter_apply',
-    // The rarity section starts collapsed: expand it so pills are visible
-    ensure: async () => { _ensureSidebar(true); _ensureSectionOpen('rarities'); },
-    target: () => firstVisible('#sidebarRarPills .fpill') || firstVisible('#floating-sidebar .fpill'),
-    action: { type: 'click', selector: '.fpill' } },
-
-  { id: 'filter_reset',
-    ensure: async () => { _ensureSidebar(true); },
-    target: '[data-action="resetFilters"]',
-    action: { type: 'dataAction', name: 'resetFilters' } },
-
-  // Validates on the actual close (✕, overlay, toggle, swipe, key B)
-  { id: 'sidebar_close',
-    target: '#sidebarClose',
-    action: { type: 'condition', check: () => !_isSidebarOpen() } },
-
-  { id: 'search',
-    ensure: async () => { _ensureSidebar(false); },
-    target: '#searchInput',
-    action: { type: 'input', selector: '#searchInput' } },
-
-  // ── 4. Badges ──
+  // ── 3. Badges ──
   { id: 'go_badges',
-    ensure: async () => { _clearSearch(); },
     target: '.bn-tab[data-view="badges"]',
     action: { type: 'view', view: 'badges' } },
 
@@ -248,7 +179,7 @@ export const TUTORIAL_STEPS = [
     target: '[data-action="enterRemoveBadgeMode"]',
     action: { type: 'dataAction', name: 'enterRemoveBadgeMode' } },
 
-  // ── 5. Stats ──
+  // ── 4. Stats ──
   { id: 'go_stats',
     target: '.bn-tab[data-view="stats"]',
     action: { type: 'view', view: 'stats' } },
@@ -258,7 +189,7 @@ export const TUTORIAL_STEPS = [
   { id: 'stats_highlights', target: () => q('#statsView .sv-feat'), observe: true },
   { id: 'stats_donut', target: () => q('#statsView .sv-donut'), observe: true },
 
-  // ── 6. Settings ──
+  // ── 5. Settings ──
   { id: 'go_settings',
     target: '.bn-tab[data-view="settings"]',
     action: { type: 'view', view: 'settings' } },

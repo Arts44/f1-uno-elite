@@ -29,7 +29,7 @@ It's a **PWA**: install it from your browser and it runs like a native app, full
 
 Track a complete **F1 UNO Élite** trading-card collection — 101 cards, each existing in up to 16 variants (base colours, foils, duals, Wild, Nitro, promos):
 
-- 📇 **Full collection management** — owned / doubles / wishlist / favourites, per-variant quantities, instant search and deep filtering.
+- 📇 **Full collection management** — owned / doubles / wishlist / favourites, per-variant quantities, the whole collection always in view.
 - ✨ **Animated 6-level rarity system** — `epic → legendary → mythic → ultra → cosmic → divine`, computed from the best owned variant. Foil cards carry live light-sweep visuals and the top tier renders as a shifting iridescent gradient (all respecting `prefers-reduced-motion`).
 - 📴 **Works fully offline** — the whole app is precached by a service worker; after the first visit, airplane mode changes nothing.
 - 🔄 **Transparent auto-updates** — new versions are detected in the background and applied with one tap, plus an in-app changelog showing what changed since *your* last version.
@@ -69,7 +69,7 @@ The source is a set of focused **ES modules** behind a single entry point, `app.
 | Layer | Modules |
 |---|---|
 | State & data | `storage.js` (localStorage, season-scoped, v1→v2 migration), `data.js`, `history.js` |
-| UI | `render.js` (grid, filters, card sheet), `stats.js`, `badges.js`, `pin.js` (settings) |
+| UI | `render.js` (grid, card sheet), `stats.js`, `badges.js`, `pin.js` (settings) |
 | Platform | `sw.js` (precache), `update.js` (update flow), `install.js`, `secure-store.js` |
 | Optional cloud | `cloud.js`, `feedback.js`, `settings-sync.js` — all raw REST |
 

@@ -2,7 +2,7 @@
    I18N — translations, language switching
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
-import { applyFilters, renderSidebar, openModal, currentView, currentCardId } from './render.js';
+import { renderCollection, openModal, currentView, currentCardId } from './render.js';
 import { renderBadges, updateUserTitle } from './badges.js';
 import { updateStats, renderStats } from './stats.js';
 import { renderSettings } from './pin.js';
@@ -46,35 +46,14 @@ export function applyLanguage(){
   document.querySelectorAll('[data-i18n-aria]').forEach(el=>{
     el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
   });
-  // Search placeholder in header
-  const si = document.getElementById('searchInput');
-  if(si) si.placeholder = t('header.search');
-
-  // Update displayedCount counter
-  const displayedCount = document.getElementById('displayedCount');
-  if(displayedCount) {
-    const currentCount = document.querySelectorAll('.card').length;
-    displayedCount.textContent = t('header.displayed',{n:currentCount});
-  }
-
-  // Re-render grid to update rarity translations
-  applyFilters();
+  // Re-render grid to update rarity translations (also refreshes the
+  // header total counter through renderCollection)
+  renderCollection();
 
   // Re-render badges to update badge translations
   if(currentView === 'badges') renderBadges();
 
-  // Sort select options
-  const sel = document.getElementById('sidebarSortSel');
-  if(sel){
-    const sortKeys = ['number:sort.num','name:sort.name','rarity_desc:sort.rar_desc','rarity_asc:sort.rar_asc','category:sort.cat'];
-    sortKeys.forEach(pair=>{
-      const [val,key] = pair.split(':');
-      const opt = sel.querySelector(`option[value="${val}"]`);
-      if(opt) opt.textContent = t(key);
-    });
-  }
   // Re-render dynamic content
-  renderSidebar();
   updateStats();
   if(currentView==='stats') renderStats();
   else if(currentView==='settings') renderSettings();

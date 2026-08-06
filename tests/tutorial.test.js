@@ -82,35 +82,36 @@ describe('tutorial — step sequence', () => {
     }
   });
 
-  test('covers the required areas (filters, search, modal, badges, stats, settings)', () => {
+  test('covers the required areas (modal, quick statuses, badges, stats, settings)', () => {
     const ids = new Set(TUTORIAL_STEPS.map(s => s.id));
-    ['sidebar_open', 'filter_apply', 'filter_reset', 'sidebar_close', 'search',
-     'open_card', 'mark_owned', 'mark_double', 'close_modal', 'favorite', 'wishlist',
+    ['open_card', 'mark_owned', 'mark_double', 'close_modal', 'favorite', 'wishlist',
      'go_badges', 'badge_manual', 'badge_remove',
      'go_stats', 'stats_progress', 'stats_highlights', 'stats_donut',
      'go_settings', 'set_theme', 'set_font', 'set_backup', 'set_data', 'replay',
     ].forEach(id => assert.ok(ids.has(id), `missing step ${id}`));
   });
 
-  test('pedagogical order: adding a card comes first, before filters and views', () => {
+  test('the search/filter steps are gone (feature removed)', () => {
+    const ids = new Set(TUTORIAL_STEPS.map(s => s.id));
+    ['sidebar_open', 'filter_apply', 'filter_reset', 'sidebar_close', 'search']
+      .forEach(id => assert.ok(!ids.has(id), `obsolete step ${id} still present`));
+  });
+
+  test('pedagogical order: adding a card comes first, before the other views', () => {
     const idx = id => TUTORIAL_STEPS.findIndex(s => s.id === id);
     assert.equal(TUTORIAL_STEPS[0].id, 'welcome');
     assert.equal(TUTORIAL_STEPS[1].id, 'open_card', 'first taught action is opening a card');
     assert.equal(TUTORIAL_STEPS[2].id, 'mark_owned', 'then marking a variant owned');
     assert.ok(idx('mark_double') < idx('favorite'), 'quantity before quick statuses');
-    assert.ok(idx('wishlist') < idx('sidebar_open'), 'quick statuses before filters');
-    assert.ok(idx('sidebar_close') < idx('search'), 'search taught after the filter panel');
-    assert.ok(idx('search') < idx('go_badges'), 'collection basics before other views');
+    assert.ok(idx('wishlist') < idx('go_badges'), 'collection basics before other views');
     assert.ok(idx('go_badges') < idx('go_stats') && idx('go_stats') < idx('go_settings'));
     assert.equal(TUTORIAL_STEPS[TUTORIAL_STEPS.length - 1].id, 'replay');
   });
 
   test('close steps validate on the actual state change (condition), not one button', () => {
-    for (const id of ['close_modal', 'sidebar_close']) {
-      const step = TUTORIAL_STEPS.find(s => s.id === id);
-      assert.equal(step.action.type, 'condition', `${id} must be condition-based`);
-      assert.equal(typeof step.action.check, 'function');
-    }
+    const step = TUTORIAL_STEPS.find(s => s.id === 'close_modal');
+    assert.equal(step.action.type, 'condition', 'close_modal must be condition-based');
+    assert.equal(typeof step.action.check, 'function');
   });
 
   test('the badge-remove step targets the force-remove action', () => {

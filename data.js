@@ -5,7 +5,7 @@
 import { log } from './logger.js';
 import { loadData } from './storage.js';
 import { loadManualBadges } from './badges.js';
-import { renderSidebar, applyFilters } from './render.js';
+import { renderCollection } from './render.js';
 import { updateStats } from './stats.js';
 
 // Current season — reassigned via setCurrentSeason() from other modules
@@ -183,8 +183,7 @@ export function switchSeason(season){
   loadAppData().then(() => {
     loadData();
     loadManualBadges();
-    renderSidebar();
-    applyFilters();
+    renderCollection();
     updateStats();
     _renderSeasonPills();
   });

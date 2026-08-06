@@ -10,7 +10,7 @@ import {
   CARDS_DB, CARD_TYPES, RARITY_ORDER, RARITY_KEYS, ROLE_BASE_RARITY
 } from './data.js';
 import { updateStats } from './stats.js';
-import { applyFilters, showToast } from './render.js';
+import { renderCollection, showToast } from './render.js';
 import {
   manualBadges, autoBadgeUnlocked,
   setManualBadges, setAutoBadgeUnlocked, saveManualBadges
@@ -270,7 +270,7 @@ function _applyImport(data, mode){
   }
   saveData();
   saveManualBadges();
-  applyFilters();
+  renderCollection();
   updateStats();
   showToast(mode==='replace'?t('imp.ok_replace'):t('imp.ok_merge'));
 }

@@ -152,7 +152,7 @@ Collections/F1/                 ← git root · all commands run here
 ├── install.js                  # PWA install (native prompt, banner, per-platform + Arc)
 ├── badges.js                   # Badge evaluation/rendering + titles
 ├── stats.js                    # computeStats(), renderStats() (progression, highlights, donut)
-├── render.js                   # Grid, sidebar, filters, modal, search, views, toast
+├── render.js                   # Grid, modal, views, toast
 ├── pin.js                      # Auth/PIN, viewer & admin modes, settings UI
 ├── cloud.js                    # Optional Supabase push/pull via raw REST fetch (magic-link auth)
 ├── settings-sync.js            # Optional settings in backups (prefs / security categories)
@@ -208,7 +208,7 @@ A change is **not done** until all of these pass. Run them before you say the wo
 5. **i18n:** any new user-facing string exists as a key in **all 7 languages** in `translations.js`; nothing is hard-coded.
 6. **Relative paths:** no new URL starts with `/`.
 7. **Logging:** no stray debug `console.log`; `DEBUG` is `false`.
-8. **Manual browser pass (what tests can't cover):** serve over HTTP and check what you touched — DOM rendering, modal/sidebar, theming, font switching, animations (incl. `prefers-reduced-motion`), the tutorial's DOM flow, PWA install, offline reload, and QR visual output. State clearly which manual checks you did and which you couldn't.
+8. **Manual browser pass (what tests can't cover):** serve over HTTP and check what you touched — DOM rendering, modal, theming, font switching, animations (incl. `prefers-reduced-motion`), the tutorial's DOM flow, PWA install, offline reload, and QR visual output. State clearly which manual checks you did and which you couldn't.
 9. **Docs:** if behaviour or structure changed, update `README.md` (and this file) so they still match reality.
 
 🇫🇷 Avant de dire « terminé » : `node --check` propre, `npm test` vert (+ test ajouté si logique modifiée), bundle reconstruit et commité si module bundlé, `SW_VERSION` incrémenté si le shell change, 7 langues à jour, aucun chemin en `/`, pas de `console.log` de debug, passe manuelle navigateur (HTTP) sur ce que tu as touché, et docs synchronisées.

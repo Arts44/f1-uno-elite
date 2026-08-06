@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.18.0',
+    date: '2026-08-04',
+    changes: {
+      en: [
+        'Simpler collection view: the search bar and the filter panel are gone — the grid now always shows the whole collection, sorted by card number.',
+        'The header counter now shows the total number of cards in the season.',
+        'The guided tour was updated to match.',
+      ],
+      fr: [
+        'Vue collection simplifiée : la barre de recherche et le panneau de filtres ont été retirés — la grille montre désormais toujours toute la collection, triée par numéro de carte.',
+        'Le compteur du header affiche maintenant le nombre total de cartes de la saison.',
+        'La visite guidée a été mise à jour en conséquence.',
+      ],
+      es: [
+        'Vista de colección simplificada: la barra de búsqueda y el panel de filtros se han eliminado — la cuadrícula muestra ahora siempre toda la colección, ordenada por número de carta.',
+        'El contador de la cabecera muestra ahora el número total de cartas de la temporada.',
+        'La visita guiada se actualizó en consecuencia.',
+      ],
+      zh: [
+        '收藏视图更简洁：搜索栏和筛选面板已移除——网格现在始终按卡号排序显示全部收藏。',
+        '页眉计数器现在显示本赛季的卡牌总数。',
+        '引导教程已相应更新。',
+      ],
+      it: [
+        'Vista collezione semplificata: la barra di ricerca e il pannello dei filtri sono stati rimossi — la griglia mostra ora sempre l’intera collezione, ordinata per numero di carta.',
+        'Il contatore nell’intestazione mostra ora il numero totale di carte della stagione.',
+        'Il tour guidato è stato aggiornato di conseguenza.',
+      ],
+      nl: [
+        'Eenvoudigere collectieweergave: de zoekbalk en het filterpaneel zijn verwijderd — het raster toont nu altijd de volledige collectie, gesorteerd op kaartnummer.',
+        'De teller in de header toont nu het totale aantal kaarten van het seizoen.',
+        'De rondleiding is hierop aangepast.',
+      ],
+      de: [
+        'Einfachere Sammlungsansicht: die Suchleiste und das Filterpanel wurden entfernt — das Raster zeigt jetzt immer die ganze Sammlung, sortiert nach Kartennummer.',
+        'Der Zähler in der Kopfzeile zeigt jetzt die Gesamtzahl der Karten der Saison.',
+        'Die geführte Tour wurde entsprechend angepasst.',
+      ],
+    },
+  },
+  {
     version: '1.17.0',
     date: '2026-07-23',
     changes: {
