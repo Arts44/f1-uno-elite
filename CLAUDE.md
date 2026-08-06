@@ -181,6 +181,23 @@ Collections/F1/                 ← git root · all commands run here
 
 **Adding a season:** create `data/cards-<year>.json` (same shape as `cards-2025.json`), update `data/metadata.json` for new teams/drivers, and remember the header only lists 2025 + seasons already present in `localStorage`.
 
+### Where to start, by task type / Par où commencer selon la tâche
+
+| Task / Tâche | Read first / Lire d'abord | Then / Ensuite |
+|---|---|---|
+| UI bug (grid, modal, toast, views) | `render.js`, `styles.css` | `data-action` wiring in `app.js` |
+| Logic bug (stats, badges, collection) | `stats.js` / `badges.js` / `collector.js` / `storage.js` | matching suite in `tests/` |
+| i18n (new text, translation fix) | `translations.js` (×7 langs), `i18n.js` | badges: `__BADGE_T` · cards: `card-descriptions.js` |
+| Card data / seasons | `data/cards-2025.json`, `data/metadata.json`, `data.js` | keep `data-embedded.js` in parity |
+| PWA / offline / update | `sw.js` (`SW_VERSION`), `update.js`, `install.js` | `manifest.webmanifest` |
+| Cloud sync | `cloud.js`, `cloud-config.js` | `docs/CLOUD-SYNC-DESIGN.md`, `tests/cloud.test.js` |
+| PIN / viewer / security | `pin.js`, `secure-store.js` | `VIEWER_BLOCKED` set in `app.js` |
+| Release / version | `changelog.js` (`APP_VERSION`), `sw.js` | Definition of Done (§8) |
+
+**Never read / Ne jamais lire :** `node_modules/`, `app.bundle.js(.map)` (generated — rebuild, never hand-edit), `package-lock.json`, `.git/`. **Assets only / Assets :** `icons/`, `screenshots/`, `fonts/`, `favicon.ico`.
+
+🇫🇷 Tableau d'orientation : pour chaque type de tâche, les fichiers à lire en premier. Ne jamais lire les dossiers générés ou les assets binaires.
+
 ---
 
 ## 7. Cloud sync — current status (read carefully)
