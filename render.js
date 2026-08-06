@@ -11,7 +11,7 @@ import {
 import {
   getTypeData, setTypeData,
   cardOwned, cardWishlist, cardDoubles, cardFavorite, cardTotalQty,
-  cardRarity, variantRarity
+  cardSetComplete, cardRarity, variantRarity
 } from './storage.js';
 import { updateStats, renderStats } from './stats.js';
 import { renderBadges } from './badges.js';
@@ -196,6 +196,7 @@ export function renderGrid(cards){
     const isOwned=cardOwned(card.id);
     const isWish=cardWishlist(card.id);
     const isFav=cardFavorite(card.id);
+    const isSet=cardSetComplete(card.id);
     const qty=cardTotalQty(card.id);
     renderedCount++;
     log('Card', index, 'isOwned:', isOwned, 'isWish:', isWish, 'isFav:', isFav, 'qty:', qty);
@@ -208,7 +209,7 @@ export function renderGrid(cards){
     const barColor=bestType?ct.color:'rgba(0,0,0,0.06)';
 
     const el=document.createElement('div');
-    let cardClass='card'+(isOwned?' has-owned':'')+(isWish?' has-wishlist':'')+(isFav?' has-favorite':'');
+    let cardClass='card'+(isOwned?' has-owned':'')+(isWish?' has-wishlist':'')+(isFav?' has-favorite':'')+(isSet?' set-complete':'');
     // FOILS (simples, duals, nitro, promos, wild) : le dégradé se
     // prolonge sur TOUTE la carte (une seule couche continue, le
     // .card-visual devient transparent) et le texte est posé sur un
@@ -242,6 +243,7 @@ export function renderGrid(cards){
       <div class="card-visual ${bestType?ct.css:''}${!isOwned?' not-owned':''}">
         ${card.champion?'<span class="crown">👑</span>':''}
         ${card.category==='reserve'?'<span class="replacement-icon">🔄</span>':''}
+        ${isSet?`<span class="set-flag" role="img" aria-label="${t('set.complete')}" title="${t('set.complete')}">🏁</span>`:''}
         ${card.category==='gp' && circuitSVG(card.id,'card') ? circuitSVG(card.id,'card') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : `<span style="font-size:40px">${catEmoji(card.category)}</span>`}
       </div>
       <div class="card-body">
@@ -481,7 +483,21 @@ function updateModalVisual(card){
   const vis=document.getElementById('moVis');
   if(!vis) return;
   const best=bestOwnedType(card);
-  vis.className = best ? `modal-visual ${CARD_TYPES[best].css}` : 'modal-visual not-owned';
+  const isSet=cardSetComplete(card.id);
+  vis.className = (best ? `modal-visual ${CARD_TYPES[best].css}` : 'modal-visual not-owned') + (isSet?' set-complete':'');
+  // Badge 🏁 « set complet » — même marqueur que sur la tuile
+  let flag=vis.querySelector('.set-flag');
+  if(isSet && !flag){
+    flag=document.createElement('span');
+    flag.className='set-flag';
+    flag.setAttribute('role','img');
+    flag.setAttribute('aria-label',t('set.complete'));
+    flag.title=t('set.complete');
+    flag.textContent='🏁';
+    vis.appendChild(flag);
+  } else if(!isSet && flag){
+    flag.remove();
+  }
 }
 
 export function toggleMoType(cardId, typeId, status){

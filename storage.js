@@ -98,6 +98,8 @@ export function cardDoubles(id){ const card=CARDS_DB.find(c=>c.id===id); return 
 export function cardFavorite(id){ const card=CARDS_DB.find(c=>c.id===id); return card.types.some(t=>getTypeData(id,t).favorite); }
 export function cardMissing(id){ return !cardOwned(id); }
 export function cardTotalQty(id){ const card=CARDS_DB.find(c=>c.id===id); return card.types.reduce((s,t)=>s+(getTypeData(id,t).qty||0),0); }
+// Set complet : au moins un exemplaire de CHAQUE type de la carte
+export function cardSetComplete(id){ const card=CARDS_DB.find(c=>c.id===id); return card.types.every(t=>{ const d=getTypeData(id,t); return d.owned && (d.qty||0)>0; }); }
 
 export function baseCardRarity(card){
   if(card.champion) return 'mythic';

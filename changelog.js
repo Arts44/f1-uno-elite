@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.20.0',
+    date: '2026-08-06',
+    changes: {
+      en: [
+        'Complete sets now stand out: once you own at least one copy of every variant of a card, its tile gets a subtle double ring and a small 🏁 badge — in the grid and on the card sheet.',
+      ],
+      fr: [
+        'Les sets complets se distinguent désormais : dès que tu possèdes au moins un exemplaire de chaque variante d’une carte, sa tuile gagne un fin double liseré et un petit badge 🏁 — dans la grille et sur la fiche carte.',
+      ],
+      es: [
+        'Las series completas ahora destacan: en cuanto posees al menos un ejemplar de cada variante de una carta, su casilla recibe un fino doble borde y una pequeña insignia 🏁 — en la cuadrícula y en la ficha de la carta.',
+      ],
+      zh: [
+        '集齐的卡组现在更醒目：只要你拥有某张卡每个版本至少一张，它的卡格就会获得细腻的双重描边和一枚小小的 🏁 徽章——在网格和卡片详情中都可见。',
+      ],
+      it: [
+        'I set completi ora si distinguono: appena possiedi almeno una copia di ogni variante di una carta, la sua tessera riceve un sottile doppio bordo e un piccolo badge 🏁 — nella griglia e nella scheda della carta.',
+      ],
+      nl: [
+        'Complete sets vallen nu op: zodra je van elke variant van een kaart minstens één exemplaar bezit, krijgt de tegel een subtiele dubbele rand en een kleine 🏁-badge — in het raster en op de kaartfiche.',
+      ],
+      de: [
+        'Komplette Sets stechen jetzt hervor: sobald du von jeder Variante einer Karte mindestens ein Exemplar besitzt, erhält ihre Kachel einen feinen Doppelrand und ein kleines 🏁-Abzeichen — im Raster und auf dem Kartenblatt.',
+      ],
+    },
+  },
+  {
     version: '1.19.0',
     date: '2026-08-06',
     changes: {
