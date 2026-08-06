@@ -1056,6 +1056,17 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .badge-manual-btn.validated{background:#E8F5E9;color:#34C759;border-color:#34C759;}
 .badge-manual-btn.validated:hover{background:#FFEBEE;color:var(--red);border-color:var(--red);}
 .badge-card.unlocked::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);}
+/* Standard « Compte » : verrouillé/déverrouillé nettement différenciés.
+   Verrouillé : carte assourdie + cadenas discret ; déverrouillé garde
+   son identité rouge, avec un léger relief. Aucun changement de markup. */
+.badge-card.locked{background:var(--surface2);box-shadow:none;}
+.badge-card.locked .badge-name{color:var(--tx2);}
+.badge-card.locked .badge-desc{color:var(--tx3);}
+.badge-card.locked::after{content:'🔒';position:absolute;top:10px;right:12px;font-size:12px;opacity:0.45;}
+.badge-card.locked:hover{transform:none;box-shadow:var(--sh-sm);border-color:var(--tx3);}
+.badge-card.unlocked{box-shadow:var(--sh-sm);}
+.badge-card.unlocked:hover{box-shadow:var(--sh-md),0 0 0 3px var(--red-s);}
+.badge-card:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
 .badge-card.locked::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--surface3);}
 
 /* Shimmer only on newly-unlocked badges */
@@ -1322,6 +1333,17 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 /* ── Vue Compte : un accent sémantique par zone (bordure gauche fine)
    — uniquement des tokens existants (cloud=bleu, sauvegarde=vert,
    avis=violet, danger=rouge). ── */
+/* Réglages : mêmes accents sémantiques que la page Compte (tokens
+   existants) — la classe est posée directement sur la section. */
+.setv-section.set-appearance{border-left:3px solid var(--purple);}
+.setv-section.set-security{border-left:3px solid var(--blue);}
+.setv-section.set-about{border-left:3px solid var(--green);}
+.setv-section.set-session{border-left:3px solid var(--red);}
+/* États hover/focus des lignes et boutons — standard « Compte » */
+.setv-row{transition:background 0.12s ease;}
+.setv-row:hover{background:var(--surface2);}
+.setv-btn:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
+
 .acc-accent > .setv-section{border-left:3px solid transparent;}
 .acc-cloud > .setv-section{border-left-color:var(--blue);}
 .acc-backup > .setv-section{border-left-color:var(--green);}

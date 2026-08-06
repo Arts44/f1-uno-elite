@@ -280,8 +280,8 @@ var F1App=(()=>{var nn=Object.defineProperty;var Si=Object.getOwnPropertyDescrip
     </div>`,document.body.appendChild(e),_="",document.getElementById("adminCancelBtn").addEventListener("click",t=>{t.stopPropagation(),e.remove(),_="",window._adminOverlayActive=!1,window._adminPinCallback=null,D(F==="settings"?"collection":F)}),document.getElementById("adminLockBtn").addEventListener("click",t=>{t.stopPropagation(),e.remove(),window._adminOverlayActive=!1,window._adminPinCallback=null,Sa()}),window._adminOverlayActive=!0,window._adminPinCallback=async()=>{if(await nt(_)===Rn()){e.remove(),window._adminOverlayActive=!1,window._adminPinCallback=null,He=!1,_t=!0,document.body.classList.remove("viewer-mode");let o=document.querySelector('.bn-tab[data-view="settings"]');o&&(o.querySelector(".bn-icon").textContent="\u2699\uFE0F",o.querySelector(".bn-label").textContent="R\xE9glages"),_="",D("settings"),y(i("adm.ok"))}else{for(let o=0;o<4;o++)document.querySelectorAll("#dot-"+o).forEach(n=>{n.classList.remove("filled"),n.classList.add("error")});document.querySelectorAll("#pin-error").forEach(o=>{o.textContent="Code incorrect"}),setTimeout(()=>{_="",_e()},700)}}}var Hn=[{id:"circuit",name:"Circuit",display:"'Space Grotesk',sans-serif",body:"'Inter',sans-serif"},{id:"sprint",name:"Sprint",display:"'Chakra Petch',sans-serif",body:"'IBM Plex Sans',sans-serif"},{id:"prestige",name:"Prestige",display:"'Fraunces',serif",body:"'Source Sans 3',sans-serif"},{id:"minimal",name:"Minimal",display:"'Manrope',sans-serif",body:"'Manrope',sans-serif"},{id:"original",name:"Original",display:"'Syne',sans-serif",body:"'DM Sans',sans-serif"}];function Ba(){return localStorage.getItem("f1uno_font")||"circuit"}function ks(e){localStorage.setItem("f1uno_font",e),Ca(e),_s(e)}function Ca(e){let t=document.documentElement;t.setAttribute("data-font",e);let o=Hn.find(n=>n.id===e);o?(t.style.setProperty("--font-d",o.display),t.style.setProperty("--font-b",o.body)):(t.style.removeProperty("--font-d"),t.style.removeProperty("--font-b"))}function et(){Ca(Ba())}function _s(e){if(!document.fonts||typeof document.fonts.load!="function")return;let t=Hn.find(n=>n.id===e);if(!t)return;[...new Set([t.display,t.body].map(n=>n.split(",")[0].trim()))].forEach(n=>{document.fonts.load(`400 1em ${n}`).catch(()=>{}),document.fonts.load(`700 1em ${n}`).catch(()=>{})})}function ge(){let e=document.getElementById("settingsView");if(!e)return;let t=document.getElementById("collectionView");t&&(t.style.display="none");let o=document.documentElement.getAttribute("data-theme")==="dark",n=yt(),a=kt(),s=Object.entries(Wn).map(([l,c])=>`<option value="${l}"${ie()===l?" selected":""}>${c}</option>`).join("");e.innerHTML=`
     <div class="setv-title">\u2699\uFE0F <span>${i("nav.settings").replace("\u2699\uFE0F ","")}</span></div>
 
-    <div class="setv-section">
-      <div class="setv-section-title">${i("s.appearance")}</div>
+    <div class="setv-section set-appearance">
+      <div class="setv-section-title">\u{1F3A8} ${i("s.appearance")}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${i("s.dark")}</div>
@@ -320,8 +320,8 @@ var F1App=(()=>{var nn=Object.defineProperty;var Si=Object.getOwnPropertyDescrip
 
     ${In()}
 
-    <div class="setv-section">
-      <div class="setv-section-title">${i("s.security")}</div>
+    <div class="setv-section set-security">
+      <div class="setv-section-title">\u{1F510} ${i("s.security")}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${i("s.pin")}</div>
@@ -374,8 +374,8 @@ var F1App=(()=>{var nn=Object.defineProperty;var Si=Object.getOwnPropertyDescrip
     </div>
 
 
-    <div class="setv-section">
-      <div class="setv-section-title">${i("s.about")}</div>
+    <div class="setv-section set-about">
+      <div class="setv-section-title">\u2139\uFE0F ${i("s.about")}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${i("s.version")}</div>
@@ -401,8 +401,8 @@ var F1App=(()=>{var nn=Object.defineProperty;var Si=Object.getOwnPropertyDescrip
     </div>
 
     ${n?`
-    <div class="setv-section">
-      <div class="setv-section-title">${i("s.session")}</div>
+    <div class="setv-section set-session">
+      <div class="setv-section-title">\u{1F512} ${i("s.session")}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${i("s.lock")}</div>
@@ -413,8 +413,8 @@ var F1App=(()=>{var nn=Object.defineProperty;var Si=Object.getOwnPropertyDescrip
     </div>`:""}
   `,e.querySelector("#pinToggle")?.addEventListener("click",async()=>{if(n){if(!confirm(i("pin.disable")))return;if(W())try{await dn(),y(i("enc.off_done"))}catch(l){console.error("encryption disable failed \u2014 PIN kept enabled",l),y(i("enc.err_generic"));return}localStorage.setItem("f1uno_pin_enabled","false"),localStorage.removeItem("f1uno_pin_hash")}else{xs(e);return}ge()}),e.querySelector("#showChangePinBtn")?.addEventListener("click",()=>{let l=e.querySelector("#changePinForm");l&&(l.style.display=l.style.display==="none"?"block":"none")}),e.querySelector("#changePinFormEl")?.addEventListener("submit",async l=>{l.preventDefault();let c=e.querySelector("#newPinA").value,d=e.querySelector("#newPinB").value,m=e.querySelector("#pinChangeError");if(!/^\d{4}$/.test(c)){m.textContent=i("pin.digits");return}if(c!==d){m.textContent=i("pin.mismatch");return}let u=await nt(c);if(W())try{await yo(c)}catch(g){console.error("re-key failed \u2014 PIN unchanged",g),m.textContent=i("enc.err_generic");return}localStorage.setItem("f1uno_pin_hash",u),m.textContent="",e.querySelector("#changePinForm").style.display="none",e.querySelector("#newPinA").value="",e.querySelector("#newPinB").value="",y(i("pin.saved"))}),e.querySelector("#viewerToggle")?.addEventListener("click",()=>{localStorage.setItem("f1uno_viewer_enabled",a?"false":"true"),ge(),y(a?i("toast.viewer_off"):i("toast.viewer_on"))}),e.querySelector("#encToggle")?.addEventListener("click",()=>{if(W()){if(!confirm(i("enc.off_confirm")))return;dn().then(()=>{ge(),y(i("enc.off_done"))}).catch(l=>{console.error("encryption disable failed",l),y(i("enc.err_generic"))})}else{if(!confirm(i("enc.warn")))return;ws(async l=>{try{await bo(l),ge(),y(i("enc.on_done"))}catch(c){console.error("encryption enable failed \u2014 data left in clear",c),y(i("enc.err_generic"))}})}}),e.querySelector("#settingsLockBtn")?.addEventListener("click",Sa),e.querySelector("#changelogBtn")?.addEventListener("click",()=>Pn()),e.querySelector("#checkUpdBtn")?.addEventListener("click",async()=>{let l=e.querySelector("#checkUpdBtn"),c=e.querySelector("#checkUpdMsg");if(!l||l.disabled)return;l.disabled=!0,c.textContent=i("upd.checking");let d=await va(),m={uptodate:"upd.uptodate",found:"upd.found_msg",offline:"upd.check_err",error:"upd.check_err",cooldown:"upd.cooldown",unsupported:"upd.check_err"};c.textContent=i(m[d]||"upd.check_err"),setTimeout(()=>{e.querySelector("#checkUpdMsg")&&(e.querySelector("#checkUpdMsg").textContent=i("s.check_upd_sub")),e.querySelector("#checkUpdBtn")&&(e.querySelector("#checkUpdBtn").disabled=!1)},6e3)}),e.querySelector("#replayTutBtn")?.addEventListener("click",()=>Bn()),zn();let r=e.querySelector("#langSel");r&&r.addEventListener("change",l=>Aa(l.target.value)),e.querySelectorAll("#fontPicker .font-opt").forEach(l=>{l.addEventListener("click",()=>{ks(l.getAttribute("data-font-id")),e.querySelectorAll("#fontPicker .font-opt").forEach(c=>c.classList.toggle("active",c===l))})})}function xs(e){e.innerHTML=`
     <div class="setv-title">\u2699\uFE0F <span>${i("nav.settings").replace("\u2699\uFE0F ","")}</span></div>
-    <div class="setv-section">
-      <div class="setv-section-title">${i("pin.set_title")}</div>
+    <div class="setv-section set-security">
+      <div class="setv-section-title">\u{1F510} ${i("pin.set_title")}</div>
       <form class="pin-change-form" id="enablePinFormEl">
         <div class="pin-input-row">
           <label class="pin-input-label" for="enablePinA">${i("s.new_pin")}</label>

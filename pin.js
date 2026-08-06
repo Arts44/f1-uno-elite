@@ -570,8 +570,8 @@ export function renderSettings(){
   el.innerHTML = `
     <div class="setv-title">⚙️ <span>${t('nav.settings').replace('⚙️ ','')}</span></div>
 
-    <div class="setv-section">
-      <div class="setv-section-title">${t('s.appearance')}</div>
+    <div class="setv-section set-appearance">
+      <div class="setv-section-title">🎨 ${t('s.appearance')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('s.dark')}</div>
@@ -610,8 +610,8 @@ export function renderSettings(){
 
     ${installRowHTML()}
 
-    <div class="setv-section">
-      <div class="setv-section-title">${t('s.security')}</div>
+    <div class="setv-section set-security">
+      <div class="setv-section-title">🔐 ${t('s.security')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('s.pin')}</div>
@@ -664,8 +664,8 @@ export function renderSettings(){
     </div>
 
 
-    <div class="setv-section">
-      <div class="setv-section-title">${t('s.about')}</div>
+    <div class="setv-section set-about">
+      <div class="setv-section-title">ℹ️ ${t('s.about')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('s.version')}</div>
@@ -691,8 +691,8 @@ export function renderSettings(){
     </div>
 
     ${pinOn ? `
-    <div class="setv-section">
-      <div class="setv-section-title">${t('s.session')}</div>
+    <div class="setv-section set-session">
+      <div class="setv-section-title">🔒 ${t('s.session')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('s.lock')}</div>
@@ -838,8 +838,8 @@ export function renderSettings(){
 function _startEnablePin(container){
   container.innerHTML = `
     <div class="setv-title">⚙️ <span>${t('nav.settings').replace('⚙️ ','')}</span></div>
-    <div class="setv-section">
-      <div class="setv-section-title">${t('pin.set_title')}</div>
+    <div class="setv-section set-security">
+      <div class="setv-section-title">🔐 ${t('pin.set_title')}</div>
       <form class="pin-change-form" id="enablePinFormEl">
         <div class="pin-input-row">
           <label class="pin-input-label" for="enablePinA">${t('s.new_pin')}</label>
