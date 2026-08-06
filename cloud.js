@@ -444,8 +444,12 @@ function _cloudAreaHTML(){
       <input type="email" class="cloud-email" id="cloudEmail" placeholder="${t('cloud.email_ph')}" autocomplete="email" inputmode="email">
       <button class="setv-btn" id="cloudSendBtn" type="button">${t('cloud.send_link')}</button>
     </div>
-    <div class="cloud-login-row" id="cloudCodeRow" style="display:none;">
-      <input type="text" class="cloud-email cloud-code" id="cloudCode" placeholder="${t('cloud.code_ph')}" inputmode="numeric" autocomplete="one-time-code" maxlength="10" aria-label="${t('cloud.code_label')}">
+    <div class="cloud-login-row cloud-otp-row" id="cloudCodeRow" style="display:none;">
+      <div class="otp-wrap" id="otpWrap">
+        <input type="text" class="otp-input" id="cloudCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" aria-label="${t('cloud.code_label')}">
+        <div class="otp-boxes" aria-hidden="true">${'<span class="otp-box"></span>'.repeat(8)}</div>
+        <span class="otp-check" aria-hidden="true">✓</span>
+      </div>
       <button class="setv-btn" id="cloudVerifyBtn" type="button">${t('cloud.verify_btn')}</button>
     </div>
     <div class="cloud-msg" id="cloudAuthMsg" aria-live="polite"></div>`;
@@ -519,26 +523,65 @@ export function bindCloudSection(){
       }
     });
   }
+  // ── Saisie OTP segmentée : le VRAI input (#cloudCode) reste l'unique
+  //    input logique (clavier, collage, backspace, lecteur d'écran) ;
+  //    les cases .otp-box ne sont qu'un miroir visuel (aria-hidden). ──
+  const otpWrap = document.getElementById('otpWrap');
+  const otpInput = document.getElementById('cloudCode');
+  if(otpWrap && otpInput){
+    const boxes = [...otpWrap.querySelectorAll('.otp-box')];
+    const renderOtp = () => {
+      const v = normalizeOtpInput(otpInput.value);
+      if(otpInput.value !== v) otpInput.value = v; // chiffres uniquement
+      const activeIdx = Math.min(v.length, boxes.length - 1);
+      boxes.forEach((b, i) => {
+        const ch = v[i] || '';
+        if(b.textContent !== ch){
+          b.textContent = ch;
+          if(ch){ b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
+        }
+        b.classList.toggle('filled', !!ch);
+        b.classList.toggle('active', document.activeElement === otpInput && i === activeIdx && v.length < boxes.length + 1);
+      });
+      otpWrap.classList.remove('otp-error');
+    };
+    otpInput.addEventListener('input', renderOtp);
+    otpInput.addEventListener('focus', renderOtp);
+    otpInput.addEventListener('blur', () => boxes.forEach(b => b.classList.remove('active')));
+    otpWrap.addEventListener('click', () => otpInput.focus());
+    renderOtp();
+  }
+
   const verifyBtn = document.getElementById('cloudVerifyBtn');
   if(verifyBtn){
     verifyBtn.addEventListener('click', async () => {
       const msg = document.getElementById('cloudAuthMsg');
       const email = (document.getElementById('cloudEmail')?.value || '').trim();
       const code = normalizeOtpInput(document.getElementById('cloudCode')?.value);
+      const wrap = document.getElementById('otpWrap');
       if(!isValidOtpFormat(code)){
         if(msg){ msg.textContent = t('cloud.code_err'); msg.className = 'cloud-msg err'; }
+        if(wrap){ wrap.classList.remove('otp-error'); void wrap.offsetWidth; wrap.classList.add('otp-error'); }
         return;
       }
       verifyBtn.disabled = true;
       if(msg){ msg.textContent = t('cloud.verifying'); msg.className = 'cloud-msg'; }
       try {
         await verifyOtpCode(email, code);
-        _refreshCloudArea(); // → signed-in state
+        if(wrap){
+          // État de succès : cases vertes + check animé, puis bascule
+          wrap.classList.add('otp-success');
+          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          setTimeout(() => _refreshCloudArea(), reduce ? 150 : 700);
+        } else {
+          _refreshCloudArea(); // → signed-in state
+        }
       } catch(e){
         log('cloud: verify error', e);
         const key = e.message === 'offline' ? 'cloud.offline'
                   : e.message === 'rate-limited' ? 'cloud.rate_limited' : 'cloud.code_err';
         if(msg){ msg.textContent = t(key); msg.className = 'cloud-msg err'; }
+        if(wrap){ wrap.classList.remove('otp-error'); void wrap.offsetWidth; wrap.classList.add('otp-error'); }
         verifyBtn.disabled = false;
       }
     });
