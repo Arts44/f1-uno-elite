@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.19.0',
+    date: '2026-08-06',
+    changes: {
+      en: [
+        'A cleaner, quieter header: one slim rail with your title, the season and the card total neatly aligned — and more room for your collection on every screen size.',
+      ],
+      fr: [
+        'Un header plus net et plus calme : une seule barre fine avec ton titre, la saison et le total de cartes bien alignés — et plus de place pour ta collection sur toutes les tailles d’écran.',
+      ],
+      es: [
+        'Una cabecera más limpia y tranquila: una sola barra fina con tu título, la temporada y el total de cartas bien alineados — y más espacio para tu colección en cualquier pantalla.',
+      ],
+      zh: [
+        '更简洁安静的页眉：一条纤细的横栏，整齐排列你的头衔、赛季和卡牌总数——在任何屏幕上都为收藏留出更多空间。',
+      ],
+      it: [
+        'Un’intestazione più pulita e tranquilla: un’unica barra sottile con il tuo titolo, la stagione e il totale delle carte ben allineati — e più spazio per la tua collezione su ogni schermo.',
+      ],
+      nl: [
+        'Een strakkere, rustigere header: één slanke balk met je titel, het seizoen en het kaarttotaal netjes uitgelijnd — en meer ruimte voor je collectie op elk schermformaat.',
+      ],
+      de: [
+        'Eine klarere, ruhigere Kopfzeile: eine schlanke Leiste mit deinem Titel, der Saison und der Kartengesamtzahl sauber ausgerichtet — und mehr Platz für deine Sammlung auf jeder Bildschirmgröße.',
+      ],
+    },
+  },
+  {
     version: '1.18.0',
     date: '2026-08-04',
     changes: {
