@@ -330,6 +330,51 @@ export async function pullCollection(){
   return rows[0].updated_at || null;
 }
 
+// True when a session exists locally (used by the Account view to gate
+// cloud-scoped actions; token freshness is re-checked by the actions).
+export function isCloudSignedIn(){
+  return isCloudConfigured() && !!loadSession();
+}
+
+// Change the account email: GoTrue sends confirmation link(s) — to both
+// mailboxes when the project has "secure email change" enabled.
+export async function requestEmailChange(newEmail){
+  const cfg = cloudConfig();
+  if(!cfg) throw new Error('not-signed-in');
+  _requireOnline();
+  const { session } = await _requireSession();
+  const resp = await fetch(`${cfg.url}/auth/v1/user`, {
+    method: 'PUT',
+    cache: 'no-store',
+    headers: { ...authHeaders(cfg, session.access_token), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: newEmail }),
+  }).catch(() => { throw new Error('offline'); });
+  if(!resp.ok){
+    log('cloud: email change failed', resp.status, await resp.text().catch(() => ''));
+    throw new Error(resp.status === 429 ? 'rate-limited' : 'email-change-failed');
+  }
+  return true;
+}
+
+// Danger zone: delete EVERY season row of the signed-in user (RLS keeps
+// this scoped to their own rows server-side).
+export async function cloudDeleteAll(){
+  const cfg = cloudConfig();
+  if(!cfg) throw new Error('not-signed-in');
+  _requireOnline();
+  const { session, userId } = await _requireSession();
+  const resp = await fetch(`${cfg.url}/rest/v1/collections?user_id=eq.${userId}`, {
+    method: 'DELETE',
+    cache: 'no-store',
+    headers: authHeaders(cfg, session.access_token),
+  }).catch(() => { throw new Error('offline'); });
+  if(!resp.ok){
+    log('cloud: delete failed', resp.status, await resp.text().catch(() => ''));
+    throw new Error('delete-failed');
+  }
+  return true;
+}
+
 // Lightweight metadata read for the "last cloud backup" line.
 export async function fetchCloudMeta(){
   const cfg = cloudConfig();
@@ -380,7 +425,15 @@ function _cloudAreaHTML(){
         <button class="setv-btn" id="cloudPullBtn" type="button">${t('cloud.pull_btn')}</button>
       </div>
       <div class="cloud-msg" id="cloudSyncMsg" aria-live="polite"></div>
-      <div><button class="setv-btn" id="cloudSignOutBtn" type="button">${t('cloud.sign_out')}</button></div>`;
+      <div class="cloud-actions">
+        <button class="setv-btn" id="cloudSignOutBtn" type="button">${t('cloud.sign_out')}</button>
+        <button class="setv-btn" id="cloudEmailChgBtn" type="button">${t('cloud.change_email')}</button>
+      </div>
+      <div class="cloud-login-row" id="cloudEmailChgRow" style="display:none;">
+        <input type="email" class="cloud-email" id="cloudNewEmail" placeholder="${t('cloud.new_email_ph')}" autocomplete="email" inputmode="email">
+        <button class="setv-btn" id="cloudEmailChgSendBtn" type="button">${t('cloud.change_email_send')}</button>
+      </div>
+      <div class="cloud-msg" id="cloudEmailChgMsg" aria-live="polite"></div>`;
   }
   return `
     <div class="setv-row-left">
@@ -496,6 +549,37 @@ export function bindCloudSection(){
       outBtn.disabled = true;
       await signOut();
       _refreshCloudArea();
+    });
+  }
+
+  // Change email: reveal the input row, then PUT /auth/v1/user.
+  const chgBtn = document.getElementById('cloudEmailChgBtn');
+  if(chgBtn){
+    chgBtn.addEventListener('click', () => {
+      const row = document.getElementById('cloudEmailChgRow');
+      if(row){ row.style.display = row.style.display === 'none' ? '' : 'none'; }
+      document.getElementById('cloudNewEmail')?.focus();
+    });
+    document.getElementById('cloudEmailChgSendBtn')?.addEventListener('click', async () => {
+      const msg = document.getElementById('cloudEmailChgMsg');
+      const btn = document.getElementById('cloudEmailChgSendBtn');
+      const email = (document.getElementById('cloudNewEmail')?.value || '').trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){
+        if(msg){ msg.textContent = t('cloud.invalid_email'); msg.className = 'cloud-msg err'; }
+        return;
+      }
+      btn.disabled = true;
+      if(msg){ msg.textContent = t('cloud.sending'); msg.className = 'cloud-msg'; }
+      try {
+        await requestEmailChange(email);
+        if(msg){ msg.textContent = t('cloud.change_email_sent'); msg.className = 'cloud-msg ok'; }
+      } catch(e){
+        log('cloud: email change error', e);
+        const key = e.message === 'offline' ? 'cloud.offline'
+                  : e.message === 'rate-limited' ? 'cloud.rate_limited' : 'cloud.change_email_err';
+        if(msg){ msg.textContent = t(key); msg.className = 'cloud-msg err'; }
+        btn.disabled = false;
+      }
     });
   }
 

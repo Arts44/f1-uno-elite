@@ -203,7 +203,14 @@ export const TUTORIAL_STEPS = [
   { id: 'set_theme', ensure: async () => { switchView('settings'); },
     target: () => q('#settingsView [data-action="toggleTheme"]'), observe: true },
   { id: 'set_font', target: '#fontPicker', observe: true },
-  { id: 'set_backup', target: '#backupCodeBtn', observe: true },
+
+  // ── 6. Account (cloud, backups, danger zone) ──
+  { id: 'go_account',
+    target: '.bn-tab[data-view="account"]',
+    action: { type: 'view', view: 'account' } },
+
+  { id: 'set_backup', ensure: async () => { switchView('account'); },
+    target: '#backupCodeBtn', observe: true },
   { id: 'set_data', target: '#importBtn', observe: true },
   { id: 'set_tools', target: '#toolsMissingBtn', observe: true },
   { id: 'replay', target: '#replayTutBtn', observe: true },

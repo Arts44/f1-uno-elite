@@ -1291,6 +1291,37 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .setv-btn:hover{background:var(--surface3);border-color:var(--red);color:var(--red);}
 .setv-btn.danger{border-color:var(--red-m);color:var(--red);}
 .setv-btn.danger:hover{background:var(--red-s);}
+
+/* ── Vue Compte : un accent sémantique par zone (bordure gauche fine)
+   — uniquement des tokens existants (cloud=bleu, sauvegarde=vert,
+   avis=violet, danger=rouge). ── */
+.acc-accent > .setv-section{border-left:3px solid transparent;}
+.acc-cloud > .setv-section{border-left-color:var(--blue);}
+.acc-backup > .setv-section{border-left-color:var(--green);}
+.acc-feedback > .setv-section{border-left-color:var(--purple);}
+.acc-danger > .setv-section{border-left-color:var(--red);}
+.danger-zone .setv-section-title{color:var(--red);}
+
+/* Modale de suppression (confirmation forte) */
+.danger-mo{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.55);padding:var(--space-4);}
+.danger-mo-box{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--red-m);
+  border-radius:var(--r-lg);padding:var(--space-5);display:flex;flex-direction:column;gap:var(--space-4);
+  box-shadow:0 24px 64px rgba(0,0,0,0.4);}
+.danger-mo-title{font-family:var(--font-d);font-weight:700;font-size:16px;color:var(--red);}
+.danger-scopes{display:flex;flex-direction:column;gap:var(--space-2);}
+.danger-scope{display:flex;align-items:flex-start;gap:var(--space-2);font-size:13px;color:var(--tx1);cursor:pointer;}
+.danger-scope input{margin-top:2px;accent-color:var(--red);}
+.danger-scope.off{opacity:0.45;cursor:not-allowed;}
+.danger-warn{font-size:12.5px;line-height:1.55;color:var(--tx2);background:var(--red-s);
+  border:1px solid var(--red-m);border-radius:var(--r-md);padding:var(--space-3);}
+.danger-confirm{display:flex;flex-direction:column;gap:var(--space-1);}
+.danger-word-hint{font-size:12px;font-weight:600;color:var(--tx2);}
+#dangerWord{padding:var(--space-2) var(--space-3);border-radius:var(--r-md);border:1px solid var(--border);
+  background:var(--surface2);color:var(--tx1);font-family:var(--font-b);font-size:14px;letter-spacing:1px;}
+#dangerWord:focus-visible{outline:2px solid var(--red);outline-offset:1px;}
+.danger-mo-actions{display:flex;justify-content:flex-end;gap:var(--space-2);}
+.danger-mo-actions .setv-btn.danger:disabled{opacity:0.4;cursor:not-allowed;}
 .setv-lang-sel{padding:var(--space-2) var(--space-3);border-radius:var(--r-pill);border:1.5px solid var(--border);background:var(--surface2);font-family:var(--font-b);font-size:13px;color:var(--tx1);cursor:pointer;outline:none;transition:var(--ease);}
 .setv-lang-sel:focus{border-color:var(--red);}
 .setv-toggle{width:46px;height:26px;border-radius:var(--r-pill);border:none;background:var(--surface3);cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;}
@@ -1317,6 +1348,11 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .retired-badge{display:inline-block;font-size:8px;font-weight:800;letter-spacing:0.5px;padding:1px var(--space-1);border-radius:4px;background:rgba(139,0,0,0.15);color:#8b0000;margin-left:var(--space-1);vertical-align:middle;text-transform:uppercase;font-family:var(--font-b);}
 
 @media(max-width:600px){.badges-grid{grid-template-columns:repeat(2,1fr);}.badges-title{font-size:22px;}.badges-progress-bar{width:140px;}.bn-tab{padding:var(--space-2) var(--space-3);}.bn-label{font-size:9px;}}
+/* 5 onglets : la largeur fixe de 72px déborde sur les petits écrans —
+   resserrer sous 400px, puis icônes seules sous 340px (zones tactiles
+   conservées ≥ 40px). */
+@media(max-width:400px){.bn-tab{width:60px;}.bottom-nav-pill{gap:0;}}
+@media(max-width:340px){.bn-label{display:none;}.bn-tab{width:48px;padding:var(--space-2) 0;min-height:40px;}.bn-icon{font-size:20px;}}
 
 /* USER TITLE */
 .user-title-wrap{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-14px);border-radius:12px;background:var(--surface2);border:1px solid var(--border);margin-bottom:var(--space-1);}

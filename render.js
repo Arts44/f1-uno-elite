@@ -17,6 +17,7 @@ import {
 import { updateStats, renderStats } from './stats.js';
 import { renderBadges } from './badges.js';
 import { renderSettings } from './pin.js';
+import { renderAccount } from './account.js';
 
 /* ── Visual helpers ── */
 export function driverNumberHTML(card){
@@ -629,11 +630,13 @@ export function switchView(view){
   const badgesView = document.getElementById('badgesView');
   const statsView = document.getElementById('statsView');
   const settingsView = document.getElementById('settingsView');
+  const accountView = document.getElementById('accountView');
 
   collectionView.style.display = 'none';
   badgesView.classList.remove('active');
   if(statsView) statsView.classList.remove('active');
   if(settingsView) settingsView.classList.remove('active');
+  if(accountView) accountView.classList.remove('active');
 
   // Bottom nav tabs
   document.querySelectorAll('.bn-tab').forEach(t => {
@@ -651,6 +654,10 @@ export function switchView(view){
     case 'settings':
       if(settingsView){ settingsView.classList.add('active'); renderSettings(); }
       // Ensure collectionView is hidden when in settings
+      collectionView.style.display = 'none';
+      break;
+    case 'account':
+      if(accountView){ accountView.classList.add('active'); renderAccount(); }
       collectionView.style.display = 'none';
       break;
     default:

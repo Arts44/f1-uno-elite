@@ -91,6 +91,24 @@ export function setTypeData(cardId, typeId, key, value){
   saveData(); updateStats();
 }
 
+// ── Suppression des données locales de collection (zone danger) ──
+// Efface les clés de collection de TOUTES les saisons (possédées,
+// badges, badges auto, historique) + les compteurs de rappel de
+// sauvegarde. Les préférences (thème, langue, police) et le PIN sont
+// volontairement conservés. Recharge l'état mémoire (vide) ensuite.
+export function deleteLocalCollectionData(){
+  const kill = [];
+  for(let i = 0; i < localStorage.length; i++){
+    const k = localStorage.key(i);
+    if(/^f1uno_(owned|badges|auto_badges|history)_/.test(k)) kill.push(k);
+  }
+  kill.forEach(k => localStorage.removeItem(k));
+  localStorage.removeItem('f1uno_changes_since_backup');
+  localStorage.removeItem('f1uno_last_backup');
+  loadData();
+  return kill.length;
+}
+
 // ── Ajout rapide depuis la grille (bouton +) ──
 // Ajoute 1 exemplaire de la variante choisie ; retourne l'état
 // précédent du type pour permettre une annulation exacte (toast).

@@ -31,8 +31,15 @@ import { initUpdateFlow, maybeOfferWhatsNew } from './update.js';
 
 // Magic-link return: if the URL carries a GoTrue #access_token fragment,
 // store the cloud session and clean the URL — before anything else
-// (incl. maybeHandleBackupHash) looks at location.hash.
-handleAuthRedirect();
+// (incl. maybeHandleBackupHash) looks at location.hash. On success,
+// land the user on the Account view so the signed-in state is visible.
+let _openAccountAfterInit = false;
+let _appInitialized = false;
+handleAuthRedirect().then(ok => {
+  if(!ok) return;
+  _openAccountAfterInit = true;
+  if(_appInitialized) switchView('account');
+});
 
 // Listen for beforeinstallprompt as early as possible — it can fire
 // before the app is initialized (login screen still visible).
@@ -71,6 +78,10 @@ export function initApp() {
     // Just updated to a newer version? Offer (never impose) the
     // "what's new" changelog. Idempotent — safe on unlock re-inits.
     maybeOfferWhatsNew();
+
+    // Magic-link sign-in just landed? Show the Account view.
+    _appInitialized = true;
+    if(_openAccountAfterInit) switchView('account');
   });
 }
 

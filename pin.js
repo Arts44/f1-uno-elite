@@ -5,15 +5,10 @@
 import { log } from './logger.js';
 import { t, LANGS, getLang, setLang } from './i18n.js';
 import { switchView, showToast, toggleTheme, currentView, setCurrentView, closeMo } from './render.js';
-import { triggerImport, collectionSnapshot, _showImportDialog } from './storage.js';
-import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg } from './backup.js';
 import { initApp } from './app.js';
 import { maybeStartTutorial, startTutorial } from './tutorial.js';
 import { missingCards, doublesList, tradeList } from './collector.js';
 import { installRowHTML, bindInstallRow } from './install.js';
-import { backupIncludes, setBackupIncludes } from './settings-sync.js';
-import { cloudSectionHTML, bindCloudSection } from './cloud.js';
-import { feedbackSectionHTML, bindFeedbackSection } from './feedback.js';
 import { openChangelog, checkForUpdatesNow, isUpdateCheckSupported } from './update.js';
 import { APP_VERSION } from './changelog.js';
 import {
@@ -716,66 +711,6 @@ export function renderSettings(){
       </div>`}
     </div>
 
-    <div class="setv-section">
-      <div class="setv-section-title">${t('s.collection')}</div>
-      <div class="setv-row" style="flex-direction:column;align-items:stretch;gap:8px;">
-        <div class="setv-row-left">
-          <div class="setv-row-label">${t('bk.inc_title')}</div>
-          <div class="setv-row-sub">${t('bk.inc_sub')}</div>
-        </div>
-        <label class="import-set-row"><input type="checkbox" id="bkIncPrefs"${backupIncludes().prefs?' checked':''}> <span>${t('bk.inc_prefs')}</span></label>
-        <label class="import-set-row"><input type="checkbox" id="bkIncSec"${backupIncludes().security?' checked':''}> <span>${t('bk.inc_sec')}</span></label>
-      </div>
-      <div class="setv-row">
-        <div class="setv-row-left">
-          <div class="setv-row-label">${t('s.import')}</div>
-          <div class="setv-row-sub">${t('s.import_sub')}</div>
-        </div>
-        <button class="setv-btn" id="importBtn">${t('s.import_btn')}</button>
-      </div>
-      <div class="setv-row">
-        <div class="setv-row-left">
-          <div class="setv-row-label">${t('s.export')}</div>
-          <div class="setv-row-sub">${t('s.export_sub')}</div>
-        </div>
-        <button class="setv-btn" data-action="exportCollection">${t('s.export_btn')}</button>
-      </div>
-      <div class="setv-row">
-        <div class="setv-row-left">
-          <div class="setv-row-label">${t('s.bkcode')}</div>
-          <div class="setv-row-sub">${t('s.bkcode_sub')}</div>
-        </div>
-        <button class="setv-btn" id="backupCodeBtn">${t('s.bkcode_btn')}</button>
-      </div>
-      <div class="setv-row" id="backupCodeArea" style="display:none;flex-direction:column;align-items:stretch;gap:8px;">
-        <textarea id="backupCodeOut" readonly rows="4" style="width:100%;resize:vertical;font-family:monospace;font-size:11px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--tx1);"></textarea>
-        <div class="pin-form-error" id="backupCodeWarn"></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="setv-btn" id="backupCopyBtn">${t('bk.copy')}</button>
-          <button class="setv-btn" id="backupQrBtn">${t('bk.show_qr')}</button>
-        </div>
-        <div class="bk-qr-wrap" id="backupQrWrap" style="display:none;">
-          <div class="bk-qr" id="backupQr" aria-label="${t('bk.qr_alt')}"></div>
-          <div class="bk-qr-hint" id="backupQrHint">${t('bk.qr_hint')}</div>
-        </div>
-      </div>
-      <div class="setv-row">
-        <div class="setv-row-left">
-          <div class="setv-row-label">${t('s.bkrestore')}</div>
-          <div class="setv-row-sub">${t('s.bkrestore_sub')}</div>
-        </div>
-        <button class="setv-btn" id="restoreCodeBtn">${t('s.bkrestore_btn')}</button>
-      </div>
-      <div class="setv-row" id="restoreCodeArea" style="display:none;flex-direction:column;align-items:stretch;gap:8px;">
-        <textarea id="restoreCodeIn" rows="4" placeholder="${t('bk.placeholder')}" style="width:100%;resize:vertical;font-family:monospace;font-size:11px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--tx1);"></textarea>
-        <div class="pin-form-error" id="restoreCodeError"></div>
-        <button class="setv-btn" id="restoreApplyBtn">${t('bk.apply')}</button>
-      </div>
-    </div>
-
-    ${cloudSectionHTML()}
-
-    ${feedbackSectionHTML()}
 
     <div class="setv-section">
       <div class="setv-section-title">${t('s.tools')}</div>
@@ -921,7 +856,6 @@ export function renderSettings(){
     }
   });
 
-  el.querySelector('#importBtn')?.addEventListener('click', triggerImport);
   el.querySelector('#settingsLockBtn')?.addEventListener('click', lockApp);
   el.querySelector('#changelogBtn')?.addEventListener('click', () => openChangelog());
 
@@ -950,67 +884,6 @@ export function renderSettings(){
     }, 6000);
   });
 
-  // — Backup code (device-to-device, no file) —
-  el.querySelector('#backupCodeBtn')?.addEventListener('click', async ()=>{
-    const area = el.querySelector('#backupCodeArea');
-    const out = el.querySelector('#backupCodeOut');
-    const warn = el.querySelector('#backupCodeWarn');
-    try {
-      const { code, tooBig } = await generateBackupCode(collectionSnapshot(backupIncludes()));
-      out.value = code;
-      warn.textContent = tooBig ? t('bk.too_big') : '';
-      area.style.display = 'flex';
-      markBackupDone();
-    } catch(e){
-      warn.textContent = t('bk.invalid');
-      area.style.display = 'flex';
-    }
-  });
-  el.querySelector('#backupCopyBtn')?.addEventListener('click', async ()=>{
-    const out = el.querySelector('#backupCodeOut');
-    try {
-      await navigator.clipboard.writeText(out.value);
-    } catch(e){
-      out.focus(); out.select();
-      document.execCommand('copy');
-    }
-    showToast(t('bk.copied'));
-  });
-  el.querySelector('#backupQrBtn')?.addEventListener('click', ()=>{
-    const out = el.querySelector('#backupCodeOut');
-    const wrap = el.querySelector('#backupQrWrap');
-    const qrBox = el.querySelector('#backupQr');
-    const hint = el.querySelector('#backupQrHint');
-    if(!out.value) return;
-    if(wrap.style.display !== 'none'){ wrap.style.display = 'none'; return; }
-    const { svg, tooBig } = makeBackupQrSvg(buildBackupLink(out.value));
-    if(tooBig){
-      qrBox.innerHTML = '';
-      hint.textContent = t('bk.qr_too_big');
-      hint.classList.add('bk-qr-warn');
-    } else {
-      qrBox.innerHTML = svg;
-      hint.textContent = t('bk.qr_hint');
-      hint.classList.remove('bk-qr-warn');
-    }
-    wrap.style.display = 'flex';
-  });
-  el.querySelector('#restoreCodeBtn')?.addEventListener('click', ()=>{
-    const area = el.querySelector('#restoreCodeArea');
-    area.style.display = area.style.display === 'none' ? 'flex' : 'none';
-  });
-  el.querySelector('#restoreApplyBtn')?.addEventListener('click', async ()=>{
-    const input = el.querySelector('#restoreCodeIn');
-    const errEl = el.querySelector('#restoreCodeError');
-    errEl.textContent = '';
-    try {
-      const data = await decodeBackupCode(input.value);
-      _showImportDialog(data); // existing merge/replace dialog
-    } catch(e){
-      errEl.textContent = e.message || t('bk.invalid');
-    }
-  });
-
   // — Collector tools: generate a shareable text list —
   const toolsArea = el.querySelector('#toolsArea');
   const toolsOut = el.querySelector('#toolsOut');
@@ -1026,10 +899,6 @@ export function renderSettings(){
 
   el.querySelector('#replayTutBtn')?.addEventListener('click', ()=> startTutorial());
   bindInstallRow();
-  bindCloudSection();
-  bindFeedbackSection();
-  el.querySelector('#bkIncPrefs')?.addEventListener('change', e => setBackupIncludes({ prefs: e.target.checked }));
-  el.querySelector('#bkIncSec')?.addEventListener('change', e => setBackupIncludes({ security: e.target.checked }));
 
   const langSel = el.querySelector('#langSel');
   if(langSel) langSel.addEventListener('change', e=>setLang(e.target.value));
