@@ -10,7 +10,7 @@ import {
   showGridSkeleton, hideGridSkeleton,
   renderCollection, switchView, closeMo,
   toggleTheme, quickToggle, changeMoQty, showToast,
-  toggleQuickAdd, quickAddType, closeQuickAdd
+  toggleQuickAdd, quickAddType, closeQuickAdd, initNavBead
 } from './render.js';
 import { updateStats } from './stats.js';
 import {
@@ -54,6 +54,7 @@ export function initApp() {
     loadData();
     loadManualBadges();
     initEvents();
+    initNavBead();
     renderCollection();
     updateStats();
     _renderSeasonPills();

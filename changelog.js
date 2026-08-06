@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.23.0',
+    date: '2026-08-07',
+    changes: {
+      en: [
+        'New navigation: the active tab now floats in a sliding bead, and the bar curves around it as it glides from tab to tab.',
+        'Cloud sign-in: the code is now typed in animated segmented boxes — auto-advance, smart paste, a green check on success.',
+        'Settings and Badges got the Account-page polish: semantic color accents, clearer sections, and locked/unlocked badges you can tell apart at a glance.',
+      ],
+      fr: [
+        'Nouvelle navigation : l’onglet actif flotte dans une pastille glissante, et la barre se creuse autour d’elle en épousant son déplacement.',
+        'Connexion cloud : le code se saisit désormais dans des cases animées — avance automatique, collage intelligent, coche verte en cas de succès.',
+        'Réglages et Badges reçoivent le soin de la page Compte : accents de couleur sémantiques, sections plus lisibles, et badges verrouillés/débloqués reconnaissables au premier coup d’œil.',
+      ],
+      es: [
+        'Nueva navegación: la pestaña activa flota en una burbuja deslizante, y la barra se curva a su alrededor mientras se desplaza.',
+        'Inicio de sesión en la nube: el código se escribe ahora en casillas animadas — avance automático, pegado inteligente, marca verde al validar.',
+        'Ajustes e Insignias reciben el pulido de la página Cuenta: acentos de color semánticos, secciones más claras e insignias bloqueadas/desbloqueadas distinguibles al instante.',
+      ],
+      zh: [
+        '全新导航：当前标签浮在一个滑动圆珠中，标签栏随其移动弯出贴合的凹槽。',
+        '云登录：验证码现在在动画分格中输入——自动前进、智能粘贴、成功时显示绿色对勾。',
+        '设置与徽章获得账户页同款打磨：语义色彩点缀、更清晰的分区，锁定/解锁徽章一眼可辨。',
+      ],
+      it: [
+        'Nuova navigazione: la scheda attiva fluttua in una pallina scorrevole, e la barra si incurva attorno ad essa seguendone il movimento.',
+        'Accesso cloud: il codice si digita ora in caselle animate — avanzamento automatico, incolla intelligente, spunta verde al successo.',
+        'Impostazioni e Badge ricevono la cura della pagina Account: accenti di colore semantici, sezioni più leggibili e badge bloccati/sbloccati distinguibili a colpo d’occhio.',
+      ],
+      nl: [
+        'Nieuwe navigatie: het actieve tabblad zweeft in een glijdende knop, en de balk buigt eromheen mee terwijl hij van tab naar tab glijdt.',
+        'Cloud-aanmelding: de code typ je nu in geanimeerde vakjes — automatisch doorschuiven, slim plakken, groen vinkje bij succes.',
+        'Instellingen en Badges kregen de Account-afwerking: semantische kleuraccenten, duidelijkere secties, en vergrendelde/ontgrendelde badges die je in één oogopslag herkent.',
+      ],
+      de: [
+        'Neue Navigation: der aktive Tab schwebt in einer gleitenden Perle, und die Leiste wölbt sich um sie herum, während sie von Tab zu Tab gleitet.',
+        'Cloud-Anmeldung: der Code wird jetzt in animierten Feldern getippt — Auto-Weiterschaltung, cleveres Einfügen, grüner Haken bei Erfolg.',
+        'Einstellungen und Abzeichen erhielten den Konto-Feinschliff: semantische Farbakzente, klarere Bereiche und auf einen Blick unterscheidbare gesperrte/freigeschaltete Abzeichen.',
+      ],
+    },
+  },
+  {
     version: '1.22.0',
     date: '2026-08-06',
     changes: {

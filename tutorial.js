@@ -194,6 +194,7 @@ export const TUTORIAL_STEPS = [
     target: () => q('#statsView .sv-progress'), observe: true },
   { id: 'stats_highlights', target: () => q('#statsView .sv-feat'), observe: true },
   { id: 'stats_donut', target: () => q('#statsView .sv-donut'), observe: true },
+  { id: 'set_tools', target: () => q('#statsView .sv-tools'), observe: true },
 
   // ── 5. Settings ──
   { id: 'go_settings',
@@ -212,7 +213,6 @@ export const TUTORIAL_STEPS = [
   { id: 'set_backup', ensure: async () => { switchView('account'); },
     target: '#backupCodeBtn', observe: true },
   { id: 'set_data', target: '#importBtn', observe: true },
-  { id: 'set_tools', target: '#toolsMissingBtn', observe: true },
   { id: 'replay', target: '#replayTutBtn', observe: true },
 ];
 

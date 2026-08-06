@@ -107,27 +107,31 @@
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="" data-i18n-aria="nav.main">
-  <div class="bottom-nav-pill">
-    <button class="bn-tab active" data-action="switchView" data-view="collection" type="button">
+  <div class="bead-nav-inner" id="beadInner">
+    <svg class="bead-bar" id="beadBar" aria-hidden="true"></svg>
+    <div class="bead" id="navBead" aria-hidden="true">🃏</div>
+    <div class="bottom-nav-pill" role="tablist">
+      <button class="bn-tab active" data-action="switchView" data-view="collection" type="button">
       <span class="bn-icon">🃏</span>
       <span class="bn-label" data-i18n="nav.collection">Collection</span>
     </button>
-    <button class="bn-tab" data-action="switchView" data-view="badges" type="button">
+      <button class="bn-tab" data-action="switchView" data-view="badges" type="button">
       <span class="bn-icon">🏅</span>
       <span class="bn-label" data-i18n="nav.badges">Badges</span>
     </button>
-    <button class="bn-tab" data-action="switchView" data-view="stats" type="button">
+      <button class="bn-tab" data-action="switchView" data-view="stats" type="button">
       <span class="bn-icon">📊</span>
       <span class="bn-label" data-i18n="nav.stats">Stats</span>
     </button>
-    <button class="bn-tab" data-action="switchView" data-view="account" type="button">
+      <button class="bn-tab" data-action="switchView" data-view="account" type="button">
       <span class="bn-icon">👤</span>
       <span class="bn-label" data-i18n="nav.account">Account</span>
     </button>
-    <button class="bn-tab" data-action="switchView" data-view="settings" type="button">
+      <button class="bn-tab" data-action="switchView" data-view="settings" type="button">
       <span class="bn-icon">⚙️</span>
       <span class="bn-label" data-i18n="nav.settings">Settings</span>
     </button>
+    </div>
   </div>
 </nav>
 

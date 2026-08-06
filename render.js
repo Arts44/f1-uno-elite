@@ -563,6 +563,88 @@ export function changeMoQty(cardId, typeId, delta){
 export function closeMoOverlay(e){ if(e.target===document.getElementById('mo')) closeMo(); }
 export function closeMo(){ document.getElementById('mo').classList.remove('open'); currentCardId=null; }
 
+/* ══════════════════════════════════════════════════════════ NAV BEAD
+   Barre de navigation à pastille : silhouette en UN path SVG
+   paramétrique (pilule + encoche circulaire), la pastille glisse en
+   CSS (transform 280 ms) et l'encoche suit via un tween rAF one-shot
+   — aucune animation continue. Les .bn-tab et data-view sont
+   inchangés (tutoriel, délégation, tests). */
+const BEAD_H = 58, BEAD_NR = 31, BEAD_CORNER = 29;
+let _beadW = 0, _beadCx = null, _beadAnim = null;
+
+function _beadPath(W, cx){
+  const f = 10, r = BEAD_NR - 4, dip = 6, C = BEAD_CORNER;
+  return [
+    `M ${C} 0`, `H ${cx - BEAD_NR - f}`,
+    `C ${cx - BEAD_NR - f/2} 0 ${cx - BEAD_NR - 1} ${dip*0.35} ${cx - r} ${dip}`,
+    `A ${r} ${r} 0 0 0 ${cx + r} ${dip}`,
+    `C ${cx + BEAD_NR + 1} ${dip*0.35} ${cx + BEAD_NR + f/2} 0 ${cx + BEAD_NR + f} 0`,
+    `H ${W - C}`, `A ${C} ${C} 0 0 1 ${W} ${C}`, `V ${BEAD_H - C}`,
+    `A ${C} ${C} 0 0 1 ${W - C} ${BEAD_H}`, `H ${C}`,
+    `A ${C} ${C} 0 0 1 0 ${BEAD_H - C}`, `V ${C}`, `A ${C} ${C} 0 0 1 ${C} 0`, 'Z',
+  ].join(' ');
+}
+
+function _beadTabs(){ return [...document.querySelectorAll('.bn-tab')]; }
+function _beadActiveIdx(){ return Math.max(0, _beadTabs().findIndex(t => t.classList.contains('active'))); }
+function _beadCxFor(i){ return _beadW / Math.max(1, _beadTabs().length) * (i + 0.5); }
+const _beadReduce = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+export function layoutNavBead(){
+  const bar = document.getElementById('beadBar');
+  const inner = document.getElementById('beadInner');
+  if(!bar || !inner) return;
+  _beadW = Math.min(window.innerWidth - 24, 560);
+  inner.style.width = _beadW + 'px';
+  bar.setAttribute('width', _beadW);
+  bar.setAttribute('height', BEAD_H);
+  bar.setAttribute('viewBox', `0 0 ${_beadW} ${BEAD_H}`);
+  _beadCx = _beadCxFor(_beadActiveIdx());
+  bar.innerHTML = `<path d="${_beadPath(_beadW, _beadCx)}"/>`;
+  const bead = document.getElementById('navBead');
+  if(bead){
+    bead.style.transition = 'none';
+    bead.style.transform = `translateX(${_beadCx - 24}px)`;
+    void bead.offsetWidth;
+    bead.style.transition = '';
+    const icon = _beadTabs()[_beadActiveIdx()]?.querySelector('.bn-icon');
+    if(icon) bead.textContent = icon.textContent;
+  }
+}
+
+export function updateNavBead(){
+  const bar = document.getElementById('beadBar');
+  const bead = document.getElementById('navBead');
+  if(!bar || !bead || !bar.firstElementChild){ return; }
+  if(!_beadW) layoutNavBead();
+  const idx = _beadActiveIdx();
+  const target = _beadCxFor(idx);
+  if(target === _beadCx) return;
+  const icon = _beadTabs()[idx]?.querySelector('.bn-icon');
+  if(icon) bead.textContent = icon.textContent;
+  bead.style.transform = `translateX(${target - 24}px)`;
+  if(_beadReduce()){
+    bar.firstElementChild.setAttribute('d', _beadPath(_beadW, target));
+    _beadCx = target;
+    return;
+  }
+  cancelAnimationFrame(_beadAnim);
+  const from = _beadCx, t0 = performance.now(), DUR = 280;
+  const ease = x => 1 - Math.pow(1 - x, 3);
+  const step = now => {
+    const k = Math.min(1, (now - t0) / DUR);
+    _beadCx = from + (target - from) * ease(k);
+    bar.firstElementChild.setAttribute('d', _beadPath(_beadW, _beadCx));
+    if(k < 1) _beadAnim = requestAnimationFrame(step);
+  };
+  _beadAnim = requestAnimationFrame(step);
+}
+
+export function initNavBead(){
+  layoutNavBead();
+  window.addEventListener('resize', layoutNavBead);
+}
+
 /* ══════════════════════════════════════════════════════════ QUICK ADD
    Bouton « + » sur la tuile → mini-sélecteur de variantes → +1 qty,
    toast avec Annuler. Les écritures passent par quickAddVariant()
@@ -642,6 +724,7 @@ export function switchView(view){
   document.querySelectorAll('.bn-tab').forEach(t => {
     t.classList.toggle('active', t.getAttribute('data-view') === view);
   });
+  updateNavBead();
 
   switch(view){
     case 'badges':
