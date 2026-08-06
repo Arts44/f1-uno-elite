@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.22.0',
+    date: '2026-08-06',
+    changes: {
+      en: [
+        'New 👤 Account tab: cloud sync, backups (code + QR, export/import) and feedback now live together — with sign-out, email change, and a danger zone to delete your data (device, cloud or both) behind a typed confirmation.',
+        'Collector tools moved into Stats: missing cards, doubles to trade and your trade list as clean tabbed lists — rarity chips, wishlist stars and copy counts included.',
+      ],
+      fr: [
+        'Nouvel onglet 👤 Compte : la synchro cloud, les sauvegardes (code + QR, export/import) et les avis vivent désormais ensemble — avec déconnexion, changement d’email, et une zone danger pour supprimer tes données (appareil, cloud ou les deux) derrière une confirmation à retaper.',
+        'Les outils de collectionneur déménagent dans Stats : cartes manquantes, doubles à échanger et liste d’échange en listes à onglets soignées — pastilles de rareté, étoiles wishlist et quantités incluses.',
+      ],
+      es: [
+        'Nueva pestaña 👤 Cuenta: la sincronización en la nube, las copias (código + QR, exportar/importar) y las opiniones ahora viven juntas — con cierre de sesión, cambio de email y una zona de peligro para borrar tus datos (dispositivo, nube o ambos) tras una confirmación escrita.',
+        'Las herramientas de coleccionista se mudan a Stats: cartas que faltan, repetidas para intercambiar y tu lista de intercambio en listas con pestañas — con chips de rareza, estrellas de wishlist y cantidades.',
+      ],
+      zh: [
+        '全新 👤 账户标签页：云同步、备份（备份码 + 二维码、导出/导入）和反馈现在集中在一起——还有退出登录、更换邮箱，以及需要输入确认词的危险区域（可删除设备、云端或两者的数据）。',
+        '收藏家工具移入统计页：缺少的卡、可交换的重复卡和交换清单以整洁的标签列表呈现——含稀有度徽章、愿望清单星标和数量。',
+      ],
+      it: [
+        'Nuova scheda 👤 Account: sincronizzazione cloud, backup (codice + QR, esporta/importa) e feedback ora vivono insieme — con disconnessione, cambio email e una zona pericolo per eliminare i tuoi dati (dispositivo, cloud o entrambi) dietro una conferma digitata.',
+        'Gli strumenti da collezionista si spostano in Stats: carte mancanti, doppioni da scambiare e la tua lista di scambio in liste a schede curate — con chip di rarità, stelle wishlist e quantità.',
+      ],
+      nl: [
+        'Nieuw 👤 Account-tabblad: cloudsync, back-ups (code + QR, export/import) en feedback wonen nu samen — met uitloggen, e-mail wijzigen en een gevarenzone om je gegevens te wissen (apparaat, cloud of beide) achter een getypte bevestiging.',
+        'De verzamelaarstools verhuizen naar Stats: ontbrekende kaarten, dubbelen om te ruilen en je ruillijst als nette lijsten met tabbladen — met zeldzaamheidschips, verlanglijst-sterren en aantallen.',
+      ],
+      de: [
+        'Neuer 👤 Konto-Tab: Cloud-Sync, Backups (Code + QR, Export/Import) und Feedback wohnen jetzt zusammen — mit Abmelden, E-Mail-Änderung und einer Gefahrenzone zum Löschen deiner Daten (Gerät, Cloud oder beides) hinter einer getippten Bestätigung.',
+        'Die Sammler-Werkzeuge ziehen in die Stats: fehlende Karten, Dubletten zum Tauschen und deine Tauschliste als saubere Listen mit Tabs — mit Seltenheits-Chips, Wunschlisten-Sternen und Stückzahlen.',
+      ],
+    },
+  },
+  {
     version: '1.21.1',
     date: '2026-08-06',
     changes: {

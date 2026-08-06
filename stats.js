@@ -2,7 +2,8 @@
    STATS — live header/counter updates + stats view rendering
    ══════════════════════════════════════════════════════════ */
 import { t } from './i18n.js';
-import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, rarityChipClass, rarityChipStyle } from './data.js';
+import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, rarityChipClass, rarityChipStyle, _currentSeason } from './data.js';
+import { missingCards, doublesList, tradeList } from './collector.js';
 import {
   getTypeData, cardOwned, cardWishlist, cardDoubles, cardMissing, cardFavorite,
   cardRarity, variantRarity, cardTotalQty
@@ -349,6 +350,18 @@ export function renderStats(){
   }
   histHtml += `<div class="sv-note">${t('st.history_note')}</div>`;
 
+  // — Outils de collectionneur : onglets Manquantes / Doubles / Échange —
+  const toolsHtml = `
+    <div class="sv-section-title">🧰 ${t('st.tools')}</div>
+    <div class="sv-tools">
+      <div class="sv-tools-tabs" role="tablist" aria-label="${t('st.tools')}">
+        <button class="sv-tool-tab active" data-tool="missing" role="tab" aria-selected="true" type="button">${t('tools.missing')} <span class="sv-tool-n">${missing}</span></button>
+        <button class="sv-tool-tab" data-tool="doubles" role="tab" aria-selected="false" type="button">${t('tools.doubles')} <span class="sv-tool-n">${doubles}</span></button>
+        <button class="sv-tool-tab" data-tool="trade" role="tab" aria-selected="false" type="button">${t('tools.trade')}</button>
+      </div>
+      <div class="sv-tools-body" id="svToolsBody">${_toolPanelHTML('missing')}</div>
+    </div>`;
+
   el.innerHTML = `
     <div class="sv-title">${t('st.title')}</div>
 
@@ -389,7 +402,109 @@ export function renderStats(){
     ${teamRows  ? `<div class="sv-section-title">${t('st.by_team')}</div><div class="sv-rows-block">${teamRows}</div>`:''}
     ${rarityRows? `<div class="sv-section-title">${t('st.by_rarity')}</div><div class="sv-rows-block">${rarityRows}</div>`:''}
 
+    ${toolsHtml}
+
     <div class="sv-section-title">${t('st.history')}</div>
     ${histHtml}
   `;
+
+  // Onglets outils : bascule locale (lecture seule, pas d'écriture)
+  el.querySelectorAll('.sv-tool-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      el.querySelectorAll('.sv-tool-tab').forEach(x => {
+        x.classList.toggle('active', x === tab);
+        x.setAttribute('aria-selected', x === tab ? 'true' : 'false');
+      });
+      const body = el.querySelector('#svToolsBody');
+      if(body) body.innerHTML = _toolPanelHTML(tab.dataset.tool);
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   COLLECTOR TOOLS UI — structured rows (one card per line, one
+   field per span) so a v2.x text export is a trivial map+join;
+   the fmt* helpers below already produce that text.
+   ══════════════════════════════════════════════════════════ */
+function _toolRow(item, extra = ''){
+  const rar = RARITIES[item.rarity] || {};
+  return `<div class="sv-tool-row" data-card="${item.id}">
+    <span class="sv-tool-cat" title="${CATS[item.category]?.label||item.category}">${CATS[item.category]?.emoji||'🃏'}</span>
+    <span class="sv-tool-num">#${item.id}</span>
+    <span class="sv-tool-name">${item.name}</span>
+    <span class="sv-tool-chip${rarityChipClass(item.rarity)}" style="${rarityChipStyle(item.rarity, rar.color)}">${t('rar.'+item.rarity)}</span>
+    ${extra}
+  </div>`;
+}
+const _missingExtra = r => r.wishlist ? `<span class="sv-tool-wish" title="${t('status.wishlist')}">⭐</span>` : '';
+const _doublesExtra = r => `<span class="sv-tool-types">${r.types.map(ty =>
+  `<span class="sv-tool-type">${CARD_TYPES[ty.type]?.icon||'?'}&nbsp;×${ty.qty}</span>`).join('')}</span>`;
+
+function _toolPanelHTML(tool){
+  if(tool === 'doubles'){
+    const rows = doublesList();
+    if(!rows.length) return `<div class="sv-tool-empty">🔄 ${t('st.doubles_empty')}</div>`;
+    return rows.map(r => _toolRow(r, _doublesExtra(r))).join('');
+  }
+  if(tool === 'trade'){
+    const { want, offer } = tradeList();
+    if(!want.length && !offer.length) return `<div class="sv-tool-empty">🤝 ${t('st.trade_empty')}</div>`;
+    return `
+      <div class="sv-tool-subtitle">🔎 ${t('tools.want')} <span class="sv-tool-n">${want.length}</span></div>
+      ${want.length ? want.map(r => _toolRow(r, _missingExtra(r))).join('') : `<div class="sv-tool-empty">${t('st.missing_empty')}</div>`}
+      <div class="sv-tool-subtitle">🔄 ${t('tools.offer')} <span class="sv-tool-n">${offer.length}</span></div>
+      ${offer.length ? offer.map(r => _toolRow(r, _doublesExtra(r))).join('') : `<div class="sv-tool-empty">${t('st.doubles_empty')}</div>`}`;
+  }
+  const rows = missingCards();
+  if(!rows.length) return `<div class="sv-tool-empty">🏆 ${t('st.missing_empty')}</div>`;
+  return rows.map(r => _toolRow(r, _missingExtra(r))).join('');
+}
+
+/* ── Collector-tools text formatting (shareable lists) — moved from
+   pin.js with the tools UI. Not wired to a button yet: kept exported
+   as the ready-made v2.x text export. Card names are data (never
+   translated); category/rarity/type labels use i18n. ── */
+function _catLabel(cat){ const k='cat.'+cat, l=t(k); return l===k ? (CATS[cat]?.label||cat) : l; }
+function _typeLabel(id){ const k='type.'+id, l=t(k); return l===k ? (CARD_TYPES[id]?.label||id) : l; }
+
+function _groupByCat(rows){
+  const groups = [];
+  Object.keys(CATS).forEach(cat => {
+    const inCat = rows.filter(r => r.category === cat);
+    if(inCat.length) groups.push({ cat, rows: inCat });
+  });
+  rows.filter(r => !CATS[r.category]).forEach(r => {
+    let g = groups.find(g => g.cat === r.category);
+    if(!g){ g = { cat: r.category, rows: [] }; groups.push(g); }
+    g.rows.push(r);
+  });
+  return groups;
+}
+function _missingLine(r){ return `  #${r.id} ${r.name} — ${t('rar.'+r.rarity)}${r.wishlist?' ⭐':''}`; }
+function _doublesLine(r){
+  const types = r.types.map(ty => `${_typeLabel(ty.type)} ×${ty.qty}`).join(', ');
+  return `  #${r.id} ${r.name} — ${types}`;
+}
+function _groupedBlock(rows, lineFn){
+  return _groupByCat(rows).map(g =>
+    `${CATS[g.cat]?.emoji||''} ${_catLabel(g.cat)}\n${g.rows.map(lineFn).join('\n')}`
+  ).join('\n\n');
+}
+function _fmtHead(titleKey){ return `F1 UNO Élite — ${t(titleKey)} (${t('tools.season',{season:_currentSeason})})`; }
+
+export function fmtMissing(){
+  const rows = missingCards();
+  const head = `${_fmtHead('tools.missing')}\n${rows.length} / ${CARDS_DB.length}`;
+  return rows.length ? `${head}\n\n${_groupedBlock(rows, _missingLine)}` : `${head}\n\n${t('tools.none')}`;
+}
+export function fmtDoubles(){
+  const rows = doublesList();
+  const head = _fmtHead('tools.doubles');
+  return rows.length ? `${head}\n\n${_groupedBlock(rows, _doublesLine)}` : `${head}\n\n${t('tools.none')}`;
+}
+export function fmtTrade(){
+  const { want, offer } = tradeList();
+  const wantBlock = want.length ? want.map(_missingLine).join('\n') : '  —';
+  const offerBlock = offer.length ? offer.map(_doublesLine).join('\n') : '  —';
+  return `${_fmtHead('tools.trade')}\n\n🔎 ${t('tools.want')} (${want.length})\n${wantBlock}\n\n🔄 ${t('tools.offer')} (${offer.length})\n${offerBlock}`;
 }

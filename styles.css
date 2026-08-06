@@ -1292,6 +1292,33 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .setv-btn.danger{border-color:var(--red-m);color:var(--red);}
 .setv-btn.danger:hover{background:var(--red-s);}
 
+/* ── Stats : outils de collectionneur (onglets internes + listes) ── */
+.sv-tools{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-5);}
+.sv-tools-tabs{display:flex;gap:var(--space-2);flex-wrap:wrap;}
+.sv-tool-tab{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 var(--space-3);
+  border-radius:var(--r-pill);border:1px solid var(--border);background:var(--surface2);
+  color:var(--tx2);font-family:var(--font-b);font-size:12.5px;font-weight:600;cursor:pointer;
+  transition:var(--ease);}
+.sv-tool-tab:hover{color:var(--tx1);border-color:var(--tx3);}
+.sv-tool-tab.active{background:var(--tx1);border-color:var(--tx1);color:var(--surface);}
+.sv-tool-tab:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
+.sv-tool-n{font-variant-numeric:tabular-nums;opacity:0.75;}
+.sv-tools-body{display:flex;flex-direction:column;gap:2px;max-height:420px;overflow-y:auto;}
+.sv-tool-row{display:flex;align-items:center;gap:var(--space-2);padding:7px var(--space-2);
+  border-radius:var(--r-md);font-size:13px;color:var(--tx1);}
+.sv-tool-row:nth-child(even){background:var(--surface2);}
+.sv-tool-cat{flex:none;font-size:14px;}
+.sv-tool-num{flex:none;font-variant-numeric:tabular-nums;color:var(--tx3);font-size:12px;min-width:38px;}
+.sv-tool-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sv-tool-chip{flex:none;font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);}
+.sv-tool-wish{flex:none;font-size:13px;}
+.sv-tool-types{flex:none;display:inline-flex;gap:6px;font-size:12px;color:var(--tx2);}
+.sv-tool-type{white-space:nowrap;}
+.sv-tool-subtitle{font-family:var(--font-d);font-weight:700;font-size:12.5px;color:var(--tx2);
+  padding:var(--space-2) var(--space-2) 2px;display:flex;align-items:center;gap:6px;}
+.sv-tool-empty{padding:var(--space-4);text-align:center;font-size:13px;color:var(--tx2);}
+
 /* ── Vue Compte : un accent sémantique par zone (bordure gauche fine)
    — uniquement des tokens existants (cloud=bleu, sauvegarde=vert,
    avis=violet, danger=rouge). ── */
