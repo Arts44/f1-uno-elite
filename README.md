@@ -23,6 +23,16 @@ It's a **PWA**: install it from your browser and it runs like a native app, full
 
 <sub>More captures in [`screenshots/`](screenshots/) — light and dark themes, desktop and mobile.</sub>
 
+### New in 1.21
+
+| Eternal rarity — complete-set champions | Quick add — variant picker |
+|---|---|
+| ![Eternal rarity — complete-set champions](screenshots/i18n/eternal-tile.en.jpg) | ![Quick add — variant picker](screenshots/i18n/quick-add.en.jpg) |
+
+| Rarity donut with Eternal | Undo toast |
+|---|---|
+| ![Rarity donut with Eternal](screenshots/i18n/stats-rarity.en.jpg) | ![Undo toast](screenshots/i18n/toast.en.jpg) |
+
 ---
 
 ## ✨ What it does
@@ -30,11 +40,12 @@ It's a **PWA**: install it from your browser and it runs like a native app, full
 Track a complete **F1 UNO Élite** trading-card collection — 101 cards, each existing in up to 16 variants (base colours, foils, duals, Wild, Nitro, promos):
 
 - 📇 **Full collection management** — owned / doubles / wishlist / favourites, per-variant quantities, the whole collection always in view.
+- ➕ **One-gesture quick add** — a + button on every tile opens a variant picker: one tap adds a copy, with an Undo toast. The header shows your live progress (owned/total) over a thin progress line.
 - ✨ **Animated 7-level rarity system** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, computed from the best owned variant, +1 level when the set is complete (every variant owned) — `eternal` is only reachable that way. Foil cards carry live light-sweep visuals and the top tier renders as a shifting iridescent gradient (all respecting `prefers-reduced-motion`).
 - 📴 **Works fully offline** — the whole app is precached by a service worker; after the first visit, airplane mode changes nothing.
 - 🔄 **Transparent auto-updates** — new versions are detected in the background and applied with one tap, plus an in-app changelog showing what changed since *your* last version.
 - 🌍 **7 languages** — English, French, Spanish, Chinese, Italian, Dutch, German. Every string, badge and changelog entry.
-- 🎓 **Interactive 26-step tutorial** — a guided tour where you *perform* the real actions, running in a sandbox that reverts every change when it ends.
+- 🎓 **Interactive 22-step tutorial** — a guided tour where you *perform* the real actions, running in a sandbox that reverts every change when it ends.
 - 🏅 **50 badges & titles** — 25 unlocked automatically from measured conditions, 25 self-declared.
 - 📊 **Stats dashboard** — global progress, rarity donut, per-category completion, highlights, and a day-by-day progression curve (pure SVG, no chart library).
 - 🔁 **Backups everywhere** — JSON export/import, a compressed device-to-device backup code, the same code as a scannable QR link, and optional cloud backup.

@@ -23,18 +23,29 @@ Es una **PWA**: instálala desde tu navegador y funciona como una app nativa, to
 
 <sub>Más capturas en [`screenshots/`](screenshots/) — temas claro y oscuro, escritorio y móvil.</sub>
 
+### Novedades 1.21
+
+| Rareza Eterna — campeones con serie completa | Añadido rápido — selector de variantes |
+|---|---|
+| ![Rareza Eterna — campeones con serie completa](screenshots/i18n/eternal-tile.es.jpg) | ![Añadido rápido — selector de variantes](screenshots/i18n/quick-add.es.jpg) |
+
+| Donut de rarezas con Eterna | Aviso Deshacer |
+|---|---|
+| ![Donut de rarezas con Eterna](screenshots/i18n/stats-rarity.es.jpg) | ![Aviso Deshacer](screenshots/i18n/toast.es.jpg) |
+
 ---
 
 ## ✨ Qué hace
 
 Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas, cada una en hasta 16 variantes (colores base, foils, duales, Wild, Nitro, promos):
 
-- 📇 **Gestión completa de la colección** — en propiedad / repetidas / wishlist / favoritas, cantidades por variante, búsqueda instantánea y filtros avanzados.
-- ✨ **Sistema de rareza animado de 6 niveles** — `epic → legendary → mythic → ultra → cosmic → divine`, calculado a partir de la mejor variante en propiedad. Las cartas foil llevan barridos de luz animados y el nivel supremo se muestra como un degradado iridiscente en movimiento (todo respetando `prefers-reduced-motion`).
+- 📇 **Gestión completa de la colección** — en propiedad / repetidas / wishlist / favoritas, cantidades por variante, toda la colección siempre a la vista.
+- ➕ **Añadido rápido con un gesto** — un botón + en cada casilla abre un selector de variantes: un toque añade un ejemplar, con aviso «Deshacer». La cabecera muestra tu progreso en vivo (poseídas/total) sobre una fina línea de progreso.
+- ✨ **Sistema de rareza animado de 7 niveles** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calculado a partir de la mejor variante en propiedad, +1 nivel cuando la serie está completa (todas las variantes en propiedad) — `eternal` solo se alcanza así. Las cartas foil llevan barridos de luz animados, `divine` se muestra como un degradado iridiscente y `eternal` en negro y oro centelleante (todo respetando `prefers-reduced-motion`).
 - 📴 **Funciona totalmente sin conexión** — toda la app queda precacheada por un service worker; tras la primera visita, el modo avión no cambia nada.
 - 🔄 **Actualizaciones transparentes** — las nuevas versiones se detectan en segundo plano y se aplican con un toque, con un changelog integrado que muestra qué ha cambiado desde *tu* última versión.
 - 🌍 **7 idiomas** — inglés, francés, español, chino, italiano, neerlandés, alemán. Cada texto, insignia y entrada del changelog.
-- 🎓 **Tutorial interactivo de 26 pasos** — una visita guiada en la que *realizas* las acciones reales, dentro de un sandbox que revierte cada cambio al terminar.
+- 🎓 **Tutorial interactivo de 22 pasos** — una visita guiada en la que *realizas* las acciones reales, dentro de un sandbox que revierte cada cambio al terminar.
 - 🏅 **50 insignias y títulos** — 25 desbloqueadas automáticamente por condiciones medidas, 25 autodeclaradas.
 - 📊 **Panel de estadísticas** — progreso global, donut de rarezas, compleción por categoría, destacados y una curva de progresión día a día (SVG puro, sin librería de gráficos).
 - 🔁 **Copias de seguridad por todas partes** — exportación/importación JSON, un código de respaldo comprimido de dispositivo a dispositivo, el mismo código como QR escaneable, y copia en la nube opcional.

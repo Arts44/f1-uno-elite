@@ -23,18 +23,29 @@ C'est une **PWA** : installez-la depuis votre navigateur et elle fonctionne comm
 
 <sub>Plus de captures dans [`screenshots/`](screenshots/) — thèmes clair et sombre, ordinateur et mobile.</sub>
 
+### Nouveautés 1.21
+
+| Rareté Éternel — champions en set complet | Ajout rapide — sélecteur de variantes |
+|---|---|
+| ![Rareté Éternel — champions en set complet](screenshots/i18n/eternal-tile.fr.jpg) | ![Ajout rapide — sélecteur de variantes](screenshots/i18n/quick-add.fr.jpg) |
+
+| Donut des raretés avec Éternel | Toast Annuler |
+|---|---|
+| ![Donut des raretés avec Éternel](screenshots/i18n/stats-rarity.fr.jpg) | ![Toast Annuler](screenshots/i18n/toast.fr.jpg) |
+
 ---
 
 ## ✨ Ce que ça fait
 
 Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chacune existant en jusqu'à 16 variantes (couleurs de base, foils, duals, Wild, Nitro, promos) :
 
-- 📇 **Gestion complète de la collection** — possédées / doubles / wishlist / favoris, quantités par variante, recherche instantanée et filtres avancés.
-- ✨ **Système de rareté animé à 6 niveaux** — `epic → legendary → mythic → ultra → cosmic → divine`, calculé depuis la meilleure variante possédée. Les cartes foil portent des reflets de lumière animés et le niveau suprême s'affiche en dégradé irisé mouvant (le tout respectant `prefers-reduced-motion`).
+- 📇 **Gestion complète de la collection** — possédées / doubles / wishlist / favoris, quantités par variante, l’ensemble de la collection toujours visible.
+- ➕ **Ajout rapide en un geste** — un bouton + sur chaque tuile ouvre un sélecteur de variantes : un appui ajoute un exemplaire, avec un toast « Annuler ». Le header affiche la progression en direct (possédées/total) au-dessus d’un fin liseré de progression.
+- ✨ **Système de rareté animé à 7 niveaux** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calculé depuis la meilleure variante possédée, +1 niveau quand le set est complet (toutes les variantes possédées) — `eternal` n'est atteignable que comme ça. Les cartes foil portent des reflets de lumière animés, `divine` s'affiche en dégradé irisé mouvant et `eternal` en noir & or scintillant (le tout respectant `prefers-reduced-motion`).
 - 📴 **Fonctionne entièrement hors-ligne** — toute l'app est précachée par un service worker ; après la première visite, le mode avion ne change rien.
 - 🔄 **Mises à jour transparentes** — les nouvelles versions sont détectées en arrière-plan et appliquées d'un tap, avec un changelog intégré qui montre ce qui a changé depuis *votre* dernière version.
 - 🌍 **7 langues** — anglais, français, espagnol, chinois, italien, néerlandais, allemand. Chaque texte, badge et entrée de changelog.
-- 🎓 **Tutoriel interactif en 26 étapes** — une visite guidée où vous *réalisez* les vraies actions, dans un bac à sable qui annule chaque modification à la fin.
+- 🎓 **Tutoriel interactif en 22 étapes** — une visite guidée où vous *réalisez* les vraies actions, dans un bac à sable qui annule chaque modification à la fin.
 - 🏅 **50 badges & titres** — 25 débloqués automatiquement sur conditions mesurées, 25 auto-déclarés.
 - 📊 **Tableau de bord Stats** — progression globale, donut des raretés, complétion par catégorie, temps forts, et une courbe de progression jour par jour (SVG pur, aucune bibliothèque de graphiques).
 - 🔁 **Sauvegardes partout** — export/import JSON, un code de sauvegarde compressé d'appareil à appareil, le même code en QR scannable, et une sauvegarde cloud optionnelle.

@@ -811,8 +811,13 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   100%{background-position:180% 0;}
 }
 .eternal-spark{position:absolute;z-index:6;color:#FACC15;text-shadow:0 0 6px #fff,0 0 10px #FACC15;pointer-events:none;font-size:14px;}
-.eternal-spark.s1{top:8px;left:10px;animation:eternalTwinkle 2.2s ease-in-out infinite;}
-.eternal-spark.s2{top:40%;right:8px;font-size:11px;animation:eternalTwinkle 2.2s ease-in-out 0.7s infinite;}
+/* Positions choisies pour ne chevaucher AUCUN élément de la tuile :
+   s1 à droite de la couronne 👑, s2 sous le badge 🏁 et au-dessus de la
+   zone du bouton +, s3 sur le bord gauche à mi-hauteur. */
+.eternal-spark.s1{top:6px;left:32px;animation:eternalTwinkle 2.2s ease-in-out infinite;}
+.eternal-spark.s2{top:32px;right:10px;font-size:11px;animation:eternalTwinkle 2.2s ease-in-out 0.7s infinite;}
+/* Fiche : le ✕ occupe le coin haut-droit — s2 descend sous lui */
+.modal-visual .eternal-spark.s2{top:56px;right:14px;}
 .eternal-spark.s3{top:42%;left:6px;font-size:9px;animation:eternalTwinkle 2.2s ease-in-out 1.4s infinite;}
 @keyframes eternalTwinkle{0%,100%{opacity:0.25;transform:scale(0.8);}50%{opacity:1;transform:scale(1.15);}}
 @media (prefers-reduced-motion: reduce){

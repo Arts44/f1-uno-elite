@@ -23,18 +23,29 @@ Het is een **PWA**: installeer haar vanuit je browser en ze draait als een nativ
 
 <sub>Meer schermafbeeldingen in [`screenshots/`](screenshots/) — licht en donker thema, desktop en mobiel.</sub>
 
+### Nieuw in 1.21
+
+| Eeuwige zeldzaamheid — kampioenen met complete set | Snel toevoegen — variantkiezer |
+|---|---|
+| ![Eeuwige zeldzaamheid — kampioenen met complete set](screenshots/i18n/eternal-tile.nl.jpg) | ![Snel toevoegen — variantkiezer](screenshots/i18n/quick-add.nl.jpg) |
+
+| Zeldzaamheids-donut met Eeuwig | Ongedaan maken-melding |
+|---|---|
+| ![Zeldzaamheids-donut met Eeuwig](screenshots/i18n/stats-rarity.nl.jpg) | ![Ongedaan maken-melding](screenshots/i18n/toast.nl.jpg) |
+
 ---
 
 ## ✨ Wat het doet
 
 Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten, elk in tot 16 varianten (basiskleuren, foils, duals, Wild, Nitro, promo's):
 
-- 📇 **Volledig collectiebeheer** — in bezit / dubbelen / verlanglijst / favorieten, aantallen per variant, directe zoekfunctie en uitgebreide filters.
-- ✨ **Geanimeerd zeldzaamheidssysteem met 6 niveaus** — `epic → legendary → mythic → ultra → cosmic → divine`, berekend uit de beste variant in bezit. Foil-kaarten dragen bewegende lichtglans-effecten en het hoogste niveau toont een verschuivend iriserend verloop (alles met respect voor `prefers-reduced-motion`).
+- 📇 **Volledig collectiebeheer** — in bezit / dubbelen / verlanglijst / favorieten, aantallen per variant, de hele collectie altijd in beeld.
+- ➕ **Snel toevoegen met één gebaar** — een +-knop op elke tegel opent een variantkiezer: één tik voegt een exemplaar toe, met een “Ongedaan maken”-melding. De koptekst toont je live voortgang (in bezit/totaal) boven een dunne voortgangslijn.
+- ✨ **Geanimeerd zeldzaamheidssysteem met 7 niveaus** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, berekend uit de beste variant in bezit, +1 niveau wanneer de set compleet is (elke variant in bezit) — `eternal` is alleen zo bereikbaar. Foil-kaarten dragen bewegende lichtglans-effecten, `divine` toont een iriserend verloop en `eternal` fonkelend zwart-goud (alles met respect voor `prefers-reduced-motion`).
 - 📴 **Werkt volledig offline** — de hele app wordt door een service worker geprecachet; na het eerste bezoek verandert vliegtuigmodus niets.
 - 🔄 **Transparante auto-updates** — nieuwe versies worden op de achtergrond gedetecteerd en met één tik toegepast, met een ingebouwde changelog die toont wat er sinds *jouw* laatste versie veranderde.
 - 🌍 **7 talen** — Engels, Frans, Spaans, Chinees, Italiaans, Nederlands, Duits. Elke tekst, badge en changelog-vermelding.
-- 🎓 **Interactieve tutorial in 26 stappen** — een rondleiding waarin je de echte handelingen *zelf uitvoert*, in een sandbox die elke wijziging aan het einde terugdraait.
+- 🎓 **Interactieve tutorial in 22 stappen** — een rondleiding waarin je de echte handelingen *zelf uitvoert*, in een sandbox die elke wijziging aan het einde terugdraait.
 - 🏅 **50 badges en titels** — 25 automatisch ontgrendeld op meetbare voorwaarden, 25 zelf gedeclareerd.
 - 📊 **Statistiekendashboard** — totale voortgang, zeldzaamheidsdonut, voltooiing per categorie, hoogtepunten en een dag-voor-dag voortgangscurve (pure SVG, geen grafiekbibliotheek).
 - 🔁 **Back-ups overal** — JSON-export/-import, een gecomprimeerde back-upcode van toestel naar toestel, dezelfde code als scanbare QR, en optionele cloudback-up.

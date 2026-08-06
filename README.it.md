@@ -23,18 +23,29 @@
 
 <sub>Altre catture in [`screenshots/`](screenshots/) — temi chiaro e scuro, desktop e mobile.</sub>
 
+### Novità 1.21
+
+| Rarità Eterna — campioni con set completo | Aggiunta rapida — selettore di varianti |
+|---|---|
+| ![Rarità Eterna — campioni con set completo](screenshots/i18n/eternal-tile.it.jpg) | ![Aggiunta rapida — selettore di varianti](screenshots/i18n/quick-add.it.jpg) |
+
+| Donut delle rarità con Eterna | Toast Annulla |
+|---|---|
+| ![Donut delle rarità con Eterna](screenshots/i18n/stats-rarity.it.jpg) | ![Toast Annulla](screenshots/i18n/toast.it.jpg) |
+
 ---
 
 ## ✨ Cosa fa
 
 Tenere traccia di una collezione completa di carte **F1 UNO Élite** — 101 carte, ciascuna in fino a 16 varianti (colori base, foil, dual, Wild, Nitro, promo):
 
-- 📇 **Gestione completa della collezione** — possedute / doppioni / wishlist / preferite, quantità per variante, ricerca istantanea e filtri avanzati.
-- ✨ **Sistema di rarità animato a 6 livelli** — `epic → legendary → mythic → ultra → cosmic → divine`, calcolato dalla migliore variante posseduta. Le carte foil hanno riflessi di luce animati e il livello supremo si mostra come un gradiente iridescente in movimento (il tutto rispettando `prefers-reduced-motion`).
+- 📇 **Gestione completa della collezione** — possedute / doppioni / wishlist / preferite, quantità per variante, l’intera collezione sempre in vista.
+- ➕ **Aggiunta rapida con un gesto** — un pulsante + su ogni tessera apre un selettore di varianti: un tocco aggiunge una copia, con toast «Annulla». L’intestazione mostra i progressi in tempo reale (possedute/totale) sopra una sottile linea di avanzamento.
+- ✨ **Sistema di rarità animato a 7 livelli** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calcolato dalla migliore variante posseduta, +1 livello quando il set è completo (tutte le varianti possedute) — `eternal` si raggiunge solo così. Le carte foil hanno riflessi di luce animati, `divine` si mostra come un gradiente iridescente ed `eternal` in nero e oro scintillante (il tutto rispettando `prefers-reduced-motion`).
 - 📴 **Funziona completamente offline** — l'intera app è precachata da un service worker; dopo la prima visita, la modalità aereo non cambia nulla.
 - 🔄 **Aggiornamenti trasparenti** — le nuove versioni vengono rilevate in background e applicate con un tocco, con un changelog integrato che mostra cosa è cambiato dalla *tua* ultima versione.
 - 🌍 **7 lingue** — inglese, francese, spagnolo, cinese, italiano, olandese, tedesco. Ogni testo, badge e voce del changelog.
-- 🎓 **Tutorial interattivo in 26 passi** — un tour guidato in cui *esegui* le azioni reali, in una sandbox che annulla ogni modifica alla fine.
+- 🎓 **Tutorial interattivo in 22 passi** — un tour guidato in cui *esegui* le azioni reali, in una sandbox che annulla ogni modifica alla fine.
 - 🏅 **50 badge e titoli** — 25 sbloccati automaticamente da condizioni misurate, 25 autodichiarati.
 - 📊 **Dashboard delle statistiche** — progresso globale, ciambella delle rarità, completamento per categoria, highlights e una curva di progressione giorno per giorno (SVG puro, nessuna libreria di grafici).
 - 🔁 **Backup ovunque** — export/import JSON, un codice di backup compresso da dispositivo a dispositivo, lo stesso codice come QR scansionabile, e backup cloud opzionale.

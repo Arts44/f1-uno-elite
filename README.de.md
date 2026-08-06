@@ -23,18 +23,29 @@ Es ist eine **PWA**: aus dem Browser installiert läuft sie wie eine native App,
 
 <sub>Weitere Aufnahmen in [`screenshots/`](screenshots/) — helles und dunkles Theme, Desktop und mobil.</sub>
 
+### Neu in 1.21
+
+| Seltenheit Ewig — Champions mit komplettem Set | Schnelles Hinzufügen — Variantenauswahl |
+|---|---|
+| ![Seltenheit Ewig — Champions mit komplettem Set](screenshots/i18n/eternal-tile.de.jpg) | ![Schnelles Hinzufügen — Variantenauswahl](screenshots/i18n/quick-add.de.jpg) |
+
+| Seltenheits-Donut mit Ewig | Rückgängig-Toast |
+|---|---|
+| ![Seltenheits-Donut mit Ewig](screenshots/i18n/stats-rarity.de.jpg) | ![Rückgängig-Toast](screenshots/i18n/toast.de.jpg) |
+
 ---
 
 ## ✨ Was sie kann
 
 Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten — 101 Karten, jede in bis zu 16 Varianten (Grundfarben, Foils, Duals, Wild, Nitro, Promos):
 
-- 📇 **Vollständige Sammlungsverwaltung** — im Besitz / Dubletten / Wunschliste / Favoriten, Stückzahlen pro Variante, Sofortsuche und umfangreiche Filter.
-- ✨ **Animiertes 6-stufiges Seltenheitssystem** — `epic → legendary → mythic → ultra → cosmic → divine`, berechnet aus der besten Variante im Besitz. Foil-Karten tragen bewegte Lichtreflexe, und die höchste Stufe erscheint als wandernder irisierender Verlauf (alles unter Beachtung von `prefers-reduced-motion`).
+- 📇 **Vollständige Sammlungsverwaltung** — im Besitz / Dubletten / Wunschliste / Favoriten, Stückzahlen pro Variante, die gesamte Sammlung immer im Blick.
+- ➕ **Schnelles Hinzufügen mit einer Geste** — ein +-Button auf jeder Kachel öffnet eine Variantenauswahl: ein Tipp fügt ein Exemplar hinzu, mit „Rückgängig“-Toast. Der Header zeigt deinen Fortschritt live (besessen/gesamt) über einer feinen Fortschrittslinie.
+- ✨ **Animiertes 7-stufiges Seltenheitssystem** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, berechnet aus der besten Variante im Besitz, +1 Stufe bei komplettem Set (jede Variante im Besitz) — `eternal` ist nur so erreichbar. Foil-Karten tragen bewegte Lichtreflexe, `divine` erscheint als irisierender Verlauf und `eternal` in funkelndem Schwarz-Gold (alles unter Beachtung von `prefers-reduced-motion`).
 - 📴 **Funktioniert komplett offline** — die gesamte App wird von einem Service Worker vorgecacht; nach dem ersten Besuch ändert der Flugmodus nichts.
 - 🔄 **Transparente Auto-Updates** — neue Versionen werden im Hintergrund erkannt und mit einem Tipp übernommen, dazu ein integriertes Changelog, das zeigt, was sich seit *deiner* letzten Version geändert hat.
 - 🌍 **7 Sprachen** — Englisch, Französisch, Spanisch, Chinesisch, Italienisch, Niederländisch, Deutsch. Jeder Text, jedes Abzeichen, jeder Changelog-Eintrag.
-- 🎓 **Interaktives Tutorial in 26 Schritten** — eine geführte Tour, in der du die echten Aktionen *selbst ausführst*, in einer Sandbox, die am Ende jede Änderung zurücknimmt.
+- 🎓 **Interaktives Tutorial in 22 Schritten** — eine geführte Tour, in der du die echten Aktionen *selbst ausführst*, in einer Sandbox, die am Ende jede Änderung zurücknimmt.
 - 🏅 **50 Abzeichen und Titel** — 25 automatisch anhand messbarer Bedingungen freigeschaltet, 25 selbst deklariert.
 - 📊 **Statistik-Dashboard** — Gesamtfortschritt, Seltenheits-Donut, Vervollständigung pro Kategorie, Highlights und eine tagesgenaue Fortschrittskurve (pures SVG, keine Chart-Bibliothek).
 - 🔁 **Backups überall** — JSON-Export/-Import, ein komprimierter Backup-Code von Gerät zu Gerät, derselbe Code als scanbarer QR-Code, und optionales Cloud-Backup.

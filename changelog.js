@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.21.1',
+    date: '2026-08-06',
+    changes: {
+      en: [
+        'Eternal polish: the ✦ stars found their final spots — they no longer overlap the crown, the + button or the card sheet’s close button.',
+      ],
+      fr: [
+        'Finitions Éternel : les étoiles ✦ ont trouvé leur place définitive — elles ne chevauchent plus la couronne, le bouton + ni le ✕ de la fiche carte.',
+      ],
+      es: [
+        'Retoques de Eterna: las estrellas ✦ encontraron su sitio definitivo — ya no se superponen a la corona, al botón + ni al ✕ de la ficha.',
+      ],
+      zh: [
+        '永恒细节打磨：✦ 星星找到了最终位置——不再与王冠、+ 按钮或卡片详情的 ✕ 重叠。',
+      ],
+      it: [
+        'Rifiniture di Eterna: le stelle ✦ hanno trovato la posizione definitiva — non si sovrappongono più alla corona, al pulsante + né alla ✕ della scheda.',
+      ],
+      nl: [
+        'Eeuwig-afwerking: de ✦-sterren vonden hun definitieve plek — ze overlappen niet langer de kroon, de +-knop of de ✕ van de kaartfiche.',
+      ],
+      de: [
+        'Ewig-Feinschliff: die ✦-Sterne haben ihren endgültigen Platz gefunden — sie überlappen nicht mehr die Krone, den +-Button oder das ✕ des Kartenblatts.',
+      ],
+    },
+  },
+  {
     version: '1.21.0',
     date: '2026-08-06',
     changes: {
