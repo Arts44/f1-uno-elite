@@ -9,7 +9,8 @@ import { loadData, coll, exportCollection, _handleImportFile } from './storage.j
 import {
   showGridSkeleton, hideGridSkeleton,
   renderCollection, switchView, closeMo,
-  toggleTheme, quickToggle, changeMoQty, showToast
+  toggleTheme, quickToggle, changeMoQty, showToast,
+  toggleQuickAdd, quickAddType, closeQuickAdd
 } from './render.js';
 import { updateStats } from './stats.js';
 import {
@@ -79,12 +80,14 @@ function initEvents(){
   _eventsInitialized = true;
   // ── Global event delegation for data-action ──
   document.addEventListener('click', e => {
+    // Quick-add : un clic hors du sélecteur/bouton + le referme
+    closeQuickAdd(e.target);
     const el = e.target.closest('[data-action]');
     if(!el) return;
     const action = el.getAttribute('data-action');
 
     // Block write actions in viewer mode
-    const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','toggleManualBadge','removeAutoBadge','enterRemoveBadgeMode','toggleTitlePicker','selectTitle']);
+    const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','quickAdd','quickAddType','toggleManualBadge','removeAutoBadge','enterRemoveBadgeMode','toggleTitlePicker','selectTitle']);
     if(isViewerMode && VIEWER_BLOCKED.has(action)){
       showToast(t('toast.readonly'));
       return;
@@ -102,6 +105,14 @@ function initEvents(){
         const typeId = el.getAttribute('data-type');
         const delta = parseInt(el.getAttribute('data-delta'), 10);
         changeMoQty(cardId, typeId, delta);
+        break;
+      }
+      case 'quickAdd': {
+        toggleQuickAdd(el.getAttribute('data-card'), el);
+        break;
+      }
+      case 'quickAddType': {
+        quickAddType(el.getAttribute('data-card'), el.getAttribute('data-type'));
         break;
       }
       case 'toggleManualBadge': {

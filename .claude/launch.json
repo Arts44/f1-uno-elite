@@ -4,8 +4,22 @@
     {
       "name": "f1-uno-elite",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8123"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8123"
+      ],
       "port": 8123
+    },
+    {
+      "name": "f1-uno-elite-8124",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8124"
+      ],
+      "port": 8124
     }
   ]
 }

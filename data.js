@@ -18,10 +18,11 @@ export let TYPE_BADGE_RARITY = {};
 export let TYPE_BADGE_STYLES = {};
 
 // ── Rarity chip painting — single source of truth ──
-// Only divine opts out of the plain "solid background + white text"
-// treatment: it is painted by CSS as an animated iridescent gradient
-// (.rar-divine-bg). Every other rarity is painted inline here.
-const RARITY_CSS_PAINTED = { divine: 'rar-divine-bg' };
+// Divine and eternal opt out of the plain "solid background + white
+// text" treatment: they are painted by CSS as animated gradients
+// (.rar-divine-bg / .rar-eternal-bg). Every other rarity is painted
+// inline here.
+const RARITY_CSS_PAINTED = { divine: 'rar-divine-bg', eternal: 'rar-eternal-bg' };
 
 // Extra class for a rarity chip ('' when the chip is painted inline).
 export function rarityChipClass(rarityKey){
@@ -29,10 +30,10 @@ export function rarityChipClass(rarityKey){
   return cls ? ' ' + cls : '';
 }
 
-// Inline style for a rarity chip. Divine paints itself, everything else
-// is a solid rarity colour with white text.
+// Inline style for a rarity chip. Divine and eternal paint themselves,
+// everything else is a solid rarity colour with white text.
 export function rarityChipStyle(rarityKey, hex){
-  if(rarityKey === 'divine') return '';
+  if(rarityKey === 'divine' || rarityKey === 'eternal') return '';
   return `background:${hex || 'var(--surface3)'};color:${rarityTextColor(hex)}`;
 }
 

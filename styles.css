@@ -392,6 +392,10 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    The total is INFORMATION, not a control: quiet display-font text
    after a thin divider, instead of a third competing pill. */
 .header-divider{width:1px;height:16px;background:var(--border);margin:0 var(--space-1);flex-shrink:0;}
+/* Progress hairline — absolute so it adds ZERO layout height (skeleton zero-shift) */
+.header-progress{position:absolute;left:0;right:0;bottom:0;height:2px;pointer-events:none;}
+.header-progress-bar{height:100%;width:0%;background:var(--green);transition:width 0.35s ease;}
+@media (prefers-reduced-motion: reduce){.header-progress-bar{transition:none;}}
 .header-count{font-family:var(--font-d);font-weight:600;font-size:12px;color:var(--tx2);white-space:nowrap;font-variant-numeric:tabular-nums;flex-shrink:0;}
 .header-title{display:inline-flex;align-items:center;gap:var(--space-1);height:28px;padding:0 var(--space-3);border-radius:var(--r-pill);font-size:11px;font-weight:700;font-family:var(--font-d);background:var(--surface2);border:1px solid var(--border);white-space:nowrap;flex-shrink:0;}
 .header-title .ht-icon{font-size:13px;}
@@ -780,6 +784,42 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    liseré externe est un langage de tuile ; ici il suit le visuel) */
 .modal-visual.set-complete{box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--tx1) 30%, transparent);}
 .modal-visual .set-flag{top:10px;right:52px;height:24px;font-size:12px;}
+
+/* ── Rareté ÉTERNEL (7e niveau) — « balayage stellaire » ──
+   Liseré or (remplace le double-ring set-complet — le badge 🏁 reste),
+   rai de lumière périodique (même technique que le foil nitro) et
+   étoiles ✦ scintillantes. Placé APRÈS les règles set-complete pour
+   que le liseré or gagne la cascade (même spécificité). */
+.card.rar-eternal-fx{
+  outline:2.5px solid #FACC15;outline-offset:3px;
+  box-shadow:0 0 14px 2px rgba(250,204,21,0.55),0 0 34px 8px rgba(250,204,21,0.22);
+  animation:eternalGlow 3s ease-in-out infinite;
+}
+@keyframes eternalGlow{
+  50%{box-shadow:0 0 22px 5px rgba(250,204,21,0.85),0 0 50px 12px rgba(250,204,21,0.35);}
+}
+.modal-visual.rar-eternal-fx{box-shadow:inset 0 0 0 2.5px #FACC15,inset 0 0 26px rgba(250,204,21,0.35);}
+.card.rar-eternal-fx::after,.modal-visual.rar-eternal-fx::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.85) 49%,rgba(250,204,21,0.85) 52%,transparent 62%);
+  background-size:300% 100%;background-repeat:no-repeat;background-position:-80% 0;
+  animation:eternalSweep 5s ease-in-out infinite;
+}
+@keyframes eternalSweep{
+  0%{background-position:-80% 0;}
+  28%{background-position:180% 0;}
+  100%{background-position:180% 0;}
+}
+.eternal-spark{position:absolute;z-index:6;color:#FACC15;text-shadow:0 0 6px #fff,0 0 10px #FACC15;pointer-events:none;font-size:14px;}
+.eternal-spark.s1{top:8px;left:10px;animation:eternalTwinkle 2.2s ease-in-out infinite;}
+.eternal-spark.s2{top:40%;right:8px;font-size:11px;animation:eternalTwinkle 2.2s ease-in-out 0.7s infinite;}
+.eternal-spark.s3{top:42%;left:6px;font-size:9px;animation:eternalTwinkle 2.2s ease-in-out 1.4s infinite;}
+@keyframes eternalTwinkle{0%,100%{opacity:0.25;transform:scale(0.8);}50%{opacity:1;transform:scale(1.15);}}
+@media (prefers-reduced-motion: reduce){
+  .card.rar-eternal-fx{animation:none;}
+  .card.rar-eternal-fx::after,.modal-visual.rar-eternal-fx::after{animation:none;background:none;}
+  .eternal-spark{animation:none;opacity:1;}
+}
 .type-badge{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;padding:2px var(--space-6px);border-radius:5px;background:rgba(0,0,0,0.55);color:white;letter-spacing:0.2px;backdrop-filter:blur(2px);}
 
 /* Card body */
@@ -941,7 +981,28 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:#1A1A1A;color:white;padding:var(--space-10px) var(--space-4);border-radius:12px;font-size:13px;font-weight:500;box-shadow:var(--sh-lg);z-index:500;opacity:0;transform:translateY(8px);transition:all 0.2s;pointer-events:none;}
-.toast.show{opacity:1;transform:translateY(0);}
+.toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+.toast-action{margin-left:var(--space-3);border:none;background:none;color:#4CD964;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;padding:0;}
+
+/* ── Quick add : bouton + sur la tuile, sélecteur de variante ── */
+.qbtn{position:absolute;bottom:8px;right:8px;z-index:4;width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--border);background:var(--surface);color:var(--tx1);
+  font-size:19px;font-weight:700;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.22);transition:transform 0.12s ease,border-color 0.12s ease,color 0.12s ease;}
+.qbtn:hover{transform:scale(1.1);border-color:var(--green);color:var(--green);}
+.qbtn:active{transform:scale(0.94);}
+.qadd-pop{position:absolute;inset:4px;z-index:6;display:flex;flex-wrap:wrap;gap:4px;
+  align-content:center;justify-content:center;padding:6px;overflow-y:auto;
+  background:color-mix(in srgb, var(--surface) 94%, transparent);
+  border:1px solid var(--border);border-radius:12px;box-shadow:var(--sh-lg);}
+.qadd-type{position:relative;width:30px;height:30px;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface2);font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:transform 0.1s ease,border-color 0.1s ease;}
+.qadd-type:hover{transform:scale(1.08);border-color:var(--green);}
+.qadd-qty{position:absolute;top:-5px;right:-5px;min-width:14px;height:14px;padding:0 3px;border-radius:7px;
+  background:var(--green);color:#fff;font-size:9px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;}
 
 @media(max-width:900px){.app{grid-template-columns:1fr;}}
 @media(max-width:600px){.card-grid{grid-template-columns:repeat(2,1fr);}}
@@ -1336,9 +1397,39 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   -webkit-text-fill-color:transparent;
   animation:divineShift 8s ease-in-out infinite;
 }
+/* Eternal (7e niveau, LE sommet) : noir & or animé + lueur — même
+   mécanique que divine mais nettement au-dessus : fond sombre profond
+   traversé d'un filon d'or, bord or, glow. Impossible à confondre avec
+   le orange plat de legendary. Texte blanc (décision 2026-07-21). */
+.rar-eternal-bg{
+  background-image:linear-gradient(115deg,#1a1302,#7a5600,#FACC15,#FFF6C9,#FACC15,#7a5600,#1a1302)!important;
+  background-size:300% 300%!important;
+  color:#fff!important;
+  border:1px solid #FACC15!important;
+  box-shadow:0 0 10px rgba(250,204,21,0.55);
+  animation:divineShift 6s ease-in-out infinite;
+}
+.rar-eternal-text{
+  background-image:linear-gradient(115deg,#B45309,#FACC15,#FFF6C9,#FACC15,#B45309);
+  background-size:300% 300%;
+  -webkit-background-clip:text;background-clip:text;
+  color:transparent!important;
+  -webkit-text-fill-color:transparent;
+  animation:divineShift 6s ease-in-out infinite;
+}
+/* Étoiles ✦ éternel — or lumineux, pulsation douce, dans la pastille
+   (aucun chevauchement possible avec les éléments de la carte). */
+.eternal-stars{
+  color:#FACC15;
+  text-shadow:0 0 3px #fff,0 0 7px rgba(250,204,21,0.9);
+  letter-spacing:1px;
+  animation:eternalStars 2.4s ease-in-out infinite;
+}
+@keyframes eternalStars{0%,100%{opacity:0.75;}50%{opacity:1;}}
 /* Reduced motion: static iridescent gradient instead of the animation */
 @media (prefers-reduced-motion:reduce){
-  .rar-divine-bg,.rar-divine-text{animation:none;background-position:50% 50%;}
+  .rar-divine-bg,.rar-divine-text,.rar-eternal-bg,.rar-eternal-text{animation:none;background-position:50% 50%;}
+  .eternal-stars{animation:none;opacity:1;}
 }
 
 /* ── Rarity chips redesign: full-color surfaces (divine keeps its

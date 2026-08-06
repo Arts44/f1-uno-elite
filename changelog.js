@@ -17,6 +17,54 @@
 
 export const CHANGELOG = [
   {
+    version: '1.21.0',
+    date: '2026-08-06',
+    changes: {
+      en: [
+        'Add a card in one gesture: the new + button on each tile opens a small variant picker — one tap adds a copy, and “Undo” in the toast reverts it.',
+        'The header now shows your progress (owned/total) with a thin progress line underneath, updated live.',
+        'New top rarity: Eternal ✦ — own every variant of a card (complete set) to push its rarity one level up. Only champions can reach Eternal, with a golden glow, light sweep and sparkling stars.',
+        'On complete sets, the copy indicators now only show variants you own more than once.',
+      ],
+      fr: [
+        'Ajoute une carte en un geste : le nouveau bouton + de chaque tuile ouvre un petit sélecteur de variantes — un appui ajoute un exemplaire, « Annuler » dans le toast revient en arrière.',
+        'Le header affiche désormais ta progression (possédées/total) avec un fin liseré de progression en dessous, mis à jour en direct.',
+        'Nouvelle rareté suprême : Éternel ✦ — possède toutes les variantes d’une carte (set complet) pour faire monter sa rareté d’un cran. Seuls les champions peuvent atteindre Éternel, avec halo doré, rai de lumière et étoiles scintillantes.',
+        'Sur les sets complets, les indicateurs d’exemplaires n’affichent plus que les variantes possédées en plusieurs fois.',
+      ],
+      es: [
+        'Añade una carta con un gesto: el nuevo botón + de cada casilla abre un pequeño selector de variantes — un toque añade un ejemplar y «Deshacer» en el aviso lo revierte.',
+        'La cabecera ahora muestra tu progreso (poseídas/total) con una fina línea de progreso debajo, actualizada al instante.',
+        'Nueva rareza suprema: Eterna ✦ — posee todas las variantes de una carta (serie completa) para subir su rareza un nivel. Solo los campeones pueden alcanzar Eterna, con halo dorado, destello de luz y estrellas brillantes.',
+        'En las series completas, los indicadores de ejemplares solo muestran las variantes que posees más de una vez.',
+      ],
+      zh: [
+        '一步添加卡牌：每张卡格上新增的 + 按钮会打开一个小版本选择器——点一下即可添加一张，提示中的“撤销”可以还原。',
+        '页眉现在会显示你的收藏进度（已拥有/总数），下方还有一条细进度线，实时更新。',
+        '全新最高稀有度：永恒 ✦——集齐一张卡的所有版本（全套）可让其稀有度提升一级。只有冠军卡能达到永恒，拥有金色光晕、流光和闪烁星星。',
+        '在全套卡组上，副本指示器现在只显示拥有多张的版本。',
+      ],
+      it: [
+        'Aggiungi una carta con un gesto: il nuovo pulsante + su ogni tessera apre un piccolo selettore di varianti — un tocco aggiunge una copia e «Annulla» nel toast la ripristina.',
+        'L’intestazione ora mostra i tuoi progressi (possedute/totale) con una sottile linea di avanzamento sotto, aggiornata in tempo reale.',
+        'Nuova rarità suprema: Eterna ✦ — possiedi tutte le varianti di una carta (set completo) per far salire la sua rarità di un livello. Solo i campioni possono raggiungere Eterna, con alone dorato, fascio di luce e stelle scintillanti.',
+        'Sui set completi, gli indicatori delle copie mostrano ora solo le varianti possedute più di una volta.',
+      ],
+      nl: [
+        'Voeg een kaart toe met één gebaar: de nieuwe +-knop op elke tegel opent een kleine variantkiezer — één tik voegt een exemplaar toe, en “Ongedaan maken” in de melding draait het terug.',
+        'De koptekst toont nu je voortgang (in bezit/totaal) met een dunne voortgangslijn eronder, live bijgewerkt.',
+        'Nieuwe topzeldzaamheid: Eeuwig ✦ — bezit elke variant van een kaart (complete set) om de zeldzaamheid een niveau te verhogen. Alleen kampioenen kunnen Eeuwig bereiken, met gouden gloed, lichtstraal en fonkelende sterren.',
+        'Bij complete sets tonen de exemplaarindicatoren nu alleen varianten die je meer dan één keer bezit.',
+      ],
+      de: [
+        'Füge eine Karte mit einer Geste hinzu: der neue +-Button auf jeder Kachel öffnet eine kleine Variantenauswahl — ein Tipp fügt ein Exemplar hinzu, „Rückgängig“ im Toast macht es rückgängig.',
+        'Der Header zeigt jetzt deinen Fortschritt (besessen/gesamt) mit einer feinen Fortschrittslinie darunter, live aktualisiert.',
+        'Neue höchste Seltenheit: Ewig ✦ — besitze jede Variante einer Karte (komplettes Set), um ihre Seltenheit eine Stufe anzuheben. Nur Champions können Ewig erreichen, mit goldenem Schein, Lichtstreif und funkelnden Sternen.',
+        'Bei kompletten Sets zeigen die Exemplar-Anzeigen jetzt nur noch Varianten, die du mehrfach besitzt.',
+      ],
+    },
+  },
+  {
     version: '1.20.0',
     date: '2026-08-06',
     changes: {

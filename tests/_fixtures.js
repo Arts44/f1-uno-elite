@@ -21,8 +21,8 @@ export const META = {
     epic: { color: '#AF52DE', stars: 3 }, legendary: { color: '#FF9500', stars: 4 },
     mythic: { color: '#34C759', stars: 5 }, ultra: { color: '#FF2D55', stars: 6 },
   },
-  rarityKeys: ['epic', 'legendary', 'mythic', 'ultra', 'cosmic', 'divine'],
-  rarityOrder: { epic: 0, legendary: 1, mythic: 2, ultra: 3, cosmic: 4, divine: 5 },
+  rarityKeys: ['epic', 'legendary', 'mythic', 'ultra', 'cosmic', 'divine', 'eternal'],
+  rarityOrder: { epic: 0, legendary: 1, mythic: 2, ultra: 3, cosmic: 4, divine: 5, eternal: 6 },
   rarities: {
     epic:      { label: 'Épique',      color: '#C026D3', stars: 1 },
     legendary: { label: 'Légendaire',  color: '#FF7A00', stars: 2 },
@@ -30,6 +30,7 @@ export const META = {
     ultra:     { label: 'Ultra rare',  color: '#FF1744', stars: 4 },
     cosmic:    { label: 'Cosmique',    color: '#7C4DFF', stars: 5 },
     divine:    { label: 'Divin',       color: '#FACC15', stars: 6 },
+    eternal:   { label: 'Éternel',     color: '#D99E00', stars: 7 },
   },
   categories: {
     pilote: { label: 'Pilote', emoji: '🏎️' }, reserve: { label: 'Réserve', emoji: '🔧' },

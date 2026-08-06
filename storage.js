@@ -91,6 +91,25 @@ export function setTypeData(cardId, typeId, key, value){
   saveData(); updateStats();
 }
 
+// ── Ajout rapide depuis la grille (bouton +) ──
+// Ajoute 1 exemplaire de la variante choisie ; retourne l'état
+// précédent du type pour permettre une annulation exacte (toast).
+export function quickAddVariant(cardId, typeId){
+  const prev = { ...getTypeData(cardId, typeId) };
+  const newQty = (prev.qty||0)+1;
+  setTypeData(cardId, typeId, 'qty', newQty);
+  setTypeData(cardId, typeId, 'owned', true);
+  setTypeData(cardId, typeId, 'doubles', newQty>1);
+  setTypeData(cardId, typeId, 'wishlist', false);
+  return prev;
+}
+export function undoQuickAdd(cardId, typeId, prev){
+  setTypeData(cardId, typeId, 'qty', prev.qty||0);
+  setTypeData(cardId, typeId, 'owned', !!prev.owned);
+  setTypeData(cardId, typeId, 'doubles', !!prev.doubles);
+  setTypeData(cardId, typeId, 'wishlist', !!prev.wishlist);
+}
+
 // Card-level
 export function cardOwned(id){ const card=CARDS_DB.find(c=>c.id===id); return card.types.some(t=>getTypeData(id,t).owned); }
 export function cardWishlist(id){ const card=CARDS_DB.find(c=>c.id===id); return !cardOwned(id) && card.types.some(t=>getTypeData(id,t).wishlist); }
@@ -117,7 +136,9 @@ export function variantRarity(card,typeId){
     let bonus = 1;
     if(typeId==='blue_red_foil' || typeId==='green_yellow_foil') bonus = 2;
     if(typeId==='nitro_foil' || typeId==='wild_foil' || typeId==='promo_blue' || typeId==='promo_green' || typeId==='promo_red' || typeId==='promo_yellow') bonus = 3;
-    idx = Math.min(baseIdx+bonus, RARITY_KEYS.length-1);
+    // Les foils clampent à divine : le 7e niveau (eternal) n'est
+    // atteignable QUE par le bonus set complet dans cardRarity().
+    idx = Math.min(baseIdx+bonus, RARITY_ORDER.divine ?? RARITY_KEYS.length-1);
   }
   return RARITY_KEYS[idx];
 }
@@ -128,10 +149,17 @@ export function variantRarity(card,typeId){
 export function cardRarity(card){
   const ownedTypes = card.types.filter(t=>getTypeData(card.id,t).owned && (getTypeData(card.id,t).qty||0)>0);
   if(ownedTypes.length===0) return baseCardRarity(card);
-  return ownedTypes.reduce((best,t)=>{
+  const best = ownedTypes.reduce((acc,t)=>{
     const r = variantRarity(card,t);
-    return RARITY_ORDER[r] > RARITY_ORDER[best] ? r : best;
+    return RARITY_ORDER[r] > RARITY_ORDER[acc] ? r : acc;
   }, baseCardRarity(card));
+  // Set complet (≥1 exemplaire de CHAQUE type) : rareté effective +1,
+  // clampée au sommet. Dynamique : recalculée à chaque rendu, donc elle
+  // rétrograde d'elle-même si un exemplaire repasse à 0.
+  if(cardSetComplete(card.id)){
+    return RARITY_KEYS[Math.min(RARITY_ORDER[best]+1, RARITY_KEYS.length-1)];
+  }
+  return best;
 }
 
 /* ══════════════════════════════════════════════════════════ EXPORT */

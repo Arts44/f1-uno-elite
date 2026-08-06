@@ -153,7 +153,8 @@
     "mythic",
     "ultra",
     "cosmic",
-    "divine"
+    "divine",
+    "eternal"
   ],
   "rarityOrder": {
     "epic": 0,
@@ -161,7 +162,8 @@
     "mythic": 2,
     "ultra": 3,
     "cosmic": 4,
-    "divine": 5
+    "divine": 5,
+    "eternal": 6
   },
   "rarities": {
     "epic": {
@@ -193,6 +195,11 @@
       "label": "Divin",
       "color": "#FACC15",
       "stars": 6
+    },
+    "eternal": {
+      "label": "Éternel",
+      "color": "#D99E00",
+      "stars": 7
     }
   },
   "typeBadgeStyles": {

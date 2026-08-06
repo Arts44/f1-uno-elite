@@ -68,7 +68,7 @@ describe('rarity chip painting', () => {
     const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
     let checked = 0;
     for(const [key, r] of Object.entries(meta.rarities)){
-      if(key === 'divine') continue; // animated gradient, paints itself
+      if(key === 'divine' || key === 'eternal') continue; // animated gradients, paint themselves
       assert.equal(rarityTextColor(r.color), '#fff', `${key} (${r.color}) must take white text`);
       assert.equal(rarityChipStyle(key, r.color), `background:${r.color};color:#fff`);
       checked++;
@@ -76,9 +76,11 @@ describe('rarity chip painting', () => {
     assert.equal(checked, 5, 'five rarities are inline-painted (epic, legendary, mythic, ultra, cosmic)');
   });
 
-  test('divine is the ONLY rarity painted by CSS', () => {
+  test('divine and eternal are the ONLY rarities painted by CSS', () => {
     assert.equal(rarityChipClass('divine'), ' rar-divine-bg');
     assert.equal(rarityChipStyle('divine', '#FACC15'), '');
+    assert.equal(rarityChipClass('eternal'), ' rar-eternal-bg');
+    assert.equal(rarityChipStyle('eternal', '#D99E00'), '');
     for(const key of ['epic', 'legendary', 'mythic', 'ultra', 'cosmic']){
       assert.equal(rarityChipClass(key), '', `${key} must not get an extra CSS class`);
     }

@@ -12,12 +12,12 @@ const card = id => CARDS.find(c => c.id === id);
 describe('rarity scale (real metadata)', () => {
   const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
 
-  test('exactly the 6 current rarities, no common/rare', () => {
-    assert.deepEqual(meta.rarityKeys, ['epic', 'legendary', 'mythic', 'ultra', 'cosmic', 'divine']);
+  test('exactly the 7 current rarities, no common/rare', () => {
+    assert.deepEqual(meta.rarityKeys, ['epic', 'legendary', 'mythic', 'ultra', 'cosmic', 'divine', 'eternal']);
     assert.ok(!('common' in meta.rarities) && !('rare' in meta.rarities));
   });
 
-  test('rarityOrder is contiguous 0..5 and matches rarityKeys', () => {
+  test('rarityOrder is contiguous 0..6 and matches rarityKeys', () => {
     meta.rarityKeys.forEach((k, i) => assert.equal(meta.rarityOrder[k], i));
     assert.equal(Object.keys(meta.rarityOrder).length, meta.rarityKeys.length);
   });
@@ -62,8 +62,14 @@ describe('variantRarity', () => {
     assert.equal(variantRarity(card('P2'), 'wild_foil'), 'cosmic');
     assert.equal(variantRarity(card('P2'), 'promo_blue'), 'cosmic');
   });
-  test('nitro on a champion clamps exactly at divine (top index)', () =>
+  test('nitro on a champion clamps exactly at divine — never eternal', () =>
     assert.equal(variantRarity(card('P1'), 'nitro_foil'), 'divine'));
+
+  test('no variant alone can ever reach eternal (foil clamp = divine)', () => {
+    for (const c of CARDS)
+      for (const ty of c.types)
+        assert.notEqual(variantRarity(c, ty), 'eternal', `${c.id}/${ty}`);
+  });
   test('reserve + wild = epic + 3 = ultra', () =>
     assert.equal(variantRarity(card('R1'), 'wild_foil'), 'ultra'));
   test('unknown type id behaves like non-foil (base)', () =>
@@ -98,6 +104,45 @@ describe('cardRarity (collection-aware)', () => {
   test('champion + nitro owned → divine', () => {
     seedCollection({ P1: { nitro_foil: { owned: true, qty: 1 } } }); loadData();
     assert.equal(cardRarity(card('P1')), 'divine');
+  });
+
+  test('set complet → effective rarity +1 (champion + nitro + set = eternal)', () => {
+    // P1: blue + blue_foil + nitro_foil tous possédés = set complet.
+    // Meilleure variante = divine (nitro sur champion) → +1 = eternal.
+    seedCollection({ P1: {
+      blue:       { owned: true, qty: 1 },
+      blue_foil:  { owned: true, qty: 1 },
+      nitro_foil: { owned: true, qty: 1 },
+    } });
+    loadData();
+    assert.equal(cardRarity(card('P1')), 'eternal');
+  });
+
+  test('set complet on a NON-champion tops out at divine, not eternal', () => {
+    // G1 (gp, legendary base): nitro = cosmic, set complet → +1 = divine.
+    seedCollection({ G1: { blue: { owned: true, qty: 1 }, nitro_foil: { owned: true, qty: 1 } } });
+    loadData();
+    assert.equal(cardRarity(card('G1')), 'divine');
+  });
+
+  test('eternal RÉTROGRADE when one copy drops back to 0 (dynamic)', () => {
+    seedCollection({ P1: {
+      blue:       { owned: true, qty: 1 },
+      blue_foil:  { owned: true, qty: 0 },   // set brisé : qty 0
+      nitro_foil: { owned: true, qty: 1 },
+    } });
+    loadData();
+    assert.equal(cardRarity(card('P1')), 'divine');
+  });
+
+  test('set complet +1 is clamped at the top (already-eternal stays eternal)', () => {
+    seedCollection({ P1: {
+      blue:       { owned: true, qty: 3 },
+      blue_foil:  { owned: true, qty: 2 },
+      nitro_foil: { owned: true, qty: 2 },
+    } });
+    loadData();
+    assert.equal(cardRarity(card('P1')), 'eternal');
   });
 
   test('every reachable rarity is one of RARITY_KEYS', () => {

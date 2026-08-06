@@ -11,7 +11,8 @@ import {
 import {
   getTypeData, setTypeData,
   cardOwned, cardWishlist, cardDoubles, cardFavorite, cardTotalQty,
-  cardSetComplete, cardRarity, variantRarity
+  cardSetComplete, cardRarity, variantRarity,
+  quickAddVariant, undoQuickAdd
 } from './storage.js';
 import { updateStats, renderStats } from './stats.js';
 import { renderBadges } from './badges.js';
@@ -112,11 +113,9 @@ export function toggleTheme(){
 export function renderCollection(){
   const result=[...CARDS_DB].sort((a,b)=>a.id.localeCompare(b.id));
   renderGrid(result);
-  // Header counter: total number of cards in the season
-  const totalCount = document.getElementById('totalCount');
-  if (totalCount) {
-    totalCount.textContent = t('header.total',{n:result.length});
-  }
+  // Header counter (owned/total + progress hairline) lives in updateStats()
+  // so it refreshes on every collection change, not only on re-renders.
+  updateStats();
 }
 
 /* ══════════════════════════════════════════════════════════ GRID */
@@ -203,13 +202,15 @@ export function renderGrid(cards){
     const bestType=bestOwnedType(card);
     const displayType=bestType||defaultBaseType(card);
     const ct=CARD_TYPES[displayType];
-    const rarity=RARITIES[cardRarity(card)];
+    const rKey=cardRarity(card);
+    const rarity=RARITIES[rKey];
+    const isEternal=rKey==='eternal';
 
     // Bar color from card type (neutre si aucune variante sélectionnée)
     const barColor=bestType?ct.color:'rgba(0,0,0,0.06)';
 
     const el=document.createElement('div');
-    let cardClass='card'+(isOwned?' has-owned':'')+(isWish?' has-wishlist':'')+(isFav?' has-favorite':'')+(isSet?' set-complete':'');
+    let cardClass='card'+(isOwned?' has-owned':'')+(isWish?' has-wishlist':'')+(isFav?' has-favorite':'')+(isSet?' set-complete':'')+(isEternal?' rar-eternal-fx':'');
     // FOILS (simples, duals, nitro, promos, wild) : le dégradé se
     // prolonge sur TOUTE la carte (une seule couche continue, le
     // .card-visual devient transparent) et le texte est posé sur un
@@ -220,11 +221,16 @@ export function renderGrid(cards){
     }
     el.className=cardClass;
     el.onclick=e=>{
-      if(!e.target.closest('.schip')&&!e.target.closest('.qbtn')) openModal(card.id);
+      if(!e.target.closest('.schip')&&!e.target.closest('.qbtn')&&!e.target.closest('.qadd-pop')) openModal(card.id);
     };
 
-    // Owned types summary
-    const ownedTypes=card.types.filter(t=>getTypeData(card.id,t).owned);
+    // Owned types summary. Set complet : posséder 1× chaque type est
+    // implicite, donc on n'affiche que les types en exemplaires
+    // multiples (×n) — le reste serait du bruit.
+    const ownedTypes=card.types.filter(t=>{
+      const d=getTypeData(card.id,t);
+      return d.owned && (!isSet || (d.qty||0)>1);
+    });
     const ownedSummary=ownedTypes.map(t=>{
       const ctt=CARD_TYPES[t];
       let cls='';
@@ -240,11 +246,13 @@ export function renderGrid(cards){
     }).join('');
 
     el.innerHTML=`
+      ${isEternal?'<span class="eternal-spark s1" aria-hidden="true">✦</span><span class="eternal-spark s2" aria-hidden="true">✦</span><span class="eternal-spark s3" aria-hidden="true">✦</span>':''}
       <div class="card-visual ${bestType?ct.css:''}${!isOwned?' not-owned':''}">
         ${card.champion?'<span class="crown">👑</span>':''}
         ${card.category==='reserve'?'<span class="replacement-icon">🔄</span>':''}
         ${isSet?`<span class="set-flag" role="img" aria-label="${t('set.complete')}" title="${t('set.complete')}">🏁</span>`:''}
         ${card.category==='gp' && circuitSVG(card.id,'card') ? circuitSVG(card.id,'card') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : `<span style="font-size:40px">${catEmoji(card.category)}</span>`}
+        <button class="qbtn" type="button" data-action="quickAdd" data-card="${card.id}" aria-label="${t('quick.add')}" title="${t('quick.add')}">+</button>
       </div>
       <div class="card-body">
         <div class="card-num">#${card.id} ${card.champion?'· 👑':''}</div>
@@ -252,7 +260,7 @@ export function renderGrid(cards){
         <div class="card-year">${card.season||2025}</div>
         <div class="card-team">${TEAM_COLORS[card.team]?`<span class="team-dot" style="background:${TEAM_COLORS[card.team]}"></span>`:''}${card.team||''}</div>
         <div class="card-rarity-row">
-          <span class="card-rarity${rarityChipClass(cardRarity(card))}" style="${rarityChipStyle(cardRarity(card),rarity.color)}">${t('rar.'+cardRarity(card))} ${'★'.repeat(rarity.stars)}</span>
+          <span class="card-rarity${rarityChipClass(rKey)}" style="${rarityChipStyle(rKey,rarity.color)}">${t('rar.'+rKey)} ${isEternal?`<span class="eternal-stars">${'✦'.repeat(rarity.stars)}</span>`:'★'.repeat(rarity.stars)}</span>
           <div class="status-chips">
             <div class="schip${isWish?' on':''}" data-s="wishlist" data-action="quickToggle" data-card="${card.id}" data-status="wishlist" title="Wishlist">⭐</div>
             <div class="schip${isFav?' on':''}" data-s="favorite" data-action="quickToggle" data-card="${card.id}" data-status="favorite" title="Favori">❤️</div>
@@ -448,7 +456,11 @@ function _renderModalTags(card){
     const rt=document.createElement('span');
     rt.className='mtag mtag-rarity'+rarityChipClass(key);
     rt.style.cssText=rarityChipStyle(key,rarity.color);
-    rt.textContent=`${'★'.repeat(rarity.stars)} ${t('rar.'+key)||rarity.label}`;
+    if(key==='eternal'){
+      rt.innerHTML=`<span class="eternal-stars">${'✦'.repeat(rarity.stars)}</span> ${t('rar.'+key)||rarity.label}`;
+    } else {
+      rt.textContent=`${'★'.repeat(rarity.stars)} ${t('rar.'+key)||rarity.label}`;
+    }
     rarEl.appendChild(rt);
   }
   _renderModalStatus(card);
@@ -484,7 +496,19 @@ function updateModalVisual(card){
   if(!vis) return;
   const best=bestOwnedType(card);
   const isSet=cardSetComplete(card.id);
-  vis.className = (best ? `modal-visual ${CARD_TYPES[best].css}` : 'modal-visual not-owned') + (isSet?' set-complete':'');
+  const isEternal=cardRarity(card)==='eternal';
+  vis.className = (best ? `modal-visual ${CARD_TYPES[best].css}` : 'modal-visual not-owned') + (isSet?' set-complete':'') + (isEternal?' rar-eternal-fx':'');
+  // Étoiles ✦ éternel — mêmes marqueurs que sur la tuile
+  vis.querySelectorAll('.eternal-spark').forEach(s=>s.remove());
+  if(isEternal){
+    ['s1','s2','s3'].forEach(cls=>{
+      const sp=document.createElement('span');
+      sp.className='eternal-spark '+cls;
+      sp.setAttribute('aria-hidden','true');
+      sp.textContent='✦';
+      vis.appendChild(sp);
+    });
+  }
   // Badge 🏁 « set complet » — même marqueur que sur la tuile
   let flag=vis.querySelector('.set-flag');
   if(isSet && !flag){
@@ -538,11 +562,64 @@ export function changeMoQty(cardId, typeId, delta){
 export function closeMoOverlay(e){ if(e.target===document.getElementById('mo')) closeMo(); }
 export function closeMo(){ document.getElementById('mo').classList.remove('open'); currentCardId=null; }
 
-/* TOAST */
-export function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),1600);
+/* ══════════════════════════════════════════════════════════ QUICK ADD
+   Bouton « + » sur la tuile → mini-sélecteur de variantes → +1 qty,
+   toast avec Annuler. Les écritures passent par quickAddVariant()
+   (storage.js) ; l'ouverture de fiche exclut .qbtn/.qadd-pop. */
+export function toggleQuickAdd(cardId, btnEl){
+  const existing=document.querySelector('.qadd-pop');
+  const wasForSame=existing && existing.dataset.card===cardId;
+  if(existing) existing.remove();
+  if(wasForSame) return; // re-clic sur le même + : simple fermeture
+  const card=CARDS_DB.find(c=>c.id===cardId);
+  if(!card || !btnEl) return;
+  const pop=document.createElement('div');
+  pop.className='qadd-pop';
+  pop.dataset.card=cardId;
+  pop.setAttribute('role','menu');
+  pop.setAttribute('aria-label',t('quick.pick'));
+  pop.innerHTML=card.types.map(ty=>{
+    const ct=CARD_TYPES[ty];
+    const d=getTypeData(cardId,ty);
+    return `<button type="button" class="qadd-type" role="menuitem" data-action="quickAddType" data-card="${cardId}" data-type="${ty}" title="${ct.label}" aria-label="${ct.label}">${ct.icon}${(d.qty||0)>0?`<span class="qadd-qty">${d.qty}</span>`:''}</button>`;
+  }).join('');
+  btnEl.closest('.card-visual').appendChild(pop);
+  const first=pop.querySelector('.qadd-type');
+  if(first) first.focus();
+}
+
+export function closeQuickAdd(target){
+  const pop=document.querySelector('.qadd-pop');
+  if(pop && (!target || (!target.closest('.qadd-pop') && !target.closest('.qbtn')))) pop.remove();
+}
+
+export function quickAddType(cardId, typeId){
+  const prev=quickAddVariant(cardId, typeId);
+  const ct=CARD_TYPES[typeId];
+  showToast(`${ct?ct.icon+' ':''}${t('quick.added')}`, {
+    actionLabel:t('quick.undo'),
+    onAction:()=>{ undoQuickAdd(cardId, typeId, prev); updateStats(); renderCollection(); }
+  });
+  updateStats(); renderCollection(); // re-render : le popover disparaît avec la grille
+}
+
+/* TOAST — msg simple, ou avec bouton d'action ({actionLabel, onAction}) */
+export function showToast(msg, opts){
+  const el=document.getElementById('toast');
+  if(!el) return;
+  el.textContent='';
+  el.append(document.createTextNode(msg));
+  if(opts && opts.actionLabel){
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='toast-action';
+    b.textContent=opts.actionLabel;
+    b.onclick=()=>{ el.classList.remove('show'); if(opts.onAction) opts.onAction(); };
+    el.appendChild(b);
+  }
+  el.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t=setTimeout(()=>el.classList.remove('show'), opts&&opts.actionLabel?4000:1600);
 }
 
 /* ══════════════════════════════════════════════════════════ VIEWS */

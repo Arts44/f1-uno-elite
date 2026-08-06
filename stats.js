@@ -39,6 +39,12 @@ export function computeStats(){
 export function updateStats(){
   const { total, owned, wish, doubles, missing, fav, totalExemplaires, pct } = computeStats();
 
+  // Header : compteur de progression (37/101 cartes) + hairline
+  const totalCount = document.getElementById('totalCount');
+  if (totalCount) totalCount.textContent = t('header.total',{o:owned,n:total});
+  const headerProgressBar = document.getElementById('headerProgressBar');
+  if (headerProgressBar) headerProgressBar.style.width = pct + '%';
+
   // Vérifications de sécurité avant de modifier le DOM
   const statOwned = document.getElementById('statOwned');
   if (statOwned) statOwned.textContent=`✓ ${owned} / ${total}`;
@@ -218,15 +224,21 @@ export function renderStats(){
     const rar = RARITIES[rKey];
     if(!rar) return '';
     const ownedAtRar = CARDS_DB.filter(c => cardOwned(c.id) && cardRarity(c) === rKey).length;
-    const reachable = CARDS_DB.filter(c => c.types.some(t => variantRarity(c,t) === rKey)).length;
+    // Une carte peut atteindre rKey soit par une variante, soit par le
+    // bonus set complet (+1 au-dessus de sa MEILLEURE variante — c'est
+    // le seul chemin vers eternal, les foils clampant à divine).
+    const reachable = CARDS_DB.filter(c => {
+      const idxs = c.types.map(ty => RARITY_ORDER[variantRarity(c,ty)]);
+      return idxs.includes(RARITY_ORDER[rKey]) || Math.max(...idxs)+1 === RARITY_ORDER[rKey];
+    }).length;
     if(reachable === 0) return '';
     const rarPct = Math.round((ownedAtRar/reachable)*100);
     // solid color dot (same visual weight as team/type rows) + colored label
-    const dot = rKey==='divine'
-      ? '<span class="sv-team-dot rar-divine-bg"></span>'
+    const dot = rKey==='divine' || rKey==='eternal'
+      ? `<span class="sv-team-dot rar-${rKey}-bg"></span>`
       : `<span class="sv-team-dot" style="background:${rar.color}"></span>`;
-    const label = rKey==='divine'
-      ? `<span class="rar-divine-text">${t('rar.'+rKey)}</span>`
+    const label = rKey==='divine' || rKey==='eternal'
+      ? `<span class="rar-${rKey}-text">${t('rar.'+rKey)}</span>`
       : `<span style="color:${rar.color}">${t('rar.'+rKey)}</span>`;
     return svRow(dot, label, ownedAtRar, reachable, rarPct);
   }).join('');
@@ -268,26 +280,33 @@ export function renderStats(){
     // per frame). Static multicolor gradient when the user prefers reduced
     // motion; d.color stays as the plain fallback for the other rarities.
     const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const divineDefs = donutData.some(d => d.k==='divine') ? `<defs>
+    const gradDefs = [];
+    if(donutData.some(d => d.k==='divine')) gradDefs.push(`
         <linearGradient id="divineGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="120" y2="120">
           <stop offset="0" stop-color="#8B5CF6"/><stop offset="0.25" stop-color="#3B82F6"/>
           <stop offset="0.5" stop-color="#14B8A6"/><stop offset="0.75" stop-color="#FACC15"/>
           <stop offset="1" stop-color="#F472B6"/>
           ${reduceMotion ? '' : '<animateTransform attributeName="gradientTransform" type="rotate" from="0 60 60" to="360 60 60" dur="9s" repeatCount="indefinite"/>'}
-        </linearGradient>
-      </defs>` : '';
+        </linearGradient>`);
+    if(donutData.some(d => d.k==='eternal')) gradDefs.push(`
+        <linearGradient id="eternalGrad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="120" y2="120">
+          <stop offset="0" stop-color="#B45309"/><stop offset="0.5" stop-color="#FACC15"/>
+          <stop offset="1" stop-color="#D99E00"/>
+          ${reduceMotion ? '' : '<animateTransform attributeName="gradientTransform" type="rotate" from="0 60 60" to="360 60 60" dur="9s" repeatCount="indefinite"/>'}
+        </linearGradient>`);
+    const divineDefs = gradDefs.length ? `<defs>${gradDefs.join('')}</defs>` : '';
     // 2px surface gap between adjacent segments (skipped for a lone segment)
     const GAP = donutData.length > 1 ? 2 : 0;
     const segs = donutData.map(d => {
       const len = d.n/ownedCards.length*C;
       const drawn = Math.max(len - GAP, 0.8);
-      const stroke = d.k==='divine' ? 'url(#divineGrad)' : d.color;
+      const stroke = d.k==='divine' ? 'url(#divineGrad)' : d.k==='eternal' ? 'url(#eternalGrad)' : d.color;
       const s = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${stroke}" stroke-width="16" stroke-dasharray="${drawn.toFixed(2)} ${(C-drawn).toFixed(2)}" stroke-dashoffset="${(-(offset + GAP/2)).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
       offset += len;
       return s;
     }).join('');
     const legend = donutData.map(d =>
-      `<div class="sv-leg-item"><span class="sv-leg-dot${d.k==='divine'?' rar-divine-bg':''}" style="${d.k==='divine'?'':`background:${d.color}`}"></span>${t('rar.'+d.k)}<span class="sv-leg-n">${d.n}</span></div>`
+      `<div class="sv-leg-item"><span class="sv-leg-dot${d.k==='divine'||d.k==='eternal'?` rar-${d.k}-bg`:''}" style="${d.k==='divine'||d.k==='eternal'?'':`background:${d.color}`}"></span>${t('rar.'+d.k)}<span class="sv-leg-n">${d.n}</span></div>`
     ).join('');
     donutHtml = `<div class="sv-donut-row">
       <svg class="sv-donut" viewBox="0 0 120 120" role="img" aria-label="${t('st.chart_rarity')}">

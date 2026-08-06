@@ -165,6 +165,12 @@ export const TUTORIAL_STEPS = [
     target: nthCardChip(1, 'wishlist'),
     action: { type: 'dataAction', name: 'quickToggle' } },
 
+  // Quick add: + button on the tile → variant picker → +1 copy.
+  // Validates when a variant is actually picked (quickAddType).
+  { id: 'quick_add',
+    target: () => q('.card .qbtn'),
+    action: { type: 'dataAction', name: 'quickAddType' } },
+
   // ── 3. Badges ──
   { id: 'go_badges',
     target: '.bn-tab[data-view="badges"]',
