@@ -1,0 +1,126 @@
+<!-- ══════════════════════════════════════════════════════════════════
+     F1 UNO Élite — template e-mail OTP / Magic Link (Supabase)
+     À coller dans : Dashboard Supabase → Authentication → Email
+     Templates → « Magic Link ». Variables Supabase utilisées :
+     {{ .Token }} (code OTP) et {{ .ConfirmationURL }} (lien).
+     Contraintes respectées : tables + styles inline uniquement, pas
+     de webfonts, pas d'images, ~600 px, sombre par design (sûr dans
+     les modes clair ET sombre de Gmail / Apple Mail / Outlook).
+     Bilingue FR (dominant) / EN (discret) — voir docs/README.
+     ══════════════════════════════════════════════════════════════════ -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>Ton code de connexion — F1 UNO Élite</title>
+</head>
+<body style="margin:0;padding:0;background-color:#ECECEE;">
+  <!-- préheader invisible (aperçu boîte de réception) -->
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
+    Ton code de connexion F1 UNO Élite&nbsp;: {{ .Token }}
+  </div>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ECECEE;">
+    <tr>
+      <td align="center" style="padding:32px 12px;">
+
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;background-color:#17181A;border-radius:16px;border:1px solid #2A2B2E;">
+
+          <!-- Bandeau accent -->
+          <tr>
+            <td style="height:5px;line-height:5px;font-size:0;background-color:#E8002D;border-radius:16px 16px 0 0;">&nbsp;</td>
+          </tr>
+
+          <!-- En-tête : nom de l'app (texte, pas d'image) -->
+          <tr>
+            <td align="center" style="padding:34px 40px 6px 40px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <div style="font-size:22px;font-weight:800;letter-spacing:1px;color:#FFFFFF;">
+                🏎️ F1&nbsp;UNO&nbsp;ÉLITE
+              </div>
+              <div style="font-size:12px;font-weight:600;letter-spacing:2px;color:#8E8F93;text-transform:uppercase;padding-top:4px;">
+                Collection Tracker
+              </div>
+            </td>
+          </tr>
+
+          <!-- Titre -->
+          <tr>
+            <td align="center" style="padding:26px 40px 8px 40px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <div style="font-size:17px;font-weight:700;color:#FFFFFF;">
+                Ton code de connexion
+              </div>
+              <div style="font-size:12px;color:#8E8F93;padding-top:3px;">
+                Your sign-in code
+              </div>
+            </td>
+          </tr>
+
+          <!-- LE CODE — très grand, espacé, facile à recopier -->
+          <tr>
+            <td align="center" style="padding:18px 30px 6px 30px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#232427;border:1px solid #3A3B3F;border-radius:12px;">
+                <tr>
+                  <td align="center" style="padding:26px 10px 24px 10px;font-family:'Courier New',Courier,monospace;">
+                    <span style="font-size:42px;line-height:1.2;font-weight:700;letter-spacing:10px;color:#FACC15;white-space:nowrap;">{{ .Token }}</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Validité -->
+          <tr>
+            <td align="center" style="padding:10px 40px 4px 40px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <div style="font-size:13px;color:#C9CACD;">
+                Saisis ce code dans l’application. Il est valable <strong style="color:#FFFFFF;">1&nbsp;heure</strong> et ne sert qu’une fois.
+              </div>
+              <div style="font-size:11.5px;color:#8E8F93;padding-top:3px;">
+                Enter this code in the app. It is valid for 1&nbsp;hour and can only be used once.
+              </div>
+            </td>
+          </tr>
+
+          <!-- Lien de secours (fonctionnel : l'app promet que le lien
+               marche aussi dans un navigateur — volontairement discret) -->
+          <tr>
+            <td align="center" style="padding:20px 40px 6px 40px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <div style="font-size:12px;color:#8E8F93;">
+                Le code ne passe pas&nbsp;? Ouvre ce lien sur l’appareil où l’application est installée&nbsp;·
+                <span style="color:#8E8F93;">Code not working? Open this link on the device where the app is installed:</span>
+              </div>
+              <div style="font-size:12px;padding-top:6px;">
+                <a href="{{ .ConfirmationURL }}" style="color:#64B5F6;text-decoration:underline;word-break:break-all;">{{ .ConfirmationURL }}</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Séparateur -->
+          <tr>
+            <td style="padding:22px 40px 0 40px;">
+              <div style="height:1px;line-height:1px;font-size:0;background-color:#2A2B2E;">&nbsp;</div>
+            </td>
+          </tr>
+
+          <!-- Sécurité + pied -->
+          <tr>
+            <td align="center" style="padding:16px 40px 30px 40px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+              <div style="font-size:12px;line-height:1.6;color:#8E8F93;">
+                Si tu n’es pas à l’origine de cette demande, ignore simplement ce message&nbsp;: rien ne sera fait sans ce code.<br>
+                <span style="font-size:11px;">If you didn’t request this, you can safely ignore this email.</span>
+              </div>
+              <div style="font-size:11px;color:#5C5D61;padding-top:14px;">
+                F1 UNO Élite — Collection Tracker · e-mail automatique, merci de ne pas répondre
+              </div>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
