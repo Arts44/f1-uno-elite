@@ -5,6 +5,7 @@
    These sections MOVED here from Réglages (pin.js) — no dupes.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { deniedForViewer } from './session.js';
 import { t } from './i18n.js';
 import { showToast, renderCollection } from './render.js';
 import { updateStats } from './stats.js';
@@ -13,6 +14,7 @@ import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, 
 import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection, isCloudSignedIn, cloudDeleteAll } from './cloud.js';
 import { feedbackSectionHTML, bindFeedbackSection } from './feedback.js';
+import { showAdminPinScreen } from './pin.js';
 
 /* ── Deletion logic (pure, unit-tested) ── */
 export const DELETE_SCOPES = ['local', 'cloud', 'both'];
@@ -34,10 +36,34 @@ export function deletionPlan(scope, cloudConnected){
   };
 }
 
+/* ── Vue verrouillée (mode spectateur) ──
+   On ne DÉSACTIVE pas les contrôles, on ne les rend pas du tout :
+   un `disabled` se retire en une ligne de console, une absence non.
+   L'écran explique le refus ET donne la sortie (passer en admin) —
+   un état bloqué sans issue est un cul-de-sac. */
+function _lockedAccountHTML(){
+  return `
+    <h2 class="setv-title">${t('acc.title')}</h2>
+    <div class="setv-section acc-locked">
+      <svg class="acc-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <div class="acc-locked-title">${t('acc.locked_title')}</div>
+      <p class="acc-locked-msg">${t('acc.locked_msg')}</p>
+      <button class="setv-btn" id="accAdminBtn" type="button">${t('acc.locked_btn')}</button>
+    </div>`;
+}
+
 /* ── View ── */
 export function renderAccount(){
   const el = document.getElementById('accountView');
   if(!el) return;
+  if(deniedForViewer()){
+    el.innerHTML = _lockedAccountHTML();
+    el.querySelector('#accAdminBtn')?.addEventListener('click', showAdminPinScreen);
+    return;
+  }
   el.innerHTML = `
     <h2 class="setv-title">👤 ${t('acc.title')}</h2>
 
@@ -194,6 +220,7 @@ function _bindBackupSection(el){
 const SCOPE_WARN_KEYS = { local: 'danger.warn_local', cloud: 'danger.warn_cloud', both: 'danger.warn_both' };
 
 export function openDeleteModal(){
+  if(deniedForViewer()) return ;   // lecture seule : refus même en appel direct
   closeDeleteModal();
   const signedIn = isCloudSignedIn();
   const overlay = document.createElement('div');

@@ -1436,6 +1436,13 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .acc-danger > .setv-section{border-left-color:var(--red);}
 .danger-zone .setv-section-title{color:var(--red);}
 
+/* Page Compte verrouillée (mode spectateur) */
+.acc-locked{display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:var(--space-4);padding:var(--space-10) var(--space-6);}
+.acc-lock-icon{width:40px;height:40px;color:var(--tx3);}
+.acc-locked-title{font-family:var(--font-d);font-weight:700;font-size:17px;color:var(--tx1);}
+.acc-locked-msg{font-size:13.5px;line-height:1.65;color:var(--tx2);max-width:46ch;margin:0;}
+
 /* Modale de suppression (confirmation forte) */
 .danger-mo{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;
   background:rgba(0,0,0,0.55);padding:var(--space-4);}

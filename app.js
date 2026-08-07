@@ -3,6 +3,7 @@
    Loaded as an ES module (<script type="module" src="app.js">).
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { isViewer } from './session.js';
 import { t, applyLanguage } from './i18n.js';
 import { loadAppData, _renderSeasonPills, switchSeason, CARDS_DB } from './data.js';
 import { loadData, coll, exportCollection, _handleImportFile } from './storage.js';
@@ -18,7 +19,7 @@ import {
   enterRemoveBadgeMode, toggleTitlePicker, getUnlockedTitles, selectTitle
 } from './badges.js';
 import {
-  isViewerMode, pinKey, pinDel, showAdminPinScreen, showSetupScreen,
+  pinKey, pinDel, showAdminPinScreen, showSetupScreen,
   needsLanguageChoice, showLanguageScreen,
   _bindViewerBrowseBtn, isViewerModeAllowed, isSetupDone, isPinEnabled,
   setAuthenticated, applySavedFont
@@ -99,8 +100,10 @@ function initEvents(){
     const action = el.getAttribute('data-action');
 
     // Block write actions in viewer mode
-    const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','quickAdd','quickAddType','toggleManualBadge','removeAutoBadge','enterRemoveBadgeMode','toggleTitlePicker','selectTitle']);
-    if(isViewerMode && VIEWER_BLOCKED.has(action)){
+    const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','quickAdd','quickAddType','toggleManualBadge','removeAutoBadge','enterRemoveBadgeMode','toggleTitlePicker','selectTitle',
+      // l'export sort la collection de l'appareil : une fuite, pas une écriture
+      'exportCollection']);
+    if(isViewer() && VIEWER_BLOCKED.has(action)){
       showToast(t('toast.readonly'));
       return;
     }
@@ -156,7 +159,7 @@ function initEvents(){
       }
       case 'switchView': {
         const view = el.getAttribute('data-view');
-        if(isViewerMode && view === 'settings'){
+        if(isViewer() && view === 'settings'){
           showAdminPinScreen();
         } else {
           switchView(view);

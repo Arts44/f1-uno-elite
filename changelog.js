@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.25.0',
+    date: '2026-08-07',
+    changes: {
+      en: [
+        'Read-only sharing is now genuinely read-only: the Account page is locked in spectator mode. Cloud sign-in, sync, backups, export, the QR code, feedback and data deletion are all out of reach — including the export and backup code, which used to let a visitor walk away with the whole collection.',
+        'The lock holds even against direct calls: every sensitive action refuses on its own, not just its button. Shared backup links are ignored too.',
+        'The locked page explains why and offers a way in: one tap asks for the PIN and hands the account back to its owner.',
+      ],
+      fr: [
+        'Le partage en lecture seule l’est vraiment : la page Compte est verrouillée en mode spectateur. Connexion cloud, synchro, sauvegardes, export, QR, avis et suppression sont hors d’atteinte — y compris l’export et le code de sauvegarde, qui permettaient jusqu’ici à un visiteur de repartir avec toute la collection.',
+        'Le verrou tient même face à un appel direct : chaque action sensible refuse d’elle-même, pas seulement son bouton. Les liens de sauvegarde partagés sont ignorés eux aussi.',
+        'La page verrouillée explique pourquoi et donne la sortie : un appui demande le code PIN et rend le compte à son propriétaire.',
+      ],
+      es: [
+        'El uso compartido de solo lectura ahora lo es de verdad: la página Cuenta está bloqueada en modo espectador. Inicio de sesión en la nube, sincronización, copias, exportación, QR, opiniones y borrado quedan fuera de alcance — incluidos la exportación y el código de copia, que hasta ahora permitían llevarse toda la colección.',
+        'El bloqueo aguanta incluso ante una llamada directa: cada acción sensible se niega por sí misma, no solo su botón. Los enlaces de copia compartidos también se ignoran.',
+        'La página bloqueada explica el motivo y ofrece la salida: un toque pide el PIN y devuelve la cuenta a su propietario.',
+      ],
+      zh: [
+        '只读分享现在名副其实：旁观模式下「账户」页已锁定。云登录、同步、备份、导出、二维码、反馈和删除全部不可用——包括此前能让访客带走整份收藏的导出和备份码。',
+        '这道锁连直接调用也挡得住：每个敏感操作自身就会拒绝，而不只是按钮。共享的备份链接同样会被忽略。',
+        '锁定页会说明原因并给出出口：轻点一下即可输入 PIN 码，把账户交还给拥有者。',
+      ],
+      it: [
+        'La condivisione in sola lettura ora lo è davvero: la pagina Account è bloccata in modalità spettatore. Accesso cloud, sincronizzazione, backup, esportazione, QR, feedback ed eliminazione sono fuori portata — inclusi l’esportazione e il codice di backup, che finora permettevano a un ospite di portarsi via l’intera collezione.',
+        'Il blocco regge anche a una chiamata diretta: ogni azione sensibile rifiuta da sé, non solo il suo pulsante. Anche i link di backup condivisi vengono ignorati.',
+        'La pagina bloccata spiega il perché e offre la via d’uscita: un tocco chiede il PIN e restituisce l’account al proprietario.',
+      ],
+      nl: [
+        'Alleen-lezen delen is nu ook echt alleen-lezen: de Account-pagina is vergrendeld in de kijkmodus. Cloud-aanmelding, synchronisatie, back-ups, export, QR, feedback en verwijderen zijn onbereikbaar — inclusief de export en de back-upcode, waarmee een bezoeker tot nu toe de hele verzameling kon meenemen.',
+        'Het slot houdt zelfs stand bij een directe aanroep: elke gevoelige actie weigert zelf, niet alleen de knop. Gedeelde back-uplinks worden eveneens genegeerd.',
+        'De vergrendelde pagina legt uit waarom en biedt een uitweg: één tik vraagt de pincode en geeft het account terug aan de eigenaar.',
+      ],
+      de: [
+        'Nur-Lesen-Teilen ist jetzt wirklich nur Lesen: die Konto-Seite ist im Zuschauermodus gesperrt. Cloud-Anmeldung, Synchronisierung, Backups, Export, QR, Feedback und Löschen sind unerreichbar — auch Export und Backup-Code, mit denen ein Besucher bisher die ganze Sammlung mitnehmen konnte.',
+        'Die Sperre hält auch einem direkten Aufruf stand: jede sensible Aktion verweigert sich selbst, nicht nur ihr Button. Geteilte Backup-Links werden ebenfalls ignoriert.',
+        'Die gesperrte Seite erklärt den Grund und bietet den Ausweg: ein Tippen fragt die PIN ab und gibt das Konto an seinen Besitzer zurück.',
+      ],
+    },
+  },
+  {
     version: '1.24.1',
     date: '2026-08-07',
     changes: {

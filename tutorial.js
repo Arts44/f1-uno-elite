@@ -25,6 +25,7 @@ import { log } from './logger.js';
 import { t, applyLanguage } from './i18n.js';
 import { _currentSeason } from './data.js';
 import { loadData } from './storage.js';
+import { isViewer } from './session.js';
 import { loadManualBadges } from './badges.js';
 import {
   currentView, setCurrentView, switchView, closeMo, renderCollection,
@@ -127,6 +128,13 @@ const nthCardChip = (n, status) => () => cards()[n]?.querySelector(`[data-action
 function _isModalOpen(){
   const mo = document.getElementById('mo');
   return !!mo && mo.classList.contains('open');
+}
+
+// En mode spectateur la page Compte est verrouillée : guider vers un
+// mur n'apprend rien, donc ces étapes sortent du parcours.
+const VIEWER_SKIPPED = new Set(['go_account', 'set_backup']);
+export function activeTutorialSteps(){
+  return isViewer() ? TUTORIAL_STEPS.filter(s => !VIEWER_SKIPPED.has(s.id)) : TUTORIAL_STEPS;
 }
 
 export const TUTORIAL_STEPS = [
@@ -291,9 +299,10 @@ function _waitForTarget(step, seq, timeout = 4000){
 async function _runStep(i){
   if(_stepCleanup){ _stepCleanup(); _stepCleanup = null; }
   if(!_active) return;
-  if(i >= TUTORIAL_STEPS.length){ _end(false); return; }
+  const STEPS = activeTutorialSteps();
+  if(i >= STEPS.length){ _end(false); return; }
   const seq = ++_stepSeq;
-  const step = TUTORIAL_STEPS[i];
+  const step = STEPS[i];
   try { if(step.ensure) await step.ensure(); } catch(e){ log('tut ensure', step.id, e); }
   if(!_active || seq !== _stepSeq) return;
   // Show the bubble IMMEDIATELY (skip/quit stay usable while the
@@ -326,8 +335,8 @@ function _positionSpot(el){
 }
 
 function _showBubble(step, i, opts = {}){
-  const isLast = i === TUTORIAL_STEPS.length - 1;
-  const total = TUTORIAL_STEPS.length;
+  const isLast = i === STEPS.length - 1;
+  const total = STEPS.length;
   const showNext = step.observe || isLast || opts.missing;
   _bubble.innerHTML = `
     <div class="tut-progress">${i + 1} / ${total}</div>

@@ -4,6 +4,7 @@
    coll[cardId][typeId] = { owned, wishlist, doubles, favorite, qty }
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { deniedForViewer } from './session.js';
 import { t } from './i18n.js';
 import {
   _currentSeason, setCurrentSeason,
@@ -97,6 +98,7 @@ export function setTypeData(cardId, typeId, key, value){
 // sauvegarde. Les préférences (thème, langue, police) et le PIN sont
 // volontairement conservés. Recharge l'état mémoire (vide) ensuite.
 export function deleteLocalCollectionData(){
+  if(deniedForViewer()) return 0;   // lecture seule : refus même en appel direct
   const kill = [];
   for(let i = 0; i < localStorage.length; i++){
     const k = localStorage.key(i);
@@ -204,6 +206,7 @@ export function collectionSnapshot(include){
 }
 
 export function exportCollection(){
+  if(deniedForViewer()) return ;   // lecture seule : refus même en appel direct
   const data = collectionSnapshot(backupIncludes());
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], {type:'application/json'});
@@ -221,6 +224,7 @@ export function exportCollection(){
 
 /* ══════════════════════════════════════════════════════════ IMPORT JSON */
 export function triggerImport(){
+  if(deniedForViewer()) return ;   // lecture seule : refus même en appel direct
   const inp = document.getElementById('importFileInput');
   if(inp){ inp.value=''; inp.click(); }
 }
@@ -241,6 +245,7 @@ export function _handleImportFile(file){
 }
 
 export function _showImportDialog(data){
+  if(deniedForViewer()) return ;   // lecture seule : refus même en appel direct
   const overlay = document.createElement('div');
   overlay.className='import-dialog-overlay';
   // Optional settings restore: only when the backup carries them.

@@ -42,9 +42,9 @@ describe('mode spectateur : le garde vit dans switchView', () => {
     const src = read('render.js');
     const fn = src.slice(src.indexOf('export function switchView'));
     const body = fn.slice(0, fn.indexOf('\n}'));
-    assert.match(body, /isViewerMode\s*&&\s*view\s*===\s*'settings'/,
+    assert.match(body, /isViewer\(\)\s*&&\s*view\s*===\s*'settings'/,
       'switchView doit porter le garde spectateur');
-    const guardAt = body.indexOf('isViewerMode');
+    const guardAt = body.indexOf('isViewer()');
     const renderAt = body.indexOf('renderSettings');
     assert.ok(guardAt >= 0 && (renderAt === -1 || guardAt < renderAt),
       'le garde doit précéder tout rendu des Réglages');

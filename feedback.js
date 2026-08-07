@@ -13,6 +13,7 @@
      here is cache:'no-store'.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { deniedForViewer } from './session.js';
 import { t, getLang } from './i18n.js';
 import { APP_VERSION } from './changelog.js';
 import {
@@ -63,6 +64,7 @@ export function feedbackCooldownRemaining(now, last = _lastSentAt, cooldownMs = 
    'session-expired' | 'rate-limited' | 'send-failed' */
 
 export async function sendFeedback(type, message){
+  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-configured');
   if(typeof navigator !== 'undefined' && navigator.onLine === false) throw new Error('offline');

@@ -9,6 +9,7 @@
                  F1U0.<base64url>  (uncompressed fallback)
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { deniedForViewer } from './session.js';
 import { t } from './i18n.js';
 import { showToast } from './render.js';
 import { encodeBinary, toSvg, Ecc } from './qrcodegen.js';
@@ -47,6 +48,7 @@ async function _pipe(bytes, TransformCtor, mode){
 /* ── code generation ── */
 // snapshot: the object returned by storage.js collectionSnapshot()
 export async function generateBackupCode(snapshot){
+  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const json = JSON.stringify(snapshot);
   const raw = new TextEncoder().encode(json);
   let code;
@@ -114,6 +116,7 @@ export function makeBackupQrSvg(link){
 // existing merge/replace import dialog, then strip the hash so a reload
 // doesn't re-trigger it. Called from initApp() once data is loaded.
 export async function maybeHandleBackupHash(){
+  if(deniedForViewer()) return false;   // lecture seule : refus même en appel direct
   const hash = location.hash || '';
   if(!/#backup=/.test(hash)) return false;
   // Clear the hash immediately (before await) so it can't fire twice

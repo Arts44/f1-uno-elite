@@ -13,6 +13,7 @@
    the Supabase origin, so no API response is ever served from cache.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { deniedForViewer } from './session.js';
 import { t } from './i18n.js';
 import { collectionSnapshot, _showImportDialog } from './storage.js';
 import { backupIncludes } from './settings-sync.js';
@@ -104,6 +105,7 @@ export function clearSession(){
 // comes back to the same entry (localhost dev or GitHub Pages) —
 // the URL must be allowed in Supabase → Auth → URL Configuration.
 export async function sendMagicLink(email){
+  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-configured');
   const redirectTo = encodeURIComponent(location.origin + location.pathname);
@@ -127,6 +129,7 @@ export async function sendMagicLink(email){
 // always opens in the default browser and never reaches the installed
 // app (and iOS PWAs don't even share localStorage with Safari).
 export async function verifyOtpCode(email, code){
+  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-configured');
   const resp = await fetch(`${cfg.url}/auth/v1/verify`, {
@@ -227,6 +230,7 @@ export async function getValidSession(){
 // Called at boot: if the URL carries a magic-link fragment, store the
 // session, resolve the user profile and clean the URL.
 export async function handleAuthRedirect(){
+  if(deniedForViewer()) return false;   // lecture seule : refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) return false;
   const parsed = parseSessionFromHash(location.hash);
@@ -244,6 +248,7 @@ export async function handleAuthRedirect(){
 }
 
 export async function signOut(){
+  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   const session = loadSession();
   clearSession(); // local state first: signing out must always succeed
@@ -278,6 +283,7 @@ async function _requireSession(){
 
 // Upsert the current season's snapshot. Returns the server updated_at.
 export async function pushCollection(){
+  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
@@ -308,6 +314,7 @@ export async function pushCollection(){
 // EXISTING import dialog (merge / replace / cancel) — the local
 // collection is never overwritten silently.
 export async function pullCollection(){
+  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
@@ -339,6 +346,7 @@ export function isCloudSignedIn(){
 // Change the account email: GoTrue sends confirmation link(s) — to both
 // mailboxes when the project has "secure email change" enabled.
 export async function requestEmailChange(newEmail){
+  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
@@ -359,6 +367,7 @@ export async function requestEmailChange(newEmail){
 // Danger zone: delete EVERY season row of the signed-in user (RLS keeps
 // this scoped to their own rows server-side).
 export async function cloudDeleteAll(){
+  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();

@@ -16,7 +16,8 @@ import {
 } from './storage.js';
 import { updateStats, renderStats } from './stats.js';
 import { renderBadges } from './badges.js';
-import { renderSettings, isViewerMode, showAdminPinScreen } from './pin.js';
+import { renderSettings, showAdminPinScreen } from './pin.js';
+import { isViewer } from './session.js';
 import { renderAccount } from './account.js';
 
 /* ── Visual helpers ── */
@@ -894,7 +895,7 @@ export function switchView(view){
   // Garde unique : le mode spectateur ne donne jamais accès aux Réglages,
   // quel que soit le chemin (clic, glissement, appel direct). Le garde
   // vivait dans la délégation d'app.js et le drag le contournait.
-  if(isViewerMode && view === 'settings'){
+  if(isViewer() && view === 'settings'){
     showAdminPinScreen();
     return;
   }

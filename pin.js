@@ -3,6 +3,7 @@
    settings screen. PIN is SHA-256 hashed in localStorage.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { isViewer, setViewer } from './session.js';
 import { t, LANGS, getLang, setLang } from './i18n.js';
 import { switchView, showToast, toggleTheme, currentView, setCurrentView, closeMo, setSettingsTabLocked, confirmDialog } from './render.js';
 import { initApp } from './app.js';
@@ -23,7 +24,9 @@ export function getStoredPinHash(){ return localStorage.getItem('f1uno_pin_hash'
 
 let pinEntry = '';
 let _authenticated = false;
-export let isViewerMode = false;
+// Le drapeau vit dans session.js (module feuille) — réexporté ici
+// pour ne pas casser les appelants historiques.
+export { isViewer as isViewerMode };
 export function setAuthenticated(v){ _authenticated = v; }
 
 // SHA-256 helper using Web Crypto API
@@ -137,7 +140,7 @@ export function enterApp(viewer=false){
   // Viewer mode needs readable data, and without a PIN there is no key:
   // an encrypted store cannot be browsed anonymously.
   if(viewer && isEncEnabled()){ showToast(t('enc.viewer_blocked')); return; }
-  isViewerMode = viewer;
+  setViewer(viewer);
   _authenticated = !viewer;
   pinEntry = '';
   const loginScreen = document.getElementById('login-screen');
@@ -157,7 +160,7 @@ function _launchApp(){
   const collectionView = document.getElementById('collectionView');
   if(collectionView) collectionView.style.display='block';
   initApp();
-  if(isViewerMode) _applyViewerMode();
+  if(isViewer()) _applyViewerMode();
   else maybeStartTutorial(); // no-op unless very first launch
 }
 
@@ -307,7 +310,7 @@ export function lockApp() {
   log('lockApp: hot lock (no reload)');
   // 1. Drop every privilege FIRST — the console guard re-arms here.
   _authenticated = false;
-  isViewerMode = false;
+  setViewer(false);
   pinEntry = '';
   window._adminOverlayActive = false;
   window._adminPinCallback = null;
@@ -468,7 +471,7 @@ export function showAdminPinScreen(){
       overlay.remove();
       window._adminOverlayActive = false;
       window._adminPinCallback = null;
-      isViewerMode = false;
+      setViewer(false);
       _authenticated = true;
       document.body.classList.remove('viewer-mode');
       setSettingsTabLocked(false);
