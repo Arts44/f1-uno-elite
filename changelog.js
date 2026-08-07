@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.26.0',
+    date: '2026-08-07',
+    changes: {
+      en: ['All 23 Grand Prix track outlines are now drawn from real GPS surveys instead of freehand sketches. Spa gets back Eau Rouge and Pouhon, Suzuka its famous figure-eight crossover, Zandvoort, Shanghai and Silverstone their true shapes — every circuit is finally recognisable at a glance.'],
+      fr: ['Les 23 tracés de Grand Prix sont désormais issus de relevés GPS réels et non plus de croquis à main levée. Spa retrouve l’Eau Rouge et Pouhon, Suzuka son fameux croisement en huit, Zandvoort, Shanghai et Silverstone leur vraie silhouette — chaque circuit est enfin reconnaissable au premier regard.'],
+      es: ['Los 23 trazados de Gran Premio proceden ahora de levantamientos GPS reales en lugar de bocetos a mano alzada. Spa recupera Eau Rouge y Pouhon, Suzuka su famoso cruce en ocho, Zandvoort, Shanghái y Silverstone su verdadera silueta — cada circuito por fin se reconoce a primera vista.'],
+      zh: ['23 条大奖赛赛道轮廓现在均基于真实 GPS 测绘数据绘制，不再是手绘草图。斯帕找回了 Eau Rouge 和 Pouhon，铃鹿恢复了著名的 8 字交叉，赞德福特、上海和银石也回到了真实形状——每条赛道终于一眼就能认出。'],
+      it: ['I 23 tracciati dei Gran Premi derivano ora da rilievi GPS reali e non più da schizzi a mano libera. Spa ritrova Eau Rouge e Pouhon, Suzuka il suo celebre incrocio a otto, Zandvoort, Shanghai e Silverstone la loro vera sagoma — ogni circuito è finalmente riconoscibile a colpo d’occhio.'],
+      nl: ['De 23 Grand Prix-tracés zijn nu gebaseerd op echte gps-metingen in plaats van schetsen uit de losse hand. Spa krijgt Eau Rouge en Pouhon terug, Suzuka zijn beroemde achtvormige kruising, Zandvoort, Shanghai en Silverstone hun ware vorm — elk circuit is eindelijk in één oogopslag herkenbaar.'],
+      de: ['Alle 23 Grand-Prix-Streckenverläufe stammen jetzt aus echten GPS-Vermessungen statt aus Freihandskizzen. Spa erhält Eau Rouge und Pouhon zurück, Suzuka seine berühmte Achterkreuzung, Zandvoort, Shanghai und Silverstone ihre wahre Silhouette — jede Strecke ist endlich auf einen Blick erkennbar.'],
+    },
+  },
+  {
     version: '1.25.1',
     date: '2026-08-07',
     changes: {

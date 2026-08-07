@@ -152,3 +152,28 @@ describe('cardRarity (collection-aware)', () => {
         assert.ok(RARITY_KEYS.includes(variantRarity(c, t)), `${c.id}/${t}`);
   });
 });
+
+describe('circuits — parité embarqué / data + géométrie GPS', () => {
+  const circuits = JSON.parse(readFileSync(new URL('../data/circuits.json', import.meta.url), 'utf8'));
+  const embSrc = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+
+  test('data-embedded.js embarque exactement data/circuits.json', () => {
+    const emb = JSON.parse(embSrc.match(/circuits:\s*({.*})/)[1]);
+    assert.deepEqual(emb, circuits,
+      'le repli hors-ligne doit servir les mêmes tracés que data/circuits.json');
+  });
+
+  test('23 GP, chaque tracé est une boucle fermée dans le viewBox 500', () => {
+    const keys = Object.keys(circuits);
+    assert.equal(keys.length, 23);
+    for (const k of keys) {
+      const p = circuits[k].path;
+      assert.match(p, /^M[\d.]/, `${k} : doit ouvrir sur un M absolu`);
+      assert.match(p, /Z$/, `${k} : un circuit est une boucle — le chemin doit se fermer`);
+      // Toutes les coordonnées restent dans le viewBox (marge sûre du trait incluse)
+      const nums = p.match(/-?\d+(\.\d+)?/g).map(Number);
+      const out = nums.filter(n => n < 0 || n > 500);
+      assert.equal(out.length, 0, `${k} : ${out.length} coordonnées hors du viewBox 0–500`);
+    }
+  });
+});
