@@ -1179,14 +1179,20 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    rivalise avec la pastille */
 .bn-tab::before{
   content:'';position:absolute;left:50%;top:50%;translate:-50% -50%;
-  width:40px;height:36px;border-radius:12px;background:transparent;
+  width:40px;height:40px;border-radius:50%;background:transparent;
   transition:background 0.15s ease;
 }
+/* Le survol est un DISQUE, pas un bloc : il reprend la forme de la
+   pastille au lieu de lui opposer un rectangle. Teinte dérivée du texte
+   plutôt qu'un gris opaque, qui trancherait sur le dégradé de la barre. */
 .bn-tab:hover{color:var(--tx1);}
-.bn-tab:hover::before{background:var(--surface2);}
+.bn-tab:hover::before{background:color-mix(in srgb, var(--tx1) 9%, transparent);}
 .bn-tab.active::before{background:transparent;}
 .bn-tab:focus-visible{outline:none !important;}
-.bn-tab:focus-visible::before{background:var(--surface2);box-shadow:0 0 0 2px var(--red);}
+.bn-tab:focus-visible::before{
+  background:color-mix(in srgb, var(--tx1) 9%, transparent);
+  box-shadow:0 0 0 2px var(--red);
+}
 .bn-icon{width:22px;height:22px;transition:opacity 0.2s ease, transform 0.2s ease;}
 .bn-tab.active .bn-icon{opacity:0;transform:translateY(-8px);} /* l'icône vit dans la pastille */
 .bn-label{
