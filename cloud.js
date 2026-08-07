@@ -19,6 +19,7 @@ import { collectionSnapshot, _showImportDialog } from './storage.js';
 import { backupIncludes } from './settings-sync.js';
 import { markBackupDone } from './backup.js';
 import { _currentSeason } from './data.js';
+import { createSegmentedInput } from './otp-input.js';
 
 export const SESSION_KEY = 'f1uno_cloud_session';
 
@@ -472,11 +473,7 @@ function _cloudAreaHTML(){
       <button class="setv-btn" id="cloudSendBtn" type="button">${t('cloud.send_link')}</button>
     </div>
     <div class="cloud-login-row cloud-otp-row" id="cloudCodeRow" style="display:none;">
-      <div class="otp-wrap" id="otpWrap">
-        <input type="text" class="otp-input" id="cloudCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10" aria-label="${t('cloud.code_label')}">
-        <div class="otp-boxes" aria-hidden="true">${'<span class="otp-box"></span>'.repeat(8)}</div>
-        <span class="otp-check" aria-hidden="true">✓</span>
-      </div>
+      <div id="otpWrap"></div>
       <button class="setv-btn" id="cloudVerifyBtn" type="button">${t('cloud.verify_btn')}</button>
     </div>
     <div class="cloud-msg" id="cloudAuthMsg" aria-live="polite"></div>`;
@@ -556,69 +553,51 @@ export function bindCloudSection(){
       }
     });
   }
-  // ── Saisie OTP segmentée : le VRAI input (#cloudCode) reste l'unique
-  //    input logique (clavier, collage, backspace, lecteur d'écran) ;
-  //    les cases .otp-box ne sont qu'un miroir visuel (aria-hidden). ──
-  const otpWrap = document.getElementById('otpWrap');
-  const otpInput = document.getElementById('cloudCode');
-  if(otpWrap && otpInput){
-    const boxes = [...otpWrap.querySelectorAll('.otp-box')];
-    const renderOtp = () => {
-      const v = normalizeOtpInput(otpInput.value);
-      if(otpInput.value !== v) otpInput.value = v; // chiffres uniquement
-      const activeIdx = Math.min(v.length, boxes.length - 1);
-      boxes.forEach((b, i) => {
-        const ch = v[i] || '';
-        if(b.textContent !== ch){
-          b.textContent = ch;
-          if(ch){ b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
-        }
-        b.classList.toggle('filled', !!ch);
-        b.classList.toggle('active', document.activeElement === otpInput && i === activeIdx && v.length < boxes.length + 1);
-      });
-      otpWrap.classList.remove('otp-error');
-    };
-    otpInput.addEventListener('input', renderOtp);
-    otpInput.addEventListener('focus', renderOtp);
-    otpInput.addEventListener('blur', () => boxes.forEach(b => b.classList.remove('active')));
-    otpWrap.addEventListener('click', () => otpInput.focus());
-    renderOtp();
-  }
-
+  // ── Saisie OTP : instance du composant segmenté partagé.
+  //    L'input caché garde l'id cloudCode (tests, autofill) et le
+  //    code complet déclenche la vérification tout seul. ──
+  const otpHost = document.getElementById('otpWrap');
   const verifyBtn = document.getElementById('cloudVerifyBtn');
-  if(verifyBtn){
-    verifyBtn.addEventListener('click', async () => {
-      const msg = document.getElementById('cloudAuthMsg');
-      const email = (document.getElementById('cloudEmail')?.value || '').trim();
-      const code = normalizeOtpInput(document.getElementById('cloudCode')?.value);
-      const wrap = document.getElementById('otpWrap');
-      if(!isValidOtpFormat(code)){
-        if(msg){ msg.textContent = t('cloud.code_err'); msg.className = 'cloud-msg err'; }
-        if(wrap){ wrap.classList.remove('otp-error'); void wrap.offsetWidth; wrap.classList.add('otp-error'); }
-        return;
+  let otpApi = null;
+  const doVerify = async () => {
+    if(!verifyBtn || verifyBtn.disabled) return;
+    const msg = document.getElementById('cloudAuthMsg');
+    const email = (document.getElementById('cloudEmail')?.value || '').trim();
+    const code = otpApi ? otpApi.value() : '';
+    if(!isValidOtpFormat(code)){
+      if(msg){ msg.textContent = t('cloud.code_err'); msg.className = 'cloud-msg err'; }
+      if(otpApi) otpApi.setState('error');
+      return;
+    }
+    verifyBtn.disabled = true;
+    if(msg){ msg.textContent = t('cloud.verifying'); msg.className = 'cloud-msg'; }
+    try {
+      await verifyOtpCode(email, code);
+      if(otpApi){
+        // Succès : cases vertes, check dessiné, texte, puis bascule
+        otpApi.setState('success');
+        if(msg){ msg.textContent = t('cloud.otp_verified'); msg.className = 'cloud-msg ok'; }
+        const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        setTimeout(() => _refreshCloudArea(), reduce ? 150 : 1100);
+      } else {
+        _refreshCloudArea(); // → signed-in state
       }
-      verifyBtn.disabled = true;
-      if(msg){ msg.textContent = t('cloud.verifying'); msg.className = 'cloud-msg'; }
-      try {
-        await verifyOtpCode(email, code);
-        if(wrap){
-          // État de succès : cases vertes + check animé, puis bascule
-          wrap.classList.add('otp-success');
-          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-          setTimeout(() => _refreshCloudArea(), reduce ? 150 : 700);
-        } else {
-          _refreshCloudArea(); // → signed-in state
-        }
-      } catch(e){
-        log('cloud: verify error', e);
-        const key = e.message === 'offline' ? 'cloud.offline'
-                  : e.message === 'rate-limited' ? 'cloud.rate_limited' : 'cloud.code_err';
-        if(msg){ msg.textContent = t(key); msg.className = 'cloud-msg err'; }
-        if(wrap){ wrap.classList.remove('otp-error'); void wrap.offsetWidth; wrap.classList.add('otp-error'); }
-        verifyBtn.disabled = false;
-      }
+    } catch(e){
+      log('cloud: verify error', e);
+      const key = e.message === 'offline' ? 'cloud.offline'
+                : e.message === 'rate-limited' ? 'cloud.rate_limited' : 'cloud.code_err';
+      if(msg){ msg.textContent = t(key); msg.className = 'cloud-msg err'; }
+      if(otpApi) otpApi.setState('error');
+      verifyBtn.disabled = false;
+    }
+  };
+  if(otpHost){
+    otpApi = createSegmentedInput(otpHost, {
+      length: 8, inputId: 'cloudCode', ariaLabel: t('cloud.code_label'),
+      autoSubmit: true, onComplete: doVerify,
     });
   }
+  if(verifyBtn){ verifyBtn.addEventListener('click', doVerify); }
   const outBtn = document.getElementById('cloudSignOutBtn');
   if(outBtn){
     outBtn.addEventListener('click', async () => {

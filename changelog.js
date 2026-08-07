@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.27.0',
+    date: '2026-08-07',
+    changes: {
+      en: [
+        'The code entry got a real face-lift: the active box now glows in the app\'s red with a visible blinking caret, each digit lands with a tiny pop, and a complete code verifies itself — no button press needed.',
+        'Clear answers in both directions: a wrong code shakes the boxes with an orange outline (deliberately not the accent red), a correct one turns them green, draws a check and sparkles briefly before signing you in.',
+      ],
+      fr: [
+        'La saisie du code a droit à un vrai lifting : la case active s\'allume dans le rouge de l\'app avec un curseur clignotant bien visible, chaque chiffre atterrit avec un petit rebond, et un code complet se vérifie tout seul — plus besoin d\'appuyer sur le bouton.',
+        'Une réponse claire dans les deux sens : un code faux secoue les cases avec un contour orange (volontairement distinct du rouge de l\'app), un code juste les passe au vert, dessine une coche et scintille brièvement avant la connexion.',
+      ],
+      es: [
+        'La entrada del código se renueva: la casilla activa se ilumina en el rojo de la app con un cursor parpadeante bien visible, cada dígito aterriza con un pequeño rebote y un código completo se verifica solo — ya no hace falta pulsar el botón.',
+        'Respuesta clara en ambos sentidos: un código erróneo sacude las casillas con un contorno naranja (a propósito distinto del rojo de la app), uno correcto las pone en verde, dibuja una marca y destella brevemente antes de iniciar sesión.',
+      ],
+      zh: [
+        '验证码输入全面翻新：当前输入框以应用红色高亮并带清晰闪烁光标，每个数字落下时有轻微弹跳，输满即自动验证——无需再按按钮。',
+        '正误一目了然：错误的验证码会让输入框抖动并显示橙色轮廓（有意区别于应用的红色），正确的则变绿、画出对勾并短暂闪光，随后完成登录。',
+      ],
+      it: [
+        'L\'inserimento del codice si rifà il look: la casella attiva si accende nel rosso dell\'app con un cursore lampeggiante ben visibile, ogni cifra atterra con un piccolo rimbalzo e un codice completo si verifica da solo — niente più pulsante da premere.',
+        'Risposta chiara in entrambi i sensi: un codice errato scuote le caselle con un contorno arancione (volutamente diverso dal rosso dell\'app), uno giusto le fa diventare verdi, disegna una spunta e brilla un istante prima dell\'accesso.',
+      ],
+      nl: [
+        'De code-invoer kreeg een echte opfrisbeurt: het actieve vakje licht op in het rood van de app met een duidelijk knipperende cursor, elk cijfer landt met een kleine stuiter, en een volledige code verifieert zichzelf — geen knop meer nodig.',
+        'Duidelijk antwoord in beide richtingen: een foute code schudt de vakjes met een oranje rand (bewust anders dan het rood van de app), een juiste maakt ze groen, tekent een vinkje en glinstert kort voor het inloggen.',
+      ],
+      de: [
+        'Die Code-Eingabe bekam ein echtes Face-Lift: das aktive Feld leuchtet im Rot der App mit gut sichtbarem blinkendem Cursor, jede Ziffer landet mit einem kleinen Hüpfer, und ein vollständiger Code prüft sich von selbst — kein Knopfdruck mehr nötig.',
+        'Klare Antwort in beide Richtungen: ein falscher Code schüttelt die Felder mit orangefarbenem Rand (bewusst nicht das Akzent-Rot), ein richtiger färbt sie grün, zeichnet einen Haken und funkelt kurz vor der Anmeldung.',
+      ],
+    },
+  },
+  {
     version: '1.26.0',
     date: '2026-08-07',
     changes: {
