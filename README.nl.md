@@ -23,15 +23,35 @@ Het is een **PWA**: installeer haar vanuit je browser en ze draait als een nativ
 
 <sub>Meer schermafbeeldingen in [`screenshots/`](screenshots/) — licht en donker thema, desktop en mobiel.</sub>
 
-### Nieuw in 1.21
+### Nieuw in 1.29 — de v2-ronde
+
+| Badges — families, voortgang, vastgezet doel | Badgedetail — ontgrendeldatum, bijdragende kaarten |
+|---|---|
+| ![Badges — families, voortgang, vastgezet doel](screenshots/badges-dark.jpg) | ![Badgedetail — ontgrendeldatum, bijdragende kaarten](screenshots/badges-detail.jpg) |
+
+| Account — cloud, back-ups, gevarenzone | Instellingen — de beveiligingskaart |
+|---|---|
+| ![Account — cloud, back-ups, gevarenzone](screenshots/account-dark.jpg) | ![Instellingen — de beveiligingskaart](screenshots/settings-dark.jpg) |
+
+| Pincode-ontgrendeling — gesegmenteerd en gemaskeerd | E-mailcode — hetzelfde gedeelde component |
+|---|---|
+| ![Pincode-ontgrendeling — gesegmenteerd en gemaskeerd](screenshots/pin-screen.jpg) | ![E-mailcode — hetzelfde gedeelde component](screenshots/otp-input.jpg) |
+
+| Circuitlijnen — opnieuw getekend uit echte GPS-data | Badges — licht thema |
+|---|---|
+| ![Circuitlijnen — opnieuw getekend uit echte GPS-data](screenshots/circuit-gp.jpg) | ![Badges — licht thema](screenshots/badges-light.jpg) |
+
+![Onderste navigatie — de bead en zijn inkeping bewegen als één geheel](screenshots/nav-bead.jpg)
+
+<sub>Gelokaliseerd in 7 talen — elke tekst, badge en changelog-regel</sub>
 
 | Eeuwige zeldzaamheid — kampioenen met complete set | Snel toevoegen — variantkiezer |
 |---|---|
 | ![Eeuwige zeldzaamheid — kampioenen met complete set](screenshots/i18n/eternal-tile.nl.jpg) | ![Snel toevoegen — variantkiezer](screenshots/i18n/quick-add.nl.jpg) |
 
-| Zeldzaamheids-donut met Eeuwig | Ongedaan maken-melding |
+| Zeldzaamheidsdonut met Eeuwig | Ongedaan maken-melding |
 |---|---|
-| ![Zeldzaamheids-donut met Eeuwig](screenshots/i18n/stats-rarity.nl.jpg) | ![Ongedaan maken-melding](screenshots/i18n/toast.nl.jpg) |
+| ![Zeldzaamheidsdonut met Eeuwig](screenshots/i18n/stats-rarity.nl.jpg) | ![Ongedaan maken-melding](screenshots/i18n/toast.nl.jpg) |
 
 ---
 
@@ -45,12 +65,13 @@ Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten, e
 - 📴 **Werkt volledig offline** — de hele app wordt door een service worker geprecachet; na het eerste bezoek verandert vliegtuigmodus niets.
 - 🔄 **Transparante auto-updates** — nieuwe versies worden op de achtergrond gedetecteerd en met één tik toegepast, met een ingebouwde changelog die toont wat er sinds *jouw* laatste versie veranderde.
 - 🌍 **7 talen** — Engels, Frans, Spaans, Chinees, Italiaans, Nederlands, Duits. Elke tekst, badge en changelog-vermelding.
-- 🎓 **Interactieve tutorial in 22 stappen** — een rondleiding waarin je de echte handelingen *zelf uitvoert*, in een sandbox die elke wijziging aan het einde terugdraait.
-- 🏅 **50 badges en titels** — 25 automatisch ontgrendeld op meetbare voorwaarden, 25 zelf gedeclareerd.
-- 📊 **Statistiekendashboard** — totale voortgang, zeldzaamheidsdonut, voltooiing per categorie, hoogtepunten en een dag-voor-dag voortgangscurve (pure SVG, geen grafiekbibliotheek).
+- 🎓 **Interactieve tutorial in 23 stappen** — een rondleiding waarin je de *echte* acties uitvoert, in een zandbak die elke wijziging aan het eind terugdraait.
+- 🏅 **Een badgepagina die je verzameling vertelt** — 50 badges in 6 families: parcours, complete sets, foils, kleuren, passie en zelf te bevestigen ervaringen. Een voortgangsring met je titel, een *Volgende badge*-kaart die altijd de dichtstbijzijnde toont — of het doel dat je zelf vastzette —, een mijlpalenladder van 1 tot 101 kaarten, ontgrendeldata en een echte viering als er één valt: gebundelde melding, korte trilling en een uitbarsting op de tegel. Je verzamelaarskaart exporteert als deelbare afbeelding.
+- 📊 **Statistiekendashboard** — algemene voortgang, zeldzaamheidsdonut, voltooiing per categorie, hoogtepunten, een dag-voor-dag voortgangscurve (pure SVG, geen grafiekbibliotheek) en de verzamelaarstools als interne tabbladen: ontbrekende kaarten, dubbels en ruillijsten.
+- 👤 **Een aparte Account-pagina** — cloud-aanmelding via e-mailcode, back-up/herstel, JSON-export/import, QR-overdracht, feedback in de app en een gevarenzone met drie verwijderbereiken, elk beveiligd met een woord dat je moet intypen. In de kijkmodus wordt de hele pagina vervangen door een vergrendelde staat: de knoppen zijn afwezig, niet uitgeschakeld.
 - 🔁 **Back-ups overal** — JSON-export/-import, een gecomprimeerde back-upcode van toestel naar toestel, dezelfde code als scanbare QR, en optionele cloudback-up.
-- 🔐 **Pincodevergrendeling, kijkersmodus en optionele versleuteling** — een 4-cijferige pincode (SHA-256), een alleen-lezen deelmodus, en opt-in-versleuteling van de collectie in rust (PBKDF2 + AES-GCM, afgeleid van de pincode).
-- 🤝 **Verzamelaarstools** — lijsten van ontbrekende / dubbele / ruilkaarten om mee te nemen naar een ruilbeurs.
+- 🔐 **Pincodeslot, kijkmodus & optionele versleuteling** — een 4-cijferige pincode op een gesegmenteerd toetsenblok (elk cijfer even zichtbaar, dan gemaskeerd), begeleide flows om hem aan te maken/wijzigen/uit te schakelen met zichtbare voortgang, een alleen-lezen deelmodus en optionele versleuteling in rust van de collectie (PBKDF2 + AES-GCM, afgeleid van de pincode).
+- 🧭 **Een navigatiebalk met bead** — de pil, de inkeping en de bead vormen één SVG-pad dat per frame opnieuw wordt berekend vanuit één animatieklok, zodat ze nooit uit elkaar lopen. Sleepbaar, bereikbaar met het toetsenbord en het respecteert `prefers-reduced-motion`.
 
 ---
 

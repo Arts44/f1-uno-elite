@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.29.1',
+    date: '2026-08-07',
+    changes: {
+      en: ['Documentation only: the whole screenshot set was regenerated from a deterministic seed and the READMEs were refreshed in all 7 languages. Nothing in the app itself changed.'],
+      fr: ['Documentation seulement : tout le jeu de captures a été régénéré depuis un seed déterministe et les README ont été mis à jour dans les 7 langues. Rien n’a changé dans l’app elle-même.'],
+      es: ['Solo documentación: todo el conjunto de capturas se regeneró desde una semilla determinista y los README se actualizaron en los 7 idiomas. Nada cambió en la app.'],
+      zh: ['仅文档更新：整套截图已按确定性种子重新生成，7 种语言的 README 也已同步更新。应用本身没有任何改动。'],
+      it: ['Solo documentazione: l’intero set di schermate è stato rigenerato da un seed deterministico e i README sono stati aggiornati in tutte e 7 le lingue. Nulla è cambiato nell’app.'],
+      nl: ['Alleen documentatie: de volledige set schermafbeeldingen is opnieuw gegenereerd vanuit een deterministische seed en de README’s zijn in alle 7 talen bijgewerkt. In de app zelf is niets veranderd.'],
+      de: ['Nur Dokumentation: der komplette Satz Screenshots wurde aus einem deterministischen Seed neu erzeugt und die READMEs in allen 7 Sprachen aktualisiert. In der App selbst hat sich nichts geändert.'],
+    },
+  },
+  {
     version: '1.29.0',
     date: '2026-08-07',
     changes: {

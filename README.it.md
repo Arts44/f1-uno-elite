@@ -23,7 +23,27 @@
 
 <sub>Altre catture in [`screenshots/`](screenshots/) — temi chiaro e scuro, desktop e mobile.</sub>
 
-### Novità 1.21
+### Novità 1.29 — la revisione v2
+
+| Badge — famiglie, progresso, obiettivo fissato | Dettaglio badge — data di sblocco, carte contributive |
+|---|---|
+| ![Badge — famiglie, progresso, obiettivo fissato](screenshots/badges-dark.jpg) | ![Dettaglio badge — data di sblocco, carte contributive](screenshots/badges-detail.jpg) |
+
+| Account — cloud, backup, zona pericolo | Impostazioni — la scheda sicurezza |
+|---|---|
+| ![Account — cloud, backup, zona pericolo](screenshots/account-dark.jpg) | ![Impostazioni — la scheda sicurezza](screenshots/settings-dark.jpg) |
+
+| Sblocco PIN — segmentato e mascherato | Codice e-mail — lo stesso componente condiviso |
+|---|---|
+| ![Sblocco PIN — segmentato e mascherato](screenshots/pin-screen.jpg) | ![Codice e-mail — lo stesso componente condiviso](screenshots/otp-input.jpg) |
+
+| Tracciati dei circuiti — rifatti da rilevamenti GPS reali | Badge — tema chiaro |
+|---|---|
+| ![Tracciati dei circuiti — rifatti da rilevamenti GPS reali](screenshots/circuit-gp.jpg) | ![Badge — tema chiaro](screenshots/badges-light.jpg) |
+
+![Navigazione in basso — la pastiglia e la sua tacca si muovono insieme](screenshots/nav-bead.jpg)
+
+<sub>Localizzato in 7 lingue — ogni testo, badge e voce del changelog</sub>
 
 | Rarità Eterna — campioni con set completo | Aggiunta rapida — selettore di varianti |
 |---|---|
@@ -45,12 +65,13 @@ Tenere traccia di una collezione completa di carte **F1 UNO Élite** — 101 car
 - 📴 **Funziona completamente offline** — l'intera app è precachata da un service worker; dopo la prima visita, la modalità aereo non cambia nulla.
 - 🔄 **Aggiornamenti trasparenti** — le nuove versioni vengono rilevate in background e applicate con un tocco, con un changelog integrato che mostra cosa è cambiato dalla *tua* ultima versione.
 - 🌍 **7 lingue** — inglese, francese, spagnolo, cinese, italiano, olandese, tedesco. Ogni testo, badge e voce del changelog.
-- 🎓 **Tutorial interattivo in 22 passi** — un tour guidato in cui *esegui* le azioni reali, in una sandbox che annulla ogni modifica alla fine.
-- 🏅 **50 badge e titoli** — 25 sbloccati automaticamente da condizioni misurate, 25 autodichiarati.
-- 📊 **Dashboard delle statistiche** — progresso globale, ciambella delle rarità, completamento per categoria, highlights e una curva di progressione giorno per giorno (SVG puro, nessuna libreria di grafici).
+- 🎓 **Tutorial interattivo in 23 passi** — una visita guidata in cui *esegui* le azioni reali, in un ambiente isolato che annulla ogni modifica alla fine.
+- 🏅 **Una pagina Badge che racconta la tua collezione** — 50 badge in 6 famiglie: percorso, set completi, foil, colori, passione ed esperienze vissute che convalidi tu stesso. Un anello di progresso con il tuo titolo, una scheda *Prossimo badge* che mette sempre in evidenza il più vicino — o l'obiettivo che hai fissato —, una scala di traguardi da 1 a 101 carte, le date di sblocco e una vera festa quando ne arriva uno: avviso raggruppato, breve vibrazione ed esplosione sulla tessera. La tua carta da collezionista si esporta come immagine condivisibile.
+- 📊 **Cruscotto statistiche** — progresso globale, donut delle rarità, completamento per categoria, momenti salienti, una curva di progresso giorno per giorno (SVG puro, nessuna libreria di grafici) e gli strumenti da collezionista come schede interne: liste mancanti, doppioni e scambi.
+- 👤 **Una pagina Account dedicata** — accesso cloud tramite codice e-mail, backup/ripristino, esportazione/importazione JSON, trasferimento via QR, feedback integrato e una zona pericolo con tre ambiti di eliminazione, ciascuno protetto da una parola da digitare. In modalità spettatore l'intera pagina è sostituita da uno stato bloccato: i controlli sono assenti, non disattivati.
 - 🔁 **Backup ovunque** — export/import JSON, un codice di backup compresso da dispositivo a dispositivo, lo stesso codice come QR scansionabile, e backup cloud opzionale.
-- 🔐 **Blocco PIN, modalità visitatore e crittografia opzionale** — un PIN a 4 cifre (SHA-256), una modalità di sola lettura per condividere, e crittografia a riposo opt-in della collezione (PBKDF2 + AES-GCM, derivata dal PIN).
-- 🤝 **Strumenti da collezionista** — liste di mancanti / doppioni / scambi da portare a un raduno.
+- 🔐 **Blocco PIN, modalità spettatore e cifratura opzionale** — un PIN di 4 cifre su un tastierino segmentato (ogni cifra visibile un istante, poi mascherata), percorsi guidati per crearlo/cambiarlo/disattivarlo con progresso visibile, una modalità di sola lettura per condividere e cifratura a riposo opzionale della collezione (PBKDF2 + AES-GCM, derivata dal PIN).
+- 🧭 **Una barra di navigazione con pastiglia** — la pillola, la sua tacca e la pastiglia sono un unico tracciato SVG ricalcolato fotogramma per fotogramma da un solo orologio di animazione, così i due non si disallineano mai. Trascinabile, raggiungibile da tastiera e rispetta `prefers-reduced-motion`.
 
 ---
 

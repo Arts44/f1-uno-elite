@@ -23,11 +23,31 @@ Es una **PWA**: instálala desde tu navegador y funciona como una app nativa, to
 
 <sub>Más capturas en [`screenshots/`](screenshots/) — temas claro y oscuro, escritorio y móvil.</sub>
 
-### Novedades 1.21
+### Novedades 1.29 — la pasada v2
 
-| Rareza Eterna — campeones con serie completa | Añadido rápido — selector de variantes |
+| Insignias — familias, progreso, objetivo fijado | Detalle de insignia — fecha de desbloqueo, cartas contributivas |
 |---|---|
-| ![Rareza Eterna — campeones con serie completa](screenshots/i18n/eternal-tile.es.jpg) | ![Añadido rápido — selector de variantes](screenshots/i18n/quick-add.es.jpg) |
+| ![Insignias — familias, progreso, objetivo fijado](screenshots/badges-dark.jpg) | ![Detalle de insignia — fecha de desbloqueo, cartas contributivas](screenshots/badges-detail.jpg) |
+
+| Cuenta — nube, copias, zona de peligro | Ajustes — la tarjeta de seguridad |
+|---|---|
+| ![Cuenta — nube, copias, zona de peligro](screenshots/account-dark.jpg) | ![Ajustes — la tarjeta de seguridad](screenshots/settings-dark.jpg) |
+
+| Desbloqueo con PIN — segmentado y enmascarado | Código por correo — el mismo componente compartido |
+|---|---|
+| ![Desbloqueo con PIN — segmentado y enmascarado](screenshots/pin-screen.jpg) | ![Código por correo — el mismo componente compartido](screenshots/otp-input.jpg) |
+
+| Trazados de circuitos — rehechos desde datos GPS reales | Insignias — tema claro |
+|---|---|
+| ![Trazados de circuitos — rehechos desde datos GPS reales](screenshots/circuit-gp.jpg) | ![Insignias — tema claro](screenshots/badges-light.jpg) |
+
+![Navegación inferior — la pastilla y su muesca se mueven como una sola pieza](screenshots/nav-bead.jpg)
+
+<sub>Localizado en 7 idiomas — cada texto, insignia y entrada del registro</sub>
+
+| Rareza Eterna — campeones con set completo | Añadido rápido — selector de variantes |
+|---|---|
+| ![Rareza Eterna — campeones con set completo](screenshots/i18n/eternal-tile.es.jpg) | ![Añadido rápido — selector de variantes](screenshots/i18n/quick-add.es.jpg) |
 
 | Donut de rarezas con Eterna | Aviso Deshacer |
 |---|---|
@@ -45,12 +65,13 @@ Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas, cada 
 - 📴 **Funciona totalmente sin conexión** — toda la app queda precacheada por un service worker; tras la primera visita, el modo avión no cambia nada.
 - 🔄 **Actualizaciones transparentes** — las nuevas versiones se detectan en segundo plano y se aplican con un toque, con un changelog integrado que muestra qué ha cambiado desde *tu* última versión.
 - 🌍 **7 idiomas** — inglés, francés, español, chino, italiano, neerlandés, alemán. Cada texto, insignia y entrada del changelog.
-- 🎓 **Tutorial interactivo de 22 pasos** — una visita guiada en la que *realizas* las acciones reales, dentro de un sandbox que revierte cada cambio al terminar.
-- 🏅 **50 insignias y títulos** — 25 desbloqueadas automáticamente por condiciones medidas, 25 autodeclaradas.
-- 📊 **Panel de estadísticas** — progreso global, donut de rarezas, compleción por categoría, destacados y una curva de progresión día a día (SVG puro, sin librería de gráficos).
+- 🎓 **Tutorial interactivo de 23 pasos** — una visita guiada donde *realizas* las acciones reales, en un entorno aislado que revierte todos los cambios al terminar.
+- 🏅 **Una página de insignias que cuenta tu colección** — 50 insignias en 6 familias: trayectoria, sets completos, foils, colores, pasión y experiencias vividas que validas tú mismo. Un anillo de progreso con tu título, una tarjeta *Próxima insignia* que destaca siempre la más cercana — o el objetivo que fijaste —, una escalera de hitos de 1 a 101 cartas, las fechas de desbloqueo y una celebración de verdad cuando cae una: aviso agrupado, vibración breve y estallido en la ficha. Tu tarjeta de coleccionista se exporta como imagen para compartir.
+- 📊 **Panel de estadísticas** — progreso global, donut de rarezas, completitud por categoría, momentos destacados, una curva de progreso día a día (SVG puro, sin librería de gráficos) y las herramientas de coleccionista como pestañas internas: listas de faltantes, repetidas e intercambios.
+- 👤 **Una página Cuenta dedicada** — inicio de sesión en la nube por código de correo, copia/restauración, exportación/importación JSON, transferencia por QR, opiniones integradas y una zona de peligro con tres alcances de borrado, cada uno protegido por una palabra que hay que escribir. En modo espectador toda la página se sustituye por un estado bloqueado: los controles están ausentes, no desactivados.
 - 🔁 **Copias de seguridad por todas partes** — exportación/importación JSON, un código de respaldo comprimido de dispositivo a dispositivo, el mismo código como QR escaneable, y copia en la nube opcional.
-- 🔐 **Bloqueo por PIN, modo lector y cifrado opcional** — un PIN de 4 dígitos (SHA-256), un modo de solo lectura para compartir, y cifrado en reposo opt-in de la colección (PBKDF2 + AES-GCM, derivado del PIN).
-- 🤝 **Herramientas de coleccionista** — listas de faltantes / repetidas / intercambios para llevar a una quedada.
+- 🔐 **Bloqueo con PIN, modo espectador y cifrado opcional** — un PIN de 4 dígitos en un teclado segmentado (cada dígito visible un instante y luego enmascarado), recorridos guiados para crearlo/cambiarlo/desactivarlo con progreso visible, un modo de solo lectura para compartir y cifrado en reposo opcional de la colección (PBKDF2 + AES-GCM, derivado del PIN).
+- 🧭 **Una barra de navegación con pastilla** — la píldora, su muesca y la pastilla son un único trazado SVG recalculado fotograma a fotograma desde un solo reloj de animación, así que nunca se desincronizan. Arrastrable, accesible por teclado y respeta `prefers-reduced-motion`.
 
 ---
 

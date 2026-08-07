@@ -23,7 +23,27 @@ It's a **PWA**: install it from your browser and it runs like a native app, full
 
 <sub>More captures in [`screenshots/`](screenshots/) — light and dark themes, desktop and mobile.</sub>
 
-### New in 1.21
+### New in 1.29 — the v2 pass
+
+| Badges — families, progress, pinned goal | Badge detail — unlock date, contributing cards |
+|---|---|
+| ![Badges — families, progress, pinned goal](screenshots/badges-dark.jpg) | ![Badge detail — unlock date, contributing cards](screenshots/badges-detail.jpg) |
+
+| Account — cloud, backups, danger zone | Settings — the security card |
+|---|---|
+| ![Account — cloud, backups, danger zone](screenshots/account-dark.jpg) | ![Settings — the security card](screenshots/settings-dark.jpg) |
+
+| PIN unlock — segmented and masked | Email code — the same shared component |
+|---|---|
+| ![PIN unlock — segmented and masked](screenshots/pin-screen.jpg) | ![Email code — the same shared component](screenshots/otp-input.jpg) |
+
+| Circuit outlines — rebuilt from real GPS traces | Badges — light theme |
+|---|---|
+| ![Circuit outlines — rebuilt from real GPS traces](screenshots/circuit-gp.jpg) | ![Badges — light theme](screenshots/badges-light.jpg) |
+
+![Bottom navigation — the bead and its notch move as one](screenshots/nav-bead.jpg)
+
+<sub>Localised in 7 languages — every string, badge and changelog entry</sub>
 
 | Eternal rarity — complete-set champions | Quick add — variant picker |
 |---|---|
@@ -45,12 +65,13 @@ Track a complete **F1 UNO Élite** trading-card collection — 101 cards, each e
 - 📴 **Works fully offline** — the whole app is precached by a service worker; after the first visit, airplane mode changes nothing.
 - 🔄 **Transparent auto-updates** — new versions are detected in the background and applied with one tap, plus an in-app changelog showing what changed since *your* last version.
 - 🌍 **7 languages** — English, French, Spanish, Chinese, Italian, Dutch, German. Every string, badge and changelog entry.
-- 🎓 **Interactive 22-step tutorial** — a guided tour where you *perform* the real actions, running in a sandbox that reverts every change when it ends.
-- 🏅 **50 badges & titles** — 25 unlocked automatically from measured conditions, 25 self-declared.
-- 📊 **Stats dashboard** — global progress, rarity donut, per-category completion, highlights, and a day-by-day progression curve (pure SVG, no chart library).
+- 🎓 **Interactive 23-step tutorial** — a guided tour where you *perform* the real actions, running in a sandbox that reverts every change when it ends.
+- 🏅 **A badges page that tells your story** — 50 badges in 6 families: journey, complete sets, foils, colours, passion, and real-world experiences you validate yourself. A progress ring with your title, a *Next badge* card that always surfaces the closest one — or the goal you pinned — a milestone ladder from 1 to 101 cards, unlock dates, and a real celebration when one drops: a grouped toast, a short haptic tap, and a burst on the tile. Your collector card exports as a shareable image.
+- 📊 **Stats dashboard** — global progress, rarity donut, per-category completion, highlights, a day-by-day progression curve (pure SVG, no chart library), and the collector tools as inner tabs: missing, doubles and trade lists.
+- 👤 **A dedicated Account page** — cloud sign-in by email code, push/pull backups, JSON export/import, the QR transfer, in-app feedback, and a danger zone offering three deletion scopes, each gated behind a word you must type. In viewer mode the whole page is replaced by a locked state — the controls are absent, not disabled.
 - 🔁 **Backups everywhere** — JSON export/import, a compressed device-to-device backup code, the same code as a scannable QR link, and optional cloud backup.
-- 🔐 **PIN lock, viewer mode & optional encryption** — a 4-digit PIN (SHA-256), a read-only sharing mode, and opt-in at-rest encryption of the collection (PBKDF2 + AES-GCM, keyed off the PIN).
-- 🤝 **Collector tools** — printable missing / doubles / trade lists to take to a swap meet.
+- 🔐 **PIN lock, viewer mode & optional encryption** — a 4-digit PIN on a segmented keypad (each digit briefly visible, then masked), guided flows to create/change/disable it with visible progress, a read-only sharing mode, and opt-in at-rest encryption of the collection (PBKDF2 + AES-GCM, keyed off the PIN).
+- 🧭 **A navigation bar with a bead** — the pill, its notch and the bead are a single SVG path recomputed per frame from one animation clock, so the two never drift apart. Draggable, keyboard-reachable, and it respects `prefers-reduced-motion`.
 
 ---
 

@@ -170,6 +170,11 @@ Collections/F1/                 ← git root · all commands run here
 ├── app.bundle.js(.map)         # ⚠ GENERATED + COMMITTED — rebuild after editing a bundled module
 ├── package.json                # esbuild build/dev + node --test scripts (esbuild = only devDep)
 ├── extract_data.mjs            # Dev tool: data extraction/generation
+├── extract_circuits.mjs        # Dev tool: circuit paths from GPS traces
+├── capture_screenshots.py      # Dev tool: regenerates EVERY screenshot (Playwright).
+│                               #   Deterministic seed computed from data/cards-2025.json;
+│                               #   needs `python3 -m http.server 8124` running. Exits 1 if
+│                               #   the Eternal-tile sparkles overlap anything.
 ├── tests/                      # node --test suites + fixtures (_setup.js, _fixtures.js)
 ├── docs/CLOUD-SYNC-DESIGN.md   # Cloud-sync design document
 └── data/

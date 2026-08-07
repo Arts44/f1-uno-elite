@@ -23,7 +23,27 @@ C'est une **PWA** : installez-la depuis votre navigateur et elle fonctionne comm
 
 <sub>Plus de captures dans [`screenshots/`](screenshots/) — thèmes clair et sombre, ordinateur et mobile.</sub>
 
-### Nouveautés 1.21
+### Nouveautés 1.29 — la passe v2
+
+| Badges — familles, progression, objectif épinglé | Détail d’un badge — date de déblocage, cartes contributives |
+|---|---|
+| ![Badges — familles, progression, objectif épinglé](screenshots/badges-dark.jpg) | ![Détail d’un badge — date de déblocage, cartes contributives](screenshots/badges-detail.jpg) |
+
+| Compte — cloud, sauvegardes, zone danger | Réglages — la carte sécurité |
+|---|---|
+| ![Compte — cloud, sauvegardes, zone danger](screenshots/account-dark.jpg) | ![Réglages — la carte sécurité](screenshots/settings-dark.jpg) |
+
+| Déverrouillage PIN — segmenté et masqué | Code e-mail — le même composant partagé |
+|---|---|
+| ![Déverrouillage PIN — segmenté et masqué](screenshots/pin-screen.jpg) | ![Code e-mail — le même composant partagé](screenshots/otp-input.jpg) |
+
+| Tracés de circuits — refaits depuis des relevés GPS réels | Badges — thème clair |
+|---|---|
+| ![Tracés de circuits — refaits depuis des relevés GPS réels](screenshots/circuit-gp.jpg) | ![Badges — thème clair](screenshots/badges-light.jpg) |
+
+![Navigation basse — la pastille et son encoche bougent d’un seul bloc](screenshots/nav-bead.jpg)
+
+<sub>Localisé en 7 langues — chaque texte, badge et entrée de changelog</sub>
 
 | Rareté Éternel — champions en set complet | Ajout rapide — sélecteur de variantes |
 |---|---|
@@ -45,12 +65,13 @@ Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chac
 - 📴 **Fonctionne entièrement hors-ligne** — toute l'app est précachée par un service worker ; après la première visite, le mode avion ne change rien.
 - 🔄 **Mises à jour transparentes** — les nouvelles versions sont détectées en arrière-plan et appliquées d'un tap, avec un changelog intégré qui montre ce qui a changé depuis *votre* dernière version.
 - 🌍 **7 langues** — anglais, français, espagnol, chinois, italien, néerlandais, allemand. Chaque texte, badge et entrée de changelog.
-- 🎓 **Tutoriel interactif en 22 étapes** — une visite guidée où vous *réalisez* les vraies actions, dans un bac à sable qui annule chaque modification à la fin.
-- 🏅 **50 badges & titres** — 25 débloqués automatiquement sur conditions mesurées, 25 auto-déclarés.
-- 📊 **Tableau de bord Stats** — progression globale, donut des raretés, complétion par catégorie, temps forts, et une courbe de progression jour par jour (SVG pur, aucune bibliothèque de graphiques).
+- 🎓 **Tutoriel interactif en 23 étapes** — une visite guidée où vous *réalisez* les vraies actions, dans un bac à sable qui annule chaque modification à la fin.
+- 🏅 **Une page Badges qui raconte votre collection** — 50 badges en 6 familles : parcours, sets complets, foils, couleurs, passion, et expériences vécues que vous validez vous-même. Un anneau de progression avec votre titre, une carte *Prochain badge* qui met toujours en avant le plus proche — ou l'objectif que vous avez épinglé —, une échelle de jalons de 1 à 101 cartes, les dates de déblocage, et une vraie célébration quand l'un tombe : toast groupé, courte vibration, et explosion sur la tuile. Votre carte de collectionneur s'exporte en image partageable.
+- 📊 **Tableau de bord Stats** — progression globale, donut des raretés, complétion par catégorie, temps forts, une courbe de progression jour par jour (SVG pur, aucune bibliothèque de graphiques), et les outils de collectionneur en onglets internes : listes manquantes, doubles et échanges.
+- 👤 **Une page Compte dédiée** — connexion cloud par code e-mail, sauvegarde/restauration, export/import JSON, transfert par QR, avis intégré, et une zone danger offrant trois portées de suppression, chacune protégée par un mot à retaper. En mode spectateur, toute la page est remplacée par un état verrouillé — les contrôles sont absents, pas grisés.
 - 🔁 **Sauvegardes partout** — export/import JSON, un code de sauvegarde compressé d'appareil à appareil, le même code en QR scannable, et une sauvegarde cloud optionnelle.
-- 🔐 **Verrou PIN, mode lecteur & chiffrement optionnel** — un PIN à 4 chiffres (SHA-256), un mode lecture seule pour partager, et un chiffrement au repos opt-in de la collection (PBKDF2 + AES-GCM, dérivé du PIN).
-- 🤝 **Outils de collectionneur** — listes manquantes / doubles / échanges à emporter à une bourse.
+- 🔐 **Verrou PIN, mode spectateur & chiffrement optionnel** — un PIN à 4 chiffres sur un pavé segmenté (chaque chiffre visible un instant, puis masqué), des parcours guidés pour le créer/changer/désactiver avec progression visible, un mode lecture seule pour partager, et un chiffrement au repos opt-in de la collection (PBKDF2 + AES-GCM, dérivé du PIN).
+- 🧭 **Une barre de navigation à pastille** — la pilule, son encoche et la pastille forment un seul chemin SVG recalculé image par image depuis une horloge unique, si bien que les deux ne dérivent jamais. Glissable, accessible au clavier, et respectant `prefers-reduced-motion`.
 
 ---
 

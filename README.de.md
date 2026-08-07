@@ -23,15 +23,35 @@ Es ist eine **PWA**: aus dem Browser installiert läuft sie wie eine native App,
 
 <sub>Weitere Aufnahmen in [`screenshots/`](screenshots/) — helles und dunkles Theme, Desktop und mobil.</sub>
 
-### Neu in 1.21
+### Neu in 1.29 — der v2-Durchgang
 
-| Seltenheit Ewig — Champions mit komplettem Set | Schnelles Hinzufügen — Variantenauswahl |
+| Abzeichen — Familien, Fortschritt, angepinntes Ziel | Abzeichen-Detail — Freischaltdatum, beitragende Karten |
 |---|---|
-| ![Seltenheit Ewig — Champions mit komplettem Set](screenshots/i18n/eternal-tile.de.jpg) | ![Schnelles Hinzufügen — Variantenauswahl](screenshots/i18n/quick-add.de.jpg) |
+| ![Abzeichen — Familien, Fortschritt, angepinntes Ziel](screenshots/badges-dark.jpg) | ![Abzeichen-Detail — Freischaltdatum, beitragende Karten](screenshots/badges-detail.jpg) |
 
-| Seltenheits-Donut mit Ewig | Rückgängig-Toast |
+| Konto — Cloud, Backups, Gefahrenzone | Einstellungen — die Sicherheitskarte |
 |---|---|
-| ![Seltenheits-Donut mit Ewig](screenshots/i18n/stats-rarity.de.jpg) | ![Rückgängig-Toast](screenshots/i18n/toast.de.jpg) |
+| ![Konto — Cloud, Backups, Gefahrenzone](screenshots/account-dark.jpg) | ![Einstellungen — die Sicherheitskarte](screenshots/settings-dark.jpg) |
+
+| PIN-Entsperrung — segmentiert und maskiert | E-Mail-Code — dieselbe geteilte Komponente |
+|---|---|
+| ![PIN-Entsperrung — segmentiert und maskiert](screenshots/pin-screen.jpg) | ![E-Mail-Code — dieselbe geteilte Komponente](screenshots/otp-input.jpg) |
+
+| Streckenverläufe — neu aus echten GPS-Daten gezeichnet | Abzeichen — helles Thema |
+|---|---|
+| ![Streckenverläufe — neu aus echten GPS-Daten gezeichnet](screenshots/circuit-gp.jpg) | ![Abzeichen — helles Thema](screenshots/badges-light.jpg) |
+
+![Untere Navigation — Bead und Kerbe bewegen sich als eine Einheit](screenshots/nav-bead.jpg)
+
+<sub>In 7 Sprachen lokalisiert — jeder Text, jedes Abzeichen, jeder Changelog-Eintrag</sub>
+
+| Ewige Seltenheit — Champions mit komplettem Set | Schnell hinzufügen — Variantenauswahl |
+|---|---|
+| ![Ewige Seltenheit — Champions mit komplettem Set](screenshots/i18n/eternal-tile.de.jpg) | ![Schnell hinzufügen — Variantenauswahl](screenshots/i18n/quick-add.de.jpg) |
+
+| Seltenheits-Donut mit Ewig | Rückgängig-Hinweis |
+|---|---|
+| ![Seltenheits-Donut mit Ewig](screenshots/i18n/stats-rarity.de.jpg) | ![Rückgängig-Hinweis](screenshots/i18n/toast.de.jpg) |
 
 ---
 
@@ -45,12 +65,13 @@ Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten — 101 Karten, 
 - 📴 **Funktioniert komplett offline** — die gesamte App wird von einem Service Worker vorgecacht; nach dem ersten Besuch ändert der Flugmodus nichts.
 - 🔄 **Transparente Auto-Updates** — neue Versionen werden im Hintergrund erkannt und mit einem Tipp übernommen, dazu ein integriertes Changelog, das zeigt, was sich seit *deiner* letzten Version geändert hat.
 - 🌍 **7 Sprachen** — Englisch, Französisch, Spanisch, Chinesisch, Italienisch, Niederländisch, Deutsch. Jeder Text, jedes Abzeichen, jeder Changelog-Eintrag.
-- 🎓 **Interaktives Tutorial in 22 Schritten** — eine geführte Tour, in der du die echten Aktionen *selbst ausführst*, in einer Sandbox, die am Ende jede Änderung zurücknimmt.
-- 🏅 **50 Abzeichen und Titel** — 25 automatisch anhand messbarer Bedingungen freigeschaltet, 25 selbst deklariert.
-- 📊 **Statistik-Dashboard** — Gesamtfortschritt, Seltenheits-Donut, Vervollständigung pro Kategorie, Highlights und eine tagesgenaue Fortschrittskurve (pures SVG, keine Chart-Bibliothek).
+- 🎓 **Interaktives Tutorial in 23 Schritten** — eine Führung, in der du die *echten* Aktionen ausführst, in einer Sandbox, die am Ende jede Änderung zurücknimmt.
+- 🏅 **Eine Abzeichen-Seite, die deine Sammlung erzählt** — 50 Abzeichen in 6 Familien: Werdegang, komplette Sets, Foils, Farben, Leidenschaft und selbst bestätigte Erlebnisse. Ein Fortschrittsring mit deinem Titel, eine *Nächstes Abzeichen*-Karte, die immer das nächstliegende zeigt — oder das Ziel, das du angepinnt hast —, eine Meilenstein-Leiter von 1 bis 101 Karten, Freischaltdaten und eine echte Feier, wenn eines fällt: gebündelter Hinweis, kurze Vibration und ein Aufplatzen der Kachel. Deine Sammlerkarte lässt sich als teilbares Bild exportieren.
+- 📊 **Statistik-Dashboard** — Gesamtfortschritt, Seltenheits-Donut, Vollständigkeit je Kategorie, Höhepunkte, eine Tag-für-Tag-Fortschrittskurve (reines SVG, keine Diagrammbibliothek) und die Sammlerwerkzeuge als innere Tabs: Fehl-, Dubletten- und Tauschlisten.
+- 👤 **Eine eigene Konto-Seite** — Cloud-Anmeldung per E-Mail-Code, Sichern/Wiederherstellen, JSON-Export/-Import, QR-Übertragung, Feedback in der App und eine Gefahrenzone mit drei Löschbereichen, jeder durch ein einzutippendes Wort geschützt. Im Zuschauermodus wird die ganze Seite durch einen gesperrten Zustand ersetzt — die Bedienelemente fehlen, sie sind nicht ausgegraut.
 - 🔁 **Backups überall** — JSON-Export/-Import, ein komprimierter Backup-Code von Gerät zu Gerät, derselbe Code als scanbarer QR-Code, und optionales Cloud-Backup.
-- 🔐 **PIN-Sperre, Betrachtermodus und optionale Verschlüsselung** — eine 4-stellige PIN (SHA-256), ein Nur-Lese-Modus zum Teilen, und Opt-in-Verschlüsselung der Sammlung im Ruhezustand (PBKDF2 + AES-GCM, aus der PIN abgeleitet).
-- 🤝 **Sammlerwerkzeuge** — Fehl-, Dubletten- und Tauschlisten zum Mitnehmen auf die Tauschbörse.
+- 🔐 **PIN-Sperre, Zuschauermodus & optionale Verschlüsselung** — eine 4-stellige PIN auf einem Segmentfeld (jede Ziffer kurz sichtbar, dann maskiert), geführte Abläufe zum Anlegen/Ändern/Deaktivieren mit sichtbarem Fortschritt, ein Nur-Lese-Modus zum Teilen und optionale Verschlüsselung der Sammlung im Ruhezustand (PBKDF2 + AES-GCM, aus der PIN abgeleitet).
+- 🧭 **Eine Navigationsleiste mit Bead** — Pille, Kerbe und Bead sind ein einziger SVG-Pfad, der Bild für Bild aus einer einzigen Animationsuhr neu berechnet wird, sodass beide nie auseinanderlaufen. Ziehbar, per Tastatur erreichbar und `prefers-reduced-motion` wird respektiert.
 
 ---
 
