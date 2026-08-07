@@ -27,10 +27,17 @@
 :root[data-font="original"]{--font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;}
 
 :root {
-  --bg:#F5F2EE;--surface:#FFFFFF;--surface2:#F0EDE8;--surface3:#E8E4DE;
-  --border:rgba(0,0,0,0.08);
-  --sh-sm:0 1px 3px rgba(0,0,0,0.06);--sh-md:0 4px 12px rgba(0,0,0,0.08);--sh-lg:0 12px 40px rgba(0,0,0,0.14);
-  --tx1:#1A1A1A;--tx2:#6B6B6B;--tx3:#9B9B9B;
+  /* ── Échelle de neutres — 4 surfaces perceptuellement régulières
+     (fond < carte < élément surélevé < survol), hairlines plutôt
+     qu'ombres lourdes, 3 niveaux de texte tous ≥ AA. La palette
+     sémantique (raretés, accents stats) est figée et n'est PAS ici. ── */
+  --bg:#F4F1ED;--surface:#FFFFFF;--surface2:#EFEBE6;--surface3:#E3DED7;
+  --border:rgba(0,0,0,0.07);--border-s:rgba(0,0,0,0.13);
+  --sh-sm:0 1px 2px rgba(0,0,0,0.05);--sh-md:0 4px 12px rgba(0,0,0,0.07);--sh-lg:0 12px 40px rgba(0,0,0,0.12);
+  --tx1:#191716;--tx2:#6A6461;--tx3:#77716C;
+  /* Carte non possédée : négatif volontaire (sombre en thème clair,
+     clair en thème sombre) — l'absence saute aux yeux. */
+  --not-owned:#3A3739;
   --red:#E8002D;--red-s:#FFE8EC;--red-m:#FFBEC8;--red-glow:rgba(232,0,45,0.18);
   --green:#34C759;--green-s:#E8F5E9;--green-m:#C8E6C9;
   --orange:#FF9500;--orange-s:#FFF3E0;--orange-m:#FFE0B2;
@@ -50,6 +57,7 @@
   --nav-clear:104px; /* barre 58 + marge 14 + débord de la pastille */
   --r-pill:100px;--content-max:800px;--tap-min:44px;
   --ease:all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);
+  --ease-fast:all 0.15s cubic-bezier(0.25,0.46,0.45,0.94);
   /* Stats semantic accents — palette validated for contrast & CVD
      separation on the light surface (see Stats view) */
   --st-owned:#00A94F;--st-wish:#EC4899;--st-doubles:#0EA5B5;
@@ -59,10 +67,14 @@
 
 /* Thème sombre */
 [data-theme="dark"] {
-  --bg:#1A1A1A;--surface:#2A2A2A;--surface2:#333333;--surface3:#404040;
-  --border:rgba(255,255,255,0.08);
-  --sh-sm:0 1px 3px rgba(0,0,0,0.3);--sh-md:0 4px 12px rgba(0,0,0,0.4);--sh-lg:0 12px 40px rgba(0,0,0,0.6);
-  --tx1:#FFFFFF;--tx2:#CCCCCC;--tx3:#999999;
+  /* Sombre : très sombre sans être noir pur, teinte légèrement chaude
+     (R>G>B) accordée au rouge accent — pas le gris neutre clinique
+     d'avant. Pas de blanc pur en texte (#F3F0F1 ≈ 95 %). */
+  --bg:#100E0F;--surface:#1A1719;--surface2:#232022;--surface3:#2E2A2C;
+  --border:rgba(255,255,255,0.08);--border-s:rgba(255,255,255,0.14);
+  --sh-sm:0 1px 2px rgba(0,0,0,0.4);--sh-md:0 4px 14px rgba(0,0,0,0.5);--sh-lg:0 16px 44px rgba(0,0,0,0.65);
+  --tx1:#F3F0F1;--tx2:#A5A0A2;--tx3:#8A8487;
+  --not-owned:#DEDADC;
   --red:#FF4757;--red-s:#2D1B1B;--red-m:#3D2B2B;--red-glow:rgba(255,71,87,0.22);
   --green:#4CD964;--green-s:#1B2D1B;--green-m:#2B3D2B;
   --orange:#FFB347;--orange-s:#2D241B;--orange-m:#3D342B;
@@ -444,8 +456,8 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 
 /* Card visual */
 .card-visual{height:120px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative;overflow:hidden;}
-.card-visual.not-owned{background:#3A3A3A;}
-[data-theme="dark"] .card-visual.not-owned{background:#E0E0E0;}
+.card-visual.not-owned{background:var(--not-owned);}
+
 .card-visual .circuit-svg{width:85%;height:70%;position:relative;z-index:1;}
 .modal-visual .circuit-svg{width:80%;height:70%;position:relative;z-index:1;}
 .circuit-svg .track-path{stroke:rgba(255,255,255,0.85);}
@@ -674,7 +686,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   100%{-webkit-mask-position:150% 0;mask-position:150% 0;}
 }
 .card.tv-wild_foil {
-  background: #080808;
+  background: var(--bg);
   background-clip: padding-box; /* nothing under the transparent border */
   position: relative;
   overflow: hidden;
@@ -876,8 +888,8 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .modal{background:var(--surface);border-radius:var(--r-xl);width:560px;max-width:calc(100vw - 32px);max-height:calc(100vh - 60px);overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.2);transform:scale(0.96) translateY(8px);transition:transform 0.2s cubic-bezier(0.25,0.46,0.45,0.94);}
 .mo.open .modal{transform:scale(1) translateY(0);}
 .modal-visual{height:160px;display:flex;align-items:center;justify-content:center;font-size:64px;position:relative;border-radius:var(--r-xl) var(--r-xl) 0 0;overflow:hidden;isolation:isolate;}
-.modal-visual.not-owned{background:#3A3A3A;}
-[data-theme="dark"] .modal-visual.not-owned{background:#E0E0E0;}
+.modal-visual.not-owned{background:var(--not-owned);}
+
 /* ── Modal mirrors of the card-scoped effects (wild / nitro) ──
    Their grid visuals live on .card.tv-* (whole-card conic beams), so the
    modal header re-creates the exact same treatment at its own scale.
@@ -985,7 +997,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .bga2{width:400px;height:400px;background:radial-gradient(circle,rgba(0,76,151,0.04) 0%,transparent 70%);bottom:-100px;left:-100px;}
 
 /* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:#1A1A1A;color:white;padding:var(--space-10px) var(--space-4);border-radius:12px;font-size:13px;font-weight:500;box-shadow:var(--sh-lg);z-index:500;opacity:0;transform:translateY(8px);transition:all 0.2s;pointer-events:none;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface3);color:var(--tx1);border:1px solid var(--border-s);padding:var(--space-10px) var(--space-4);border-radius:12px;font-size:13px;font-weight:500;box-shadow:var(--sh-lg);z-index:500;opacity:0;transform:translateY(8px);transition:all 0.2s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
 .toast-action{margin-left:var(--space-3);border:none;background:none;color:#4CD964;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;padding:0;}
 
@@ -1317,8 +1329,9 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   border-radius:var(--r-pill);border:1px solid var(--border);background:var(--surface2);
   color:var(--tx2);font-family:var(--font-b);font-size:12.5px;font-weight:600;cursor:pointer;
   transition:var(--ease);}
-.sv-tool-tab:hover{color:var(--tx1);border-color:var(--tx3);}
+.sv-tool-tab:hover{color:var(--tx1);border-color:var(--tx3);background:var(--surface3);}
 .sv-tool-tab.active{background:var(--tx1);border-color:var(--tx1);color:var(--surface);}
+.qbtn:focus-visible,.qadd-type:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
 .sv-tool-tab:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
 .sv-tool-n{font-variant-numeric:tabular-nums;opacity:0.75;}
 .sv-tools-body{display:flex;flex-direction:column;gap:2px;max-height:420px;overflow-y:auto;}
@@ -1374,7 +1387,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .setv-section.set-about{border-left:3px solid var(--green);}
 .setv-section.set-session{border-left:3px solid var(--red);}
 /* États hover/focus des lignes et boutons — standard « Compte » */
-.setv-row{transition:background 0.12s ease;}
+.setv-row{transition:var(--ease-fast);}
 .setv-row:hover{background:var(--surface2);}
 .setv-btn:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
 
