@@ -564,84 +564,192 @@ export function closeMoOverlay(e){ if(e.target===document.getElementById('mo')) 
 export function closeMo(){ document.getElementById('mo').classList.remove('open'); currentCardId=null; }
 
 /* ══════════════════════════════════════════════════════════ NAV BEAD
-   Barre de navigation à pastille : silhouette en UN path SVG
-   paramétrique (pilule + encoche circulaire), la pastille glisse en
-   CSS (transform 280 ms) et l'encoche suit via un tween rAF one-shot
-   — aucune animation continue. Les .bn-tab et data-view sont
-   inchangés (tutoriel, délégation, tests). */
-const BEAD_H = 58, BEAD_NR = 31, BEAD_CORNER = 29;
-let _beadW = 0, _beadCx = null, _beadAnim = null;
+   Barre de navigation à pastille. Trois invariants :
+
+   1. UN SEUL path SVG paramétrique — pilule + encoche circulaire de
+      MÊME centre que la pastille, rayon + marge constante, raccordée
+      par des congés dont les points de tangence sont calculés (aucune
+      courbe approximée).
+   2. UNE SEULE horloge — la pastille n'a pas de transition CSS : elle
+      et l'encoche sont posées ensemble par setCx(), donc aucune dérive
+      possible entre les deux.
+   3. L'encoche dégage toujours les coins — la bande d'onglets reçoit
+      une marge intérieure calculée pour ça ; si elle comprimait les
+      onglets sous le seuil tactile, c'est le rayon de coin qui cède.
+
+   Les .bn-tab et leurs data-view sont inchangés : le tutoriel, la
+   délégation d'événements et les tests gardent leurs sélecteurs. */
+const BEAD_R = 25, BEAD_GAP = 5, BEAD_SINK = 15, BEAD_FIL = 10;
+const BEAD_H = 58, BEAD_DUR = 350, TAP_MIN = 44;
+let _beadW = 0, _beadCx = null, _beadAnim = null, _beadG = null;
+
+function _beadTabs(){ return [...document.querySelectorAll('.bn-tab')]; }
+function _beadActiveIdx(){ return Math.max(0, _beadTabs().findIndex(t => t.classList.contains('active'))); }
+const _beadReduce = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Géométrie dérivée de la largeur : encoche, marge intérieure, rayon de coin.
+function _beadGeom(w, n){
+  const cy = BEAD_SINK - BEAD_R;                 // centre pastille / haut de barre
+  const rn = BEAD_R + BEAD_GAP;                  // rayon d'encoche (marge constante)
+  const sh = Math.sqrt(Math.max(0, (BEAD_FIL + rn) ** 2 - (cy - BEAD_FIL) ** 2));
+  const tx = sh - BEAD_FIL * sh / (BEAD_FIL + rn);
+  const ty = BEAD_FIL + BEAD_FIL * (cy - BEAD_FIL) / (BEAD_FIL + rn);
+  let corner = Math.min(BEAD_H / 2, 29);
+  let pad = Math.max(0, (corner + sh - w / (2 * n)) / (1 - 1 / n));
+  const padMax = Math.max(0, (w - TAP_MIN * n) / 2);
+  if(pad > padMax){                              // priorité à la zone tactile
+    pad = padMax;
+    corner = Math.max(4, pad + (w - 2 * pad) / (2 * n) - sh);
+  }
+  return { cy, rn, sh, tx, ty, pad, corner, tabW: (w - 2 * pad) / n, over: 2 * BEAD_R - BEAD_SINK };
+}
 
 function _beadPath(W, cx){
-  const f = 10, r = BEAD_NR - 4, dip = 6, C = BEAD_CORNER;
+  const { rn, sh, tx, ty, corner: C } = _beadG, f = BEAD_FIL;
   return [
-    `M ${C} 0`, `H ${cx - BEAD_NR - f}`,
-    `C ${cx - BEAD_NR - f/2} 0 ${cx - BEAD_NR - 1} ${dip*0.35} ${cx - r} ${dip}`,
-    `A ${r} ${r} 0 0 0 ${cx + r} ${dip}`,
-    `C ${cx + BEAD_NR + 1} ${dip*0.35} ${cx + BEAD_NR + f/2} 0 ${cx + BEAD_NR + f} 0`,
+    `M ${C} 0`, `H ${(cx - sh).toFixed(2)}`,
+    `A ${f} ${f} 0 0 1 ${(cx - tx).toFixed(2)} ${ty.toFixed(2)}`,
+    `A ${rn} ${rn} 0 0 0 ${(cx + tx).toFixed(2)} ${ty.toFixed(2)}`,
+    `A ${f} ${f} 0 0 1 ${(cx + sh).toFixed(2)} 0`,
     `H ${W - C}`, `A ${C} ${C} 0 0 1 ${W} ${C}`, `V ${BEAD_H - C}`,
     `A ${C} ${C} 0 0 1 ${W - C} ${BEAD_H}`, `H ${C}`,
     `A ${C} ${C} 0 0 1 0 ${BEAD_H - C}`, `V ${C}`, `A ${C} ${C} 0 0 1 ${C} 0`, 'Z',
   ].join(' ');
 }
+function _beadCxFor(i){ return _beadG.pad + _beadG.tabW * (i + 0.5); }
 
-function _beadTabs(){ return [...document.querySelectorAll('.bn-tab')]; }
-function _beadActiveIdx(){ return Math.max(0, _beadTabs().findIndex(t => t.classList.contains('active'))); }
-function _beadCxFor(i){ return _beadW / Math.max(1, _beadTabs().length) * (i + 0.5); }
-const _beadReduce = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-export function layoutNavBead(){
+// Pose la pastille ET l'encoche — le halo d'accent suit le même centre.
+function _beadSetCx(cx){
+  _beadCx = cx;
   const bar = document.getElementById('beadBar');
-  const inner = document.getElementById('beadInner');
-  if(!bar || !inner) return;
-  _beadW = Math.min(window.innerWidth - 24, 560);
-  inner.style.width = _beadW + 'px';
-  bar.setAttribute('width', _beadW);
-  bar.setAttribute('height', BEAD_H);
-  bar.setAttribute('viewBox', `0 0 ${_beadW} ${BEAD_H}`);
-  _beadCx = _beadCxFor(_beadActiveIdx());
-  bar.innerHTML = `<path d="${_beadPath(_beadW, _beadCx)}"/>`;
   const bead = document.getElementById('navBead');
-  if(bead){
-    bead.style.transition = 'none';
-    bead.style.transform = `translateX(${_beadCx - 24}px)`;
-    void bead.offsetWidth;
-    bead.style.transition = '';
-    const icon = _beadTabs()[_beadActiveIdx()]?.querySelector('.bn-icon');
-    if(icon) bead.textContent = icon.textContent;
-  }
+  if(!bar || !bead) return;
+  const d = _beadPath(_beadW, cx);
+  bar.querySelectorAll('path').forEach(p => p.setAttribute('d', d));
+  const glow = bar.querySelector('#beadGlowGrad');
+  if(glow){ glow.setAttribute('cx', cx); glow.setAttribute('cy', 0); }
+  bead.style.transform = `translateX(${cx - BEAD_R}px)`;
 }
 
-export function updateNavBead(){
-  const bar = document.getElementById('beadBar');
-  const bead = document.getElementById('navBead');
-  if(!bar || !bead || !bar.firstElementChild){ return; }
-  if(!_beadW) layoutNavBead();
-  const idx = _beadActiveIdx();
-  const target = _beadCxFor(idx);
-  if(target === _beadCx) return;
-  const icon = _beadTabs()[idx]?.querySelector('.bn-icon');
-  if(icon) bead.textContent = icon.textContent;
-  bead.style.transform = `translateX(${target - 24}px)`;
-  if(_beadReduce()){
-    bar.firstElementChild.setAttribute('d', _beadPath(_beadW, target));
-    _beadCx = target;
-    return;
-  }
+function _beadTweenTo(target){
   cancelAnimationFrame(_beadAnim);
-  const from = _beadCx, t0 = performance.now(), DUR = 280;
+  if(_beadReduce()){ _beadSetCx(target); return; }
+  const from = _beadCx, t0 = performance.now();
   const ease = x => 1 - Math.pow(1 - x, 3);
   const step = now => {
-    const k = Math.min(1, (now - t0) / DUR);
-    _beadCx = from + (target - from) * ease(k);
-    bar.firstElementChild.setAttribute('d', _beadPath(_beadW, _beadCx));
+    const k = Math.min(1, (now - t0) / BEAD_DUR);
+    _beadSetCx(from + (target - from) * ease(k));
     if(k < 1) _beadAnim = requestAnimationFrame(step);
   };
   _beadAnim = requestAnimationFrame(step);
 }
 
+// L'icône de la pastille est clonée depuis l'onglet actif (une seule
+// source pour les deux, la taille est réglée en CSS).
+function _beadSyncIcon(){
+  const bead = document.getElementById('navBead');
+  const icon = _beadTabs()[_beadActiveIdx()]?.querySelector('.bn-icon');
+  if(bead && icon) bead.innerHTML = icon.outerHTML;
+}
+
+export function layoutNavBead(){
+  const bar = document.getElementById('beadBar');
+  const inner = document.getElementById('beadInner');
+  const pill = document.querySelector('.bottom-nav-pill');
+  if(!bar || !inner) return;
+  const tabs = _beadTabs();
+  if(!tabs.length) return;
+  _beadW = Math.min(window.innerWidth - 24, 560);
+  _beadG = _beadGeom(_beadW, tabs.length);
+  inner.style.width = _beadW + 'px';
+  if(pill){ pill.style.left = _beadG.pad + 'px'; pill.style.right = _beadG.pad + 'px'; }
+  bar.setAttribute('width', _beadW);
+  bar.setAttribute('height', BEAD_H);
+  bar.setAttribute('viewBox', `0 0 ${_beadW} ${BEAD_H}`);
+  const d = _beadPath(_beadW, _beadCxFor(_beadActiveIdx()));
+  bar.innerHTML =
+    '<defs>' +
+      '<linearGradient id="beadBarFill" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="var(--nav-fill-top)"/><stop offset="1" stop-color="var(--nav-fill-bot)"/>' +
+      '</linearGradient>' +
+      '<linearGradient id="beadBarEdge" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="var(--nav-edge-top)"/>' +
+        '<stop offset="0.55" stop-color="var(--nav-edge-bot)"/>' +
+        '<stop offset="1" stop-color="var(--nav-edge-bot)"/>' +
+      '</linearGradient>' +
+      '<radialGradient id="beadGlowGrad" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="110">' +
+        '<stop offset="0" stop-color="rgb(var(--nav-glow))" stop-opacity="var(--nav-glow-a1)"/>' +
+        '<stop offset="0.45" stop-color="rgb(var(--nav-glow))" stop-opacity="var(--nav-glow-a2)"/>' +
+        '<stop offset="1" stop-color="rgb(var(--nav-glow))" stop-opacity="0"/>' +
+      '</radialGradient>' +
+    '</defs>' +
+    `<path class="nav-bar-shape" d="${d}"/><path class="nav-bar-glow" d="${d}"/>`;
+  const bead = document.getElementById('navBead');
+  if(bead) bead.style.top = (-_beadG.over) + 'px';
+  _beadSyncIcon();
+  _beadSetCx(_beadCxFor(_beadActiveIdx()));
+}
+
+export function updateNavBead(){
+  const bar = document.getElementById('beadBar');
+  if(!bar || !bar.querySelector('path')) return;
+  if(!_beadW || !_beadG) layoutNavBead();
+  const target = _beadCxFor(_beadActiveIdx());
+  _beadSyncIcon();
+  if(target === _beadCx) return;
+  _beadTweenTo(target);
+}
+
+// Glisser la pastille : suivi direct au pointeur, aperçu de l'onglet
+// survolé, aimantation par le même tween au relâchement.
+function _beadInitDrag(){
+  const bead = document.getElementById('navBead');
+  if(!bead || bead.dataset.dragReady) return;
+  bead.dataset.dragReady = '1';
+  let dragging = false, moved = false;
+  const nearest = x => {
+    const i = Math.round((x - _beadG.pad) / _beadG.tabW - 0.5);
+    return Math.max(0, Math.min(_beadTabs().length - 1, i));
+  };
+  bead.addEventListener('pointerdown', e => {
+    if(!_beadG) return;
+    dragging = true; moved = false;
+    try { bead.setPointerCapture(e.pointerId); } catch(err){}
+    cancelAnimationFrame(_beadAnim);
+    e.preventDefault();
+  });
+  bead.addEventListener('pointermove', e => {
+    if(!dragging) return;
+    moved = true;
+    const inner = document.getElementById('beadInner');
+    const last = _beadTabs().length - 1;
+    const x = Math.max(_beadCxFor(0), Math.min(_beadCxFor(last),
+      e.clientX - inner.getBoundingClientRect().left));
+    _beadSetCx(x);
+    const n = nearest(x);
+    const tabs = _beadTabs();
+    if(!tabs[n]?.classList.contains('active')){
+      tabs.forEach((t, i) => t.classList.toggle('active', i === n));
+      _beadSyncIcon();
+    }
+  });
+  const end = e => {
+    if(!dragging) return;
+    dragging = false;
+    try { bead.releasePointerCapture(e.pointerId); } catch(err){}
+    const idx = _beadActiveIdx();
+    if(moved) _beadTweenTo(_beadCxFor(idx)); else _beadSetCx(_beadCxFor(idx));
+    // le drag EST une navigation : appliquer la vue de l'onglet atteint
+    const view = _beadTabs()[idx]?.getAttribute('data-view');
+    if(moved && view && view !== currentView) switchView(view);
+  };
+  bead.addEventListener('pointerup', end);
+  bead.addEventListener('pointercancel', end);
+}
+
 export function initNavBead(){
   layoutNavBead();
+  _beadInitDrag();
   window.addEventListener('resize', layoutNavBead);
 }
 

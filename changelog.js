@@ -17,6 +17,54 @@
 
 export const CHANGELOG = [
   {
+    version: '1.24.0',
+    date: '2026-08-07',
+    changes: {
+      en: [
+        'Redesigned navigation: crisp outline icons replace the emoji, the bar hugs the active bead with an exact matching notch — and you can now grab the bead and slide it along the bar to switch views.',
+        'A refined palette gives the app real depth: a deeper, warmer dark, four distinct surface levels, and softer hairline borders. Muted text is now readable everywhere.',
+        'Settings and Badges match the Account page: colour-coded sections, and locked badges you can tell apart from unlocked ones at a glance.',
+        'Cloud sign-in: the code goes into animated boxes — auto-advance, smart paste, green check on success.',
+      ],
+      fr: [
+        'Navigation repensée : des icônes au trait remplacent les émojis, la barre épouse exactement la pastille active — et tu peux désormais attraper la pastille et la faire glisser le long de la barre pour changer de vue.',
+        'Une palette affinée donne enfin de la profondeur à l’app : un sombre plus dense et légèrement chaud, quatre niveaux de surface distincts, des bordures plus fines. Le texte atténué est lisible partout.',
+        'Réglages et Badges s’alignent sur la page Compte : sections identifiées par couleur, et badges verrouillés reconnaissables au premier coup d’œil.',
+        'Connexion cloud : le code se saisit dans des cases animées — avance automatique, collage intelligent, coche verte au succès.',
+      ],
+      es: [
+        'Navegación rediseñada: iconos de línea sustituyen a los emojis, la barra abraza exactamente la burbuja activa — y ahora puedes arrastrarla a lo largo de la barra para cambiar de vista.',
+        'Una paleta afinada da por fin profundidad a la app: un oscuro más denso y cálido, cuatro niveles de superficie distintos, bordes más finos. El texto atenuado ya se lee bien en todas partes.',
+        'Ajustes e Insignias se alinean con la página Cuenta: secciones identificadas por color e insignias bloqueadas reconocibles al instante.',
+        'Inicio de sesión en la nube: el código se escribe en casillas animadas — avance automático, pegado inteligente, marca verde al validar.',
+      ],
+      zh: [
+        '导航重新设计：线条图标取代表情符号，标签栏精确贴合当前圆珠——现在你还可以抓住圆珠沿栏滑动来切换页面。',
+        '精修的配色终于带来层次感：更深、略暖的暗色，四个清晰的表面层级，更细的描边。淡色文字现在处处可读。',
+        '设置与徽章向账户页看齐：分区以颜色标识，锁定的徽章一眼即可分辨。',
+        '云登录：验证码在动画分格中输入——自动前进、智能粘贴、成功时显示绿色对勾。',
+      ],
+      it: [
+        'Navigazione ridisegnata: icone a tratto al posto delle emoji, la barra abbraccia esattamente la pallina attiva — e ora puoi afferrarla e farla scorrere lungo la barra per cambiare vista.',
+        'Una palette raffinata dà finalmente profondità all’app: uno scuro più denso e caldo, quattro livelli di superficie distinti, bordi più sottili. Il testo attenuato è leggibile ovunque.',
+        'Impostazioni e Badge si allineano alla pagina Account: sezioni identificate da colori e badge bloccati riconoscibili a colpo d’occhio.',
+        'Accesso cloud: il codice si digita in caselle animate — avanzamento automatico, incolla intelligente, spunta verde al successo.',
+      ],
+      nl: [
+        'Vernieuwde navigatie: lijnpictogrammen vervangen de emoji, de balk omsluit de actieve knop precies — en je kunt de knop nu vastpakken en langs de balk schuiven om van weergave te wisselen.',
+        'Een verfijnd palet geeft de app eindelijk diepte: een dieper, warmer donker, vier duidelijke oppervlakteniveaus en fijnere randen. Gedempte tekst is nu overal leesbaar.',
+        'Instellingen en Badges sluiten aan op de Account-pagina: secties met kleurcodering en vergrendelde badges die je meteen herkent.',
+        'Cloud-aanmelding: de code typ je in geanimeerde vakjes — automatisch doorschuiven, slim plakken, groen vinkje bij succes.',
+      ],
+      de: [
+        'Neu gestaltete Navigation: Strich-Icons ersetzen die Emojis, die Leiste umschließt die aktive Perle exakt — und du kannst die Perle jetzt greifen und entlang der Leiste ziehen, um die Ansicht zu wechseln.',
+        'Eine verfeinerte Palette gibt der App endlich Tiefe: ein dunkleres, wärmeres Schwarz, vier klar getrennte Flächenebenen, feinere Ränder. Gedämpfter Text ist überall lesbar.',
+        'Einstellungen und Abzeichen ziehen mit der Konto-Seite gleich: farblich gekennzeichnete Bereiche und auf einen Blick erkennbare gesperrte Abzeichen.',
+        'Cloud-Anmeldung: der Code wird in animierten Feldern getippt — Auto-Weiterschaltung, cleveres Einfügen, grüner Haken bei Erfolg.',
+      ],
+    },
+  },
+  {
     version: '1.23.0',
     date: '2026-08-07',
     changes: {

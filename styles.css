@@ -38,6 +38,11 @@
   /* Carte non possédée : négatif volontaire (sombre en thème clair,
      clair en thème sombre) — l'absence saute aux yeux. */
   --not-owned:#3A3739;
+  /* Nav bead — dégradés dérivés de l'accent existant */
+  --nav-edge-top:rgba(0,0,0,0.16);--nav-edge-bot:rgba(0,0,0,0.04);
+  --nav-fill-top:#FFFFFF;--nav-fill-bot:#F6F3EF;
+  --nav-bead-hi:#FF3355;--nav-bead-lo:#C9002A;
+  --nav-glow:232,0,45;--nav-glow-a1:0.16;--nav-glow-a2:0.05;
   --red:#E8002D;--red-s:#FFE8EC;--red-m:#FFBEC8;--red-glow:rgba(232,0,45,0.18);
   --green:#34C759;--green-s:#E8F5E9;--green-m:#C8E6C9;
   --orange:#FF9500;--orange-s:#FFF3E0;--orange-m:#FFE0B2;
@@ -54,7 +59,7 @@
   --space-6px:6px;--space-10px:10px;--space-14px:14px;
   /* Clearance under the floating bottom tab bar — was repeated
      verbatim in the four scrolling views. */
-  --nav-clear:104px; /* barre 58 + marge 14 + débord de la pastille */
+  --nav-clear:calc(107px + env(safe-area-inset-bottom)); /* 14 marge + 58 barre + 35 débord pastille */
   --r-pill:100px;--content-max:800px;--tap-min:44px;
   --ease:all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);
   --ease-fast:all 0.15s cubic-bezier(0.25,0.46,0.45,0.94);
@@ -75,6 +80,10 @@
   --sh-sm:0 1px 2px rgba(0,0,0,0.4);--sh-md:0 4px 14px rgba(0,0,0,0.5);--sh-lg:0 16px 44px rgba(0,0,0,0.65);
   --tx1:#F3F0F1;--tx2:#A5A0A2;--tx3:#8A8487;
   --not-owned:#DEDADC;
+  --nav-edge-top:rgba(255,255,255,0.22);--nav-edge-bot:rgba(255,255,255,0.04);
+  --nav-fill-top:#242023;--nav-fill-bot:#171416;
+  --nav-bead-hi:#FF7A88;--nav-bead-lo:#E4243C;
+  --nav-glow:255,71,87;--nav-glow-a1:0.30;--nav-glow-a2:0.09;
   --red:#FF4757;--red-s:#2D1B1B;--red-m:#3D2B2B;--red-glow:rgba(255,71,87,0.22);
   --green:#4CD964;--green-s:#1B2D1B;--green-m:#2B3D2B;
   --orange:#FFB347;--orange-s:#2D241B;--orange-m:#3D342B;
@@ -1126,47 +1135,70 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   100%{opacity:0;box-shadow:inset 0 0 0px rgba(232,0,45,0),0 0 0px rgba(232,0,45,0);}
 }
 
-/* BOTTOM NAV — barre à « bead » : silhouette en un path SVG
-   paramétrique (voir render.js), pastille glissante, label sous la
-   pastille active, icônes seules ailleurs. */
+/* BOTTOM NAV — barre à « bead ». La silhouette (pilule + encoche) est
+   un seul path SVG calculé dans render.js ; ici, uniquement l'habillage :
+   dégradés, halo, états. La pastille n'a AUCUNE transition CSS — elle est
+   animée avec l'encoche par la même boucle rAF, sinon les deux dérivent. */
 .bottom-nav{
   position:fixed;
-  bottom:14px;
+  bottom:calc(14px + env(safe-area-inset-bottom));
   left:50%;
   transform:translateX(-50%);
   z-index:200;
   pointer-events:none;
   background:transparent;
-  filter:drop-shadow(0 8px 24px rgba(0,0,0,0.22));
+  filter:drop-shadow(0 8px 22px rgba(0,0,0,0.26));
 }
 .bead-nav-inner{position:relative;pointer-events:all;}
 .bead-bar{display:block;}
-.bead-bar path{fill:var(--surface);stroke:var(--border);stroke-width:1;}
-.bead{position:absolute;top:-26px;left:0;width:48px;height:48px;border-radius:50%;
-  background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;
-  font-size:21px;box-shadow:0 4px 14px var(--red-glow),0 2px 4px rgba(0,0,0,0.2);
-  transition:transform 0.28s cubic-bezier(0.22,0.9,0.36,1);pointer-events:none;z-index:2;}
-.bottom-nav-pill{position:absolute;inset:0;display:flex;background:none;border:none;padding:0;}
+.bead-bar .nav-bar-shape{fill:url(#beadBarFill);stroke:url(#beadBarEdge);stroke-width:1.25;}
+.bead-bar .nav-bar-glow{fill:url(#beadGlowGrad);pointer-events:none;}
+.bead{
+  position:absolute;left:0;width:50px;height:50px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;z-index:3;cursor:grab;touch-action:none;
+  -webkit-tap-highlight-color:transparent;
+  background:radial-gradient(circle at 34% 26%, var(--nav-bead-hi), var(--nav-bead-lo) 78%);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.18) inset,
+    0 0 8px 1px rgba(var(--nav-glow),0.50),
+    0 0 18px 2px rgba(var(--nav-glow),0.22),
+    0 6px 16px rgba(0,0,0,0.32);
+}
+.bead:active{cursor:grabbing;}
+.bead .bn-icon{width:25px;height:25px;opacity:1;transform:none;}
+.bottom-nav-pill{position:absolute;top:0;bottom:0;display:flex;background:none;border:none;padding:0;}
 .bn-tab{
-  flex:1;position:relative;min-width:44px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-  border:none;background:transparent;border-radius:var(--r-pill);
+  flex:1;position:relative;min-width:var(--tap-min);
+  display:flex;align-items:center;justify-content:center;
+  border:none;background:transparent;
   font-family:var(--font-b);cursor:pointer;
-  transition:var(--ease);
-  color:var(--tx3);
+  color:var(--tx3);transition:color 0.15s ease;
+}
+/* hover/focus : fond doux arrondi DANS la barre — jamais une forme qui
+   rivalise avec la pastille */
+.bn-tab::before{
+  content:'';position:absolute;left:50%;top:50%;translate:-50% -50%;
+  width:40px;height:36px;border-radius:12px;background:transparent;
+  transition:background 0.15s ease;
 }
 .bn-tab:hover{color:var(--tx1);}
-.bn-tab.active{background:transparent;color:var(--tx1);}
-.bn-tab:focus-visible{outline:2px solid var(--red);outline-offset:-6px;}
-.bn-icon{font-size:19px;line-height:1;transition:opacity 0.2s ease, transform 0.2s ease;}
+.bn-tab:hover::before{background:var(--surface2);}
+.bn-tab.active::before{background:transparent;}
+.bn-tab:focus-visible{outline:none !important;}
+.bn-tab:focus-visible::before{background:var(--surface2);box-shadow:0 0 0 2px var(--red);}
+.bn-icon{width:22px;height:22px;transition:opacity 0.2s ease, transform 0.2s ease;}
 .bn-tab.active .bn-icon{opacity:0;transform:translateY(-8px);} /* l'icône vit dans la pastille */
-.bn-label{position:absolute;bottom:9px;left:0;right:0;text-align:center;
-  font-size:9.5px;font-weight:700;line-height:1;white-space:nowrap;color:var(--tx1);
-  opacity:0;transform:translateY(3px);transition:opacity 0.2s ease, transform 0.2s ease;}
+.bn-label{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:10.5px;font-weight:700;line-height:1;white-space:nowrap;
+  color:var(--red);text-shadow:0 1px 3px var(--surface),0 0 8px var(--surface);
+  opacity:0;transform:translateY(3px);
+  transition:opacity 0.2s ease, transform 0.2s ease;pointer-events:none;
+}
 .bn-tab.active .bn-label{opacity:1;transform:translateY(0);}
 @media (prefers-reduced-motion: reduce){
-  .bead{transition:none;}
-  .bn-icon,.bn-label{transition:none;}
+  .bn-icon,.bn-label,.bn-tab,.bn-tab::before{transition:none;}
 }
 
 /* STATS VIEW */
@@ -1626,13 +1658,13 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{
 }
 .setv-btn:hover,.pin-key:hover,.import-dialog-btn:hover,
 .setv-lang-sel:hover,.schip:hover,
-.bn-tab:hover,.qbtn:hover,.lang-opt:hover,.font-opt:hover,.modal-close:hover,
+.qbtn:hover,.lang-opt:hover,.font-opt:hover,.modal-close:hover,
 .install-banner-btn:hover,.setv-toggle:hover{
   box-shadow:0 0 0 3px var(--red-glow);
   filter:brightness(0.97);
 }
-button:not(:disabled):active,
-.schip:active,.bn-tab:active,.qbtn:active,
+button:not(:disabled):not(.bn-tab):active,
+.schip:active,.qbtn:active,
 .pin-key:active,.setv-btn:active,.lang-opt:active,.font-opt:active{
   transform:scale(0.955);
 }
