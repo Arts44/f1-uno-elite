@@ -118,9 +118,27 @@ export async function sendMagicLink(email){
   if(!resp.ok){
     const body = await resp.text().catch(() => '');
     log('cloud: otp failed', resp.status, body);
-    throw new Error(resp.status === 429 ? 'rate-limited' : 'otp-failed');
+    throw new Error(classifyOtpError(resp.status, body));
   }
   return true;
+}
+
+/* ── Pourquoi l'e-mail n'est pas parti (pur, testé) ──
+   Un seul message « vérifie l'adresse » couvrait quatre causes très
+   différentes, dont trois où l'adresse n'y est pour RIEN. La plus
+   fréquente pour un nouvel utilisateur : sans SMTP personnalisé,
+   Supabase REFUSE de livrer à une adresse hors équipe du projet
+   (403 email_address_not_authorized) — dire « vérifie l'adresse »
+   envoie alors l'utilisateur corriger une adresse correcte.
+   Renvoie : 'rate-limited' | 'email-not-allowed' | 'signups-closed'
+             | 'mail-down' | 'otp-failed'. */
+export function classifyOtpError(status, body){
+  const b = String(body || '');
+  if(status === 429 || b.includes('over_email_send_rate_limit')) return 'rate-limited';
+  if(b.includes('email_address_not_authorized')) return 'email-not-allowed';
+  if(b.includes('signup_disabled') || b.includes('otp_disabled')) return 'signups-closed';
+  if(status >= 500 || b.includes('error_sending')) return 'mail-down';
+  return 'otp-failed';
 }
 
 // Verify the 6-digit code from the email (GoTrue /verify). This is the
@@ -526,7 +544,13 @@ export function bindCloudSection(){
           _startCooldownUi(sendBtn);
           if(msg){ msg.textContent = t('cloud.rate_limited'); msg.className = 'cloud-msg err'; }
         } else {
-          if(msg){ msg.textContent = e.message === 'offline' ? t('cloud.offline') : t('cloud.link_error'); msg.className = 'cloud-msg err'; }
+          const KEY = {
+            'offline':          'cloud.offline',
+            'email-not-allowed':'cloud.email_not_allowed',
+            'signups-closed':   'cloud.signups_closed',
+            'mail-down':        'cloud.mail_down',
+          };
+          if(msg){ msg.textContent = t(KEY[e.message] || 'cloud.link_error'); msg.className = 'cloud-msg err'; }
           sendBtn.disabled = false;
         }
       }

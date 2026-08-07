@@ -1,4 +1,5 @@
 import './_setup.js';
+import '../translations.js';
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
@@ -8,7 +9,7 @@ import {
   cloudConfig, isCloudConfigured,
   decodeJwtSub, buildUpsertRow,
   verifyOtpCode, sendCooldownRemaining, SEND_COOLDOWN_MS,
-  normalizeOtpInput, isValidOtpFormat,
+  normalizeOtpInput, isValidOtpFormat, classifyOtpError,
 } from '../cloud.js';
 
 const CFG = { url: 'https://proj.supabase.co', anonKey: 'anon-key-123' };
@@ -186,4 +187,42 @@ describe('cloud — configuration gate', () => {
     window.__F1UNO_CLOUD = undefined;
     assert.equal(isCloudConfigured(), false);
   });
+});
+
+describe('cloud — pourquoi l’e-mail n’est pas parti', () => {
+  // Un seul « vérifie l'adresse » couvrait quatre causes ; trois
+  // d'entre elles n'ont RIEN à voir avec l'adresse saisie.
+  const CASES = [
+    [429, '',                                                  'rate-limited',      'quota atteint (statut)'],
+    [400, '{"error_code":"over_email_send_rate_limit"}',        'rate-limited',      'quota atteint (code)'],
+    [403, '{"error_code":"email_address_not_authorized"}',      'email-not-allowed', 'SMTP par défaut : hors équipe'],
+    [422, '{"error_code":"signup_disabled"}',                   'signups-closed',    'inscriptions fermées'],
+    [422, '{"error_code":"otp_disabled"}',                      'signups-closed',    'OTP fermé aux nouveaux'],
+    [500, '{"error_code":"unexpected_failure"}',                'mail-down',         'serveur mail en panne'],
+    [400, '{"error_code":"error_sending_magic_link"}',          'mail-down',         'échec d’envoi explicite'],
+    [400, '{"error_code":"validation_failed"}',                 'otp-failed',        'adresse réellement invalide'],
+  ];
+  for (const [status, body, expected, why] of CASES) {
+    test(`${status} ${why} → ${expected}`, () => {
+      assert.equal(classifyOtpError(status, body), expected);
+    });
+  }
+
+  test('le quota prime sur tout le reste', () => {
+    assert.equal(classifyOtpError(429, '{"error_code":"error_sending_magic_link"}'), 'rate-limited');
+  });
+
+  test('un corps vide ou absent ne fait pas planter le classement', () => {
+    assert.equal(classifyOtpError(400, null), 'otp-failed');
+    assert.equal(classifyOtpError(503, undefined), 'mail-down');
+  });
+});
+
+describe('cloud — les 3 nouveaux messages existent partout', () => {
+  const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
+  for (const key of ['cloud.email_not_allowed', 'cloud.signups_closed', 'cloud.mail_down']) {
+    test(`${key} : 7 langues`, () => {
+      for (const l of LANGS) assert.ok(window.__T[l] && window.__T[l][key], `${key} manque en ${l}`);
+    });
+  }
 });

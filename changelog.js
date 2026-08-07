@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.25.1',
+    date: '2026-08-07',
+    changes: {
+      en: ['When a sign-in email fails to leave, the app now names the actual reason: quota reached, mail service down, sign-ups closed, or an address the mail service refuses to deliver to. It used to say “check the address” in all four cases — misleading advice in three of them.'],
+      fr: ['Quand l’e-mail de connexion ne part pas, l’app dit désormais pourquoi : quota atteint, service d’envoi en panne, inscriptions fermées, ou adresse que le service refuse de livrer. Elle répondait « vérifie l’adresse » dans les quatre cas — un mauvais conseil dans trois d’entre eux.'],
+      es: ['Cuando el correo de acceso no sale, la app ahora dice por qué: cuota alcanzada, servicio de correo caído, registros cerrados o una dirección a la que el servicio se niega a entregar. Antes respondía «comprueba la dirección» en los cuatro casos — un mal consejo en tres de ellos.'],
+      zh: ['登录邮件发不出去时，应用现在会说明真正的原因：配额用尽、邮件服务故障、注册已关闭，或该地址被邮件服务拒绝投递。此前四种情况都只说「请检查邮箱地址」——其中三种都是误导。'],
+      it: ['Quando l’e-mail di accesso non parte, l’app ora dice perché: quota raggiunta, servizio di posta non raggiungibile, iscrizioni chiuse o indirizzo a cui il servizio rifiuta di consegnare. Prima rispondeva «controlla l’indirizzo» in tutti e quattro i casi — un consiglio sbagliato in tre.'],
+      nl: ['Als de inlogmail niet vertrekt, noemt de app nu de echte reden: quotum bereikt, maildienst uit de lucht, aanmeldingen gesloten, of een adres waaraan de dienst weigert te bezorgen. Voorheen stond er in alle vier de gevallen “controleer het adres” — misleidend advies in drie ervan.'],
+      de: ['Wenn die Anmelde-E-Mail nicht rausgeht, nennt die App jetzt den echten Grund: Kontingent erreicht, Maildienst gestört, Registrierungen geschlossen oder eine Adresse, an die der Dienst nicht zustellt. Bisher hieß es in allen vier Fällen „Adresse prüfen“ — in dreien ein falscher Rat.'],
+    },
+  },
+  {
     version: '1.25.0',
     date: '2026-08-07',
     changes: {
