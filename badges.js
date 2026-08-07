@@ -8,12 +8,11 @@ import {
   cardOwned, cardWishlist, cardDoubles, cardFavorite
 } from './storage.js';
 import { updateStats } from './stats.js';
-import { showToast } from './render.js';
+import { showToast, switchView } from './render.js';
 import { secureGet, secureSet } from './secure-store.js';
 
 export let manualBadges = {};        // { badgeId: true/false }
 export let autoBadgeUnlocked = {};   // { badgeId: true } — persists once unlocked
-export let _selectRemoveMode = false; // when true, clicking an auto badge removes it
 const _seenAutoBadges = new Set();    // auto badge IDs already displayed with shimmer
 
 // Setters for cross-module writes (import "replace" mode)
@@ -94,14 +93,93 @@ export function loadManualBadges(){
 export function saveManualBadges(){ secureSet(_storageKey('badges'), JSON.stringify(manualBadges)); secureSet(_storageKey('auto_badges'), JSON.stringify(autoBadgeUnlocked)); }
 
 // Check if auto badge is unlocked (current condition OR previously unlocked)
+// La valeur persistée est le TIMESTAMP de déblocage (Date.now()) ; les
+// anciens enregistrements valent `true` (pas de date connue) — les deux
+// sont vrais, la règle « une fois débloqué, toujours débloqué » ne change pas.
 export function isAutoBadgeUnlocked(badge){
   const p = evaluateBadgeCondition(badge);
   const currently = p.cur >= p.max;
   if(currently && !autoBadgeUnlocked[badge.id]){
-    autoBadgeUnlocked[badge.id] = true;
+    autoBadgeUnlocked[badge.id] = Date.now();
     saveManualBadges();
   }
   return !!autoBadgeUnlocked[badge.id];
+}
+
+// Date de déblocage lisible, ou null (badge hérité sans date / verrouillé)
+export function badgeUnlockDate(store, id){
+  const v = store[id];
+  return (typeof v === 'number' && v > 0) ? new Date(v) : null;
+}
+
+/* ══════════════════════════════════════════════════════════
+   FAMILLES — le regroupement éditorial de la page. Un badge auto
+   inconnu (future saison) tombe dans 'passion' plutôt que de
+   disparaître. Les couleurs sont des tokens sémantiques existants ;
+   l'or des sets est l'identité Éternel déjà en place (#FACC15 via
+   --gold, défini dans styles.css).
+   ══════════════════════════════════════════════════════════ */
+export const FAMILIES = [
+  { id:'parcours', ico:'🛣️', cls:'bf-parcours', ladder:true,
+    ids:['first_card','collector_10','hunter_25','expert_50','master_75','legend_101'] },
+  { id:'sets',     ico:'🧩', cls:'bf-sets',
+    ids:['pilote_all','reserve_all','director_all','gp_all','champ_all'] },
+  { id:'foils',    ico:'✦',  cls:'bf-foils',
+    ids:['foil_5','nitro_1','wild_3','promo_1'] },
+  { id:'colors',   ico:'🎨', cls:'bf-colors',
+    ids:['blue_20','green_20','red_20','yellow_20'] },
+  { id:'passion',  ico:'❤️', cls:'bf-passion',
+    ids:['dreamer_5','ambitious_15','doubler_5','massive_50','fan_5','superfan_15'] },
+  { id:'exp',      ico:'🎟️', cls:'bf-exp', manual:true, ids:null }, // = tous les manuels
+];
+export function familyBadges(fam){
+  if(fam.manual) return MANUAL_BADGES;
+  const known = new Set(FAMILIES.flatMap(f => f.ids || []));
+  const list = fam.ids.map(id => AUTO_BADGES.find(b => b.id === id)).filter(Boolean);
+  if(fam.id === 'passion') AUTO_BADGES.forEach(b => { if(!known.has(b.id)) list.push(b); });
+  return list;
+}
+
+/* ── Prochain badge (pur, testé) ──
+   L'objectif épinglé par l'utilisateur gagne s'il est encore
+   verrouillé ; sinon le badge auto le plus proche de tomber
+   (meilleure fraction, puis plus petit reste). */
+export function pickNextBadge(pinnedId, badges, evalFn, unlockedFn){
+  const locked = badges.filter(b => !unlockedFn(b));
+  if(!locked.length) return null;
+  if(pinnedId){
+    const pin = locked.find(b => b.id === pinnedId);
+    if(pin) return { badge: pin, p: evalFn(pin), pinned: true };
+  }
+  let best = null, bestFrac = -1, bestLeft = Infinity;
+  locked.forEach(b => {
+    const p = evalFn(b);
+    const frac = p.max ? p.cur / p.max : 0;
+    const left = p.max - p.cur;
+    if(frac > bestFrac || (frac === bestFrac && left < bestLeft)){
+      best = { badge: b, p, pinned: false }; bestFrac = frac; bestLeft = left;
+    }
+  });
+  return best;
+}
+
+// Le badge débloqué le plus « difficile » : la plus grande cible
+// (101 cartes bat 20 bleues) — déterministe et explicable.
+export function hardestUnlockedBadge(badges, evalFn, unlockedFn){
+  let best = null, bestMax = -1;
+  badges.forEach(b => {
+    if(!unlockedFn(b)) return;
+    const m = evalFn(b).max;
+    if(m > bestMax){ best = b; bestMax = m; }
+  });
+  return best;
+}
+
+/* ── Objectif épinglé (préférence locale, par saison) ── */
+export function getPinnedBadge(){ return localStorage.getItem(_storageKey('pinned_badge')) || null; }
+export function setPinnedBadge(id){
+  if(id) localStorage.setItem(_storageKey('pinned_badge'), id);
+  else localStorage.removeItem(_storageKey('pinned_badge'));
 }
 
 export function removeAutoBadge(badgeId){
@@ -110,62 +188,45 @@ export function removeAutoBadge(badgeId){
     saveManualBadges();
     renderBadges();
     updateStats();
-    showToast('Badge retiré');
+    showToast(t('b.removed'));
   }
 }
 
-// Enter "remove badge" selection mode (triggered from the badges header button)
-export function enterRemoveBadgeMode(){
-  _selectRemoveMode = true;
-  document.querySelectorAll('#autoBadgesGrid .badge-card.unlocked').forEach(c=>c.classList.add('select-remove'));
-  showToast('Cliquez sur un badge débloqué pour le retirer');
+/* ── Célébration d'une tuile (particules + glow, nettoyée seule).
+   prefers-reduced-motion : rien — la tuile passe juste à l'état
+   débloqué. ── */
+function _celebrate(tile){
+  if(!tile) return;
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  tile.classList.add('just-unlocked');
+  const particles = document.createElement('div');
+  particles.className = 'badge-particles';
+  const colors = ['var(--red)','var(--orange)','var(--gold)','var(--green)','var(--blue)','var(--purple)'];
+  for(let i=0;i<12;i++){
+    const p = document.createElement('div');
+    p.className = 'badge-particle';
+    const angle = (Math.PI*2/12)*i;
+    const dist = 34 + Math.random()*26;
+    p.style.cssText = `left:50%;top:26px;background:${colors[i%colors.length]};--px:${Math.cos(angle)*dist}px;--py:${Math.sin(angle)*dist}px;animation-delay:${i*0.02}s;`;
+    particles.appendChild(p);
+  }
+  tile.appendChild(particles);
+  setTimeout(()=>{ tile.classList.remove('just-unlocked'); particles.remove(); }, 1200);
 }
 
 export function toggleManualBadge(badgeId){
   const wasUnlocked = !!manualBadges[badgeId];
-  manualBadges[badgeId] = !manualBadges[badgeId];
+  if(wasUnlocked) delete manualBadges[badgeId];
+  else manualBadges[badgeId] = Date.now();   // timestamp = date de déblocage
   saveManualBadges();
   renderBadges();
-  if(!wasUnlocked && manualBadges[badgeId]){
-    // Celebration effect — find the card and animate it
-    setTimeout(()=>{
-      const cards = document.querySelectorAll('#manualBadgesGrid .badge-card');
-      cards.forEach(card => {
-        const btn = card.querySelector('.badge-manual-btn');
-        if(btn && btn.getAttribute('data-badge') === badgeId){
-          card.classList.add('just-unlocked');
-          card.classList.add('shimmer-active');
-          // Spawn particles
-          const particles = document.createElement('div');
-          particles.className = 'badge-particles';
-          const colors = ['#E8002D','#FF6B35','#FFD700','#34C759','#007AFF','#AF52DE'];
-          for(let i=0;i<12;i++){
-            const p = document.createElement('div');
-            p.className = 'badge-particle';
-            const angle = (Math.PI*2/12)*i;
-            const dist = 40 + Math.random()*30;
-            p.style.cssText = `left:50%;top:50%;background:${colors[i%colors.length]};--px:${Math.cos(angle)*dist}px;--py:${Math.sin(angle)*dist}px;animation-delay:${i*0.03}s;`;
-            particles.appendChild(p);
-          }
-          card.appendChild(particles);
-          // Glow
-          const glow = document.createElement('div');
-          glow.className = 'badge-glow';
-          card.appendChild(glow);
-          // Cleanup celebration
-          setTimeout(()=>{
-            card.classList.remove('just-unlocked');
-            particles.remove();
-            glow.remove();
-          },1200);
-          // Stop shimmer after 5s
-          setTimeout(()=>{ card.classList.remove('shimmer-active'); },5000);
-        }
-      });
-    },50);
-    showToast('🏅 Badge débloqué !');
+  if(!wasUnlocked){
+    const tile = document.querySelector(`.badge-tile[data-badge="${badgeId}"]`);
+    _celebrate(tile);
+    const b = MANUAL_BADGES.find(x => x.id === badgeId);
+    if(b) queueBadgeToasts([b], { navigate: false });
   } else {
-    showToast('Badge retiré');
+    showToast(t('b.removed'));
   }
 }
 
@@ -204,145 +265,361 @@ export function getBadgeCards(badgeId){
   return [];
 }
 
-export function toggleBadgePreview(cardEl, badgeId){
-  const existing = cardEl.querySelector('.badge-preview');
-  if(existing){existing.remove();return;}
-  // Close any other open previews
-  document.querySelectorAll('.badge-preview').forEach(e=>e.remove());
-  const cards = getBadgeCards(badgeId);
-  if(!cards.length) return;
-  const catMap = {pilote_all:true,reserve_all:true,director_all:true,gp_all:true,champ_all:true};
-  const isCat = catMap[badgeId];
-  const ownedCards = cards.filter(c=>c.owned);
-  const missingCards = isCat ? cards.filter(c=>!c.owned) : [];
-  let html = '<div class="badge-preview">';
-  if(isCat){
-    html += `<div class="badge-preview-title">✓ Possédées (${ownedCards.length})</div><div class="badge-preview-grid">`;
-    ownedCards.forEach(c=>{html+=`<div class="badge-preview-chip owned">#${c.id} ${c.name}</div>`;});
-    html += '</div>';
-    if(missingCards.length){
-      html += `<div class="badge-preview-title" style="margin-top:6px">✗ Manquantes (${missingCards.length})</div><div class="badge-preview-grid">`;
-      missingCards.forEach(c=>{html+=`<div class="badge-preview-chip missing">#${c.id} ${c.name}</div>`;});
-      html += '</div>';
-    }
-  } else {
-    html += `<div class="badge-preview-title">Cartes contributives (${ownedCards.length})</div><div class="badge-preview-grid">`;
-    cards.forEach(c=>{html+=`<div class="badge-preview-chip owned">#${c.id} ${c.name}</div>`;});
-    html += '</div>';
+/* ── Détail d'un badge (panneau inline sous la grille de sa famille) ──
+   Description, progression, date de déblocage, cartes contributives
+   (getBadgeCards inchangé), objectif épinglable (auto verrouillé),
+   validation (manuel) et retrait (débloqué). ── */
+let _openDetail = null;
+
+function _detailHTML(b, fam){
+  const isManual = !!fam.manual;
+  const store = isManual ? manualBadges : autoBadgeUnlocked;
+  const unlocked = isManual ? !!manualBadges[b.id] : !!autoBadgeUnlocked[b.id];
+  const tr = (window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {});
+  let h = `<div class="bd-name">${b.emoji} ${tr.name || b.name}</div>
+    <div class="bd-desc">${tr.desc || b.desc || ''}</div>`;
+  if(unlocked){
+    const d = badgeUnlockDate(store, b.id);
+    h += `<div class="bd-date">✓ ${d
+      ? t('b.unlocked_on', { d: d.toLocaleDateString(getLang(), { day:'numeric', month:'long', year:'numeric' }) })
+      : t('b.unlocked_simple')}</div>`;
+  } else if(!isManual){
+    const p = evaluateBadgeCondition(b);
+    const pct = p.max ? Math.min(100, Math.round(p.cur / p.max * 100)) : 0;
+    h += `<div class="bd-bar"><i style="width:${pct}%"></i></div>
+      <div class="bd-sub">${p.cur} / ${p.max} — ${t('b.remaining', { n: p.max - p.cur })}</div>`;
   }
-  html += '</div>';
-  cardEl.insertAdjacentHTML('beforeend',html);
+  if(!isManual){
+    const cards = getBadgeCards(b.id);
+    if(cards.length){
+      const isCat = ['pilote_all','reserve_all','director_all','gp_all','champ_all'].includes(b.id);
+      h += `<div class="bd-chips">`;
+      cards.filter(c => c.owned).slice(0, 14).forEach(c => { h += `<span class="bd-chip">#${c.id} ${c.name}</span>`; });
+      const more = cards.filter(c => c.owned).length - 14;
+      if(more > 0) h += `<span class="bd-chip">+${more}…</span>`;
+      if(isCat) cards.filter(c => !c.owned).forEach(c => { h += `<span class="bd-chip miss">#${c.id} ${c.name}</span>`; });
+      h += `</div>`;
+    }
+  }
+  h += `<div class="bd-actions">`;
+  if(isManual){
+    h += `<button class="bd-btn ${unlocked ? '' : 'primary'}" data-action="toggleManualBadge" data-badge="${b.id}">${unlocked ? t('b.remove_badge') : t('b.validate_btn')}</button>`;
+  } else if(unlocked){
+    h += `<button class="bd-btn" data-action="removeAutoBadge" data-badge="${b.id}">${t('b.remove_badge')}</button>`;
+  } else {
+    const pinned = getPinnedBadge() === b.id;
+    h += `<button class="bd-btn ${pinned ? '' : 'primary'}" data-action="${pinned ? 'unpinBadge' : 'pinBadge'}" data-badge="${b.id}">${pinned ? t('b.unpin_objective') : t('b.pin_objective')}</button>`;
+  }
+  h += `</div>`;
+  return h;
 }
 
-export function renderBadges(){
+export function toggleBadgeDetail(badgeId){
+  const fam = FAMILIES.find(f => familyBadges(f).some(b => b.id === badgeId));
+  if(!fam) return;
+  const det = document.getElementById('bd-' + fam.id);
+  if(!det) return;
+  if(_openDetail === badgeId){ det.classList.remove('open'); _openDetail = null; return; }
+  document.querySelectorAll('.badge-detail').forEach(d => d.classList.remove('open'));
+  const b = familyBadges(fam).find(x => x.id === badgeId);
+  det.innerHTML = _detailHTML(b, fam);
+  det.classList.add('open');
+  _openDetail = badgeId;
+}
+
+export function pinBadge(badgeId){
+  setPinnedBadge(badgeId);
+  renderBadges();
+  showToast(t('b.pinned_toast'));
+}
+export function unpinBadge(){
+  setPinnedBadge(null);
+  renderBadges();
+}
+
+/* ══════════════════════════════════════════════════════════
+   RENDU DE LA PAGE — hero (anneau + titre + plus difficile +
+   partage), carte Prochain badge / Objectif, familles (échelle
+   pour le Parcours, tuiles ailleurs), détail inline.
+   ══════════════════════════════════════════════════════════ */
+const _bt = b => (window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {});
+
+function _tileHTML(b, fam){
+  const isManual = !!fam.manual;
+  const unlocked = isManual ? !!manualBadges[b.id] : !!autoBadgeUnlocked[b.id];
+  const p = isManual ? null : evaluateBadgeCondition(b);
+  // seule la « prochaine » tuile verrouillée de la famille porte l'arc
+  const eternal = b.id === 'champ_all';
+  let cls = unlocked ? 'un' : 'lock';
+  let arc = '';
+  if(!unlocked && p && p.cur > 0){
+    cls = 'prog';
+    const pct = Math.min(100, Math.round(p.cur / p.max * 100));
+    arc = ` style="--p:${pct}"`;
+  }
+  return `<div class="badge-tile ${cls}${eternal ? ' eternal' : ''}" data-action="toggleBadgeDetail" data-badge="${b.id}" role="listitem" tabindex="0"${arc}>
+    ${unlocked ? '<span class="bt-chk">✓</span>' : ''}
+    <div class="bt-med"><span>${b.emoji}</span></div>
+    ${cls === 'prog' ? `<span class="bt-pp">${p.cur}/${p.max}</span>` : ''}
+    <div class="bt-name">${_bt(b).name || b.name}</div>
+  </div>`;
+}
+
+let _heroWasAnimated = false;
+export function renderBadges(opts = {}){
   loadManualBadges();
-  const autoGrid = document.getElementById('autoBadgesGrid');
-  const manualGrid = document.getElementById('manualBadgesGrid');
-  if(!autoGrid || !manualGrid) return;
+  const hero = document.getElementById('badgesHero');
+  const next = document.getElementById('badgesNext');
+  const fams = document.getElementById('badgesFams');
+  if(!hero || !next || !fams) return;
+  _openDetail = null;
 
-  let autoUnlocked = 0;
-  let manualUnlocked = 0;
+  const autoUnlocked = AUTO_BADGES.filter(b => isAutoBadgeUnlocked(b)).length;
+  const manualUnlocked = Object.values(manualBadges).filter(Boolean).length;
+  const total = autoUnlocked + manualUnlocked;
+  const TOTAL = AUTO_BADGES.length + MANUAL_BADGES.length;
 
-  // Helper: generate sparkle HTML for unlocked badges
-  function sparkleHTML(){
-    let s = '<div class="badge-sparkles">';
-    for(let i=0;i<6;i++){
-      const x = 10 + Math.random()*80;
-      const y = 10 + Math.random()*80;
-      const dur = (2 + Math.random()*2).toFixed(1);
-      const delay = (Math.random()*3).toFixed(1);
-      s += `<div class="badge-sparkle" style="left:${x}%;top:${y}%;--dur:${dur}s;--delay:${delay}s;"></div>`;
-    }
-    s += '</div>';
-    return s;
+  // ── Hero : anneau + compteur + titre + plus difficile + partage ──
+  const C = 2 * Math.PI * 38;
+  const hardest = hardestUnlockedBadge(AUTO_BADGES, evaluateBadgeCondition, isAutoBadgeUnlocked);
+  hero.innerHTML = `
+    <div class="bh-ring">
+      <svg width="86" height="86" viewBox="0 0 86 86" aria-hidden="true">
+        <circle class="bh-bg" cx="43" cy="43" r="38" fill="none" stroke-width="7"/>
+        <circle class="bh-fg" id="bhFg" cx="43" cy="43" r="38" fill="none" stroke-width="7"
+          stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - total / TOTAL)}"/>
+      </svg>
+      <div class="bh-num"><b id="bhCount">${total}</b><span>/ ${TOTAL}</span></div>
+    </div>
+    <div class="bh-right">
+      <div class="bh-kicker">${t('b.title').replace('🏅 ','')}</div>
+      <div class="user-title-wrap" id="userTitleCard"></div>
+      ${hardest ? `<div class="bh-hardest">${t('b.hardest')} <b>${hardest.emoji} ${_bt(hardest).name || hardest.name}</b></div>` : ''}
+    </div>
+    <button class="bh-share" data-action="shareBadges" type="button" aria-label="${t('b.share')}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
+    </button>`;
+
+  // ── Prochain badge / Objectif épinglé ──
+  const nx = pickNextBadge(getPinnedBadge(), AUTO_BADGES, evaluateBadgeCondition, isAutoBadgeUnlocked);
+  if(nx && getPinnedBadge() && !nx.pinned) setPinnedBadge(null); // objectif tombé → retour au calcul
+  if(total === 0){
+    next.innerHTML = `<div class="bn-empty">🏁 <b>${t('b.empty_title')}</b><br>${t('b.empty_sub')}</div>`;
+  } else if(!nx){
+    next.innerHTML = `<div class="bn-empty full">🌟 <b>${t('b.all_done')}</b></div>`;
+  } else {
+    const pct = nx.p.max ? Math.min(100, Math.round(nx.p.cur / nx.p.max * 100)) : 0;
+    next.innerHTML = `
+      <div class="bn-next" data-action="toggleBadgeDetail" data-badge="${nx.badge.id}" role="button" tabindex="0">
+        <div class="bn-med">${nx.badge.emoji}</div>
+        <div class="bn-body">
+          <div class="bn-k">${nx.pinned ? '📌 ' + t('b.objective') : t('b.next_badge')}</div>
+          <div class="bn-n">${_bt(nx.badge).name || nx.badge.name}</div>
+          <div class="bn-bar"><i style="width:${pct}%"></i></div>
+          <div class="bn-s"><b>${nx.p.cur}/${nx.p.max}</b> · ${t('b.remaining', { n: nx.p.max - nx.p.cur })}</div>
+        </div>
+      </div>`;
   }
 
-  // Auto badges
-  autoGrid.innerHTML = '';
-  AUTO_BADGES.forEach(b => {
-    const p = evaluateBadgeCondition(b);
-    const unlocked = isAutoBadgeUnlocked(b);
-    if(unlocked) autoUnlocked++;
-    const pct = Math.min(100, Math.round((p.cur/p.max)*100));
-    const card = document.createElement('div');
-    card.className = `badge-card ${unlocked ? 'unlocked' : 'locked'}`;
-    card.innerHTML = `
-      ${unlocked ? sparkleHTML() : ''}
-      ${unlocked ? '<span class="badge-confetti">✓</span>' : ''}
-      <div class="badge-card-top">
-        <div class="badge-icon-wrap"><span class="badge-emoji">${b.emoji}</span></div>
-        <div class="badge-info">
-          <div class="badge-name">${(window.__BADGE_T?.[b.id]?.[getLang()]||window.__BADGE_T?.[b.id]?.en||{}).name||b.name}</div>
-          <div class="badge-desc">${(window.__BADGE_T?.[b.id]?.[getLang()]||window.__BADGE_T?.[b.id]?.en||{}).desc||b.desc}</div>
-        </div>
-      </div>
-      <div class="badge-prog-wrap"><div class="badge-prog-fill" style="width:${pct}%"></div></div>
-      <div class="badge-prog-label"><span>${p.cur} / ${p.max}</span><span>${pct}%</span></div>
-      <div class="badge-status">
-        <span class="badge-status-tag auto">${t('b.auto_tag')}</span>
-        <span class="badge-unlock-indicator ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? t('b.status_unlocked') : t('b.status_locked')}</span>
-      </div>`;
-    card.classList.add('clickable');
-    card.onclick=()=>{
-      if(_selectRemoveMode && unlocked){
-        removeAutoBadge(b.id);
-        _selectRemoveMode = false;
-        document.querySelectorAll('.badge-card').forEach(c=>c.classList.remove('select-remove'));
-        return;
-      }
-      toggleBadgePreview(card,b.id);
-    };
-    autoGrid.appendChild(card);
-    // Shimmer only on newly-unlocked auto badges (not seen before)
-    if(unlocked && !_seenAutoBadges.has(b.id)){
-      card.classList.add('shimmer-active');
-      setTimeout(()=>{ card.classList.remove('shimmer-active'); },5000);
+  // ── Familles ──
+  let h = '';
+  FAMILIES.forEach(fam => {
+    const list = familyBadges(fam);
+    const un = list.filter(b => fam.manual ? !!manualBadges[b.id] : !!autoBadgeUnlocked[b.id]).length;
+    h += `<div class="badge-fam ${fam.cls}">
+      <div class="bfh"><span class="bfh-ico">${fam.ico}</span><span class="bfh-name">${t('b.fam_' + fam.id)}</span><span class="bfh-count">${un}/${list.length}</span></div>
+      <div class="bfh-bar"><i style="width:${list.length ? un / list.length * 100 : 0}%"></i></div>`;
+    if(fam.ladder){
+      h += `<div class="badge-ladder" role="list">`;
+      list.forEach(b => {
+        const unl = !!autoBadgeUnlocked[b.id];
+        const p = evaluateBadgeCondition(b);
+        const cur = !unl && p.cur > 0 && list.filter(x => !autoBadgeUnlocked[x.id])[0]?.id === b.id;
+        h += `<div class="bl-rung ${unl ? 'done' : cur ? 'cur' : 'lock'}" data-action="toggleBadgeDetail" data-badge="${b.id}" role="listitem" tabindex="0">
+          <div class="bl-dot">${b.emoji}</div><div class="bl-lbl">${p.max}</div></div>`;
+      });
+      h += `</div><div class="badge-detail" id="bd-${fam.id}"></div>`;
+    } else {
+      h += `<div class="badge-tiles" role="list">`;
+      list.forEach(b => { h += _tileHTML(b, fam); });
+      h += `<div class="badge-detail" id="bd-${fam.id}"></div></div>`;
     }
+    h += `</div>`;
   });
+  fams.innerHTML = h;
 
-  // Manual badges
-  manualGrid.innerHTML = '';
-  MANUAL_BADGES.forEach(b => {
-    const unlocked = !!manualBadges[b.id];
-    if(unlocked) manualUnlocked++;
-    const card = document.createElement('div');
-    card.className = `badge-card ${unlocked ? 'unlocked' : 'locked'}`;
-    card.innerHTML = `
-      ${unlocked ? sparkleHTML() : ''}
-      ${unlocked ? '<span class="badge-confetti">✓</span>' : ''}
-      <div class="badge-card-top">
-        <div class="badge-icon-wrap"><span class="badge-emoji">${b.emoji}</span></div>
-        <div class="badge-info">
-          <div class="badge-name">${(window.__BADGE_T?.[b.id]?.[getLang()]||window.__BADGE_T?.[b.id]?.en||{}).name||b.name}</div>
-          <div class="badge-desc">${(window.__BADGE_T?.[b.id]?.[getLang()]||window.__BADGE_T?.[b.id]?.en||{}).desc||b.desc}</div>
-        </div>
-      </div>
-      <div class="badge-status">
-        <span class="badge-status-tag manual">${t('b.manual_tag')}</span>
-        <span class="badge-unlock-indicator ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? t('b.status_validated') : t('b.status_to_validate')}</span>
-      </div>
-      <button class="badge-manual-btn ${unlocked ? 'validated' : ''}" data-action="toggleManualBadge" data-badge="${b.id}">${unlocked ? t('b.status_validated') : t('b.validate_btn')}</button>`;
-    manualGrid.appendChild(card);
-  });
-
-  // Update counters
-  const totalUnlocked = autoUnlocked + manualUnlocked;
-  const bpText = document.querySelector('.badges-progress-text');
-  if(bpText) bpText.innerHTML = t('b.unlocked',{n:`<span id="badgesUnlockedCount">${totalUnlocked}</span>`});
-  const el2 = document.getElementById('badgesProgressFill');
-  if(el2) el2.style.width = Math.round((totalUnlocked/50)*100) + '%';
-  const el3 = document.getElementById('autoBadgeCount');
-  if(el3) el3.textContent = `${autoUnlocked}/25`;
-  const el4 = document.getElementById('manualBadgeCount');
-  if(el4) el4.textContent = `${manualUnlocked}/25`;
-  const el5 = document.getElementById('badgeCountTab');
-  if(el5) el5.textContent = `${totalUnlocked}/50`;
+  // ── Compteur d'onglet + titre ──
+  const tabCount = document.getElementById('badgeCountTab');
+  if(tabCount) tabCount.textContent = `${total}/${TOTAL}`;
   updateUserTitle();
 
-  // Mark all currently unlocked auto badges as seen
+  // ── Animation d'arrivée (one-shot ~600 ms, statique en reduced-motion) ──
+  if(opts.animateHero && !_heroWasAnimated){
+    _heroWasAnimated = true;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!reduce && total > 0){
+      const fg = document.getElementById('bhFg');
+      const cnt = document.getElementById('bhCount');
+      if(fg && cnt){
+        const target = C * (1 - total / TOTAL);
+        fg.style.transition = 'none';
+        fg.setAttribute('stroke-dashoffset', C);
+        void fg.getBoundingClientRect();
+        fg.style.transition = 'stroke-dashoffset 0.6s cubic-bezier(0.22,0.9,0.36,1)';
+        fg.setAttribute('stroke-dashoffset', target);
+        const t0 = performance.now();
+        const tick = now => {
+          const k = Math.min(1, (now - t0) / 600);
+          cnt.textContent = Math.round(total * (1 - Math.pow(1 - k, 3)));
+          if(k < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        // filet : rAF gelé (onglet caché) → valeur finale posée quand même
+        setTimeout(() => { cnt.textContent = String(total); }, 650);
+      }
+    }
+  }
+
+  AUTO_BADGES.forEach(b => { if(isAutoBadgeUnlocked(b)) _seenAutoBadges.add(b.id); });
+}
+
+// L'animation du hero rejoue à chaque ARRIVÉE sur la page, pas aux
+// re-rendus internes : render.js arme ce drapeau en quittant la vue.
+export function resetHeroAnimation(){ _heroWasAnimated = false; }
+
+/* ══════════════════════════════════════════════════════════
+   DÉBLOCAGE EN COURS D'USAGE — détection + toast badge.
+   Appelé par updateStats() après chaque écriture de collection.
+   Groupé si plusieurs tombent d'un coup ; file d'attente pour ne
+   jamais se battre avec le toast standard (Annuler) : on attend
+   qu'il soit parti. Haptique courte, silencieuse là où vibrate
+   n'existe pas (iOS).
+   ══════════════════════════════════════════════════════════ */
+export function groupBadgeToastLabel(names, tf = t){
+  if(names.length === 1) return names[0];
+  return tf('b.toast_many', { n: names.length }) + ' — ' + names.slice(0, 3).join(', ') + (names.length > 3 ? '…' : '');
+}
+
+const _toastQueue = [];
+let _toastShowing = false;
+export function queueBadgeToasts(badges, opts = {}){
+  if(!badges.length) return;
+  _toastQueue.push({ badges, navigate: opts.navigate !== false });
+  _drainToastQueue();
+}
+function _drainToastQueue(){
+  if(_toastShowing || !_toastQueue.length) return;
+  // le toast standard (Annuler…) est prioritaire : repasser après lui
+  const std = document.getElementById('toast');
+  if(std && std.classList.contains('show')){ setTimeout(_drainToastQueue, 1200); return; }
+  _toastShowing = true;
+  const { badges, navigate } = _toastQueue.shift();
+  let el = document.getElementById('badgeToast');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'badgeToast';
+    el.className = 'badge-toast';
+    document.body.appendChild(el);
+  }
+  const names = badges.map(b => _bt(b).name || b.name);
+  el.innerHTML = `<div class="bgt-med">${badges[0].emoji}</div>
+    <div><div class="bgt-k">${badges.length > 1 ? t('b.toast_many', { n: badges.length }) : t('b.toast_one')}</div>
+    <div class="bgt-n">${badges.length > 1 ? names.slice(0, 3).join(', ') + (names.length > 3 ? '…' : '') : names[0]}</div></div>`;
+  el.onclick = navigate ? () => { el.classList.remove('show'); switchView('badges'); } : () => el.classList.remove('show');
+  // setTimeout, PAS requestAnimationFrame : rAF ne tourne pas onglet en
+  // arrière-plan — le toast ne serait jamais monté à l'écran au retour.
+  setTimeout(() => el.classList.add('show'), 20);
+  try { if(navigator.vibrate) navigator.vibrate(30); } catch(e){ /* iOS: pas d'API */ }
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => { _toastShowing = false; _drainToastQueue(); }, 400);
+  }, 2800);
+}
+
+// Détecte les transitions verrouillé → débloqué depuis la dernière
+// écriture. C'est un AJOUT : la persistance passe toujours par
+// autoBadgeUnlocked + saveManualBadges, comme avant.
+export function checkNewAutoBadges(){
+  const fresh = [];
   AUTO_BADGES.forEach(b => {
-    if(isAutoBadgeUnlocked(b)) _seenAutoBadges.add(b.id);
+    if(autoBadgeUnlocked[b.id]) return;
+    const p = evaluateBadgeCondition(b);
+    if(p.cur >= p.max){
+      autoBadgeUnlocked[b.id] = Date.now();
+      fresh.push(b);
+    }
   });
+  if(fresh.length){
+    saveManualBadges();
+    queueBadgeToasts(fresh);
+    const tile = document.querySelector(`.badge-tile[data-badge="${fresh[0].id}"]`);
+    if(tile) _celebrate(tile);
+  }
+}
+
+/* ── Carte de profil exportable (canvas → PNG) ── */
+export async function shareProfileCard(){
+  loadManualBadges();
+  const total = AUTO_BADGES.filter(b => isAutoBadgeUnlocked(b)).length
+    + Object.values(manualBadges).filter(Boolean).length;
+  const TOTAL = AUTO_BADGES.length + MANUAL_BADGES.length;
+  const unlockedList = [...AUTO_BADGES, ...MANUAL_BADGES]
+    .filter(b => autoBadgeUnlocked[b.id] || manualBadges[b.id]);
+  const hardest = hardestUnlockedBadge(AUTO_BADGES, evaluateBadgeCondition, isAutoBadgeUnlocked);
+  const titleEl = document.querySelector('#headerTitle .ht-icon + span');
+  const titleTxt = titleEl ? titleEl.textContent : 'Rookie';
+  const dark = document.documentElement.getAttribute('data-theme') !== 'light';
+
+  const W = 1000, H = 1250;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+  x.fillStyle = dark ? '#100E0F' : '#F4F1ED'; x.fillRect(0, 0, W, H);
+  const ink = dark ? '#F3F0F1' : '#191716';
+  const sub = dark ? '#A5A0A2' : '#6A6461';
+  const red = dark ? '#FF4757' : '#E8002D';
+  // liseré
+  x.strokeStyle = red; x.lineWidth = 10; x.strokeRect(25, 25, W - 50, H - 50);
+  // en-tête
+  x.fillStyle = ink; x.textAlign = 'center';
+  x.font = '700 54px system-ui'; x.fillText('F1 UNO ÉLITE', W / 2, 130);
+  x.fillStyle = sub; x.font = '600 30px system-ui'; x.fillText(t('b.title').replace('🏅 ', '').toUpperCase(), W / 2, 180);
+  // anneau
+  const cx = W / 2, cy = 430, r = 150;
+  x.lineWidth = 26; x.lineCap = 'round';
+  x.strokeStyle = dark ? '#2E2A2C' : '#E3DED7';
+  x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.stroke();
+  x.strokeStyle = red;
+  x.beginPath(); x.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (total / TOTAL)); x.stroke();
+  x.fillStyle = ink; x.font = '700 110px system-ui'; x.fillText(String(total), cx, cy + 20);
+  x.fillStyle = sub; x.font = '600 36px system-ui'; x.fillText(`/ ${TOTAL}`, cx, cy + 75);
+  // titre actif
+  x.fillStyle = red; x.font = '700 44px system-ui'; x.fillText(titleTxt, W / 2, 700);
+  if(hardest){
+    x.fillStyle = sub; x.font = '500 28px system-ui';
+    x.fillText(`${t('b.hardest')} ${_bt(hardest).name || hardest.name}`, W / 2, 755);
+  }
+  // badges marquants (jusqu'à 8 emojis)
+  const show = unlockedList.slice(0, 8);
+  x.font = '64px system-ui';
+  show.forEach((b, i) => {
+    const bx = W / 2 + (i - (show.length - 1) / 2) * 100;
+    x.fillText(b.emoji, bx, 890);
+  });
+  // pied
+  x.fillStyle = sub; x.font = '500 26px system-ui';
+  x.fillText('arts44.github.io/f1-uno-elite', W / 2, H - 90);
+
+  const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
+  if(!blob) return;
+  const file = new File([blob], 'f1-uno-badges.png', { type: 'image/png' });
+  if(navigator.canShare && navigator.canShare({ files: [file] })){
+    try { await navigator.share({ files: [file] }); return; } catch(e){ /* annulé → repli */ }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'f1-uno-badges.png'; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  showToast(t('b.share_saved'));
 }
 
 /* ══════════════════════════════════════════════════════════

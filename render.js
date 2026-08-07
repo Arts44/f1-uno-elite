@@ -15,7 +15,7 @@ import {
   quickAddVariant, undoQuickAdd
 } from './storage.js';
 import { updateStats, renderStats } from './stats.js';
-import { renderBadges } from './badges.js';
+import { renderBadges, resetHeroAnimation } from './badges.js';
 import { renderSettings, showAdminPinScreen } from './pin.js';
 import { isViewer } from './session.js';
 import { renderAccount } from './account.js';
@@ -899,6 +899,7 @@ export function switchView(view){
     showAdminPinScreen();
     return;
   }
+  if(currentView === 'badges' && view !== 'badges') resetHeroAnimation();
   currentView = view;
   const collectionView = document.getElementById('collectionView');
   const badgesView = document.getElementById('badgesView');
@@ -921,7 +922,7 @@ export function switchView(view){
   switch(view){
     case 'badges':
       badgesView.classList.add('active');
-      renderBadges();
+      renderBadges({ animateHero: true });
       break;
     case 'stats':
       if(statsView){ statsView.classList.add('active'); renderStats(); }

@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.29.0',
+    date: '2026-08-07',
+    changes: {
+      en: [
+        'The Badges page has been rebuilt from scratch: a progress ring with your title, a "Next badge" card that always shows the closest one to dropping, and 6 families (Journey, Complete sets, Foils, Colours, Passion, Experiences) with compact tiles — unlocked in colour, in-progress with an arc, locked desaturated. The Journey is a milestone track from 1 to 101.',
+        'Badges now celebrate: when one drops during use, a dedicated toast appears (with a short vibration where supported) and the tile bursts on the page. Multiple unlocks are grouped into one toast. Tap a badge for its detail: description, progress, contributing cards, and its unlock date — recorded from now on.',
+        'Pick your own goal: "Make it my goal" pins any badge to the top card instead of the automatic pick. The hero also names your hardest badge, and a share button exports your collector card as an image.',
+      ],
+      fr: [
+        'La page Badges est reconstruite de zéro : un anneau de progression avec ton titre, une carte « Prochain badge » qui montre toujours le plus proche de tomber, et 6 familles (Parcours, Sets complets, Foils, Couleurs, Passion, Expériences) en tuiles compactes — débloqué en couleur, en cours avec un arc, verrouillé désaturé. Le Parcours est une échelle de jalons de 1 à 101.',
+        'Les badges célèbrent désormais : quand l\'un tombe pendant l\'usage, un toast dédié apparaît (avec une courte vibration là où c\'est possible) et la tuile explose sur la page. Plusieurs déblocages d\'un coup sont regroupés en un seul toast. Un appui sur un badge ouvre son détail : description, progression, cartes contributives, et sa date de déblocage — enregistrée à partir de maintenant.',
+        'Choisis ton propre objectif : « En faire mon objectif » épingle n\'importe quel badge dans la carte du haut à la place du calcul automatique. Le hero nomme aussi ton badge le plus difficile, et un bouton de partage exporte ta carte de collectionneur en image.',
+      ],
+      es: [
+        'La página de insignias se ha reconstruido desde cero: un anillo de progreso con tu título, una tarjeta «Próxima insignia» que siempre muestra la más cercana a caer, y 6 familias (Trayectoria, Sets completos, Foils, Colores, Pasión, Experiencias) en fichas compactas — desbloqueada en color, en curso con un arco, bloqueada desaturada. La Trayectoria es una escalera de hitos de 1 a 101.',
+        'Las insignias ahora celebran: cuando una cae durante el uso, aparece un aviso dedicado (con una breve vibración donde sea posible) y la ficha estalla en la página. Varios desbloqueos a la vez se agrupan en un solo aviso. Un toque abre su detalle: descripción, progreso, cartas contributivas y su fecha de desbloqueo — registrada a partir de ahora.',
+        'Elige tu propio objetivo: «Convertirla en mi objetivo» fija cualquier insignia en la tarjeta superior en lugar del cálculo automático. El héroe también nombra tu insignia más difícil, y un botón de compartir exporta tu tarjeta de coleccionista como imagen.',
+      ],
+      zh: [
+        '徽章页面彻底重建：进度圆环搭配你的头衔，「下一枚徽章」卡片始终展示最接近解锁的一枚，50 枚徽章分为 6 个家族（收集之路、完整套组、闪卡、颜色、热爱、亲身经历），以紧凑磁贴呈现——已解锁的彩色、进行中的带进度弧、未解锁的去色。收集之路是从 1 到 101 的里程碑阶梯。',
+        '徽章现在会庆祝：使用中解锁时会弹出专属提示（支持的设备上伴随短震动），页面上的磁贴同时绽放。一次解锁多枚会合并为一条提示。点击徽章查看详情：说明、进度、贡献卡牌，以及解锁日期——从现在起开始记录。',
+        '选择你自己的目标：「设为我的目标」可将任意徽章钉在顶部卡片，替代自动推荐。头部还会标出你最难得到的徽章，分享按钮可将你的收藏家卡片导出为图片。',
+      ],
+      it: [
+        'La pagina Badge è ricostruita da zero: un anello di progresso con il tuo titolo, una scheda «Prossimo badge» che mostra sempre il più vicino a cadere, e 6 famiglie (Percorso, Set completi, Foil, Colori, Passione, Esperienze) in tessere compatte — sbloccato a colori, in corso con un arco, bloccato desaturato. Il Percorso è una scala di traguardi da 1 a 101.',
+        'I badge ora festeggiano: quando uno cade durante l\'uso appare un avviso dedicato (con una breve vibrazione dove possibile) e la tessera esplode sulla pagina. Più sblocchi insieme vengono raggruppati in un solo avviso. Un tocco apre il dettaglio: descrizione, progresso, carte contributive e la data di sblocco — registrata da ora in poi.',
+        'Scegli il tuo obiettivo: «Rendilo il mio obiettivo» fissa qualsiasi badge nella scheda in alto al posto del calcolo automatico. L\'intestazione nomina anche il tuo badge più difficile, e un pulsante di condivisione esporta la tua carta da collezionista come immagine.',
+      ],
+      nl: [
+        'De badgepagina is helemaal opnieuw opgebouwd: een voortgangsring met je titel, een «Volgende badge»-kaart die altijd de dichtstbijzijnde toont, en 6 families (Parcours, Complete sets, Foils, Kleuren, Passie, Ervaringen) in compacte tegels — ontgrendeld in kleur, bezig met een boog, vergrendeld ontkleurd. Het Parcours is een mijlpalenladder van 1 tot 101.',
+        'Badges vieren nu feest: valt er één tijdens het gebruik, dan verschijnt een eigen melding (met een korte trilling waar mogelijk) en barst de tegel open op de pagina. Meerdere ontgrendelingen tegelijk worden gebundeld in één melding. Tik op een badge voor detail: omschrijving, voortgang, bijdragende kaarten en de ontgrendeldatum — vanaf nu vastgelegd.',
+        'Kies je eigen doel: «Maak dit mijn doel» pint elke badge vast in de bovenste kaart in plaats van de automatische keuze. De held toont ook je moeilijkste badge, en een deelknop exporteert je verzamelaarskaart als afbeelding.',
+      ],
+      de: [
+        'Die Abzeichen-Seite wurde von Grund auf neu gebaut: ein Fortschrittsring mit deinem Titel, eine „Nächstes Abzeichen"-Karte, die immer das am nächsten stehende zeigt, und 6 Familien (Werdegang, Komplette Sets, Foils, Farben, Leidenschaft, Erlebnisse) in kompakten Kacheln — freigeschaltet in Farbe, laufend mit Bogen, gesperrt entsättigt. Der Werdegang ist eine Meilenstein-Leiter von 1 bis 101.',
+        'Abzeichen feiern jetzt: Fällt eines während der Nutzung, erscheint ein eigener Hinweis (mit kurzer Vibration, wo möglich) und die Kachel platzt auf der Seite auf. Mehrere Freischaltungen auf einmal werden in einem Hinweis gebündelt. Ein Tipp öffnet das Detail: Beschreibung, Fortschritt, beitragende Karten und das Freischaltdatum — ab jetzt aufgezeichnet.',
+        'Wähle dein eigenes Ziel: „Zu meinem Ziel machen" pinnt jedes Abzeichen in die obere Karte statt der automatischen Wahl. Der Held nennt auch dein schwerstes Abzeichen, und ein Teilen-Knopf exportiert deine Sammlerkarte als Bild.',
+      ],
+    },
+  },
+  {
     version: '1.28.0',
     date: '2026-08-07',
     changes: {

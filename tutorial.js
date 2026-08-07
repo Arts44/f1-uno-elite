@@ -184,14 +184,12 @@ export const TUTORIAL_STEPS = [
     target: '.bn-tab[data-view="badges"]',
     action: { type: 'view', view: 'badges' } },
 
-  { id: 'badge_manual',
+  { id: 'badge_next',
     ensure: async () => { switchView('badges'); },
-    target: () => firstVisible('[data-action="toggleManualBadge"]'),
-    action: { type: 'dataAction', name: 'toggleManualBadge' } },
+    target: () => q('#badgesNext'), observe: true },
 
-  { id: 'badge_remove',
-    target: '[data-action="enterRemoveBadgeMode"]',
-    action: { type: 'dataAction', name: 'enterRemoveBadgeMode' } },
+  { id: 'badge_families',
+    target: () => q('#badgesFams .badge-fam'), observe: true },
 
   // ── 4. Stats ──
   { id: 'go_stats',

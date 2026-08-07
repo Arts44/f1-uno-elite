@@ -81,22 +81,9 @@
     <div class="card-grid" id="cardGrid" role="list" aria-label="Grille de cartes"></div>
   </main>
   <section class="badges-view" id="badgesView" role="tabpanel" aria-label="" data-i18n-aria="b.view">
-    <div class="badges-header">
-      <div class="badges-title" data-i18n="b.title">🏅 My Badges</div>
-      <div class="badges-progress-wrap">
-        <div class="badges-progress-text"><span id="badgesUnlockedCount">0</span> <span id="badgesUnlockedLabel" data-i18n="b.unlocked">/ 50 unlocked</span></div>
-        <div class="badges-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="50"><div class="badges-progress-fill" id="badgesProgressFill"></div></div>
-      </div>
-    </div>
-    <div class="user-title-wrap" id="userTitleCard"></div>
-    <div class="badges-section">
-      <div class="badges-section-title"><span data-i18n="b.auto">🤖 Automatic badges</span> <span class="badge-count" id="autoBadgeCount">0/25</span><button class="badge-reset-select-btn" id="badgeResetSelectBtn" data-action="enterRemoveBadgeMode" type="button"><span data-i18n="b.remove">↺ Remove</span></button></div>
-      <div class="badges-grid" id="autoBadgesGrid" role="list"></div>
-    </div>
-    <div class="badges-section">
-      <div class="badges-section-title"><span data-i18n="b.manual">✋ Manual badges</span> <span class="badge-count" id="manualBadgeCount">0/25</span></div>
-      <div class="badges-grid" id="manualBadgesGrid" role="list"></div>
-    </div>
+    <div class="badges-hero" id="badgesHero"></div>
+    <div class="badges-next" id="badgesNext"></div>
+    <div id="badgesFams"></div>
   </section>
   <section class="stats-view" id="statsView" role="tabpanel" aria-label="" data-i18n-aria="st.view"></section>
   <section class="settings-view" id="accountView" role="tabpanel" aria-label="" data-i18n-aria="acc.view"></section>

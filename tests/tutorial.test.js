@@ -85,7 +85,7 @@ describe('tutorial — step sequence', () => {
   test('covers the required areas (modal, quick statuses, badges, stats, settings)', () => {
     const ids = new Set(TUTORIAL_STEPS.map(s => s.id));
     ['open_card', 'mark_owned', 'mark_double', 'close_modal', 'favorite', 'wishlist',
-     'go_badges', 'badge_manual', 'badge_remove',
+     'go_badges', 'badge_next', 'badge_families',
      'go_stats', 'stats_progress', 'stats_highlights', 'stats_donut',
      'go_settings', 'set_theme', 'set_font', 'set_backup', 'set_data', 'replay',
     ].forEach(id => assert.ok(ids.has(id), `missing step ${id}`));
@@ -114,10 +114,14 @@ describe('tutorial — step sequence', () => {
     assert.equal(typeof step.action.check, 'function');
   });
 
-  test('the badge-remove step targets the force-remove action', () => {
-    const step = TUTORIAL_STEPS.find(s => s.id === 'badge_remove');
-    assert.equal(step.action.type, 'dataAction');
-    assert.equal(step.action.name, 'enterRemoveBadgeMode');
+  test('the badge steps are observe-only on the v2.2 page (next + families)', () => {
+    // v2.2 : plus de mode « retirer » global ni de bouton valider en
+    // grille — le tutoriel montre la carte Prochain badge et les
+    // familles sans déclencher d'écriture.
+    const nx = TUTORIAL_STEPS.find(s => s.id === 'badge_next');
+    const fam = TUTORIAL_STEPS.find(s => s.id === 'badge_families');
+    assert.ok(nx.observe && fam.observe);
+    assert.ok(!nx.action && !fam.action);
   });
 });
 

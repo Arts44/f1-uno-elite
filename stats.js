@@ -9,7 +9,7 @@ import {
   cardRarity, variantRarity, cardTotalQty
 } from './storage.js';
 import { getHistory } from './history.js';
-import { loadManualBadges, isAutoBadgeUnlocked, manualBadges, renderBadges, updateUserTitle } from './badges.js';
+import { loadManualBadges, isAutoBadgeUnlocked, manualBadges, renderBadges, updateUserTitle, checkNewAutoBadges } from './badges.js';
 import { currentView } from './render.js';
 
 // Pure aggregates over the current CARDS_DB + collection state —
@@ -38,6 +38,9 @@ export function computeStats(){
 }
 
 export function updateStats(){
+  // Un badge auto vient-il de tomber ? (toast + persistance — ajout v2.2,
+  // la règle « une fois débloqué, toujours débloqué » ne change pas)
+  try { checkNewAutoBadges(); } catch(e){ console.error('badge check failed', e); }
   const { total, owned, wish, doubles, missing, fav, totalExemplaires, pct } = computeStats();
 
   // Header : compteur de progression (37/101 cartes) + hairline

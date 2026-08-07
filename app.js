@@ -16,7 +16,8 @@ import {
 import { updateStats } from './stats.js';
 import {
   loadManualBadges, updateUserTitle, toggleManualBadge, removeAutoBadge,
-  enterRemoveBadgeMode, toggleTitlePicker, getUnlockedTitles, selectTitle
+  toggleBadgeDetail, pinBadge, unpinBadge, shareProfileCard,
+  toggleTitlePicker, getUnlockedTitles, selectTitle
 } from './badges.js';
 import {
   pinKey, pinDel, showAdminPinScreen, showSetupScreen,
@@ -100,7 +101,7 @@ function initEvents(){
     const action = el.getAttribute('data-action');
 
     // Block write actions in viewer mode
-    const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','quickAdd','quickAddType','toggleManualBadge','removeAutoBadge','enterRemoveBadgeMode','toggleTitlePicker','selectTitle',
+    const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','quickAdd','quickAddType','toggleManualBadge','removeAutoBadge','pinBadge','unpinBadge','toggleTitlePicker','selectTitle',
       // l'export sort la collection de l'appareil : une fuite, pas une écriture
       'exportCollection']);
     if(isViewer() && VIEWER_BLOCKED.has(action)){
@@ -141,8 +142,22 @@ function initEvents(){
         removeAutoBadge(badgeId);
         break;
       }
-      case 'enterRemoveBadgeMode': {
-        enterRemoveBadgeMode();
+      case 'toggleBadgeDetail': {
+        toggleBadgeDetail(el.getAttribute('data-badge'));
+        break;
+      }
+      case 'pinBadge': {
+        e.stopPropagation();
+        pinBadge(el.getAttribute('data-badge'));
+        break;
+      }
+      case 'unpinBadge': {
+        e.stopPropagation();
+        unpinBadge();
+        break;
+      }
+      case 'shareBadges': {
+        shareProfileCard();
         break;
       }
       case 'toggleTitlePicker': {
@@ -216,6 +231,14 @@ function initEvents(){
 // Theme toggle works even before login (PIN screen)
 document.addEventListener('click', e => {
   if(e.target.closest('[data-action="toggleTheme"]')) toggleTheme();
+});
+
+// Les tuiles et jalons de badges portent tabindex : le clavier doit
+// les ouvrir comme la souris (Entrée / Espace → même délégation).
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Enter' && e.key !== ' ') return;
+  const el = e.target.closest && e.target.closest('.badge-tile, .bl-rung, .bn-next');
+  if(el){ e.preventDefault(); el.click(); }
 });
 
 // Keyboard support for PIN (login screen OR admin overlay)

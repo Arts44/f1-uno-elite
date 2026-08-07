@@ -18,8 +18,8 @@ en:{'acc.locked_title':'Read-only mode','acc.locked_msg':'Your account, backups 
 'tut.wishlist_t':'Wishlist','tut.wishlist_d':'The star adds a card to your wishlist: the cards you are hunting for. It feeds the “missing cards” and trade lists in the collector tools.',
 'tut.quick_add_t':'Quick add','tut.quick_add_d':'The + button on a tile adds a copy in one gesture: tap it, pick the variant, done. “Undo” in the toast reverts it.',
 'tut.go_badges_t':'Badges','tut.go_badges_d':'Badges are the trophies of your collection: some unlock automatically as it grows, others you validate yourself. Open the Badges tab.',
-'tut.badge_manual_t':'Validate a badge','tut.badge_manual_d':'Manual badges reward real-life feats (attending a race, completing a trade…). Tap one to validate it yourself — you decide.',
-'tut.badge_remove_t':'Remove a badge','tut.badge_remove_d':'Made a mistake? Remove mode lets you un-validate any badge, even one that unlocked automatically.',
+
+
 'tut.go_stats_t':'Stats','tut.go_stats_d':'Stats turn your collection into a dashboard: completion, trends, records. Open the Stats tab.',
 'tut.stats_progress_t':'Progress','tut.stats_progress_d':'Your overall completion at a glance, and how it grows over time — this is what every card you mark owned feeds.',
 'tut.stats_highlights_t':'Highlights','tut.stats_highlights_d':'The pride of your collection: your rarest owned card and your biggest stack of doubles.',
@@ -59,7 +59,7 @@ en:{'acc.locked_title':'Read-only mode','acc.locked_msg':'Your account, backups 
 'st.history_empty':'The curve will build day by day as your collection grows — check back soon!',
 'st.history_note':'History is recorded from the day this feature was added; earlier progress cannot be reconstructed.',
 'st.history_owned':'owned cards',
-'b.title':'🏅 My Badges','b.view':'Badges','b.unlocked':'{n} / 50 unlocked','b.auto':'🤖 Automatic badges','b.auto_tag':'Auto','b.manual':'✋ Manual badges','b.manual_tag':'Manual','b.remove':'↺ Remove','b.choose':'▼ Choose my title','b.titles_unlocked':'titles unlocked','b.status_unlocked':'✓ Unlocked','b.status_locked':'🔒 Locked','b.status_validated':'✓ Validated','b.status_to_validate':'🔒 To validate','b.validate_btn':'Validate this badge',
+'b.title':'🏅 My Badges','b.fam_parcours':'Journey','b.fam_sets':'Complete sets','b.fam_foils':'Foils & rarities','b.fam_colors':'Colours','b.fam_passion':'Passion','b.fam_exp':'Experiences','b.next_badge':'Next badge','b.objective':'My goal','b.pin_objective':'Make it my goal','b.unpin_objective':'Remove goal','b.pinned_toast':'Goal pinned — it now leads the page','b.remaining':'{n} to go','b.unlocked_on':'Unlocked on {d}','b.unlocked_simple':'Unlocked','b.hardest':'Hardest badge:','b.share':'Share my card','b.share_saved':'Image saved','b.toast_one':'Badge unlocked','b.toast_many':'{n} badges unlocked','b.empty_title':'Your first badge is one card away.','b.empty_sub':'Add your first card and “First card” drops instantly — 49 more are waiting.','b.all_done':'Badge collection complete — all 50 are yours.','b.remove_badge':'Remove this badge','b.removed':'Badge removed','tut.badge_next_t':'Your next badge','tut.badge_next_d':'The page always shows the badge closest to dropping — or the one you pinned as your goal.','tut.badge_families_t':'Badge families','tut.badge_families_d':'50 badges in 6 families: journey, complete sets, foils, colours, passion and real-world experiences to self-validate.','b.view':'Badges','b.choose':'▼ Choose my title','b.titles_unlocked':'titles unlocked','b.validate_btn':'Validate this badge',
 'm.copies':'My copies by type','m.modal':'Card details','m.close':'Close modal','m.types_list':'Copies by type','m.champion':'🏆 Champion','m.retired':'RETIRED',
 's.title':'⚙️ Settings','s.view':'Settings','s.appearance':'Appearance','s.dark':'Dark mode','s.dark_sub':'Toggle light / dark',
 's.lang':'Language','s.lang_sub':'Display language',
@@ -143,8 +143,8 @@ fr:{'acc.locked_title':'Mode lecture seule','acc.locked_msg':'Le compte, les sau
 'tut.wishlist_t':'Wishlist','tut.wishlist_d':'L’étoile ajoute une carte à ta wishlist : les cartes que tu recherches. Elle alimente les listes « cartes manquantes » et de troc des outils de collectionneur.',
 'tut.quick_add_t':'Ajout rapide','tut.quick_add_d':'Le bouton + d’une tuile ajoute un exemplaire en un geste : touche-le, choisis la variante, c’est fait. « Annuler » dans le toast revient en arrière.',
 'tut.go_badges_t':'Badges','tut.go_badges_d':'Les badges sont les trophées de ta collection : certains se débloquent automatiquement quand elle grandit, d’autres se valident à la main. Ouvre l’onglet Badges.',
-'tut.badge_manual_t':'Valider un badge','tut.badge_manual_d':'Les badges manuels récompensent des exploits réels (assister à une course, réussir un échange…). Touche l’un d’eux pour le valider toi-même — c’est toi qui décides.',
-'tut.badge_remove_t':'Retirer un badge','tut.badge_remove_d':'Une erreur ? Le mode retrait permet de dévalider n’importe quel badge, même débloqué automatiquement.',
+
+
 'tut.go_stats_t':'Stats','tut.go_stats_d':'Les stats transforment ta collection en tableau de bord : complétion, tendances, records. Ouvre l’onglet Stats.',
 'tut.stats_progress_t':'Progression','tut.stats_progress_d':'Ta complétion globale en un coup d’œil, et son évolution dans le temps — c’est elle que nourrit chaque carte marquée possédée.',
 'tut.stats_highlights_t':'Cartes phares','tut.stats_highlights_d':'La fierté de ta collection : ta carte possédée la plus rare et ta plus grosse pile de doubles.',
@@ -184,7 +184,7 @@ fr:{'acc.locked_title':'Mode lecture seule','acc.locked_msg':'Le compte, les sau
 'st.history_empty':'La courbe se construira jour après jour au fil de votre collection — revenez bientôt !',
 'st.history_note':'L\'historique est enregistré depuis l\'ajout de cette fonctionnalité ; la progression antérieure ne peut pas être reconstituée.',
 'st.history_owned':'cartes possédées',
-'b.title':'🏅 Mes Badges','b.view':'Badges','b.unlocked':'{n} / 50 débloqués','b.auto':'🤖 Badges automatiques','b.auto_tag':'Auto','b.manual':'✋ Badges manuels','b.manual_tag':'Manuel','b.remove':'↺ Retirer','b.choose':'▼ Choisir mon titre','b.titles_unlocked':'titres débloqués','b.status_unlocked':'✓ Débloqué','b.status_locked':'🔒 Verrouillé','b.status_validated':'✓ Validé','b.status_to_validate':'🔒 À valider','b.validate_btn':'Valider ce badge',
+'b.title':'🏅 Mes Badges','b.fam_parcours':'Parcours','b.fam_sets':'Sets complets','b.fam_foils':'Foils & raretés','b.fam_colors':'Couleurs','b.fam_passion':'Passion','b.fam_exp':'Expériences','b.next_badge':'Prochain badge','b.objective':'Mon objectif','b.pin_objective':'En faire mon objectif','b.unpin_objective':'Retirer l’objectif','b.pinned_toast':'Objectif épinglé — il mène désormais la page','b.remaining':'plus que {n}','b.unlocked_on':'Débloqué le {d}','b.unlocked_simple':'Débloqué','b.hardest':'Badge le plus difficile :','b.share':'Partager ma carte','b.share_saved':'Image enregistrée','b.toast_one':'Badge débloqué','b.toast_many':'{n} badges débloqués','b.empty_title':'Ton premier badge est à une carte près.','b.empty_sub':'Ajoute ta première carte et « Première carte » tombe aussitôt — 49 autres t’attendent.','b.all_done':'Collection de badges complète — les 50 sont à toi.','b.remove_badge':'Retirer ce badge','b.removed':'Badge retiré','tut.badge_next_t':'Ton prochain badge','tut.badge_next_d':'La page met toujours en avant le badge le plus proche de tomber — ou celui que tu as épinglé comme objectif.','tut.badge_families_t':'Les familles de badges','tut.badge_families_d':'50 badges en 6 familles : parcours, sets complets, foils, couleurs, passion et expériences vécues à valider toi-même.','b.view':'Badges','b.choose':'▼ Choisir mon titre','b.titles_unlocked':'titres débloqués','b.validate_btn':'Valider ce badge',
 'm.copies':'Mes exemplaires par type','m.modal':'Détails de la carte','m.close':'Fermer la fenêtre','m.types_list':'Exemplaires par type','m.champion':'🏆 Champion','m.retired':'RETRAITÉ',
 's.title':'⚙️ Réglages','s.view':'Réglages','s.appearance':'Apparence','s.dark':'Thème sombre','s.dark_sub':'Basculer clair / sombre',
 's.lang':'Langue','s.lang_sub':'Langue d\'affichage',
@@ -268,8 +268,8 @@ es:{'acc.locked_title':'Modo solo lectura','acc.locked_msg':'La cuenta, las copi
 'tut.wishlist_t':'Wishlist','tut.wishlist_d':'La estrella añade una carta a tu wishlist: las cartas que buscas. Alimenta las listas de «cartas que faltan» y de intercambio de las herramientas de coleccionista.',
 'tut.quick_add_t':'Añadido rápido','tut.quick_add_d':'El botón + de una carta añade un ejemplar en un gesto: tócalo, elige la variante y listo. «Deshacer» en el aviso lo revierte.',
 'tut.go_badges_t':'Insignias','tut.go_badges_d':'Las insignias son los trofeos de tu colección: algunas se desbloquean solas al crecer, otras las validas tú. Abre la pestaña Insignias.',
-'tut.badge_manual_t':'Validar una insignia','tut.badge_manual_d':'Las insignias manuales premian logros reales (ir a una carrera, cerrar un intercambio…). Toca una para validarla tú mismo — tú decides.',
-'tut.badge_remove_t':'Quitar una insignia','tut.badge_remove_d':'¿Un error? El modo de retirada permite invalidar cualquier insignia, incluso una desbloqueada automáticamente.',
+
+
 'tut.go_stats_t':'Estadísticas','tut.go_stats_d':'Las estadísticas convierten tu colección en un panel: progreso, tendencias, récords. Abre la pestaña Estadísticas.',
 'tut.stats_progress_t':'Progreso','tut.stats_progress_d':'Tu progreso global de un vistazo y su evolución en el tiempo — esto es lo que alimenta cada carta marcada como poseída.',
 'tut.stats_highlights_t':'Destacadas','tut.stats_highlights_d':'El orgullo de tu colección: tu carta poseída más rara y tu mayor pila de repetidas.',
@@ -309,7 +309,7 @@ es:{'acc.locked_title':'Modo solo lectura','acc.locked_msg':'La cuenta, las copi
 'st.history_empty':'La curva se irá construyendo día a día con tu colección — ¡vuelve pronto!',
 'st.history_note':'El historial se registra desde que se añadió esta función; el progreso anterior no se puede reconstruir.',
 'st.history_owned':'cartas poseídas',
-'b.title':'🏅 Mis Insignias','b.view':'Insignias','b.unlocked':'{n} / 50 desbloqueadas','b.auto':'🤖 Insignias automáticas','b.auto_tag':'Auto','b.manual':'✋ Insignias manuales','b.manual_tag':'Manual','b.remove':'↺ Quitar','b.choose':'▼ Elegir mi título','b.titles_unlocked':'títulos desbloqueados','b.status_unlocked':'✓ Desbloqueado','b.status_locked':'🔒 Bloqueado','b.status_validated':'✓ Validado','b.status_to_validate':'🔒 Para validar','b.validate_btn':'Validar esta insignia',
+'b.title':'🏅 Mis Insignias','b.fam_parcours':'Trayectoria','b.fam_sets':'Sets completos','b.fam_foils':'Foils y rarezas','b.fam_colors':'Colores','b.fam_passion':'Pasión','b.fam_exp':'Experiencias','b.next_badge':'Próxima insignia','b.objective':'Mi objetivo','b.pin_objective':'Convertirla en mi objetivo','b.unpin_objective':'Quitar el objetivo','b.pinned_toast':'Objetivo fijado — ahora encabeza la página','b.remaining':'faltan {n}','b.unlocked_on':'Desbloqueada el {d}','b.unlocked_simple':'Desbloqueada','b.hardest':'Insignia más difícil:','b.share':'Compartir mi tarjeta','b.share_saved':'Imagen guardada','b.toast_one':'Insignia desbloqueada','b.toast_many':'{n} insignias desbloqueadas','b.empty_title':'Tu primera insignia está a una carta.','b.empty_sub':'Añade tu primera carta y «Primera carta» cae al instante — te esperan 49 más.','b.all_done':'Colección de insignias completa — las 50 son tuyas.','b.remove_badge':'Quitar esta insignia','b.removed':'Insignia quitada','tut.badge_next_t':'Tu próxima insignia','tut.badge_next_d':'La página destaca siempre la insignia más cercana a caer — o la que fijaste como objetivo.','tut.badge_families_t':'Las familias de insignias','tut.badge_families_d':'50 insignias en 6 familias: trayectoria, sets completos, foils, colores, pasión y experiencias vividas que validas tú mismo.','b.view':'Insignias','b.choose':'▼ Elegir mi título','b.titles_unlocked':'títulos desbloqueados','b.validate_btn':'Validar esta insignia',
 'm.copies':'Mis copias por tipo','m.modal':'Detalles de carta','m.close':'Cerrar modal','m.types_list':'Copias por tipo','m.champion':'🏆 Campeón','m.retired':'RETIRADO',
 's.title':'⚙️ Ajustes','s.view':'Ajustes','s.appearance':'Apariencia','s.dark':'Modo oscuro','s.dark_sub':'Alternar claro / oscuro',
 's.lang':'Idioma','s.lang_sub':'Idioma de la aplicación',
@@ -393,8 +393,8 @@ zh:{'acc.locked_title':'只读模式','acc.locked_msg':'账户、备份和云同
 'tut.wishlist_t':'愿望清单','tut.wishlist_d':'星星把卡加入愿望清单：你正在寻找的卡。它会用于收藏家工具里的“缺卡”和交换清单。',
 'tut.quick_add_t':'快速添加','tut.quick_add_d':'卡牌上的 + 按钮一步即可添加一张：点击它，选择版本，完成。提示中的“撤销”可以还原。',
 'tut.go_badges_t':'徽章','tut.go_badges_d':'徽章是你收藏的奖杯：有的随收藏增长自动解锁，有的由你自己验证。打开“徽章”标签页。',
-'tut.badge_manual_t':'验证徽章','tut.badge_manual_d':'手动徽章奖励现实中的成就（去看比赛、完成交换……）。点击一个自己验证——由你决定。',
-'tut.badge_remove_t':'移除徽章','tut.badge_remove_d':'弄错了？移除模式可以取消任何徽章的验证，包括自动解锁的。',
+
+
 'tut.go_stats_t':'统计','tut.go_stats_d':'统计把你的收藏变成仪表盘：完成度、趋势、纪录。打开“统计”标签页。',
 'tut.stats_progress_t':'进度','tut.stats_progress_d':'一眼看到你的总完成度及其随时间的增长——每标记一张已拥有的卡都会推动它。',
 'tut.stats_highlights_t':'亮点','tut.stats_highlights_d':'你收藏的骄傲：你拥有的最稀有的卡，和你最大的一叠重复卡。',
@@ -434,7 +434,7 @@ zh:{'acc.locked_title':'只读模式','acc.locked_msg':'账户、备份和云同
 'st.history_empty':'曲线会随着收藏的增加逐日绘制 — 过几天再来看看吧！',
 'st.history_note':'历史记录从此功能上线之日开始；无法追溯之前的进度。',
 'st.history_owned':'拥有的卡牌',
-'b.title':'🏅 我的徽章','b.view':'徽章','b.unlocked':'已解锁 {n} / 50','b.auto':'🤖 自动徽章','b.auto_tag':'自动','b.manual':'✋ 手动徽章','b.manual_tag':'手动','b.remove':'↺ 移除','b.choose':'▼ 选择称号','b.titles_unlocked':'已解锁称号','b.status_unlocked':'✓ 已解锁','b.status_locked':'🔒 已锁定','b.status_validated':'✓ 已验证','b.status_to_validate':'🔒 待验证','b.validate_btn':'验证此徽章',
+'b.title':'🏅 我的徽章','b.fam_parcours':'收集之路','b.fam_sets':'完整套组','b.fam_foils':'闪卡与稀有','b.fam_colors':'颜色','b.fam_passion':'热爱','b.fam_exp':'亲身经历','b.next_badge':'下一枚徽章','b.objective':'我的目标','b.pin_objective':'设为我的目标','b.unpin_objective':'取消目标','b.pinned_toast':'目标已钉选——它现在排在页面最前','b.remaining':'还差 {n}','b.unlocked_on':'解锁于 {d}','b.unlocked_simple':'已解锁','b.hardest':'最难的徽章：','b.share':'分享我的成就卡','b.share_saved':'图片已保存','b.toast_one':'徽章已解锁','b.toast_many':'解锁了 {n} 枚徽章','b.empty_title':'你的第一枚徽章只差一张卡。','b.empty_sub':'添加第一张卡，「第一张卡」徽章立即到手——还有 49 枚等着你。','b.all_done':'徽章收集完成——50 枚全部属于你。','b.remove_badge':'移除此徽章','b.removed':'徽章已移除','tut.badge_next_t':'你的下一枚徽章','tut.badge_next_d':'页面始终突出最接近解锁的徽章——或你钉选为目标的那枚。','tut.badge_families_t':'徽章家族','tut.badge_families_d':'50 枚徽章分为 6 个家族：收集之路、完整套组、闪卡、颜色、热爱，以及需要你亲自验证的真实经历。','b.view':'徽章','b.choose':'▼ 选择称号','b.titles_unlocked':'已解锁称号','b.validate_btn':'验证此徽章',
 'm.copies':'各类型副本','m.modal':'卡牌详情','m.close':'关闭弹窗','m.types_list':'各类型副本','m.champion':'🏆 冠军','m.retired':'已退役',
 's.title':'⚙️ 设置','s.view':'设置','s.appearance':'外观','s.dark':'深色模式','s.dark_sub':'切换明/暗主题',
 's.lang':'语言','s.lang_sub':'显示语言',
@@ -518,8 +518,8 @@ it:{'acc.locked_title':'Modalità sola lettura','acc.locked_msg':'Account, backu
 'tut.wishlist_t':'Wishlist','tut.wishlist_d':'La stella aggiunge una carta alla wishlist: le carte che stai cercando. Alimenta le liste «carte mancanti» e di scambio degli strumenti da collezionista.',
 'tut.quick_add_t':'Aggiunta rapida','tut.quick_add_d':'Il pulsante + su una carta aggiunge una copia in un gesto: toccalo, scegli la variante, fatto. «Annulla» nel toast la ripristina.',
 'tut.go_badges_t':'Badge','tut.go_badges_d':'I badge sono i trofei della tua collezione: alcuni si sbloccano da soli mentre cresce, altri li convalidi tu. Apri la scheda Badge.',
-'tut.badge_manual_t':'Convalida un badge','tut.badge_manual_d':'I badge manuali premiano imprese reali (andare a una gara, concludere uno scambio…). Toccane uno per convalidarlo tu stesso — decidi tu.',
-'tut.badge_remove_t':'Rimuovi un badge','tut.badge_remove_d':'Un errore? La modalità rimozione permette di invalidare qualsiasi badge, anche uno sbloccato automaticamente.',
+
+
 'tut.go_stats_t':'Statistiche','tut.go_stats_d':'Le statistiche trasformano la collezione in un cruscotto: completamento, tendenze, record. Apri la scheda Statistiche.',
 'tut.stats_progress_t':'Progresso','tut.stats_progress_d':'Il tuo completamento globale a colpo d’occhio e la sua crescita nel tempo — è ciò che ogni carta segnata come posseduta alimenta.',
 'tut.stats_highlights_t':'In evidenza','tut.stats_highlights_d':'L’orgoglio della tua collezione: la carta posseduta più rara e la tua pila di doppioni più grande.',
@@ -559,7 +559,7 @@ it:{'acc.locked_title':'Modalità sola lettura','acc.locked_msg':'Account, backu
 'st.history_empty':'La curva si costruirà giorno dopo giorno con la tua collezione — torna presto!',
 'st.history_note':'La cronologia viene registrata dall\'aggiunta di questa funzione; i progressi precedenti non possono essere ricostruiti.',
 'st.history_owned':'carte possedute',
-'b.title':'🏅 I miei Distintivi','b.view':'Distintivi','b.unlocked':'{n} / 50 sbloccati','b.auto':'🤖 Distintivi automatici','b.auto_tag':'Auto','b.manual':'✋ Distintivi manuali','b.manual_tag':'Manuale','b.remove':'↺ Rimuovi','b.choose':'▼ Scegli il mio titolo','b.titles_unlocked':'titoli sbloccati','b.status_unlocked':'✓ Sbloccato','b.status_locked':'🔒 Bloccato','b.status_validated':'✓ Validato','b.status_to_validate':'🔒 Da validare','b.validate_btn':'Valida questo distintivo',
+'b.title':'🏅 I miei Distintivi','b.fam_parcours':'Percorso','b.fam_sets':'Set completi','b.fam_foils':'Foil e rarità','b.fam_colors':'Colori','b.fam_passion':'Passione','b.fam_exp':'Esperienze','b.next_badge':'Prossimo badge','b.objective':'Il mio obiettivo','b.pin_objective':'Rendilo il mio obiettivo','b.unpin_objective':'Rimuovi obiettivo','b.pinned_toast':'Obiettivo fissato — ora guida la pagina','b.remaining':'ne mancano {n}','b.unlocked_on':'Sbloccato il {d}','b.unlocked_simple':'Sbloccato','b.hardest':'Badge più difficile:','b.share':'Condividi la mia carta','b.share_saved':'Immagine salvata','b.toast_one':'Badge sbloccato','b.toast_many':'{n} badge sbloccati','b.empty_title':'Il tuo primo badge è a una carta di distanza.','b.empty_sub':'Aggiungi la prima carta e «Prima carta» arriva subito — altri 49 ti aspettano.','b.all_done':'Collezione di badge completa — tutti i 50 sono tuoi.','b.remove_badge':'Rimuovi questo badge','b.removed':'Badge rimosso','tut.badge_next_t':'Il tuo prossimo badge','tut.badge_next_d':'La pagina evidenzia sempre il badge più vicino a cadere — o quello che hai fissato come obiettivo.','tut.badge_families_t':'Le famiglie di badge','tut.badge_families_d':'50 badge in 6 famiglie: percorso, set completi, foil, colori, passione ed esperienze vissute da convalidare tu stesso.','b.view':'Distintivi','b.choose':'▼ Scegli il mio titolo','b.titles_unlocked':'titoli sbloccati','b.validate_btn':'Valida questo distintivo',
 'm.copies':'Le mie copie per tipo','m.modal':'Dettagli carta','m.close':'Chiudi modal','m.types_list':'Copie per tipo','m.champion':'🏆 Campione','m.retired':'RITIRATO',
 's.title':'⚙️ Impostazioni','s.view':'Impostazioni','s.appearance':'Aspetto','s.dark':'Modalità scura','s.dark_sub':'Alterna chiaro / scuro',
 's.lang':'Lingua','s.lang_sub':'Lingua dell\'app',
@@ -643,8 +643,8 @@ nl:{'acc.locked_title':'Alleen-lezen modus','acc.locked_msg':'Account, back-ups 
 'tut.wishlist_t':'Wenslijst','tut.wishlist_d':'De ster zet een kaart op je wenslijst: de kaarten waarnaar je op jacht bent. Die voedt de lijsten «ontbrekende kaarten» en ruillijsten in de verzamelaarstools.',
 'tut.quick_add_t':'Snel toevoegen','tut.quick_add_d':'De +-knop op een kaart voegt in één gebaar een exemplaar toe: tik erop, kies de variant, klaar. “Ongedaan maken” in de melding draait het terug.',
 'tut.go_badges_t':'Badges','tut.go_badges_d':'Badges zijn de trofeeën van je collectie: sommige ontgrendelen vanzelf terwijl ze groeit, andere valideer je zelf. Open het tabblad Badges.',
-'tut.badge_manual_t':'Badge valideren','tut.badge_manual_d':'Handmatige badges belonen echte prestaties (een race bijwonen, een ruil sluiten…). Tik er een aan om hem zelf te valideren — jij beslist.',
-'tut.badge_remove_t':'Badge verwijderen','tut.badge_remove_d':'Foutje? De verwijdermodus laat je elke badge ongedaan maken, ook een die automatisch werd ontgrendeld.',
+
+
 'tut.go_stats_t':'Statistieken','tut.go_stats_d':'Statistieken maken van je collectie een dashboard: voortgang, trends, records. Open het tabblad Statistieken.',
 'tut.stats_progress_t':'Voortgang','tut.stats_progress_d':'Je totale voortgang in één oogopslag, en de groei in de tijd — dit is wat elke kaart die je als in bezit markeert voedt.',
 'tut.stats_highlights_t':'Hoogtepunten','tut.stats_highlights_d':'De trots van je collectie: je zeldzaamste kaart in bezit en je grootste stapel dubbele.',
@@ -684,7 +684,7 @@ nl:{'acc.locked_title':'Alleen-lezen modus','acc.locked_msg':'Account, back-ups 
 'st.history_empty':'De curve bouwt zich dag na dag op met je collectie — kom snel terug!',
 'st.history_note':'De geschiedenis wordt bijgehouden vanaf de toevoeging van deze functie; eerdere voortgang kan niet worden gereconstrueerd.',
 'st.history_owned':'kaarten in bezit',
-'b.title':'🏅 Mijn Badges','b.view':'Badges','b.unlocked':'{n} / 50 ontgrendeld','b.auto':'🤖 Automatische badges','b.auto_tag':'Auto','b.manual':'✋ Handmatige badges','b.manual_tag':'Handmatig','b.remove':'↺ Verwijderen','b.choose':'▼ Kies mijn titel','b.titles_unlocked':'titels ontgrendeld','b.status_unlocked':'✓ Ontgrendeld','b.status_locked':'🔒 Vergrendeld','b.status_validated':'✓ Gevalideerd','b.status_to_validate':'🔒 Te valideren','b.validate_btn':'Valideer deze badge',
+'b.title':'🏅 Mijn Badges','b.fam_parcours':'Parcours','b.fam_sets':'Complete sets','b.fam_foils':'Foils & zeldzaamheden','b.fam_colors':'Kleuren','b.fam_passion':'Passie','b.fam_exp':'Ervaringen','b.next_badge':'Volgende badge','b.objective':'Mijn doel','b.pin_objective':'Maak dit mijn doel','b.unpin_objective':'Doel verwijderen','b.pinned_toast':'Doel vastgezet — het leidt nu de pagina','b.remaining':'nog {n}','b.unlocked_on':'Ontgrendeld op {d}','b.unlocked_simple':'Ontgrendeld','b.hardest':'Moeilijkste badge:','b.share':'Mijn kaart delen','b.share_saved':'Afbeelding opgeslagen','b.toast_one':'Badge ontgrendeld','b.toast_many':'{n} badges ontgrendeld','b.empty_title':'Je eerste badge is één kaart verwijderd.','b.empty_sub':'Voeg je eerste kaart toe en «Eerste kaart» valt meteen — er wachten er nog 49.','b.all_done':'Badgecollectie compleet — alle 50 zijn van jou.','b.remove_badge':'Deze badge verwijderen','b.removed':'Badge verwijderd','tut.badge_next_t':'Je volgende badge','tut.badge_next_d':'De pagina toont altijd de badge die het dichtst bij ontgrendelen is — of degene die je als doel hebt vastgezet.','tut.badge_families_t':'De badgefamilies','tut.badge_families_d':'50 badges in 6 families: parcours, complete sets, foils, kleuren, passie en zelf te bevestigen ervaringen.','b.view':'Badges','b.choose':'▼ Kies mijn titel','b.titles_unlocked':'titels ontgrendeld','b.validate_btn':'Valideer deze badge',
 'm.copies':'Mijn exemplaren per type','m.modal':'Kaartdetails','m.close':'Modal sluiten','m.types_list':'Exemplaren per type','m.champion':'🏆 Kampioen','m.retired':'GEPENSIONEERD',
 's.title':'⚙️ Instellingen','s.view':'Instellingen','s.appearance':'Uiterlijk','s.dark':'Donkere modus','s.dark_sub':'Wisselen licht / donker',
 's.lang':'Taal','s.lang_sub':'Weergavetaal',
@@ -768,8 +768,8 @@ de:{'acc.locked_title':'Nur-Lesen-Modus','acc.locked_msg':'Konto, Backups und Cl
 'tut.wishlist_t':'Wunschliste','tut.wishlist_d':'Der Stern setzt eine Karte auf deine Wunschliste: die Karten, die du suchst. Sie speist die Listen „fehlende Karten“ und die Tauschlisten der Sammlerwerkzeuge.',
 'tut.quick_add_t':'Schnell hinzufügen','tut.quick_add_d':'Der +-Button auf einer Karte fügt mit einer Geste ein Exemplar hinzu: antippen, Variante wählen, fertig. „Rückgängig“ im Toast macht es rückgängig.',
 'tut.go_badges_t':'Abzeichen','tut.go_badges_d':'Abzeichen sind die Trophäen deiner Sammlung: Manche schalten sich automatisch frei, andere bestätigst du selbst. Öffne den Tab Abzeichen.',
-'tut.badge_manual_t':'Abzeichen bestätigen','tut.badge_manual_d':'Manuelle Abzeichen belohnen echte Erlebnisse (ein Rennen besuchen, einen Tausch abschließen…). Tippe eines an, um es selbst zu bestätigen — du entscheidest.',
-'tut.badge_remove_t':'Abzeichen entfernen','tut.badge_remove_d':'Ein Versehen? Der Entfernen-Modus macht jedes Abzeichen ungültig — auch eines, das automatisch freigeschaltet wurde.',
+
+
 'tut.go_stats_t':'Statistiken','tut.go_stats_d':'Statistiken machen aus deiner Sammlung ein Dashboard: Fortschritt, Trends, Rekorde. Öffne den Tab Statistiken.',
 'tut.stats_progress_t':'Fortschritt','tut.stats_progress_d':'Dein Gesamtfortschritt auf einen Blick und sein Wachstum über die Zeit — genau das speist jede Karte, die du als besessen markierst.',
 'tut.stats_highlights_t':'Highlights','tut.stats_highlights_d':'Der Stolz deiner Sammlung: deine seltenste Karte im Besitz und dein größter Stapel Doppelter.',
@@ -809,7 +809,7 @@ de:{'acc.locked_title':'Nur-Lesen-Modus','acc.locked_msg':'Konto, Backups und Cl
 'st.history_empty':'Die Kurve baut sich Tag für Tag mit deiner Sammlung auf — schau bald wieder vorbei!',
 'st.history_note':'Der Verlauf wird ab dem Hinzufügen dieser Funktion aufgezeichnet; früherer Fortschritt kann nicht rekonstruiert werden.',
 'st.history_owned':'Karten im Besitz',
-'b.title':'🏅 Meine Abzeichen','b.view':'Abzeichen','b.unlocked':'{n} / 50 freigeschaltet','b.auto':'🤖 Automatische Abzeichen','b.auto_tag':'Auto','b.manual':'✋ Manuelle Abzeichen','b.manual_tag':'Manuell','b.remove':'↺ Entfernen','b.choose':'▼ Meinen Titel wählen','b.titles_unlocked':'Titel freigeschaltet','b.status_unlocked':'✓ Freigeschaltet','b.status_locked':'🔒 Gesperrt','b.status_validated':'✓ Validiert','b.status_to_validate':'🔒 Zu validieren','b.validate_btn':'Dieses Abzeichen validieren',
+'b.title':'🏅 Meine Abzeichen','b.fam_parcours':'Werdegang','b.fam_sets':'Komplette Sets','b.fam_foils':'Foils & Raritäten','b.fam_colors':'Farben','b.fam_passion':'Leidenschaft','b.fam_exp':'Erlebnisse','b.next_badge':'Nächstes Abzeichen','b.objective':'Mein Ziel','b.pin_objective':'Zu meinem Ziel machen','b.unpin_objective':'Ziel entfernen','b.pinned_toast':'Ziel angepinnt — es führt jetzt die Seite an','b.remaining':'noch {n}','b.unlocked_on':'Freigeschaltet am {d}','b.unlocked_simple':'Freigeschaltet','b.hardest':'Schwerstes Abzeichen:','b.share':'Meine Karte teilen','b.share_saved':'Bild gespeichert','b.toast_one':'Abzeichen freigeschaltet','b.toast_many':'{n} Abzeichen freigeschaltet','b.empty_title':'Dein erstes Abzeichen ist eine Karte entfernt.','b.empty_sub':'Füge deine erste Karte hinzu und „Erste Karte" fällt sofort — 49 weitere warten.','b.all_done':'Abzeichensammlung komplett — alle 50 gehören dir.','b.remove_badge':'Dieses Abzeichen entfernen','b.removed':'Abzeichen entfernt','tut.badge_next_t':'Dein nächstes Abzeichen','tut.badge_next_d':'Die Seite zeigt immer das Abzeichen, das am nächsten vor dem Fall steht — oder das, das du als Ziel angepinnt hast.','tut.badge_families_t':'Die Abzeichen-Familien','tut.badge_families_d':'50 Abzeichen in 6 Familien: Werdegang, komplette Sets, Foils, Farben, Leidenschaft und selbst zu bestätigende Erlebnisse.','b.view':'Abzeichen','b.choose':'▼ Meinen Titel wählen','b.titles_unlocked':'Titel freigeschaltet','b.validate_btn':'Dieses Abzeichen validieren',
 'm.copies':'Meine Exemplare pro Typ','m.modal':'Kartendetails','m.close':'Modal schließen','m.types_list':'Exemplare pro Typ','m.champion':'🏆 Champion','m.retired':'ZURÜCKGETRETEN',
 's.title':'⚙️ Einstellungen','s.view':'Einstellungen','s.appearance':'Erscheinungsbild','s.dark':'Dunkler Modus','s.dark_sub':'Hell / dunkel wechseln',
 's.lang':'Sprache','s.lang_sub':'App-Anzeigesprache',

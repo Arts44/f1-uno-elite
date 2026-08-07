@@ -66,10 +66,13 @@ describe('isAutoBadgeUnlocked', () => {
     seedCollection(SAMPLE_COLL); loadData();
   });
 
-  test('unlocks when the condition is met, and persists it', () => {
+  test('unlocks when the condition is met, and persists the unlock DATE', () => {
+    // v2.2 : la valeur persistée est le timestamp du déblocage (les
+    // anciens `true` restent valides — badgeUnlockDate les traite).
     assert.equal(isAutoBadgeUnlocked(badge('first_card')), true);
     const persisted = JSON.parse(localStorage.getItem('f1uno_auto_badges_2025'));
-    assert.equal(persisted.first_card, true);
+    assert.equal(typeof persisted.first_card, 'number');
+    assert.ok(persisted.first_card > 0);
   });
 
   test('not unlocked when below target', () => {
