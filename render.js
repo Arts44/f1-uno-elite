@@ -16,7 +16,7 @@ import {
 } from './storage.js';
 import { updateStats, renderStats } from './stats.js';
 import { renderBadges } from './badges.js';
-import { renderSettings } from './pin.js';
+import { renderSettings, isViewerMode, showAdminPinScreen } from './pin.js';
 import { renderAccount } from './account.js';
 
 /* ── Visual helpers ── */
@@ -747,10 +747,86 @@ function _beadInitDrag(){
   bead.addEventListener('pointercancel', end);
 }
 
+/* L'onglet Réglages devient « Admin » en mode spectateur. Écrire
+   .textContent sur un <svg> DÉTRUIT ses <path> — d'où l'icône vide
+   qu'on a eue en 1.24.0. On échange donc le contenu SVG, et le libellé
+   passe par i18n au lieu d'une chaîne en dur. */
+const NAV_UNLOCK = '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>';
+
+export function setSettingsTabLocked(locked){
+  const tab = document.querySelector('.bn-tab[data-view="settings"]');
+  if(!tab) return;
+  const icon = tab.querySelector('.bn-icon');
+  if(icon){
+    if(locked){
+      if(!icon.dataset.origIcon) icon.dataset.origIcon = icon.innerHTML;
+      icon.innerHTML = NAV_UNLOCK;
+    } else if(icon.dataset.origIcon){
+      icon.innerHTML = icon.dataset.origIcon;
+    }
+  }
+  const label = tab.querySelector('.bn-label');
+  if(label){
+    // basculer la CLÉ, pas seulement le texte : applyLanguage() repasse
+    // derrière et réécrirait le libellé depuis data-i18n.
+    const key = locked ? 'nav.admin' : 'nav.settings';
+    label.setAttribute('data-i18n', key);
+    label.textContent = t(key);
+  }
+  _beadSyncIcon();   // la pastille clone l'onglet actif : la resynchroniser
+}
+
 export function initNavBead(){
   layoutNavBead();
   _beadInitDrag();
   window.addEventListener('resize', layoutNavBead);
+}
+
+/* ══════════════════════════════════════════════════════════ CONFIRM
+   Remplace confirm() : un navigateur qui a supprimé les dialogues natifs
+   rendait les actions de sécurité inertes, sans le moindre retour. */
+export function confirmDialog(message, opts = {}){
+  return new Promise(resolve => {
+    document.getElementById('confirmMo')?.remove();
+    const prev = document.activeElement;
+    const ov = document.createElement('div');
+    ov.className = 'danger-mo';
+    ov.id = 'confirmMo';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-modal', 'true');
+    ov.innerHTML = `
+      <div class="danger-mo-box confirm-box">
+        <div class="confirm-msg"></div>
+        <div class="danger-mo-actions">
+          <button class="setv-btn" data-r="0" type="button">${t('danger.cancel')}</button>
+          <button class="setv-btn${opts.danger ? ' danger' : ''}" data-r="1" type="button">${opts.confirmLabel || t('cfm.confirm')}</button>
+        </div>
+      </div>`;
+    ov.querySelector('.confirm-msg').textContent = message; // jamais d'injection
+    document.body.appendChild(ov);
+    const done = v => {
+      ov.remove();
+      document.removeEventListener('keydown', onKey);
+      try { prev && prev.focus(); } catch(e){}
+      resolve(v);
+    };
+    const onKey = e => {
+      if(e.key === 'Escape') done(false);
+      if(e.key === 'Tab'){                      // focus piégé dans la modale
+        const f = [...ov.querySelectorAll('button')];
+        const i = f.indexOf(document.activeElement);
+        e.preventDefault();
+        f[(i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+      }
+    };
+    ov.addEventListener('click', e => {
+      const b = e.target.closest('[data-r]');
+      if(b) done(b.dataset.r === '1');
+      else if(e.target === ov) done(false);
+    });
+    document.addEventListener('keydown', onKey);
+    ov.querySelector('[data-r="1"]').focus();
+  });
 }
 
 /* ══════════════════════════════════════════════════════════ QUICK ADD
@@ -815,6 +891,13 @@ export function showToast(msg, opts){
 
 /* ══════════════════════════════════════════════════════════ VIEWS */
 export function switchView(view){
+  // Garde unique : le mode spectateur ne donne jamais accès aux Réglages,
+  // quel que soit le chemin (clic, glissement, appel direct). Le garde
+  // vivait dans la délégation d'app.js et le drag le contournait.
+  if(isViewerMode && view === 'settings'){
+    showAdminPinScreen();
+    return;
+  }
   currentView = view;
   const collectionView = document.getElementById('collectionView');
   const badgesView = document.getElementById('badgesView');

@@ -4,7 +4,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { t, LANGS, getLang, setLang } from './i18n.js';
-import { switchView, showToast, toggleTheme, currentView, setCurrentView, closeMo } from './render.js';
+import { switchView, showToast, toggleTheme, currentView, setCurrentView, closeMo, setSettingsTabLocked, confirmDialog } from './render.js';
 import { initApp } from './app.js';
 import { maybeStartTutorial, startTutorial } from './tutorial.js';
 import { installRowHTML, bindInstallRow } from './install.js';
@@ -105,7 +105,7 @@ async function checkPin(opts={}) {
       try {
         await unlockSecureStore(pinEntry);
       } catch(e){
-        _handleUnlockDecryptFailure();
+        await _handleUnlockDecryptFailure();
         return;
       }
     }
@@ -123,10 +123,10 @@ async function checkPin(opts={}) {
 // collection so a backup can be restored — the undecryptable data is
 // moved aside (f1uno_enc_orphan_*), never deleted. Cancel keeps the
 // lock screen and every byte as it was.
-function _handleUnlockDecryptFailure(){
+async function _handleUnlockDecryptFailure(){
   pinEntry = '';
   updatePinDots();
-  if(confirm(t('enc.err_unlock'))){
+  if(await confirmDialog(t('enc.err_unlock'), { danger:true })){
     quarantineEncryptedData();
     enterApp(false);
     showToast(t('enc.quarantined'));
@@ -163,11 +163,7 @@ function _launchApp(){
 
 function _applyViewerMode(){
   document.body.classList.add('viewer-mode');
-  const settingsTab = document.querySelector('.bn-tab[data-view="settings"]');
-  if(settingsTab){
-    settingsTab.querySelector('.bn-icon').textContent='🔓';
-    settingsTab.querySelector('.bn-label').textContent='Admin';
-  }
+  setSettingsTabLocked(true);
   // Always start on collection in viewer mode
   setCurrentView('collection');
   switchView('collection');
@@ -322,8 +318,7 @@ export function lockApp() {
   document.querySelectorAll('.import-dialog-overlay').forEach(o => o.remove());
   // Viewer-mode leftovers (the reload used to clear these implicitly)
   document.body.classList.remove('viewer-mode');
-  const settingsIcon = document.querySelector('.bn-tab[data-view="settings"] .bn-icon');
-  if(settingsIcon) settingsIcon.textContent = '⚙️';
+  setSettingsTabLocked(false);
   // 3. Reset the view so the next unlock starts on a clean collection
   setCurrentView('collection');
   try { switchView('collection'); } catch(e){}
@@ -476,11 +471,7 @@ export function showAdminPinScreen(){
       isViewerMode = false;
       _authenticated = true;
       document.body.classList.remove('viewer-mode');
-      const settingsTab = document.querySelector('.bn-tab[data-view="settings"]');
-      if(settingsTab){
-        settingsTab.querySelector('.bn-icon').textContent='⚙️';
-        settingsTab.querySelector('.bn-label').textContent='Réglages';
-      }
+      setSettingsTabLocked(false);
       pinEntry='';
       switchView('settings');
       showToast(t('adm.ok'));
@@ -708,7 +699,7 @@ export function renderSettings(){
     if(pinOn){
       // Disable PIN: confirm — and decrypt everything back to clear
       // FIRST (no PIN = no key: encrypted data would become unreachable).
-      if(!confirm(t('pin.disable'))) return;
+      if(!await confirmDialog(t('pin.disable'), { danger:true })) return;
       if(isEncEnabled()){
         try {
           await disableEncryption();
@@ -769,16 +760,16 @@ export function renderSettings(){
 
   // — Local data encryption (needs the PIN in clear to derive the key,
   //   so enabling re-asks it on the keypad) —
-  el.querySelector('#encToggle')?.addEventListener('click', ()=>{
+  el.querySelector('#encToggle')?.addEventListener('click', async ()=>{
     if(isEncEnabled()){
-      if(!confirm(t('enc.off_confirm'))) return;
+      if(!await confirmDialog(t('enc.off_confirm'), { danger:true })) return;
       disableEncryption()
         .then(()=>{ renderSettings(); showToast(t('enc.off_done')); })
         .catch(e=>{ console.error('encryption disable failed', e); showToast(t('enc.err_generic')); });
     } else {
       // The warning is the contract: forgotten PIN = unrecoverable local
       // data, so back up first. Explicit confirmation required.
-      if(!confirm(t('enc.warn'))) return;
+      if(!await confirmDialog(t('enc.warn'), { danger:true })) return;
       _askPin(async pin => {
         try {
           await enableEncryption(pin);

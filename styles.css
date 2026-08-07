@@ -1449,6 +1449,10 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   background:var(--surface2);color:var(--tx1);font-family:var(--font-b);font-size:14px;letter-spacing:1px;}
 #dangerWord:focus-visible{outline:2px solid var(--red);outline-offset:1px;}
 .danger-mo-actions{display:flex;justify-content:flex-end;gap:var(--space-2);}
+/* Confirmation in-app (remplace confirm()) — même boîte que la zone
+   danger, sans la liste de portées. */
+.confirm-box{max-width:400px;border-color:var(--border-s);}
+.confirm-msg{font-size:14px;line-height:1.6;color:var(--tx1);}
 .danger-mo-actions .setv-btn.danger:disabled{opacity:0.4;cursor:not-allowed;}
 .setv-lang-sel{padding:var(--space-2) var(--space-3);border-radius:var(--r-pill);border:1.5px solid var(--border);background:var(--surface2);font-family:var(--font-b);font-size:13px;color:var(--tx1);cursor:pointer;outline:none;transition:var(--ease);}
 .setv-lang-sel:focus{border-color:var(--red);}

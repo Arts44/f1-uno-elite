@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.24.1',
+    date: '2026-08-07',
+    changes: {
+      en: [
+        'Security fix: spectator mode could be escaped by dragging the nav bead onto Settings — which even allowed turning the PIN off. Every route into Settings is now blocked in spectator mode.',
+        'The Settings tab icon is back in spectator mode (it had gone blank) and is now a proper lock.',
+        'Turning the PIN off, and switching local encryption on or off, now use an in-app confirmation. Browsers that suppress native dialogs made those buttons do nothing at all.',
+      ],
+      fr: [
+        'Faille corrigée : le mode spectateur pouvait être contourné en faisant glisser la pastille de navigation sur Réglages — ce qui permettait même de désactiver le code PIN. Tous les chemins vers Réglages sont désormais bloqués en spectateur.',
+        'L’icône de l’onglet Réglages réapparaît en mode spectateur (elle était vide) et prend la forme d’un cadenas.',
+        'Désactiver le PIN, et activer ou désactiver le chiffrement local, passent maintenant par une confirmation intégrée. Les navigateurs qui bloquent les dialogues natifs rendaient ces boutons totalement inertes.',
+      ],
+      es: [
+        'Fallo de seguridad corregido: el modo espectador podía burlarse arrastrando la burbuja de navegación hasta Ajustes — lo que incluso permitía desactivar el PIN. Ahora todas las rutas hacia Ajustes están bloqueadas en modo espectador.',
+        'El icono de la pestaña Ajustes vuelve a verse en modo espectador (estaba vacío) y ahora es un candado.',
+        'Desactivar el PIN y activar o desactivar el cifrado local usan ahora una confirmación integrada. Los navegadores que bloquean los diálogos nativos dejaban esos botones sin efecto alguno.',
+      ],
+      zh: [
+        '安全修复：此前可以把导航圆珠拖到「设置」来绕过旁观模式——甚至能关闭 PIN 码。现在旁观模式下通往设置的所有路径都已封堵。',
+        '旁观模式下「设置」标签的图标恢复显示（此前是空白），并改为一枚锁形图标。',
+        '关闭 PIN 码、开启或关闭本地加密，现在改用应用内确认。此前在屏蔽原生对话框的浏览器中，这些按钮完全没有反应。',
+      ],
+      it: [
+        'Falla corretta: la modalità spettatore poteva essere aggirata trascinando la pallina di navigazione su Impostazioni — il che permetteva persino di disattivare il PIN. Ora ogni percorso verso Impostazioni è bloccato in modalità spettatore.',
+        'L’icona della scheda Impostazioni torna visibile in modalità spettatore (era vuota) ed è ora un lucchetto.',
+        'Disattivare il PIN e attivare o disattivare la cifratura locale passano ora da una conferma integrata. Nei browser che bloccano le finestre native quei pulsanti non facevano assolutamente nulla.',
+      ],
+      nl: [
+        'Beveiligingslek gedicht: de kijkmodus was te omzeilen door de navigatieknop naar Instellingen te slepen — waarmee zelfs de pincode uitgeschakeld kon worden. Elke route naar Instellingen is nu geblokkeerd in de kijkmodus.',
+        'Het icoon van het tabblad Instellingen is terug in de kijkmodus (het was leeg) en is nu een slot.',
+        'De pincode uitschakelen en lokale versleuteling aan- of uitzetten gebruiken nu een bevestiging in de app. Browsers die native dialoogvensters blokkeren maakten die knoppen volledig werkeloos.',
+      ],
+      de: [
+        'Sicherheitslücke behoben: der Zuschauermodus ließ sich umgehen, indem man die Navigationsperle auf Einstellungen zog — damit konnte sogar die PIN abgeschaltet werden. Jeder Weg zu den Einstellungen ist im Zuschauermodus jetzt gesperrt.',
+        'Das Symbol des Einstellungen-Tabs ist im Zuschauermodus wieder da (es war leer) und zeigt nun ein Schloss.',
+        'Die PIN abschalten sowie die lokale Verschlüsselung ein- oder ausschalten laufen jetzt über eine In-App-Bestätigung. In Browsern, die native Dialoge unterdrücken, taten diese Schalter zuvor schlicht gar nichts.',
+      ],
+    },
+  },
+  {
     version: '1.24.0',
     date: '2026-08-07',
     changes: {
