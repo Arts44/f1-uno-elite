@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.28.0',
+    date: '2026-08-07',
+    changes: {
+      en: [
+        'The PIN screen now speaks the same language as the code entry: segmented boxes under a lock icon, each digit briefly visible before masking, a shake with an orange outline when wrong, a brief green when right — quiet, no celebration.',
+        'Managing the PIN became a guided flow with visible progress: create (1/2 then 2/2), change (old code 1/3, new 2/3, confirm 3/3), and disabling now requires typing the current code — an "OK" button no longer removes a protection.',
+        'The security section shows its state at a glance: an Active/Off chip next to the PIN, a short description, and one clear action per row.',
+      ],
+      fr: [
+        'L\'écran PIN parle désormais la même langue que la saisie de code : cases segmentées sous un cadenas, chaque chiffre visible un instant avant masquage, secousse à contour orange si faux, vert bref si juste — sobre, sans célébration.',
+        'La gestion du code devient un parcours guidé à progression visible : créer (1/2 puis 2/2), changer (ancien code 1/3, nouveau 2/3, confirmation 3/3), et désactiver exige désormais de saisir le code actuel — un bouton « OK » ne retire plus une protection.',
+        'La section sécurité montre son état d\'un coup d\'œil : une puce Actif/Inactif à côté du PIN, une description courte, et une action claire par ligne.',
+      ],
+      es: [
+        'La pantalla del PIN habla ahora el mismo idioma que la entrada de código: casillas segmentadas bajo un candado, cada dígito visible un instante antes de ocultarse, sacudida con contorno naranja si es erróneo, verde breve si es correcto — sobrio, sin celebración.',
+        'La gestión del PIN es ahora un recorrido guiado con progreso visible: crear (1/2 y 2/2), cambiar (código antiguo 1/3, nuevo 2/3, confirmación 3/3), y desactivar exige teclear el código actual — un botón «OK» ya no retira una protección.',
+        'La sección de seguridad muestra su estado de un vistazo: un distintivo Activo/Inactivo junto al PIN, una descripción corta y una acción clara por fila.',
+      ],
+      zh: [
+        'PIN 界面与验证码输入终于说同一种语言：锁形图标下的分格输入框，每个数字短暂显示后即掩码，输错时橙色轮廓抖动，输对时短暂变绿——克制，不张扬。',
+        'PIN 管理变成带可见进度的引导流程：创建（1/2、2/2）、修改（旧密码 1/3、新密码 2/3、确认 3/3），停用现在必须输入当前密码——仅按「确定」不再能移除保护。',
+        '安全区域一眼可见状态：PIN 旁的已启用/未启用标签、简短说明、每行一个明确操作。',
+      ],
+      it: [
+        'La schermata PIN parla ora la stessa lingua dell\'inserimento codice: caselle segmentate sotto un lucchetto, ogni cifra visibile un istante prima di essere mascherata, scossa con contorno arancione se errato, verde breve se giusto — sobrio, senza celebrazioni.',
+        'La gestione del PIN diventa un percorso guidato con progresso visibile: creare (1/2 poi 2/2), cambiare (vecchio codice 1/3, nuovo 2/3, conferma 3/3), e disattivare richiede ora di digitare il codice attuale — un «OK» non rimuove più una protezione.',
+        'La sezione sicurezza mostra il suo stato a colpo d\'occhio: un badge Attivo/Disattivo accanto al PIN, una breve descrizione e un\'azione chiara per riga.',
+      ],
+      nl: [
+        'Het pinscherm spreekt nu dezelfde taal als de code-invoer: vakjes onder een hangslot, elk cijfer even zichtbaar voor het wordt gemaskeerd, een schud met oranje rand bij fout, kort groen bij goed — ingetogen, zonder feestje.',
+        'Pinbeheer is een begeleide flow met zichtbare voortgang: aanmaken (1/2 en 2/2), wijzigen (oude code 1/3, nieuwe 2/3, bevestiging 3/3), en uitschakelen vereist nu het intypen van de huidige code — een «OK»-knop haalt geen bescherming meer weg.',
+        'De beveiligingssectie toont haar status in één oogopslag: een Actief/Uit-label naast de pincode, een korte omschrijving en één duidelijke actie per rij.',
+      ],
+      de: [
+        'Der PIN-Bildschirm spricht jetzt dieselbe Sprache wie die Code-Eingabe: Segmentfelder unter einem Schloss, jede Ziffer kurz sichtbar vor der Maskierung, Schütteln mit orangefarbenem Rand bei falsch, kurzes Grün bei richtig — dezent, ohne Feier.',
+        'Die PIN-Verwaltung ist ein geführter Ablauf mit sichtbarem Fortschritt: Anlegen (1/2, dann 2/2), Ändern (alter Code 1/3, neuer 2/3, Bestätigung 3/3), und Deaktivieren verlangt jetzt die Eingabe des aktuellen Codes — ein „OK" entfernt keinen Schutz mehr.',
+        'Der Sicherheitsbereich zeigt seinen Zustand auf einen Blick: ein Aktiv/Aus-Chip neben der PIN, eine kurze Beschreibung und eine klare Aktion pro Zeile.',
+      ],
+    },
+  },
+  {
     version: '1.27.0',
     date: '2026-08-07',
     changes: {

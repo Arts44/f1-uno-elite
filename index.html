@@ -26,12 +26,10 @@
     <button class="theme-switch" id="loginThemeSwitch" type="button" aria-label="" data-i18n-aria="theme.toggle" data-action="toggleTheme">
       <span class="theme-icon" id="loginThemeIcon" aria-hidden="true">🌙</span>
     </button>
+    <svg class="pin-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     <label class="pin-label" for="pin-keypad" data-i18n="login.pin">PIN Code</label>
-    <div class="pin-dots" id="pin-dots" role="status" aria-live="polite" aria-label="" data-i18n-aria="login.pin_input">
-      <div class="pin-dot" id="dot-0" aria-hidden="true"></div>
-      <div class="pin-dot" id="dot-1" aria-hidden="true"></div>
-      <div class="pin-dot" id="dot-2" aria-hidden="true"></div>
-      <div class="pin-dot" id="dot-3" aria-hidden="true"></div>
+    <div class="otp-wrap pin-segs" id="pin-segs" role="status" aria-live="polite" aria-label="" data-i18n-aria="login.pin_input">
+      <div class="otp-boxes" aria-hidden="true"><span class="otp-box"><span class="otp-caret"></span></span><span class="otp-box"><span class="otp-caret"></span></span><span class="otp-box"><span class="otp-caret"></span></span><span class="otp-box"><span class="otp-caret"></span></span></div>
     </div>
     <div class="pin-keypad" id="pin-keypad" role="group" aria-label="Clavier numérique">
       <button class="pin-key" data-digit="1" type="button">1</button>

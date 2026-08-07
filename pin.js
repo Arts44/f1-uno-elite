@@ -11,6 +11,7 @@ import { maybeStartTutorial, startTutorial } from './tutorial.js';
 import { installRowHTML, bindInstallRow } from './install.js';
 import { openChangelog, checkForUpdatesNow, isUpdateCheckSupported } from './update.js';
 import { APP_VERSION } from './changelog.js';
+import { segDisplay, segActiveIndex } from './otp-input.js';
 import {
   isEncEnabled, unlockSecureStore, enableEncryption, disableEncryption,
   rekeyEncryption, quarantineEncryptedData
@@ -55,18 +56,51 @@ const _origLog=console.log;const _origWarn=console.warn;const _origError=console
   }
 });
 
-function updatePinDots() {
-  for (let i = 0; i < 4; i++) {
-    // querySelectorAll so we update both login screen AND admin overlay if both in DOM
-    document.querySelectorAll('#dot-' + i).forEach(dot => {
-      if (i < pinEntry.length) {
-        dot.classList.add('filled');
-        dot.classList.remove('error');
-      } else {
-        dot.classList.remove('filled', 'error');
+/* ── Rendu des cases PIN ──
+   Toutes les surfaces (écran de boot, overlay admin, flux de gestion)
+   portent le même markup .pin-segs et sont repeintes ensemble — comme
+   les anciens #dot-i, mais via les helpers purs du composant segmenté
+   (masquage avec révélation brève du dernier chiffre). */
+const PIN_LEN = 4;
+const _SEGS_BOXES = '<div class="otp-boxes" aria-hidden="true">'
+  + '<span class="otp-box"><span class="otp-caret"></span></span>'.repeat(PIN_LEN) + '</div>';
+const _segsMarkup = () => `<div class="otp-wrap pin-segs">${_SEGS_BOXES}</div>`;
+const _reduceMotion = () => typeof window !== 'undefined' && window.matchMedia
+  && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let _segReveal = -1, _segRevealTimer = 0;
+
+function updatePinDots() { // nom historique — repeint toutes les .pin-segs
+  const active = segActiveIndex(pinEntry, PIN_LEN);
+  document.querySelectorAll('.pin-segs').forEach(wrap => {
+    wrap.classList.remove('seg-error', 'seg-success');
+    wrap.querySelectorAll('.otp-box').forEach((b, i) => {
+      const shown = segDisplay(pinEntry, i, { mask: true, revealIdx: _segReveal });
+      const txt = b.lastChild && b.lastChild.nodeType === 3 ? b.lastChild : null;
+      if((txt ? txt.data : '') !== shown){
+        if(txt) txt.data = shown; else b.appendChild(document.createTextNode(shown));
+        if(shown && !_reduceMotion()){ b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
       }
+      b.classList.toggle('filled', !!pinEntry[i]);
+      b.classList.toggle('active', i === active);
     });
-  }
+  });
+}
+
+// Échec : secousse + contour d'erreur (orange, jamais l'accent), message,
+// puis saisie vidée — le comportement commun aux trois surfaces.
+function _segsError(msg){
+  clearTimeout(_segRevealTimer); _segReveal = -1; // un repaint différé effacerait la secousse
+  document.querySelectorAll('.pin-segs').forEach(w => {
+    w.classList.remove('seg-error'); void w.offsetWidth; w.classList.add('seg-error');
+  });
+  document.querySelectorAll('#pin-error').forEach(e => { e.textContent = msg; });
+  setTimeout(() => { pinEntry = ''; _segReveal = -1; updatePinDots(); }, 700);
+}
+
+// Succès : vert bref et discret — un déverrouillage n'est pas une fête.
+function _segsSuccess(){
+  clearTimeout(_segRevealTimer); _segReveal = -1; // idem : le vert doit tenir le fondu
+  document.querySelectorAll('.pin-segs').forEach(w => w.classList.add('seg-success'));
 }
 
 let _pinKeyProcessing = false;
@@ -77,6 +111,10 @@ export function pinKey(digit) {
   if (pinEntry.length < 4) {
     pinEntry += digit;
     log('pinEntry after adding digit:', pinEntry);
+    // révélation brève du chiffre tapé, puis masquage (comme l'OTP)
+    clearTimeout(_segRevealTimer);
+    _segReveal = pinEntry.length - 1;
+    _segRevealTimer = setTimeout(() => { _segReveal = -1; updatePinDots(); }, _reduceMotion() ? 0 : 200);
     updatePinDots();
     if (pinEntry.length === 4) {
       checkPin();
@@ -112,13 +150,10 @@ async function checkPin(opts={}) {
         return;
       }
     }
+    _segsSuccess(); // vert bref pendant le fondu — pas de célébration
     enterApp(false);
   } else {
-    for (let i = 0; i < 4; i++) {
-      document.querySelectorAll('#dot-' + i).forEach(d => { d.classList.remove('filled'); d.classList.add('error'); });
-    }
-    document.querySelectorAll('#pin-error').forEach(e => { e.textContent = opts.errorMsg || 'Code incorrect — réessayez'; });
-    setTimeout(() => { pinEntry = ''; updatePinDots(); }, 700);
+    _segsError(opts.errorMsg || t('pin.wrong'));
   }
 }
 
@@ -248,11 +283,8 @@ function showSetupPinEntry(ls, subtitle){
       <div class="login-uno"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="UNO"></div>
     </div>
     <div class="setup-title">${t('setup.choose')}</div>
-    <div class="setup-sub">${subtitle||t('setup.enter')}</div>
-    <div class="pin-dots" id="pin-dots">
-      <div class="pin-dot" id="dot-0"></div><div class="pin-dot" id="dot-1"></div>
-      <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
-    </div>
+    <div class="setup-sub" data-step="1">${subtitle||t('setup.enter')} <span class="pin-flow-num">1/2</span></div>
+    ${_segsMarkup()}
     <div class="pin-keypad" id="pin-keypad">
       <button class="pin-key" data-digit="1" type="button">1</button>
       <button class="pin-key" data-digit="2" type="button">2</button>
@@ -276,7 +308,7 @@ function showSetupPinEntry(ls, subtitle){
       window._setupFirstPin = pinEntry;
       window._setupPhase = 'confirm';
       pinEntry = '';
-      box.querySelector('.setup-sub').textContent = t('setup.confirm');
+      box.querySelector('.setup-sub').innerHTML = `${t('setup.confirm')} <span class="pin-flow-num">2/2</span>`;
       updatePinDots();
     } else {
       if(pinEntry === window._setupFirstPin){
@@ -286,14 +318,13 @@ function showSetupPinEntry(ls, subtitle){
         localStorage.setItem('f1uno_setup_done','true');
         window._setupCheckOverride = null;
         window._setupPhase = null;
+        _segsSuccess();
         enterApp(false);
       } else {
         window._setupPhase = 'enter';
         window._setupFirstPin = '';
-        pinEntry = '';
-        updatePinDots();
-        const errEl = document.getElementById('pin-error');
-        if(errEl) errEl.textContent = t('setup.mismatch');
+        box.querySelector('.setup-sub').innerHTML = `${t('setup.enter')} <span class="pin-flow-num">1/2</span>`;
+        _segsError(t('setup.mismatch'));
       }
     }
   };
@@ -372,10 +403,7 @@ function _askPin(onOk){
   overlay.innerHTML=`
     <div class="login-box">
       <div class="pin-label" style="margin-top:8px">${t('enc.pin_confirm')}</div>
-      <div class="pin-dots">
-        <div class="pin-dot" id="dot-0"></div><div class="pin-dot" id="dot-1"></div>
-        <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
-      </div>
+      ${_segsMarkup()}
       <div class="pin-keypad">
         ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="pin-key" data-digit="${d}" type="button">${d}</button>`).join('')}
         <button class="pin-key del" data-action="pinDel" type="button">⌫</button>
@@ -401,14 +429,73 @@ function _askPin(onOk){
       close();
       await onOk(pin);
     } else {
-      for(let i=0;i<4;i++){
-        document.querySelectorAll('#dot-'+i).forEach(d=>{ d.classList.remove('filled'); d.classList.add('error'); });
-      }
-      document.querySelectorAll('#pin-error').forEach(e=>{ e.textContent=t('pin.wrong'); });
-      setTimeout(()=>{ pinEntry=''; updatePinDots(); },700);
+      _segsError(t('pin.wrong'));
     }
   };
 }
+
+/* ── Flux PIN à étapes (créer / changer / désactiver) ──
+   Un seul moteur : plein écran, pavé numérique, cases segmentées,
+   titre + intitulé d'étape + progression « 2/3 » visible, erreurs en
+   ligne (secousse orange + message). Auto-avance à 4 chiffres via le
+   hook _adminPinCallback — le même que l'overlay admin, donc lockApp
+   sait déjà nettoyer cet écran. check() renvoie true, ou
+   { err:'clé i18n', goto:index } pour rejouer une étape. */
+function _pinFlow(title, steps, onDone){
+  const overlay = document.createElement('div');
+  overlay.id = 'admin-pin-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;';
+  overlay.innerHTML=`
+    <div class="login-box">
+      <svg class="pin-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div class="pin-flow-title">${title}</div>
+      <div class="pin-flow-step"><span id="pinFlowPrompt"></span> <span class="pin-flow-num" id="pinFlowNum"></span></div>
+      ${_segsMarkup()}
+      <div class="pin-keypad">
+        ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="pin-key" data-digit="${d}" type="button">${d}</button>`).join('')}
+        <button class="pin-key del" data-action="pinDel" type="button">⌫</button>
+        <button class="pin-key zero" data-digit="0" type="button">0</button>
+      </div>
+      <div class="pin-error-msg" id="pin-error" role="alert" aria-live="assertive"></div>
+      <button class="pin-flow-cancel" id="pinFlowCancel" type="button">${t('adm.cancel')}</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  let idx = 0; const ctx = {};
+  const setStep = () => {
+    overlay.querySelector('#pinFlowPrompt').textContent = t(steps[idx].prompt);
+    overlay.querySelector('#pinFlowNum').textContent = `${idx+1}/${steps.length}`;
+    overlay.querySelector('#pin-error').textContent = ''; // l'erreur appartient à SON étape
+    pinEntry = ''; _segReveal = -1; updatePinDots();
+  };
+  const close = () => {
+    overlay.remove(); pinEntry = '';
+    window._adminOverlayActive = false;
+    window._adminPinCallback = null;
+  };
+  overlay.querySelector('#pinFlowCancel').addEventListener('click', e => { e.stopPropagation(); close(); });
+  window._adminOverlayActive = true;
+  window._adminPinCallback = async () => {
+    const res = await steps[idx].check(pinEntry, ctx);
+    if(res === true){
+      idx++;
+      if(idx >= steps.length){ close(); await onDone(ctx); }
+      else setStep();
+    } else {
+      if(typeof res.goto === 'number') idx = res.goto;
+      overlay.querySelector('#pinFlowPrompt').textContent = t(steps[idx].prompt);
+      overlay.querySelector('#pinFlowNum').textContent = `${idx+1}/${steps.length}`;
+      _segsError(t(res.err || 'pin.wrong'));
+    }
+  };
+  setStep();
+}
+
+// Les trois briques d'étape partagées
+const _stepVerify = { prompt: 'pin.flow_verify', check: async pin =>
+  (await sha256(pin)) === getStoredPinHash() ? true : { err: 'pin.wrong' } };
+const _stepNew = { prompt: 's.new_pin', check: (pin, ctx) => { ctx.pin = pin; return true; } };
+const _stepConfirm = goto => ({ prompt: 's.confirm_pin', check: (pin, ctx) =>
+  pin === ctx.pin ? true : { err: 'pin.mismatch', goto } });
 
 export function showAdminPinScreen(){
   // When in viewer mode, show a PIN overlay to switch to admin
@@ -423,10 +510,7 @@ export function showAdminPinScreen(){
         <div class="login-uno"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="UNO"></div>
       </div>
       <div class="pin-label" style="margin-top:16px">${t('adm.title')}</div>
-      <div class="pin-dots" id="admin-pin-dots">
-        <div class="pin-dot" id="dot-0"></div><div class="pin-dot" id="dot-1"></div>
-        <div class="pin-dot" id="dot-2"></div><div class="pin-dot" id="dot-3"></div>
-      </div>
+      ${_segsMarkup()}
       <div class="pin-keypad" id="pin-keypad">
         <button class="pin-key" data-digit="1" type="button">1</button>
         <button class="pin-key" data-digit="2" type="button">2</button>
@@ -479,11 +563,7 @@ export function showAdminPinScreen(){
       switchView('settings');
       showToast(t('adm.ok'));
     } else {
-      for(let i=0;i<4;i++){
-        document.querySelectorAll('#dot-'+i).forEach(d=>{ d.classList.remove('filled'); d.classList.add('error'); });
-      }
-      document.querySelectorAll('#pin-error').forEach(e=>{ e.textContent='Code incorrect'; });
-      setTimeout(()=>{ pinEntry=''; updatePinDots(); },700);
+      _segsError(t('pin.wrong'));
     }
   };
 }
@@ -608,31 +688,18 @@ export function renderSettings(){
       <div class="setv-section-title">🔐 ${t('s.security')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
-          <div class="setv-row-label">${t('s.pin')}</div>
+          <div class="setv-row-label">${t('s.pin')} <span class="sec-chip${pinOn?' on':''}">${t(pinOn?'pin.state_on':'pin.state_off')}</span></div>
           <div class="setv-row-sub">${t('s.pin_sub')}</div>
         </div>
         <button class="setv-toggle${pinOn?' on':''}" id="pinToggle"></button>
       </div>
       ${pinOn ? `
-      <div class="setv-row" id="changePinRow" style="flex-direction:column;align-items:flex-start;gap:0;padding-bottom:6px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 0 12px;">
-          <div class="setv-row-left"><div class="setv-row-label">${t('s.change_pin')}</div></div>
-          <button class="setv-btn" id="showChangePinBtn">${t('s.change_btn')}</button>
+      <div class="setv-row">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.change_pin')}</div>
+          <div class="setv-row-sub">${t('pin.change_sub')}</div>
         </div>
-        <div id="changePinForm" style="display:none;width:100%">
-          <form class="pin-change-form" id="changePinFormEl">
-            <div class="pin-input-row">
-              <label class="pin-input-label" for="newPinA">${t('s.new_pin')}</label>
-              <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" class="pin-mini-input" id="newPinA" placeholder="••••">
-            </div>
-            <div class="pin-input-row">
-              <label class="pin-input-label" for="newPinB">${t('s.confirm_pin')}</label>
-              <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" class="pin-mini-input" id="newPinB" placeholder="••••">
-            </div>
-            <div class="pin-form-error" id="pinChangeError"></div>
-            <button class="pin-save-btn" id="savePinBtn" type="submit">${t('s.enable_pin')}</button>
-          </form>
-        </div>
+        <button class="setv-btn" id="showChangePinBtn">${t('s.change_btn')}</button>
       </div>
       <div class="setv-row">
         <div class="setv-row-left">
@@ -700,59 +767,57 @@ export function renderSettings(){
   // — Bindings —
   el.querySelector('#pinToggle')?.addEventListener('click', async ()=>{
     if(pinOn){
-      // Disable PIN: confirm — and decrypt everything back to clear
-      // FIRST (no PIN = no key: encrypted data would become unreachable).
+      // Désactiver : avertissement, puis VÉRIFICATION du code — un
+      // simple « OK » ne suffit plus pour retirer une protection.
+      // Le déchiffrement repasse tout en clair AVANT de jeter la clé
+      // (sans PIN, pas de clé : des données chiffrées seraient perdues).
       if(!await confirmDialog(t('pin.disable'), { danger:true })) return;
+      _pinFlow(t('pin.flow_disable'), [_stepVerify], async ()=>{
+        if(isEncEnabled()){
+          try {
+            await disableEncryption();
+            showToast(t('enc.off_done'));
+          } catch(e){
+            console.error('encryption disable failed — PIN kept enabled', e);
+            showToast(t('enc.err_generic'));
+            return;
+          }
+        }
+        localStorage.setItem('f1uno_pin_enabled','false');
+        localStorage.removeItem('f1uno_pin_hash');
+        renderSettings();
+        showToast(t('pin.off_done'));
+      });
+    } else {
+      // Activer : nouveau code + confirmation (2 étapes)
+      _pinFlow(t('pin.set_title'), [_stepNew, _stepConfirm(0)], async ctx=>{
+        const hash = await sha256(ctx.pin);
+        localStorage.setItem('f1uno_pin_hash', hash);
+        localStorage.setItem('f1uno_pin_enabled','true');
+        showToast(t('toast.pin_on'));
+        renderSettings();
+      });
+    }
+  });
+
+  // Changer : ancien code → nouveau → confirmation (3 étapes)
+  el.querySelector('#showChangePinBtn')?.addEventListener('click', ()=>{
+    _pinFlow(t('s.change_pin'), [_stepVerify, _stepNew, _stepConfirm(1)], async ctx=>{
+      const hash = await sha256(ctx.pin);
+      // Re-encrypt under the new PIN BEFORE the hash is replaced: if the
+      // re-key fails, the old PIN must still open the old ciphertexts.
       if(isEncEnabled()){
         try {
-          await disableEncryption();
-          showToast(t('enc.off_done'));
+          await rekeyEncryption(ctx.pin);
         } catch(e){
-          console.error('encryption disable failed — PIN kept enabled', e);
+          console.error('re-key failed — PIN unchanged', e);
           showToast(t('enc.err_generic'));
           return;
         }
       }
-      localStorage.setItem('f1uno_pin_enabled','false');
-      localStorage.removeItem('f1uno_pin_hash');
-    } else {
-      // Enable PIN: need to set one first
-      _startEnablePin(el);
-      return;
-    }
-    renderSettings();
-  });
-
-  el.querySelector('#showChangePinBtn')?.addEventListener('click', ()=>{
-    const form = el.querySelector('#changePinForm');
-    if(form) form.style.display = form.style.display==='none'?'block':'none';
-  });
-
-  el.querySelector('#changePinFormEl')?.addEventListener('submit', async e=>{
-    e.preventDefault(); // handled in JS — nothing must navigate
-    const a = el.querySelector('#newPinA').value;
-    const b = el.querySelector('#newPinB').value;
-    const errEl = el.querySelector('#pinChangeError');
-    if(!/^\d{4}$/.test(a)){ errEl.textContent=t('pin.digits'); return; }
-    if(a !== b){ errEl.textContent=t('pin.mismatch'); return; }
-    const hash = await sha256(a);
-    // Re-encrypt under the new PIN BEFORE the hash is replaced: if the
-    // re-key fails, the old PIN must still open the old ciphertexts.
-    if(isEncEnabled()){
-      try {
-        await rekeyEncryption(a);
-      } catch(e){
-        console.error('re-key failed — PIN unchanged', e);
-        errEl.textContent = t('enc.err_generic');
-        return;
-      }
-    }
-    localStorage.setItem('f1uno_pin_hash', hash);
-    errEl.textContent='';
-    el.querySelector('#changePinForm').style.display='none';
-    el.querySelector('#newPinA').value='';
-    el.querySelector('#newPinB').value='';
-    showToast(t('pin.saved'));
+      localStorage.setItem('f1uno_pin_hash', hash);
+      showToast(t('pin.saved'));
+    });
   });
 
   el.querySelector('#viewerToggle')?.addEventListener('click', ()=>{
@@ -829,39 +894,3 @@ export function renderSettings(){
   });
 }
 
-function _startEnablePin(container){
-  container.innerHTML = `
-    <div class="setv-title">⚙️ <span>${t('nav.settings').replace('⚙️ ','')}</span></div>
-    <div class="setv-section set-security">
-      <div class="setv-section-title">🔐 ${t('pin.set_title')}</div>
-      <form class="pin-change-form" id="enablePinFormEl">
-        <div class="pin-input-row">
-          <label class="pin-input-label" for="enablePinA">${t('s.new_pin')}</label>
-          <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" class="pin-mini-input" id="enablePinA" placeholder="••••">
-        </div>
-        <div class="pin-input-row">
-          <label class="pin-input-label" for="enablePinB">${t('s.confirm_pin')}</label>
-          <input type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="new-password" class="pin-mini-input" id="enablePinB" placeholder="••••">
-        </div>
-        <div class="pin-form-error" id="enablePinError"></div>
-        <div style="display:flex;gap:8px;">
-          <button class="pin-save-btn" id="enablePinSave" type="submit">${t('s.enable_pin')}</button>
-          <button class="setv-btn" id="enablePinCancel" type="button" style="margin-top:4px">${t('adm.cancel')}</button>
-        </div>
-      </form>
-    </div>`;
-  container.querySelector('#enablePinCancel').addEventListener('click', renderSettings);
-  container.querySelector('#enablePinFormEl').addEventListener('submit', async e=>{
-    e.preventDefault(); // handled in JS — nothing must navigate
-    const a = container.querySelector('#enablePinA').value;
-    const b = container.querySelector('#enablePinB').value;
-    const errEl = container.querySelector('#enablePinError');
-    if(!/^\d{4}$/.test(a)){ errEl.textContent=t('pin.digits'); return; }
-    if(a !== b){ errEl.textContent=t('pin.mismatch'); return; }
-    const hash = await sha256(a);
-    localStorage.setItem('f1uno_pin_hash', hash);
-    localStorage.setItem('f1uno_pin_enabled','true');
-    showToast(t('toast.pin_on'));
-    renderSettings();
-  });
-}
