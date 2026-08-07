@@ -144,10 +144,6 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
   display: flex; align-items: center; justify-content: center; gap: var(--space-3);
   margin-bottom: var(--space-1);
 }
-.login-duo{display:flex;align-items:center;gap:0;}
-.login-f1 img{height:48px;width:auto;display:block;}
-.login-x{font-family:var(--font-d);font-weight:800;font-size:22px;color:var(--tx3);margin:0 var(--space-6px);line-height:1;}
-.login-uno img{height:48px;width:auto;display:block;}
 .login-title {
   font-family: var(--font-d); font-weight: 800;
   font-size: 2.4rem;
@@ -372,10 +368,6 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    shrinks below its content (children are nowrap/flex-shrink:0). */
 .header-right{flex:1 0 auto;display:flex;justify-content:flex-end;align-items:center;gap:var(--space-2);}
 .logo{display:flex;align-items:center;gap:var(--space-10px);flex-shrink:0;text-decoration:none;}
-.logo-duo{display:flex;align-items:center;gap:0;flex-shrink:0;}
-.logo-f1 img{height:28px;width:auto;display:block;}
-.logo-x{font-family:var(--font-d);font-weight:800;font-size:14px;color:var(--tx3);margin:0 var(--space-1);line-height:1;}
-.logo-uno img{height:28px;width:auto;display:block;}
 .logo-text{font-family:var(--font-d);font-weight:800;font-size:18px;letter-spacing:-0.5px;color:var(--tx1);}
 .logo-sub{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.5px;}
 /* Right-side rail: every control is 28px tall → one optical line.
@@ -441,9 +433,34 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .circuit-svg .track-path{stroke:rgba(255,255,255,0.85);}
 [data-theme="dark"] .circuit-svg .track-path{stroke:rgba(0,0,0,0.85);}
 /* Driver number */
+/* ── LOCKUP « F1 UNO Élite » (v2.3) ──────────────────────────
+   Remplace les logos F1 et UNO qui étaient hotlinkés depuis
+   Wikimedia : marques déposées, dépendance externe, hors-ligne
+   cassé. Uniquement de la typographie, l'accent rouge des tokens
+   et une barre de vitesse abstraite — aucun élément de marque.
+   Suit --font-d, donc les 5 thèmes de police. */
+.lockup{display:inline-flex;flex-direction:column;gap:0.2em;font-family:var(--font-d);line-height:1;white-space:nowrap;}
+.lk-top{display:flex;align-items:baseline;gap:0.28em;}
+.lk-f1{font-weight:800;font-size:1em;letter-spacing:-0.03em;color:var(--tx1);}
+.lk-uno{font-weight:800;font-size:1em;letter-spacing:-0.03em;color:var(--red);}
+.lk-elite{font-weight:700;font-size:0.4em;letter-spacing:0.3em;color:var(--tx3);text-transform:uppercase;}
+.lk-bar{height:0.11em;border-radius:0.06em;
+  background:linear-gradient(90deg,var(--red) 0 38%,var(--tx3) 38% 100%);
+  -webkit-mask-image:linear-gradient(90deg,#000 0 72%,transparent 100%);
+  mask-image:linear-gradient(90deg,#000 0 72%,transparent 100%);}
+.lk-hd{font-size:20px;}                       /* header */
+.lk-lg{font-size:34px;margin-bottom:var(--space-2);}  /* PIN, langue, setup */
+
+/* ── Monogrammes d'écurie (v2.3) ──
+   Les logos officiels venaient de formula1.com. Un monogramme sur la
+   couleur d'équipe identifie l'écurie sans emprunter sa marque. */
+.team-mono-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:100%;position:relative;z-index:1;}
+.team-mono{font-family:var(--font-d);font-weight:800;letter-spacing:-0.02em;
+  color:var(--tc,#fff);text-shadow:0 0 14px color-mix(in srgb,var(--tc,#fff) 45%,transparent);}
+.card-visual .team-mono{font-size:40px;}
+.modal-visual .team-mono{font-size:74px;}
+
 .driver-number{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;position:relative;z-index:1;gap:2px;}
-.driver-img{width:65%;height:55%;object-fit:contain;object-position:top center;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4));border-radius:var(--r-md);}
-.modal-visual .driver-img{width:55%;height:50%;}
 .dn-num{font-family:'Orbitron',sans-serif;font-weight:900;color:var(--tc,#fff);text-shadow:0 0 12px var(--tc,#fff),0 0 30px color-mix(in srgb,var(--tc,#fff) 40%,transparent);line-height:1;}
 .card-visual .dn-num{font-size:28px;letter-spacing:-1px;}
 .modal-visual .dn-num{font-size:56px;letter-spacing:-2px;}
@@ -473,11 +490,6 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .dn-had{font-family:'Racing Sans One',serif;letter-spacing:2px;font-style:italic;}
 .dn-law{font-family:'Orbitron',sans-serif;letter-spacing:2px;font-weight:700;}
 /* Team logo */
-.team-logo-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:100%;position:relative;z-index:1;--logo-bg:rgba(0,0,0,0.35);--logo-blur:blur(4px);--logo-shadow:0 0 20px rgba(0,0,0,0.15);--logo-drop:drop-shadow(0 2px 6px rgba(0,0,0,0.3));}
-.team-logo-wrap::before{content:'';position:absolute;inset:15%;border-radius:var(--r-lg);background:var(--logo-bg);backdrop-filter:var(--logo-blur);-webkit-backdrop-filter:var(--logo-blur);box-shadow:var(--logo-shadow);}
-.team-logo{position:relative;z-index:1;max-width:65%;max-height:55%;object-fit:contain;filter:var(--logo-drop);}
-.modal-visual .team-logo-wrap::before{inset:10%;border-radius:var(--r-xl);}
-.modal-visual .team-logo{max-width:60%;max-height:50%;}
 #moEmoji{display:flex;align-items:center;justify-content:center;width:100%;height:100%;}
 /* Type backgrounds */
 /* ── TYPE VISUALS — "Soie vive" (P5) ──
@@ -1507,9 +1519,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   .header-inner{gap:var(--space-2);padding:0 var(--space-3);}
   .header-left{flex:0 0 auto;}
   .header-right{gap:var(--space-1);}
-  .logo-f1 img,.logo-uno img{height:20px;}
-  .logo-x{margin:0 2px;font-size:12px;}
-  /* Title pill yields first; season + total stay anchored right and
+  .logo-f1 img,    /* Title pill yields first; season + total stay anchored right and
      can never wrap (two flex blocks, nowrap children). */
   .header .header-title{display:none;}
   .season-pill{padding:0 var(--space-2);}

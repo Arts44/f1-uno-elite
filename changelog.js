@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.30.0',
+    date: '2026-08-07',
+    changes: {
+      en: [
+        'The app no longer loads a single file from the internet. The F1 and UNO logos, the team logos and the driver photos were all hotlinked from other people\'s servers — trademarks in an app that calls itself a fan project, and an "offline mode" that quietly depended on the network. All 33 are gone.',
+        'A new identity replaces them: an "F1 UNO Élite" typographic lockup with an abstract speed bar, on the header, the PIN screen, the language picker and the app icon. Driver cards now lead with their race number in full team colour, and team cards with a monogram — no borrowed marks anywhere.',
+      ],
+      fr: [
+        'L\'app ne charge plus un seul fichier depuis internet. Les logos F1 et UNO, les logos d\'écuries et les photos de pilotes étaient tous hotlinkés depuis les serveurs d\'autrui — des marques déposées dans une app qui se déclare fan project, et un « mode hors-ligne » qui dépendait discrètement du réseau. Les 33 ont disparu.',
+        'Une identité propre les remplace : un lockup typographique « F1 UNO Élite » avec une barre de vitesse abstraite, sur le header, l\'écran PIN, le choix de langue et l\'icône de l\'app. Les cartes pilote mettent désormais en avant leur numéro de course dans la couleur de l\'écurie, et les cartes d\'écurie un monogramme — plus aucune marque empruntée.',
+      ],
+      es: [
+        'La app ya no carga ni un solo archivo desde internet. Los logotipos de F1 y UNO, los de las escuderías y las fotos de pilotos estaban enlazados desde servidores ajenos — marcas registradas en una app que se declara proyecto de fans, y un «modo sin conexión» que dependía en silencio de la red. Los 33 han desaparecido.',
+        'Los sustituye una identidad propia: un lockup tipográfico «F1 UNO Élite» con una barra de velocidad abstracta, en la cabecera, la pantalla del PIN, la elección de idioma y el icono. Las cartas de piloto destacan ahora su número de carrera en el color de la escudería, y las de escudería un monograma — ninguna marca prestada.',
+      ],
+      zh: [
+        '应用不再从互联网加载任何一个文件。F1 与 UNO 的标志、车队标志和车手照片此前全部外链自他人服务器——一个自称粉丝作品的应用里塞满注册商标，而所谓的「离线模式」其实悄悄依赖网络。这 33 个外链已全部移除。',
+        '取而代之的是自有识别：「F1 UNO Élite」文字标识配一道抽象速度条，用于顶栏、PIN 界面、语言选择和应用图标。车手卡现在以车队配色的赛车号为主视觉，车队卡则用字母缩写——不再借用任何品牌元素。',
+      ],
+      it: [
+        'L\'app non carica più un solo file da internet. I loghi F1 e UNO, quelli delle scuderie e le foto dei piloti erano tutti collegati ai server altrui — marchi registrati in un\'app che si dichiara fan project, e una «modalità offline» che dipendeva silenziosamente dalla rete. Tutti e 33 sono spariti.',
+        'Al loro posto un\'identità propria: un lockup tipografico «F1 UNO Élite» con una barra di velocità astratta, sull\'intestazione, la schermata PIN, la scelta della lingua e l\'icona. Le carte pilota ora mettono in primo piano il numero di gara nel colore della scuderia, e quelle di scuderia un monogramma — nessun marchio preso in prestito.',
+      ],
+      nl: [
+        'De app laadt geen enkel bestand meer van internet. De F1- en UNO-logo\'s, de teamlogo\'s en de coureursfoto\'s werden allemaal van andermans servers gehaald — handelsmerken in een app die zichzelf fanproject noemt, en een «offline modus» die stilletjes van het netwerk afhing. Alle 33 zijn weg.',
+        'Een eigen identiteit vervangt ze: een typografisch «F1 UNO Élite»-lockup met een abstracte snelheidsbalk, op de header, het pinscherm, de taalkeuze en het app-icoon. Coureurskaarten tonen nu hun racenummer in de teamkleur, teamkaarten een monogram — geen geleende merken meer.',
+      ],
+      de: [
+        'Die App lädt keine einzige Datei mehr aus dem Internet. Die F1- und UNO-Logos, die Teamlogos und die Fahrerfotos waren alle von fremden Servern verlinkt — eingetragene Marken in einer App, die sich Fanprojekt nennt, und ein „Offline-Modus", der klammheimlich vom Netz abhing. Alle 33 sind weg.',
+        'Eine eigene Identität ersetzt sie: ein typografisches „F1 UNO Élite"-Lockup mit abstraktem Geschwindigkeitsbalken, in der Kopfzeile, im PIN-Bildschirm, in der Sprachauswahl und im App-Icon. Fahrerkarten zeigen jetzt ihre Startnummer in der Teamfarbe, Teamkarten ein Monogramm — keine geliehenen Marken mehr.',
+      ],
+    },
+  },
+  {
     version: '1.29.1',
     date: '2026-08-07',
     changes: {

@@ -344,59 +344,22 @@
     "Atlassian Williams Racing": "#64C4FF",
     "Stake F1 Team KICK Sauber": "#52E252"
   },
-  "teamLogos": {
-    "Oracle Red Bull Racing": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/red%20bull%20racing.png",
-    "Scuderia Ferrari HP": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/ferrari.png",
-    "McLaren F1": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/mclaren.png",
-    "Mercedes-AMG Petronas Formula One Team": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/mercedes.png",
-    "Aston Martin Aramco Formula One Team": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/aston%20martin.png",
-    "BWT Alpine F1 Team": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/alpine.png",
-    "MoneyGram Haas F1 Team": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/haas.png",
-    "Visa Cash App RB Formula One": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/rb.png",
-    "Atlassian Williams Racing": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/williams.png",
-    "Stake F1 Team KICK Sauber": "https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/team%20logos/kick%20sauber.png"
-  },
-  "driverImages": {
-    "Max Verstappen": "https://www.formula1.com/content/dam/fom-website/drivers/M/MAXVER01_Max_Verstappen/maxver01.png.transform/1col/image.png",
-    "Lewis Hamilton": "https://www.formula1.com/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/1col/image.png",
-    "Charles Leclerc": "https://www.formula1.com/content/dam/fom-website/drivers/C/CHALEC01_Charles_Leclerc/chalec01.png.transform/1col/image.png",
-    "Lando Norris": "https://www.formula1.com/content/dam/fom-website/drivers/L/LANNOR01_Lando_Norris/lannor01.png.transform/1col/image.png",
-    "Carlos Sainz": "https://www.formula1.com/content/dam/fom-website/drivers/C/CARSAI01_Carlos_Sainz/carsai01.png.transform/1col/image.png",
-    "Oscar Piastri": "https://www.formula1.com/content/dam/fom-website/drivers/O/OSCPIA01_Oscar_Piastri/oscpia01.png.transform/1col/image.png",
-    "George Russell": "https://www.formula1.com/content/dam/fom-website/drivers/G/GEORUS01_George_Russell/georus01.png.transform/1col/image.png",
-    "Fernando Alonso": "https://www.formula1.com/content/dam/fom-website/drivers/F/FERALO01_Fernando_Alonso/feralo01.png.transform/1col/image.png",
-    "Pierre Gasly": "https://www.formula1.com/content/dam/fom-website/drivers/P/PIEGAS01_Pierre_Gasly/piegas01.png.transform/1col/image.png",
-    "Esteban Ocon": "https://www.formula1.com/content/dam/fom-website/drivers/E/ESTOCO01_Esteban_Ocon/estoco01.png.transform/1col/image.png",
-    "Alex Albon": "https://www.formula1.com/content/dam/fom-website/drivers/A/ALEALB01_Alexander_Albon/alealb01.png.transform/1col/image.png",
-    "Yuki Tsunoda": "https://www.formula1.com/content/dam/fom-website/drivers/Y/YUKTSU01_Yuki_Tsunoda/yuktsu01.png.transform/1col/image.png",
-    "Lance Stroll": "https://www.formula1.com/content/dam/fom-website/drivers/L/LANSTR01_Lance_Stroll/lanstr01.png.transform/1col/image.png",
-    "Nico Hülkenberg": "https://www.formula1.com/content/dam/fom-website/drivers/N/NICHUL01_Nico_Hulkenberg/nichul01.png.transform/1col/image.png",
-    "Kimi Antonelli": "https://media.formula1.com/image/upload/fom-website/drivers/K/KIMANT01_Kimi_Antonelli/kimant01.png",
-    "Oliver Bearman": "https://www.formula1.com/content/dam/fom-website/drivers/O/OLIBEA01_Oliver_Bearman/olibea01.png.transform/1col/image.png",
-    "Gabriel Bortoleto": "https://www.formula1.com/content/dam/fom-website/drivers/G/GABBOR01_Gabriel_Bortoleto/gabbor01.png.transform/1col/image.png",
-    "Franco Colapinto": "https://www.formula1.com/content/dam/fom-website/drivers/F/FRACOL01_Franco_Colapinto/fracol01.png.transform/1col/image.png",
-    "Jack Doohan": "https://www.formula1.com/content/dam/fom-website/drivers/J/JACDOO01_Jack_Doohan/jacdoo01.png.transform/1col/image.png",
-    "Isack Hadjar": "https://www.formula1.com/content/dam/fom-website/drivers/I/ISAHAD01_Isack_Hadjar/isahad01.png.transform/1col/image.png",
-    "Liam Lawson": "https://www.formula1.com/content/dam/fom-website/drivers/L/LIALAW01_Liam_Lawson/lialaw01.png.transform/1col/image.png"
-  },
-  "teamLogoBg": {
-    "Oracle Red Bull Racing": "rgba(255,255,255,1)",
-    "Visa Cash App RB Formula One": "rgba(20,52,203,0.95)",
-    "MoneyGram Haas F1 Team": "rgba(255,255,255,0.92)",
-    "Stake F1 Team KICK Sauber": "rgba(255,255,255,0.92)",
-    "Atlassian Williams Racing": "rgba(255,255,255,0.92)",
-    "Mercedes-AMG Petronas Formula One Team": "rgba(255,255,255,0.92)",
-    "McLaren F1": "rgba(255,255,255,0.92)",
-    "Aston Martin Aramco Formula One Team": "rgba(255,255,255,0.92)"
-  },
-  "teamLogoNoeffects": [
-    "MoneyGram Haas F1 Team",
-    "Stake F1 Team KICK Sauber"
-  ],
   "roleBaseRarity": {
     "pilote": "legendary",
     "reserve": "epic",
     "directeur": "epic",
     "gp": "legendary"
+  },
+  "teamMonograms": {
+    "Oracle Red Bull Racing": "RBR",
+    "Scuderia Ferrari HP": "SF",
+    "McLaren F1": "MCL",
+    "Mercedes-AMG Petronas Formula One Team": "MER",
+    "Aston Martin Aramco Formula One Team": "AMR",
+    "BWT Alpine F1 Team": "ALP",
+    "MoneyGram Haas F1 Team": "HAA",
+    "Visa Cash App RB Formula One": "RB",
+    "Atlassian Williams Racing": "WIL",
+    "Stake F1 Team KICK Sauber": "SAU"
   }
 }

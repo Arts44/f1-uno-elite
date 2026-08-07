@@ -60,13 +60,10 @@ export let CATS = {};
 export let CIRCUIT_SVGS = {};
 export let DRIVER_NUMBERS = {};
 export let TEAM_COLORS = {};
-export let TEAM_LOGOS = {};
-export let DRIVER_IMAGES = {};
-export let TEAM_LOGO_BG = {};
-export let TEAM_LOGO_NOEFFECTS = new Set([
-  'Visa Cash App RB Formula One',
-  'Oracle Red Bull Racing'
-]);
+// Monogrammes d'écurie (v2.3) — remplacent les logos officiels qui
+// étaient hotlinkés depuis formula1.com : marques déposées, dépendance
+// externe, et hors-ligne cassé. Du texte + la couleur d'équipe, rien de plus.
+export let TEAM_MONOGRAMS = {};
 export let ROLE_BASE_RARITY = {};
 
 // Card database (mutated in place, never reassigned)
@@ -98,13 +95,7 @@ export function _applyMetadata(meta){
   CATS = meta.categories;
   DRIVER_NUMBERS = meta.driverNumbers;
   TEAM_COLORS = meta.teamColors;
-  TEAM_LOGOS = meta.teamLogos;
-  DRIVER_IMAGES = meta.driverImages;
-  TEAM_LOGO_BG = meta.teamLogoBg;
-  // Merge hardcoded noeffects with metadata noeffects
-    const hardcodedNoEffects = ['Visa Cash App RB Formula One', 'Oracle Red Bull Racing'];
-    const allNoEffects = new Set([...(meta.teamLogoNoeffects || []), ...hardcodedNoEffects]);
-    TEAM_LOGO_NOEFFECTS = allNoEffects;
+  TEAM_MONOGRAMS = meta.teamMonograms || {};
   ROLE_BASE_RARITY = meta.roleBaseRarity;
 }
 

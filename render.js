@@ -5,8 +5,7 @@ import { DEBUG, log } from './logger.js';
 import { t } from './i18n.js';
 import {
   CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityChipClass, rarityChipStyle,
-  CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_LOGOS, DRIVER_IMAGES,
-  TEAM_LOGO_BG, TEAM_LOGO_NOEFFECTS
+  CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_MONOGRAMS
 } from './data.js';
 import {
   getTypeData, setTypeData,
@@ -20,28 +19,24 @@ import { renderSettings, showAdminPinScreen } from './pin.js';
 import { isViewer } from './session.js';
 import { renderAccount } from './account.js';
 
-/* ── Visual helpers ── */
+/* ── Visual helpers ──
+   v2.3 : plus AUCUNE image distante. Les photos de pilotes et les logos
+   d'écuries venaient de formula1.com — marques déposées, dépendance
+   externe, et un hors-ligne qui n'en était pas un. Le numéro de course
+   (déjà la plus belle partie de la carte) devient le visuel principal,
+   et les écuries sont représentées par leur monogramme + leur couleur. */
 export function driverNumberHTML(card){
   const d=DRIVER_NUMBERS[card.name];
-  const img=DRIVER_IMAGES[card.name];
-  if(!d && !img) return null;
+  if(!d) return null;
   const col=TEAM_COLORS[card.team]||'#fff';
-  const hasImg=!!img;
-  const imgHtml=img?`<img class="driver-img" src="${img}" alt="${card.name}" crossorigin="anonymous" onerror="this.style.display='none';this.nextElementSibling&&this.parentElement.classList.add('no-img')"/>`:'';
-  const numHtml=d?`<span class="dn-num ${d.cls}">${d.n}</span>`:'';
-  return `<div class="driver-number${hasImg?'':' no-img'}" style="--tc:${col}">${imgHtml}${numHtml}</div>`;
+  return `<div class="driver-number no-img" style="--tc:${col}"><span class="dn-num ${d.cls}">${d.n}</span></div>`;
 }
 
 export function teamLogoHTML(team){
-  const url=TEAM_LOGOS[team];
-  if(!url) return null;
-  const bg=TEAM_LOGO_BG[team]||'';
-  const noEffects=TEAM_LOGO_NOEFFECTS.has(team);
-  const vars=[];
-  if(bg) vars.push(`--logo-bg:${bg}`);
-  if(noEffects){ vars.push('--logo-blur:none'); vars.push('--logo-shadow:none'); vars.push('--logo-drop:none'); }
-  const style=vars.length?` style="${vars.join(';')}"`:'';
-  return `<div class="team-logo-wrap"${style}><img class="team-logo" src="${url}" alt="${team}" crossorigin="anonymous" onerror="this.outerHTML='<span style=font-size:40px>🎯</span>'"/></div>`;
+  const mono=TEAM_MONOGRAMS[team];
+  if(!mono) return null;
+  const col=TEAM_COLORS[team]||'#fff';
+  return `<div class="team-mono-wrap" style="--tc:${col}"><span class="team-mono">${mono}</span></div>`;
 }
 
 export function circuitSVG(cardId, size='card'){

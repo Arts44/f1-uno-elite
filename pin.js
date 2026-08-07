@@ -231,11 +231,7 @@ export function showLanguageScreen(){
         <span class="lang-name" lang="${code}">${label}</span>
       </button>`).join('');
   ls.querySelector('.login-box').innerHTML = `
-    <div class="login-duo">
-      <div class="login-f1"><img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" alt="F1"></div>
-      <span class="login-x">×</span>
-      <div class="login-uno"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="UNO"></div>
-    </div>
+    <span class="lockup lk-lg" aria-label="F1 UNO Élite"><span class="lk-top"><span class="lk-f1">F1</span><span class="lk-uno">UNO</span><span class="lk-elite">Élite</span></span><span class="lk-bar" aria-hidden="true"></span></span>
     <div class="lang-globe" aria-hidden="true">🌐</div>
     <div class="lang-prompt">${LANG_PROMPTS.join(' · ')}</div>
     <div class="lang-grid" role="group" aria-label="Language">${buttons}</div>`;
@@ -255,11 +251,7 @@ export function showSetupScreen(){
   const ls = document.getElementById('login-screen');
   if(!ls) return;
   ls.querySelector('.login-box').innerHTML = `
-    <div class="login-duo">
-      <div class="login-f1"><img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" alt="F1"></div>
-      <span class="login-x">×</span>
-      <div class="login-uno"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="UNO"></div>
-    </div>
+    <span class="lockup lk-lg" aria-label="F1 UNO Élite"><span class="lk-top"><span class="lk-f1">F1</span><span class="lk-uno">UNO</span><span class="lk-elite">Élite</span></span><span class="lk-bar" aria-hidden="true"></span></span>
     <div class="setup-title">${t('setup.welcome')}</div>
     <div class="setup-sub">${t('setup.subtitle')}</div>
     <div class="setup-btns">
@@ -277,11 +269,7 @@ export function showSetupScreen(){
 function showSetupPinEntry(ls, subtitle){
   const box = ls.querySelector('.login-box') || ls;
   box.innerHTML = `
-    <div class="login-duo">
-      <div class="login-f1"><img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" alt="F1"></div>
-      <span class="login-x">×</span>
-      <div class="login-uno"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="UNO"></div>
-    </div>
+    <span class="lockup lk-lg" aria-label="F1 UNO Élite"><span class="lk-top"><span class="lk-f1">F1</span><span class="lk-uno">UNO</span><span class="lk-elite">Élite</span></span><span class="lk-bar" aria-hidden="true"></span></span>
     <div class="setup-title">${t('setup.choose')}</div>
     <div class="setup-sub" data-step="1">${subtitle||t('setup.enter')} <span class="pin-flow-num">1/2</span></div>
     ${_segsMarkup()}
@@ -504,11 +492,7 @@ export function showAdminPinScreen(){
   overlay.style.cssText='position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;';
   overlay.innerHTML=`
     <div class="login-box">
-      <div class="login-duo">
-        <div class="login-f1"><img src="https://upload.wikimedia.org/wikipedia/commons/3/33/F1.svg" alt="F1"></div>
-        <span class="login-x">×</span>
-        <div class="login-uno"><img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/UNO_Logo.svg" alt="UNO"></div>
-      </div>
+      <span class="lockup lk-lg" aria-label="F1 UNO Élite"><span class="lk-top"><span class="lk-f1">F1</span><span class="lk-uno">UNO</span><span class="lk-elite">Élite</span></span><span class="lk-bar" aria-hidden="true"></span></span>
       <div class="pin-label" style="margin-top:16px">${t('adm.title')}</div>
       ${_segsMarkup()}
       <div class="pin-keypad" id="pin-keypad">
