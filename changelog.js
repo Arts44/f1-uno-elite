@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.34.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'Variant colours finally show — loud and proud, from the very first base card: the owned colour washes over the card body with a crisp coloured edge (blue, green, red, yellow), and foil, dual and promo bodies become tinted glass in their family colour instead of near-black panels. Rarity keeps the visual background; wild, nitro and Eternal keep their own worlds.',
+      ],
+      fr: [
+        'Les couleurs de variantes se voient enfin — franchement, dès la première carte de base : la couleur possédée lave le corps de la carte avec une arête colorée nette (bleu, vert, rouge, jaune), et les corps foil, dual et promo deviennent un verre teinté à leur couleur de famille au lieu de panneaux presque noirs. La rareté garde le fond du visuel ; wild, nitro et Éternel gardent leurs mondes propres.',
+      ],
+      es: [
+        'Los colores de las variantes por fin se ven — con fuerza, desde la primera carta base: el color poseído baña el cuerpo de la carta con un borde de color nítido (azul, verde, rojo, amarillo), y los cuerpos foil, dual y promo se vuelven un cristal tintado de su color de familia en lugar de paneles casi negros. La rareza conserva el fondo del visual; wild, nitro y Eterno conservan sus propios mundos.',
+      ],
+      zh: [
+        '版本颜色终于醒目可见——从第一张基础卡开始:持有的颜色以清晰的彩色上边线晕染卡片主体(蓝、绿、红、黄),闪卡、双色和 promo 的主体也从近乎全黑的面板变为家族色的染色玻璃。稀有度仍占据视觉背景;wild、nitro 和永恒保留各自的世界。',
+      ],
+      it: [
+        'I colori delle varianti finalmente si vedono — con decisione, fin dalla prima carta base: il colore posseduto lava il corpo della carta con un bordo colorato netto (blu, verde, rosso, giallo), e i corpi foil, dual e promo diventano un vetro colorato della loro famiglia invece di pannelli quasi neri. La rarità mantiene lo sfondo del visual; wild, nitro ed Eterno mantengono i loro mondi.',
+      ],
+      nl: [
+        'Variantkleuren zijn eindelijk goed zichtbaar — vol en duidelijk, vanaf de allereerste basiskaart: de bezeten kleur wast over de kaartromp met een scherpe gekleurde rand (blauw, groen, rood, geel), en foil-, dual- en promorompen worden getint glas in hun familiekleur in plaats van bijna zwarte panelen. Zeldzaamheid behoudt de visualachtergrond; wild, nitro en Eeuwig behouden hun eigen werelden.',
+      ],
+      de: [
+        'Die Variantenfarben sind endlich richtig sichtbar — kräftig, schon ab der ersten Basiskarte: die besessene Farbe überzieht den Kartenkörper mit einer klaren farbigen Kante (Blau, Grün, Rot, Gelb), und Foil-, Dual- und Promo-Körper werden zu getöntem Glas in ihrer Familienfarbe statt fast schwarzer Paneele. Die Seltenheit behält den Hintergrund des Visuals; Wild, Nitro und Ewig behalten ihre eigenen Welten.',
+      ],
+    },
+  },
+  {
     version: '1.33.1',
     date: '2026-08-08',
     changes: {

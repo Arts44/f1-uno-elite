@@ -222,11 +222,15 @@ function buildCardEl(card){
     const rarity=RARITIES[rKey];
     const isEternal=rKey==='eternal';
 
-    // Bar color from card type (neutre si aucune variante sélectionnée)
-    const barColor=bestType?ct.color:'rgba(0,0,0,0.06)';
-
     const el=document.createElement('div');
     let cardClass='card'+(isOwned?' has-owned':'')+(isWish?' has-wishlist':'')+(isFav?' has-favorite':'')+(isSet?' set-complete':'')+(isEternal?' rar-eternal-fx':'');
+    // Couleur de variante BIEN visible dès la carte de base (1.34.0) :
+    // les 4 couleurs lavent le CORPS de la carte (le fond du visuel
+    // reste à la rareté — règle P1 intacte). Les foils ont déjà leur
+    // dégradé pleine carte sous le panneau translucide.
+    if(bestType && CARD_TYPES[bestType] && !CARD_TYPES[bestType].foil){
+      cardClass+=` vt-${bestType}`;
+    }
     // FOILS (simples, duals, nitro, promos, wild) : le dégradé se
     // prolonge sur TOUTE la carte (une seule couche continue, le
     // .card-visual devient transparent) et le texte est posé sur un
