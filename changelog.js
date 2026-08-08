@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.33.1',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'Two fixes: the + quick-add button (and the card sheet\'s ✕) had drifted out of their corners since the touch-target enlargement — back in place, with their finger-sized tap zones verified. And circuit outlines are visible again in dark mode: the stroke stayed black from the era of light tile backgrounds.',
+      ],
+      fr: [
+        'Deux correctifs : le bouton + d\'ajout rapide (et le ✕ de la fiche) avaient quitté leur coin depuis l\'agrandissement des zones tactiles — remis en place, zones de tap vérifiées. Et les tracés de circuits sont de nouveau visibles en thème sombre : le trait était resté noir, hérité de l\'époque des fonds de tuile clairs.',
+      ],
+      es: [
+        'Dos correcciones: el botón + de añadido rápido (y la ✕ de la ficha) se habían salido de su esquina desde la ampliación de las zonas táctiles — recolocados, con sus zonas de toque verificadas. Y los trazados de los circuitos vuelven a verse en modo oscuro: el trazo seguía negro, heredado de la época de fondos claros.',
+      ],
+      zh: [
+        '两项修复:快速添加的 + 按钮(以及卡片详情的 ✕)自触控区域扩大后偏离了原位——已归位,指尖大小的触区已验证。赛道轮廓在深色模式下重新可见:线条此前沿用了浅色卡格背景时代的黑色。',
+      ],
+      it: [
+        'Due correzioni: il pulsante + di aggiunta rapida (e la ✕ della scheda) erano usciti dal loro angolo dall\'ampliamento delle aree tattili — rimessi al loro posto, con le zone di tocco verificate. E i tracciati dei circuiti sono di nuovo visibili in tema scuro: il tratto era rimasto nero, ereditato dall\'epoca degli sfondi chiari.',
+      ],
+      nl: [
+        'Twee fixes: de +-knop voor snel toevoegen (en de ✕ van de kaartfiche) waren sinds de vergroting van de aanraakzones uit hun hoek verschoven — teruggezet, met geverifieerde tikzones. En de circuitomtrekken zijn weer zichtbaar in donker thema: de lijn was zwart gebleven uit de tijd van lichte tegelachtergronden.',
+      ],
+      de: [
+        'Zwei Korrekturen: der +-Knopf zum schnellen Hinzufügen (und das ✕ des Kartenblatts) waren seit der Vergrößerung der Touch-Zonen aus ihrer Ecke gewandert — wieder an Ort und Stelle, mit geprüften Tippzonen. Und die Streckenverläufe sind im dunklen Design wieder sichtbar: die Linie war schwarz geblieben, ein Erbe der hellen Kachelhintergründe.',
+      ],
+    },
+  },
+  {
     version: '1.33.0',
     date: '2026-08-08',
     changes: {

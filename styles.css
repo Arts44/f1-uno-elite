@@ -430,8 +430,9 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 
 .card-visual .circuit-svg{width:85%;height:70%;position:relative;z-index:1;}
 .modal-visual .circuit-svg{width:80%;height:70%;position:relative;z-index:1;}
+/* Fond P1 toujours sombre : tracé clair sur les deux thèmes (le noir
+   ciblait l'ancien aplat clair des non-possédées, disparu en 1.33.0) */
 .circuit-svg .track-path{stroke:rgba(255,255,255,0.85);}
-[data-theme="dark"] .circuit-svg .track-path{stroke:rgba(0,0,0,0.85);}
 /* Driver number */
 /* ── LOCKUP « F1 UNO Élite » (v2.3) ──────────────────────────
    Remplace les logos F1 et UNO qui étaient hotlinkés depuis
@@ -1884,8 +1885,11 @@ button:not(:disabled):not(.bn-tab):active,
    son parent). Les extensions horizontales s'arrêtent à mi-chemin
    du voisin interactif pour ne jamais détourner un tap.
    ══════════════════════════════════════════════════════════ */
-.schip,.qbtn,.qadd-type,.mqbtn,.modal-close,.sv-tool-tab,
-.user-title-next,.bh-share,.season-pill,.logo,.setv-btn,.toast-action{position:relative;}
+/* .qbtn, .modal-close et .bh-share sont DÉJÀ position:absolute — les
+   passer en relative les sortait de leur coin (régression 1.32.0) ;
+   leur ::after fonctionne tel quel sur un élément absolu. */
+.schip,.qadd-type,.mqbtn,.sv-tool-tab,
+.user-title-next,.season-pill,.logo,.setv-btn,.toast-action{position:relative;}
 .schip::after,.qbtn::after,.qadd-type::after,.mqbtn::after,.modal-close::after,
 .sv-tool-tab::after,.user-title-next::after,.bh-share::after,.season-pill::after,
 .logo::after,.setv-btn::after,.toast-action::after,.setv-toggle::before{
