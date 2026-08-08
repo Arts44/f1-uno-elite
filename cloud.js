@@ -209,12 +209,15 @@ async function _fetchUser(cfg, accessToken){
 
 // Exchange the refresh token for a new session.
 async function _refresh(cfg, refreshToken){
+  // fix 1.40.0 : un échec RÉSEAU (tunnel, avion) n'est pas un refus du
+  // serveur — il remonte 'offline' et la session reste récupérable.
+  // Seul un vrai refus (resp !ok) vaut 'refresh-failed' → déconnexion.
   const resp = await fetch(`${cfg.url}/auth/v1/token?grant_type=refresh_token`, {
     method: 'POST',
     cache: 'no-store',
     headers: authHeaders(cfg),
     body: JSON.stringify({ refresh_token: refreshToken }),
-  });
+  }).catch(() => { throw new Error('offline'); });
   if(!resp.ok) throw new Error('refresh-failed');
   const d = await resp.json();
   return {
@@ -241,7 +244,13 @@ export async function getValidSession(){
     log('cloud: session refreshed');
     return session;
   } catch(e){
-    log('cloud: refresh failed, signing out', e);
+    if(e && e.message === 'offline'){
+      // coupure pendant le refresh : la session n'est PAS jetée —
+      // l'opération échoue en 'offline' et se retentera au retour du réseau
+      log('cloud: refresh offline, session kept');
+      throw e;
+    }
+    log('cloud: refresh refused, signing out', e);
     clearSession();
     return null;
   }
@@ -318,6 +327,11 @@ export async function pushCollection(){
     },
     body: JSON.stringify([row]),
   }).catch(() => { throw new Error('offline'); });
+  if(resp.status === 401 || resp.status === 403){
+    // token révoqué côté serveur : session morte — purge + message typé
+    clearSession();
+    throw new Error('not-signed-in');
+  }
   if(!resp.ok){
     log('cloud: push failed', resp.status, await resp.text().catch(() => ''));
     throw new Error('push-failed');
@@ -344,6 +358,11 @@ export async function pullCollection(){
     cache: 'no-store',
     headers: authHeaders(cfg, session.access_token),
   }).catch(() => { throw new Error('offline'); });
+  if(resp.status === 401 || resp.status === 403){
+    // token révoqué côté serveur : session morte — purge + message typé
+    clearSession();
+    throw new Error('not-signed-in');
+  }
   if(!resp.ok){
     log('cloud: pull failed', resp.status, await resp.text().catch(() => ''));
     throw new Error('pull-failed');

@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.40.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'Cloud sync, hardened against real-world networks: a connection drop during a save now says "you are offline" and your session survives — previously, a drop at the wrong moment could silently sign you out. A token revoked server-side now shows the proper "session expired" state and cleans up. In every failure case, your local collection is untouched — verified scenario by scenario.',
+      ],
+      fr: [
+        'Synchronisation cloud endurcie face aux réseaux réels : une coupure pendant une sauvegarde dit désormais « tu es hors-ligne » et ta session survit — avant, une coupure au mauvais moment pouvait te déconnecter silencieusement. Un jeton révoqué côté serveur affiche maintenant le vrai état « session expirée » et nettoie proprement. Dans tous les cas d\'échec, ta collection locale est intouchée — vérifié scénario par scénario.',
+      ],
+      es: [
+        'Sincronización en la nube endurecida frente a redes reales: un corte durante un guardado ahora dice «estás sin conexión» y tu sesión sobrevive — antes, un corte en mal momento podía cerrarte la sesión en silencio. Un token revocado en el servidor muestra ahora el estado correcto de «sesión caducada» y limpia bien. En todos los casos de fallo, tu colección local queda intacta — verificado escenario por escenario.',
+      ],
+      zh: [
+        '云同步在真实网络环境下更加健壮:保存过程中断网现在会提示「你已离线」,且会话得以保留——此前不巧的断网可能悄悄将你登出。服务器端吊销的令牌现在会正确显示「会话已过期」并妥善清理。所有失败情形下,本地收藏都不受影响——逐一场景验证。',
+      ],
+      it: [
+        'Sincronizzazione cloud temprata per le reti reali: un\'interruzione durante un salvataggio ora dice «sei offline» e la tua sessione sopravvive — prima, un\'interruzione al momento sbagliato poteva disconnetterti in silenzio. Un token revocato lato server mostra ora il vero stato «sessione scaduta» e pulisce correttamente. In ogni caso di errore, la collezione locale resta intatta — verificato scenario per scenario.',
+      ],
+      nl: [
+        'Cloudsynchronisatie gehard voor echte netwerken: een verbindingsonderbreking tijdens het opslaan zegt nu "je bent offline" en je sessie overleeft — voorheen kon een onderbreking op het verkeerde moment je stilletjes uitloggen. Een servergezijds ingetrokken token toont nu de juiste "sessie verlopen"-status en ruimt netjes op. In elk foutgeval blijft je lokale collectie onaangetast — scenario voor scenario geverifieerd.',
+      ],
+      de: [
+        'Cloud-Sync gehärtet für echte Netze: ein Verbindungsabbruch während des Speicherns sagt jetzt „du bist offline" und deine Sitzung überlebt — vorher konnte ein Abbruch im falschen Moment still abmelden. Ein serverseitig widerrufenes Token zeigt jetzt den korrekten Zustand „Sitzung abgelaufen" und räumt sauber auf. In jedem Fehlerfall bleibt die lokale Sammlung unberührt — Szenario für Szenario geprüft.',
+      ],
+    },
+  },
+  {
     version: '1.39.0',
     date: '2026-08-08',
     changes: {
