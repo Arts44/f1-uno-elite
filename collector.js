@@ -47,3 +47,28 @@ export function doublesList(){
 export function tradeList(){
   return { want: missingCards(), offer: doublesList() };
 }
+
+
+/* ── OBJECTIFS PROCHES (phase H) — les buts « à N cartes près ».
+   Pur et injectable : candidats = chaque écurie (posséder toutes ses
+   cartes), chaque catégorie, et les champions. Ne garde que les buts
+   ENTAMÉS et non finis, triés par manque croissant (le plus proche
+   d'aboutir d'abord), limités à `limit`. Chaque objectif emporte ses
+   cartes manquantes — l'UI les rend cliquables. ── */
+export function nearGoals(cards, ownedFn, limit = 4){
+  const goals = [];
+  const consider = (kind, key, pool) => {
+    if(!pool.length) return;
+    const missing = pool.filter(c => !ownedFn(c.id));
+    if(missing.length === 0 || missing.length === pool.length) return; // fini, ou pas commencé
+    goals.push({ kind, key, total: pool.length, owned: pool.length - missing.length,
+                 missing: missing.map(c => ({ id: c.id, name: c.name })) });
+  };
+  [...new Set(cards.map(c => c.team).filter(Boolean))]
+    .forEach(tm => consider('team', tm, cards.filter(c => c.team === tm)));
+  [...new Set(cards.map(c => c.category))]
+    .forEach(cat => consider('category', cat, cards.filter(c => c.category === cat)));
+  consider('champion', 'champion', cards.filter(c => c.champion));
+  goals.sort((a, b) => a.missing.length - b.missing.length || b.owned / b.total - a.owned / a.total);
+  return goals.slice(0, limit);
+}

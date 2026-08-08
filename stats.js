@@ -3,7 +3,7 @@
    ══════════════════════════════════════════════════════════ */
 import { t } from './i18n.js';
 import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, MANUAL_BADGES, rarityChipClass, rarityChipStyle, _currentSeason } from './data.js';
-import { missingCards, doublesList, tradeList } from './collector.js';
+import { missingCards, doublesList, tradeList, nearGoals } from './collector.js';
 import {
   getTypeData, cardOwned, cardWishlist, cardDoubles, cardMissing, cardFavorite,
   cardRarity, variantRarity, cardTotalQty
@@ -366,6 +366,28 @@ export function renderStats(){
       <div class="sv-tools-body" id="svToolsBody">${_toolPanelHTML('missing')}</div>
     </div>`;
 
+  // — Objectifs proches (phase H) : les buts « à N cartes près »,
+  //   cliquables → les manquantes concernées (chips), même grammaire de
+  //   motivation que la carte « Prochain badge » de la page Badges.
+  const TEAM_SHORT_G = TEAM_SHORT;
+  const goals = nearGoals(CARDS_DB, id => cardOwned(id));
+  const goalLabel = g => g.kind === 'team' ? t('st.goal_finish', { x: TEAM_SHORT_G[g.key] || g.key })
+    : g.kind === 'champion' ? t('st.goal_finish', { x: t('st.champions') })
+    : t('st.goal_finish', { x: t('cat.' + g.key) });
+  const goalsHtml = goals.length ? `
+    <div class="sv-section-title">${t('st.goals')}</div>
+    <div class="sv-goals">${goals.map((g, i) => `
+      <div class="sv-goal" data-goal="${i}" role="button" tabindex="0">
+        <div class="sv-goal-row">
+          <div class="sv-goal-txt"><b>${goalLabel(g)}</b>
+            <span>${t('b.remaining', { n: g.missing.length })} · ${g.owned}/${g.total}</span></div>
+          <div class="sv-mini-bar"><div class="sv-mini-fill" style="width:${Math.round(g.owned / g.total * 100)}%"></div></div>
+        </div>
+        <div class="sv-goal-miss" id="goalMiss${i}" style="display:none">${g.missing.map(m =>
+          `<span class="bd-chip miss">#${m.id} ${m.name}</span>`).join('')}</div>
+      </div>`).join('')}
+    </div>` : '';
+
   el.innerHTML = `
     <div class="sv-title">${t('st.title')}</div>
 
@@ -401,6 +423,8 @@ export function renderStats(){
       </div>`:''}
     </div>
 
+    ${goalsHtml}
+
     ${catRows   ? `<div class="sv-section-title">${t('st.by_cat')}</div><div class="sv-rows-block">${catRows}</div>`:''}
     ${typeRows  ? `<div class="sv-section-title">${t('st.by_type')}</div><div class="sv-rows-block">${typeRows}</div>`:''}
     ${teamRows  ? `<div class="sv-section-title">${t('st.by_team')}</div><div class="sv-rows-block">${teamRows}</div>`:''}
@@ -411,6 +435,16 @@ export function renderStats(){
     <div class="sv-section-title">${t('st.history')}</div>
     ${histHtml}
   `;
+
+  // Objectifs proches : clic/Entrée = déplier les manquantes concernées
+  el.querySelectorAll('.sv-goal').forEach(gl => {
+    const toggle = () => {
+      const p = gl.querySelector('.sv-goal-miss');
+      if(p) p.style.display = p.style.display === 'none' ? '' : 'none';
+    };
+    gl.addEventListener('click', toggle);
+    gl.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); } });
+  });
 
   // Onglets outils : bascule locale (lecture seule, pas d'écriture)
   el.querySelectorAll('.sv-tool-tab').forEach(tab => {

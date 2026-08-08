@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.41.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'Stats now motivate: a new "Close goals" block shows what you are closest to finishing — "Finish Williams, 2 to go", "Finish Champions, 3 to go" — sorted by fewest missing. Tap a goal to reveal exactly which cards are missing.',
+      ],
+      fr: [
+        'Les Stats motivent désormais : un nouveau bloc « Objectifs proches » montre ce que tu es le plus près de finir — « Finir Williams, plus que 2 », « Finir Champions, plus que 3 » — trié par manque croissant. Touche un objectif pour révéler exactement quelles cartes manquent.',
+      ],
+      es: [
+        'Las estadísticas ahora motivan: un nuevo bloque «Objetivos cercanos» muestra lo que estás más cerca de terminar — «Terminar Williams, faltan 2», «Terminar Campeones, faltan 3» — ordenado por lo que menos falta. Toca un objetivo para revelar exactamente qué cartas faltan.',
+      ],
+      zh: [
+        '统计页现在更有动力:新的「近在咫尺的目标」板块展示你最接近完成的目标——「集齐 Williams,还差 2 张」「集齐冠军,还差 3 张」——按缺失数量排序。点按目标即可看到具体缺哪些卡。',
+      ],
+      it: [
+        'Le statistiche ora motivano: un nuovo blocco «Obiettivi vicini» mostra ciò che sei più vicino a completare — «Completare Williams, ne mancano 2», «Completare Campioni, ne mancano 3» — ordinato per mancanza crescente. Tocca un obiettivo per rivelare esattamente quali carte mancano.',
+      ],
+      nl: [
+        'Statistieken motiveren nu: een nieuw blok "Bijna-doelen" toont wat je het dichtst bij voltooiing bent — "Williams afronden, nog 2", "Kampioenen afronden, nog 3" — gesorteerd op minste ontbrekend. Tik op een doel om precies te zien welke kaarten ontbreken.',
+      ],
+      de: [
+        'Die Statistiken motivieren jetzt: ein neuer Block „Nahe Ziele" zeigt, was du am ehesten abschließen kannst — „Williams abschließen, noch 2", „Champions abschließen, noch 3" — sortiert nach geringstem Fehlbestand. Tippe auf ein Ziel, um genau zu sehen, welche Karten fehlen.',
+      ],
+    },
+  },
+  {
     version: '1.40.0',
     date: '2026-08-08',
     changes: {
