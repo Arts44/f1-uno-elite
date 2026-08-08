@@ -654,15 +654,6 @@ function _drainToastQueue(){
 // Détecte les transitions verrouillé → débloqué depuis la dernière
 // écriture. C'est un AJOUT : la persistance passe toujours par
 // autoBadgeUnlocked + saveManualBadges, comme avant.
-/* Mode pochette (phase G) : pendant une session, les badges qui
-   tombent sont RETENUS ici au lieu d'être toastés un par un — ils
-   sont livrés groupés sur l'écran de résumé. La persistance, elle,
-   se fait normalement (un badge débloqué le reste). */
-let _holdToasts = false;
-let _heldBadges = [];
-export function holdBadgeToasts(on){ _holdToasts = !!on; if(on) _heldBadges = []; }
-export function takeHeldBadges(){ const h = _heldBadges; _heldBadges = []; return h; }
-
 export function checkNewAutoBadges(){
   const fresh = [];
   AUTO_BADGES.forEach(b => {
@@ -675,7 +666,6 @@ export function checkNewAutoBadges(){
   });
   if(fresh.length){
     saveManualBadges();
-    if(_holdToasts){ _heldBadges.push(...fresh); return; }
     queueBadgeToasts(fresh);
     const tile = document.querySelector(`.badge-tile[data-badge="${fresh[0].id}"]`);
     if(tile) _celebrate(tile);

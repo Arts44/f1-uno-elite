@@ -2,13 +2,12 @@
    APP — entry point: init sequence, global event wiring, boot.
    Loaded as an ES module (<script type="module" src="app.js">).
    ══════════════════════════════════════════════════════════ */
-import { openPack } from './pack.js';
 import { log } from './logger.js';
 import { isViewer } from './session.js';
 import { t, applyLanguage } from './i18n.js';
 import { loadAppData, _renderSeasonPills, switchSeason, CARDS_DB } from './data.js';
 import { loadData, coll, exportCollection, _handleImportFile } from './storage.js';
-import { setSortPref, maybeShowQuickAddHint, dismissQuickAddHint,
+import { maybeShowQuickAddHint, dismissQuickAddHint,
   showGridSkeleton, hideGridSkeleton,
   renderCollection, switchView, closeMo,
   toggleTheme, quickToggle, changeMoQty, showToast,
@@ -123,7 +122,7 @@ function initEvents(){
     // Block write actions in viewer mode
     const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','quickAdd','quickAddType','toggleManualBadge','removeAutoBadge','pinBadge','unpinBadge','toggleTitlePicker','selectTitle',
       // l'export sort la collection de l'appareil : une fuite, pas une écriture
-      'exportCollection', 'openPack']);
+      'exportCollection']);
     if(isViewer() && VIEWER_BLOCKED.has(action)){
       showToast(t('toast.readonly'));
       return;
@@ -147,16 +146,8 @@ function initEvents(){
         toggleQuickAdd(el.getAttribute('data-card'), el);
         break;
       }
-      case 'setSort': {
-        setSortPref(el.getAttribute('data-sort'));
-        break;
-      }
       case 'dismissQaHint': {
         dismissQuickAddHint();
-        break;
-      }
-      case 'openPack': {
-        openPack();
         break;
       }
       case 'quickAddType': {

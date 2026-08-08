@@ -29,10 +29,6 @@ Es una **PWA**: instálala desde tu navegador y funciona como una app nativa, to
 |---|---|---|
 | ![Demo añadido rápido](screenshots/demo-quick-add.gif) | ![Demo navegación](screenshots/demo-nav.gif) | ![Demo insignias](screenshots/demo-badges.gif) |
 
-**Modo sobre** — escribes el número, un botón lo añade, el resumen llega al final:
-
-![Demo modo sobre](screenshots/demo-pack.gif)
-
 
 ### Novedades 1.29 — la pasada v2
 
@@ -72,7 +68,6 @@ Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas, cada 
 
 - 📇 **Gestión completa de la colección** — en propiedad / repetidas / wishlist / favoritas, cantidades por variante, toda la colección siempre a la vista.
 - ➕ **Añadido rápido con un gesto** — un botón + en cada casilla abre un selector de variantes: un toque añade un ejemplar, con aviso «Deshacer». La cabecera muestra tu progreso en vivo (poseídas/total) sobre una fina línea de progreso.
-- 🎴 **Modo sobre — el flujo de mesa.** Abrir un sobre es un momento físico: tiene su propio flujo a pantalla completa. Escribes el número de la carta en un teclado grande, se reconoce en la tercera cifra y un solo botón grande añade un ejemplar con respuesta háptica. Cada acción se deshace una a una, las insignias desbloqueadas durante la sesión se entregan juntas en el resumen, y *Deshacer todo* restaura la colección exactamente como estaba.
 - ✨ **Sistema de rareza animado de 7 niveles** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calculado a partir de la mejor variante en propiedad, +1 nivel cuando la serie está completa (todas las variantes en propiedad) — `eternal` solo se alcanza así. Las cartas foil llevan barridos de luz animados, `divine` se muestra como un degradado iridiscente y `eternal` en negro y oro centelleante (todo respetando `prefers-reduced-motion`).
 - 📴 **Funciona totalmente sin conexión** — toda la app queda precacheada por un service worker; tras la primera visita, el modo avión no cambia nada.
 - 🔄 **Actualizaciones transparentes** — las nuevas versiones se detectan en segundo plano y se aplican con un toque, con un changelog integrado que muestra qué ha cambiado desde *tu* última versión.
@@ -113,7 +108,7 @@ El código es un conjunto de **módulos ES** enfocados tras un único punto de e
 | Capa | Módulos |
 |---|---|
 | Estado y datos | `storage.js` (localStorage, por temporada, migración v1→v2), `data.js`, `history.js` |
-| Interfaz | `render.js` (cuadrícula, filtros, ficha de carta), `stats.js`, `badges.js`, `pack.js`, `pin.js` (ajustes) |
+| Interfaz | `render.js` (cuadrícula, filtros, ficha de carta), `stats.js`, `badges.js`, `pin.js` (ajustes) |
 | Plataforma | `sw.js` (precache), `update.js` (actualizaciones), `install.js`, `secure-store.js` |
 | Nube opcional | `cloud.js`, `feedback.js`, `settings-sync.js` — todos en REST puro |
 

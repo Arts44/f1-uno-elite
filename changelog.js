@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.44.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'The bar above the grid is gone, and with it the sort switch and Pack mode. The grid goes back to card order and starts right under the header — more cards visible, less to read before you get to them. Your collection, badges and backups are untouched.',
+      ],
+      fr: [
+        'La barre au-dessus de la grille disparaît, et avec elle le tri et le mode pochette. La grille reprend l\'ordre par numéro de carte et commence juste sous l\'en-tête — plus de cartes visibles, moins à lire avant d\'y arriver. Ta collection, tes badges et tes sauvegardes sont intacts.',
+      ],
+      es: [
+        'La barra encima de la cuadrícula desaparece, y con ella el orden y el modo sobre. La cuadrícula vuelve al orden por número de carta y empieza justo bajo la cabecera — más cartas visibles, menos que leer antes de llegar. Tu colección, insignias y copias quedan intactas.',
+      ],
+      zh: [
+        '网格上方的工具栏已移除,排序切换和开包模式一并取消。网格恢复按卡号排列,并紧贴页首开始——可见卡片更多,阅读干扰更少。你的收藏、徽章和备份不受影响。',
+      ],
+      it: [
+        'La barra sopra la griglia sparisce, e con lei l\'ordinamento e la modalità bustina. La griglia torna all\'ordine per numero di carta e inizia subito sotto l\'intestazione — più carte visibili, meno da leggere prima di arrivarci. Collezione, badge e backup restano intatti.',
+      ],
+      nl: [
+        'De balk boven het raster verdwijnt, en daarmee de sortering en de zakje-modus. Het raster keert terug naar kaartnummervolgorde en begint direct onder de header — meer kaarten zichtbaar, minder te lezen voordat je er bent. Je collectie, badges en back-ups blijven ongemoeid.',
+      ],
+      de: [
+        'Die Leiste über dem Raster verschwindet, und mit ihr die Sortierung und der Päckchen-Modus. Das Raster kehrt zur Kartennummern-Reihenfolge zurück und beginnt direkt unter der Kopfzeile — mehr Karten sichtbar, weniger zu lesen davor. Sammlung, Abzeichen und Backups bleiben unangetastet.',
+      ],
+    },
+  },
+  {
     version: '1.43.0',
     date: '2026-08-08',
     changes: {

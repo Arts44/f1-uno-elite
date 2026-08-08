@@ -29,10 +29,6 @@ Es ist eine **PWA**: aus dem Browser installiert läuft sie wie eine native App,
 |---|---|---|
 | ![Demo schnelles Hinzufügen](screenshots/demo-quick-add.gif) | ![Demo Navigation](screenshots/demo-nav.gif) | ![Demo Abzeichen](screenshots/demo-badges.gif) |
 
-**Päckchen-Modus** — Nummer tippen, ein Knopf fügt hinzu, am Ende die Zusammenfassung:
-
-![Demo Päckchen-Modus](screenshots/demo-pack.gif)
-
 
 ### Neu in 1.29 — der v2-Durchgang
 
@@ -72,7 +68,6 @@ Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten — 101 Karten, 
 
 - 📇 **Vollständige Sammlungsverwaltung** — im Besitz / Dubletten / Wunschliste / Favoriten, Stückzahlen pro Variante, die gesamte Sammlung immer im Blick.
 - ➕ **Schnelles Hinzufügen mit einer Geste** — ein +-Button auf jeder Kachel öffnet eine Variantenauswahl: ein Tipp fügt ein Exemplar hinzu, mit „Rückgängig“-Toast. Der Header zeigt deinen Fortschritt live (besessen/gesamt) über einer feinen Fortschrittslinie.
-- 🎴 **Päckchen-Modus — der Ablauf am Tisch.** Einen Booster zu öffnen ist ein physischer Moment und bekommt deshalb einen eigenen Vollbild-Ablauf: Kartennummer auf großem Ziffernblock tippen, ab der dritten Ziffer wird die Karte erkannt, ein großer Knopf fügt ein Exemplar mit haptischem Impuls hinzu. Jede Aktion ist einzeln rückgängig zu machen, in der Sitzung freigeschaltete Abzeichen kommen gesammelt in der Zusammenfassung, und *Alles rückgängig* stellt die Sammlung exakt wieder her.
 - ✨ **Animiertes 7-stufiges Seltenheitssystem** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, berechnet aus der besten Variante im Besitz, +1 Stufe bei komplettem Set (jede Variante im Besitz) — `eternal` ist nur so erreichbar. Foil-Karten tragen bewegte Lichtreflexe, `divine` erscheint als irisierender Verlauf und `eternal` in funkelndem Schwarz-Gold (alles unter Beachtung von `prefers-reduced-motion`).
 - 📴 **Funktioniert komplett offline** — die gesamte App wird von einem Service Worker vorgecacht; nach dem ersten Besuch ändert der Flugmodus nichts.
 - 🔄 **Transparente Auto-Updates** — neue Versionen werden im Hintergrund erkannt und mit einem Tipp übernommen, dazu ein integriertes Changelog, das zeigt, was sich seit *deiner* letzten Version geändert hat.
@@ -113,7 +108,7 @@ Der Quellcode besteht aus fokussierten **ES-Modulen** hinter einem einzigen Eins
 | Schicht | Module |
 |---|---|
 | Zustand & Daten | `storage.js` (localStorage, saisonbezogen, Migration v1→v2), `data.js`, `history.js` |
-| Oberfläche | `render.js` (Raster, Filter, Kartenansicht), `stats.js`, `badges.js`, `pack.js`, `pin.js` (Einstellungen) |
+| Oberfläche | `render.js` (Raster, Filter, Kartenansicht), `stats.js`, `badges.js`, `pin.js` (Einstellungen) |
 | Plattform | `sw.js` (Precache), `update.js` (Updates), `install.js`, `secure-store.js` |
 | Optionale Cloud | `cloud.js`, `feedback.js`, `settings-sync.js` — alle über rohes REST |
 

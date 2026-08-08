@@ -29,10 +29,6 @@ Het is een **PWA**: installeer haar vanuit je browser en ze draait als een nativ
 |---|---|---|
 | ![Demo snel toevoegen](screenshots/demo-quick-add.gif) | ![Demo navigatie](screenshots/demo-nav.gif) | ![Demo badges](screenshots/demo-badges.gif) |
 
-**Zakje-modus** — typ het nummer, één knop voegt toe, het overzicht volgt aan het eind:
-
-![Demo zakje-modus](screenshots/demo-pack.gif)
-
 
 ### Nieuw in 1.29 — de v2-ronde
 
@@ -72,7 +68,6 @@ Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten, e
 
 - 📇 **Volledig collectiebeheer** — in bezit / dubbelen / verlanglijst / favorieten, aantallen per variant, de hele collectie altijd in beeld.
 - ➕ **Snel toevoegen met één gebaar** — een +-knop op elke tegel opent een variantkiezer: één tik voegt een exemplaar toe, met een “Ongedaan maken”-melding. De koptekst toont je live voortgang (in bezit/totaal) boven een dunne voortgangslijn.
-- 🎴 **Zakje-modus — de flow aan tafel.** Een boosterpakje openen is een fysiek moment en krijgt daarom een eigen schermvullende flow: typ het kaartnummer op een groot toetsenblok, bij het derde cijfer wordt de kaart herkend, en één grote knop voegt een exemplaar toe met een haptische tik. Elke handeling is één voor één ongedaan te maken, badges uit de sessie komen samen in het overzicht, en *Alles ongedaan maken* zet de collectie exact terug.
 - ✨ **Geanimeerd zeldzaamheidssysteem met 7 niveaus** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, berekend uit de beste variant in bezit, +1 niveau wanneer de set compleet is (elke variant in bezit) — `eternal` is alleen zo bereikbaar. Foil-kaarten dragen bewegende lichtglans-effecten, `divine` toont een iriserend verloop en `eternal` fonkelend zwart-goud (alles met respect voor `prefers-reduced-motion`).
 - 📴 **Werkt volledig offline** — de hele app wordt door een service worker geprecachet; na het eerste bezoek verandert vliegtuigmodus niets.
 - 🔄 **Transparante auto-updates** — nieuwe versies worden op de achtergrond gedetecteerd en met één tik toegepast, met een ingebouwde changelog die toont wat er sinds *jouw* laatste versie veranderde.
@@ -113,7 +108,7 @@ De code bestaat uit gerichte **ES-modules** achter één ingangspunt, `app.js`, 
 | Laag | Modules |
 |---|---|
 | Staat en data | `storage.js` (localStorage, per seizoen, migratie v1→v2), `data.js`, `history.js` |
-| Interface | `render.js` (raster, filters, kaartfiche), `stats.js`, `badges.js`, `pack.js`, `pin.js` (instellingen) |
+| Interface | `render.js` (raster, filters, kaartfiche), `stats.js`, `badges.js`, `pin.js` (instellingen) |
 | Platform | `sw.js` (precache), `update.js` (updates), `install.js`, `secure-store.js` |
 | Optionele cloud | `cloud.js`, `feedback.js`, `settings-sync.js` — alle via kale REST |
 

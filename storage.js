@@ -51,6 +51,11 @@ function _migrateStorage(){
 /* ── Collection state ── */
 export let coll = {};
 
+/* Nettoyage 1.44.0 : le tri de grille a été retiré. Sa préférence
+   traînerait indéfiniment dans le localStorage des utilisateurs qui
+   l'avaient réglée — on la balaie une fois. */
+try { localStorage.removeItem('f1uno_sort'); } catch(e){ /* stockage indisponible */ }
+
 export function loadData(){
   _migrateStorage();
   try{

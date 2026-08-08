@@ -29,10 +29,6 @@
 |---|---|---|
 | ![Demo aggiunta rapida](screenshots/demo-quick-add.gif) | ![Demo navigazione](screenshots/demo-nav.gif) | ![Demo badge](screenshots/demo-badges.gif) |
 
-**Modalità bustina** — digiti il numero, un pulsante la aggiunge, il riepilogo arriva alla fine:
-
-![Demo modalità bustina](screenshots/demo-pack.gif)
-
 
 ### Novità 1.29 — la revisione v2
 
@@ -72,7 +68,6 @@ Tenere traccia di una collezione completa di carte **F1 UNO Élite** — 101 car
 
 - 📇 **Gestione completa della collezione** — possedute / doppioni / wishlist / preferite, quantità per variante, l’intera collezione sempre in vista.
 - ➕ **Aggiunta rapida con un gesto** — un pulsante + su ogni tessera apre un selettore di varianti: un tocco aggiunge una copia, con toast «Annulla». L’intestazione mostra i progressi in tempo reale (possedute/totale) sopra una sottile linea di avanzamento.
-- 🎴 **Modalità bustina — il flusso da tavolo.** Aprire un pacchetto è un momento fisico: ha un flusso a schermo intero dedicato. Digiti il numero della carta su un tastierino grande, viene riconosciuta alla terza cifra e un solo grande pulsante aggiunge un esemplare con risposta aptica. Ogni gesto si annulla uno per uno, i badge sbloccati durante la sessione arrivano insieme nel riepilogo, e *Annulla tutto* ripristina la collezione esattamente com'era.
 - ✨ **Sistema di rarità animato a 7 livelli** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calcolato dalla migliore variante posseduta, +1 livello quando il set è completo (tutte le varianti possedute) — `eternal` si raggiunge solo così. Le carte foil hanno riflessi di luce animati, `divine` si mostra come un gradiente iridescente ed `eternal` in nero e oro scintillante (il tutto rispettando `prefers-reduced-motion`).
 - 📴 **Funziona completamente offline** — l'intera app è precachata da un service worker; dopo la prima visita, la modalità aereo non cambia nulla.
 - 🔄 **Aggiornamenti trasparenti** — le nuove versioni vengono rilevate in background e applicate con un tocco, con un changelog integrato che mostra cosa è cambiato dalla *tua* ultima versione.
@@ -113,7 +108,7 @@ Il codice è un insieme di **moduli ES** mirati dietro un unico punto di ingress
 | Livello | Moduli |
 |---|---|
 | Stato e dati | `storage.js` (localStorage, per stagione, migrazione v1→v2), `data.js`, `history.js` |
-| Interfaccia | `render.js` (griglia, filtri, scheda carta), `stats.js`, `badges.js`, `pack.js`, `pin.js` (impostazioni) |
+| Interfaccia | `render.js` (griglia, filtri, scheda carta), `stats.js`, `badges.js`, `pin.js` (impostazioni) |
 | Piattaforma | `sw.js` (precache), `update.js` (aggiornamenti), `install.js`, `secure-store.js` |
 | Cloud opzionale | `cloud.js`, `feedback.js`, `settings-sync.js` — tutti in REST puro |
 

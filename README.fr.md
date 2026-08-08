@@ -29,10 +29,6 @@ C'est une **PWA** : installez-la depuis votre navigateur et elle fonctionne comm
 |---|---|---|
 | ![Démo ajout rapide](screenshots/demo-quick-add.gif) | ![Démo navigation](screenshots/demo-nav.gif) | ![Démo badges](screenshots/demo-badges.gif) |
 
-**Mode pochette** — on tape le numéro, un bouton l'ajoute, le résumé tombe à la fin :
-
-![Démo mode pochette](screenshots/demo-pack.gif)
-
 
 ### Nouveautés 1.29 — la passe v2
 
@@ -72,7 +68,6 @@ Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chac
 
 - 📇 **Gestion complète de la collection** — possédées / doubles / wishlist / favoris, quantités par variante, l’ensemble de la collection toujours visible.
 - ➕ **Ajout rapide en un geste** — un bouton + sur chaque tuile ouvre un sélecteur de variantes : un appui ajoute un exemplaire, avec un toast « Annuler ». Le header affiche la progression en direct (possédées/total) au-dessus d’un fin liseré de progression.
-- 🎴 **Mode pochette — le flux de table.** Ouvrir un booster est un moment physique : il a donc son propre flux plein écran. On tape le numéro de la carte sur un grand pavé, elle est reconnue dès le 3ᵉ chiffre, et un seul gros bouton ajoute un exemplaire avec un retour haptique. Chaque geste s'annule un par un, les badges débloqués pendant la session sont retenus et livrés ensemble au résumé, et *Tout annuler* restaure la collection exactement — depuis un instantané pris à l'ouverture.
 - ✨ **Système de rareté animé à 7 niveaux** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calculé depuis la meilleure variante possédée, +1 niveau quand le set est complet (toutes les variantes possédées) — `eternal` n'est atteignable que comme ça. Les cartes foil portent des reflets de lumière animés, `divine` s'affiche en dégradé irisé mouvant et `eternal` en noir & or scintillant (le tout respectant `prefers-reduced-motion`).
 - 📴 **Fonctionne entièrement hors-ligne** — toute l'app est précachée par un service worker ; après la première visite, le mode avion ne change rien.
 - 🔄 **Mises à jour transparentes** — les nouvelles versions sont détectées en arrière-plan et appliquées d'un tap, avec un changelog intégré qui montre ce qui a changé depuis *votre* dernière version.
@@ -113,7 +108,7 @@ Le code est un ensemble de **modules ES** ciblés derrière un point d'entrée u
 | Couche | Modules |
 |---|---|
 | État & données | `storage.js` (localStorage, scoppé par saison, migration v1→v2), `data.js`, `history.js` |
-| Interface | `render.js` (grille, filtres, fiche carte), `stats.js`, `badges.js`, `pack.js`, `pin.js` (réglages) |
+| Interface | `render.js` (grille, filtres, fiche carte), `stats.js`, `badges.js`, `pin.js` (réglages) |
 | Plateforme | `sw.js` (précache), `update.js` (mises à jour), `install.js`, `secure-store.js` |
 | Cloud optionnel | `cloud.js`, `feedback.js`, `settings-sync.js` — tous en REST brut |
 

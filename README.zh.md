@@ -29,10 +29,6 @@
 |---|---|---|
 | ![快速添加演示](screenshots/demo-quick-add.gif) | ![导航演示](screenshots/demo-nav.gif) | ![徽章演示](screenshots/demo-badges.gif) |
 
-**开包模式**——输入编号,一个按钮完成添加,最后给出结算:
-
-![开包模式演示](screenshots/demo-pack.gif)
-
 
 ### 1.29 新功能 — v2 大改版
 
@@ -72,7 +68,6 @@
 
 - 📇 **完整的收藏管理** — 已拥有 / 重复 / 愿望清单 / 收藏夹，支持按变体记录数量、整个收藏一目了然。
 - ➕ **一步快速添加** — 每张卡格上的 + 按钮会打开版本选择器：点一下即可添加一张，并附“撤销”提示。页眉实时显示收藏进度（已拥有/总数）和一条细进度线。
-- 🎴 **开包模式——牌桌上的流程。** 拆开一包卡是实实在在的时刻,因此它有专属的全屏流程:在大号数字键盘输入卡片编号,满三位即识别,一个大按钮带触感反馈地添加一张。每一步都可逐一撤销,开包期间解锁的徽章会在结算页一并呈现,「全部撤销」则依据开包时的快照,把收藏原样还原。
 - ✨ **7 级动态稀有度系统** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`，根据已拥有的最高变体自动计算；集齐全套（拥有所有版本）再升 1 级——`eternal` 只能通过这种方式达到。闪卡带有流动的光泽效果，`divine` 呈现流转的虹彩渐变，`eternal` 则是闪耀的黑金风格（全部遵循 `prefers-reduced-motion`）。
 - 📴 **完全离线可用** — 整个应用由 Service Worker 预缓存；首次访问之后，开启飞行模式也毫无影响。
 - 🔄 **无感自动更新** — 后台检测新版本，轻点一下即可应用，并附带应用内更新日志，显示自*你*上次使用的版本以来有哪些变化。
@@ -113,7 +108,7 @@
 | 层次 | 模块 |
 |---|---|
 | 状态与数据 | `storage.js`（localStorage，按赛季隔离，v1→v2 迁移）、`data.js`、`history.js` |
-| 界面 | `render.js`（网格、筛选、卡牌详情）、`stats.js`、`badges.js`、`pack.js`, `pin.js`（设置） |
+| 界面 | `render.js`（网格、筛选、卡牌详情）、`stats.js`、`badges.js`、`pin.js`（设置） |
 | 平台 | `sw.js`（预缓存）、`update.js`（更新流程）、`install.js`、`secure-store.js` |
 | 可选云端 | `cloud.js`、`feedback.js`、`settings-sync.js` — 均为纯 REST |
 

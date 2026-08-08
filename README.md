@@ -29,10 +29,6 @@ It's a **PWA**: install it from your browser and it runs like a native app, full
 |---|---|---|
 | ![Quick add demo](screenshots/demo-quick-add.gif) | ![Navigation demo](screenshots/demo-nav.gif) | ![Badges demo](screenshots/demo-badges.gif) |
 
-**Pack mode** — type the number, one button adds it, the summary lands at the end:
-
-![Pack mode demo](screenshots/demo-pack.gif)
-
 
 ### Badges — families, progress, difficulty
 
@@ -72,7 +68,6 @@ Track a complete **F1 UNO Élite** trading-card collection — 101 cards, each e
 
 - 📇 **Full collection management** — owned / doubles / wishlist / favourites, per-variant quantities, the whole collection always in view.
 - ➕ **One-gesture quick add** — a + button on every tile opens a variant picker: one tap adds a copy, with an Undo toast. The header shows your live progress (owned/total) over a thin progress line.
-- 🎴 **Pack mode — the table-side flow.** Opening a booster is a physical moment, so it gets its own full-screen flow: type the card number on a large keypad, it is recognised at the third digit, and one big button adds a copy with a haptic tap. Every action is undoable one by one, badges unlocked during the session are held back and delivered together on the summary, and *Undo everything* restores the collection exactly as it was — from a snapshot taken when the pack opened.
 - ✨ **Animated 7-level rarity system** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, computed from the best owned variant, +1 level when the set is complete (every variant owned) — `eternal` is only reachable that way. Foil cards carry live light-sweep visuals and the top tier renders as a shifting iridescent gradient (all respecting `prefers-reduced-motion`).
 - 📴 **Works fully offline** — the whole app is precached by a service worker; after the first visit, airplane mode changes nothing.
 - 🔄 **Transparent auto-updates** — new versions are detected in the background and applied with one tap, plus an in-app changelog showing what changed since *your* last version.
@@ -113,7 +108,7 @@ The source is a set of focused **ES modules** behind a single entry point, `app.
 | Layer | Modules |
 |---|---|
 | State & data | `storage.js` (localStorage, season-scoped, v1→v2 migration), `data.js`, `history.js` |
-| UI | `render.js` (grid, card sheet), `stats.js`, `badges.js`, `pack.js` (pack mode), `pin.js` (settings), `icons.js` |
+| UI | `render.js` (grid, card sheet), `stats.js`, `badges.js`, `pin.js` (settings), `icons.js` |
 | Platform | `sw.js` (precache), `update.js` (update flow), `install.js`, `secure-store.js` |
 | Optional cloud | `cloud.js`, `feedback.js`, `settings-sync.js` — all raw REST |
 
