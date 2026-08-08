@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.42.2',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'Security fix: a shared backup — a code, a QR, or a link — could carry hidden code that ran when the import dialog opened, with access to everything this app stores on your device. Every value coming from outside is now neutralised before display, on all four import paths (file, code, link, cloud). Update if you ever open backups you did not create yourself.',
+      ],
+      fr: [
+        'Correctif de sécurité : une sauvegarde partagée — un code, un QR ou un lien — pouvait transporter du code caché qui s\'exécutait à l\'ouverture de la fenêtre d\'import, avec accès à tout ce que l\'app garde sur ton appareil. Toute valeur venant de l\'extérieur est désormais neutralisée avant affichage, sur les quatre chemins d\'import (fichier, code, lien, cloud). À installer si tu ouvres des sauvegardes que tu n\'as pas créées toi-même.',
+      ],
+      es: [
+        'Corrección de seguridad: una copia compartida — un código, un QR o un enlace — podía transportar código oculto que se ejecutaba al abrirse el diálogo de importación, con acceso a todo lo que la app guarda en tu dispositivo. Todo valor externo se neutraliza ahora antes de mostrarse, en las cuatro vías de importación (archivo, código, enlace, nube).',
+      ],
+      zh: [
+        '安全修复:他人分享的备份——备份码、二维码或链接——可能夹带隐藏代码,在导入对话框打开时执行,并能访问本应用存储在你设备上的一切。现在所有来自外部的数值在显示前都会被中和,四条导入路径(文件、备份码、链接、云端)均已覆盖。若你会打开非自己创建的备份,请务必更新。',
+      ],
+      it: [
+        'Correzione di sicurezza: un backup condiviso — un codice, un QR o un link — poteva trasportare codice nascosto che veniva eseguito all\'apertura della finestra di importazione, con accesso a tutto ciò che l\'app conserva sul tuo dispositivo. Ogni valore proveniente dall\'esterno è ora neutralizzato prima della visualizzazione, su tutti e quattro i percorsi di importazione.',
+      ],
+      nl: [
+        'Beveiligingsfix: een gedeelde back-up — een code, een QR of een link — kon verborgen code bevatten die werd uitgevoerd zodra het importvenster opende, met toegang tot alles wat de app op je apparaat bewaart. Elke waarde van buitenaf wordt nu onschadelijk gemaakt vóór weergave, op alle vier de importpaden.',
+      ],
+      de: [
+        'Sicherheitskorrektur: ein geteiltes Backup — ein Code, ein QR oder ein Link — konnte verstecken Code enthalten, der beim Öffnen des Import-Dialogs ausgeführt wurde, mit Zugriff auf alles, was die App auf deinem Gerät speichert. Jeder von außen kommende Wert wird jetzt vor der Anzeige unschädlich gemacht, auf allen vier Importwegen.',
+      ],
+    },
+  },
+  {
     version: '1.42.1',
     date: '2026-08-08',
     changes: {

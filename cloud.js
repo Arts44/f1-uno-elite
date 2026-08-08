@@ -14,7 +14,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
-import { t } from './i18n.js';
+import { t, escapeHtml } from './i18n.js';
 import { collectionSnapshot, _showImportDialog } from './storage.js';
 import { backupIncludes } from './settings-sync.js';
 import { icon } from './icons.js';
@@ -465,7 +465,7 @@ function _cloudAreaHTML(){
     return `
       <div class="cloud-status">
         <span class="cloud-dot on" aria-hidden="true"></span>
-        <span>${t('cloud.signed_in')} <b>${email}</b></span>
+        <span>${t('cloud.signed_in')} <b>${escapeHtml(email)}</b></span>
       </div>
       <div class="setv-row-sub">${t('cloud.last_backup')} <span id="cloudLastBackup">…</span></div>
       <div class="cloud-actions">

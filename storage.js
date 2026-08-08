@@ -5,7 +5,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
-import { t } from './i18n.js';
+import { t, tEsc } from './i18n.js';
 import {
   _currentSeason, setCurrentSeason,
   CARDS_DB, CARD_TYPES, RARITY_ORDER, RARITY_KEYS, ROLE_BASE_RARITY
@@ -288,7 +288,7 @@ export function _showImportDialog(data){
   overlay.innerHTML=`
     <div class="import-dialog">
       <div class="import-dialog-title">${t('imp.title')}</div>
-      <div class="import-dialog-sub">${t('imp.sub',{season:data.season||'?',date:data.exportDate?new Date(data.exportDate).toLocaleDateString():'?'})}<br>${t('imp.q')}</div>
+      <div class="import-dialog-sub">${tEsc('imp.sub',{season:data.season||'?',date:data.exportDate?new Date(data.exportDate).toLocaleDateString():'?'})}<br>${t('imp.q')}</div>
       ${settingsRows}
       <div class="import-dialog-btns">
         <button class="import-dialog-btn" id="importMergeBtn">${t('imp.merge')}</button>

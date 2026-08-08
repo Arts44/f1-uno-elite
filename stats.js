@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════════════════════
    STATS — live header/counter updates + stats view rendering
    ══════════════════════════════════════════════════════════ */
-import { t } from './i18n.js';
+import { t, tEsc } from './i18n.js';
 import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, MANUAL_BADGES, rarityChipClass, rarityChipStyle, _currentSeason } from './data.js';
 import { missingCards, doublesList, tradeList, nearGoals } from './collector.js';
 import {
@@ -371,7 +371,7 @@ export function renderStats(){
   //   motivation que la carte « Prochain badge » de la page Badges.
   const TEAM_SHORT_G = TEAM_SHORT;
   const goals = nearGoals(CARDS_DB, id => cardOwned(id));
-  const goalLabel = g => g.kind === 'team' ? t('st.goal_finish', { x: TEAM_SHORT_G[g.key] || g.key })
+  const goalLabel = g => g.kind === 'team' ? tEsc('st.goal_finish', { x: TEAM_SHORT_G[g.key] || g.key })
     : g.kind === 'champion' ? t('st.goal_finish', { x: t('st.champions') })
     : t('st.goal_finish', { x: t('cat.' + g.key) });
   const goalsHtml = goals.length ? `

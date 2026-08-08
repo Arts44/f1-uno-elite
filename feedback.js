@@ -14,7 +14,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
-import { t, getLang } from './i18n.js';
+import { t, getLang, escapeHtml } from './i18n.js';
 import { APP_VERSION } from './changelog.js';
 import {
   cloudConfig, isCloudConfigured, authHeaders, getValidSession,
@@ -206,14 +206,10 @@ export function bindFeedbackSection(){
       const rows = await fetchMyFeedback();
       area.innerHTML = rows.length
         ? rows.map(r => `<div class="setv-row-sub" style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;">
-            <strong>${t('fb.type_' + (FEEDBACK_TYPES.includes(r.type) ? r.type : 'other'))}</strong> · ${new Date(r.created_at).toLocaleDateString()}<br>${_esc(r.message)}</div>`).join('')
+            <strong>${t('fb.type_' + (FEEDBACK_TYPES.includes(r.type) ? r.type : 'other'))}</strong> · ${new Date(r.created_at).toLocaleDateString()}<br>${escapeHtml(r.message)}</div>`).join('')
         : `<span class="setv-row-sub">${t('fb.mine_empty')}</span>`;
     } catch(e){
       area.innerHTML = `<span class="setv-row-sub">${t('fb.err_failed')}</span>`;
     }
   });
-}
-
-function _esc(s){
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }

@@ -21,7 +21,7 @@
    de storage.js — aucune écriture directe ici.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
-import { t } from './i18n.js';
+import { t, tEsc } from './i18n.js';
 import { CARDS_DB, CARD_TYPES, TEAM_COLORS, TEAM_LIVERIES, sortTypesCanonical, _currentSeason } from './data.js';
 import { cardOwned, quickAddVariant, undoQuickAdd, getTypeData, loadData } from './storage.js';
 import { renderCollection, showToast, defaultBaseType } from './render.js';
@@ -149,7 +149,7 @@ function _visualHTML(card){
 function _matchHTML(){
   const r = resolvePackInput(_buf, CARDS_DB);
   if(r.state === 'typing') return `<div class="pk-empty">${t('pack.hint')}</div>`;
-  if(r.state === 'unknown') return `<div class="pk-empty">${t('pack.unknown', { id: r.id })}</div>`;
+  if(r.state === 'unknown') return `<div class="pk-empty">${tEsc('pack.unknown', { id: r.id })}</div>`;
   const card = r.card;
   const owned = cardOwned(card.id);
   return `<div class="pk-card">

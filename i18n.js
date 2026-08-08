@@ -16,6 +16,15 @@ export function setLang(code){
   applyLanguage();
 }
 
+/* Échappement HTML — UNE seule implémentation pour tout le projet.
+   Nécessaire parce que le rendu passe massivement par innerHTML avec
+   des chaînes de template : toute donnée qui n'est pas du code doit
+   être échappée avant d'y entrer. */
+export function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+}
+
 export function t(key, p={}){
   const d = (window.__T||{})[getLang()]||(window.__T||{}).en||{};
   const base = (window.__T||{}).en||{};
@@ -23,6 +32,18 @@ export function t(key, p={}){
   Object.keys(p).forEach(k=>{ s=s.replace('{'+k+'}',p[k]); });
   log('t() called:', key, p, 'result:', s);
   return s;
+}
+
+/* t() destiné à innerHTML : les VALEURS interpolées sont échappées,
+   pas le gabarit traduit (qui est du contenu maîtrisé du dépôt).
+   À utiliser dès qu'un paramètre vient d'ailleurs que du code —
+   fichier importé, code de sauvegarde, lien #backup=, réponse cloud.
+   Corrige la XSS de 1.42.1 : un `season` hostile dans une sauvegarde
+   partagée s'exécutait dans l'origine de l'app. */
+export function tEsc(key, p={}){
+  const safe = {};
+  Object.keys(p).forEach(k => { safe[k] = escapeHtml(p[k]); });
+  return t(key, safe);
 }
 
 export function applyLanguage(){
