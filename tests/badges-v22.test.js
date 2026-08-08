@@ -24,9 +24,9 @@ const read = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
 const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
 
 describe('familles — le regroupement couvre tout, une seule fois', () => {
-  test('les 25 badges auto RÉELS sont répartis sans doublon ni oubli', () => {
+  test('les 59 badges auto RÉELS sont répartis sans doublon ni oubli', () => {
     const real = JSON.parse(readFileSync(new URL('../data/badges.json', import.meta.url), 'utf8'));
-    const famIds = FAMILIES.filter(f => !f.manual).flatMap(f => f.ids);
+    const famIds = FAMILIES.filter(f => !f.manual).flatMap(f => [...(f.ids || []), ...(f.extraIds || [])]); // v3 : extraIds (tuiles sous l'échelle)
     assert.equal(new Set(famIds).size, famIds.length, 'aucun badge dans deux familles');
     const autoIds = real.auto.map(b => b.id);
     autoIds.forEach(id => assert.ok(famIds.includes(id), `${id} sans famille`));
@@ -77,12 +77,15 @@ describe('hardestUnlockedBadge — la plus grande cible débloquée', () => {
   const ev = b => b._p;
   const un = b => b._p.cur >= b._p.max;
 
-  test('101 cartes bat 20 bleues', () => {
-    const r = hardestUnlockedBadge([mk('blue', 20, 20), mk('legend', 101, 101), mk('locked', 3, 50)], ev, un);
+  // v3 : le « plus difficile » se mesure au SCORE de difficulté (scoreFn
+  // injectable) — plus à la taille de la cible.
+  const score = b => b._p.max;
+  test('le score le plus haut débloqué gagne', () => {
+    const r = hardestUnlockedBadge([mk('blue', 20, 20), mk('legend', 101, 101), mk('locked', 3, 50)], ev, un, score);
     assert.equal(r.id, 'legend');
   });
   test('aucun débloqué → null', () => {
-    assert.equal(hardestUnlockedBadge([mk('a', 0, 5)], ev, un), null);
+    assert.equal(hardestUnlockedBadge([mk('a', 0, 5)], ev, un, score), null);
   });
 });
 

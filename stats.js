@@ -2,7 +2,7 @@
    STATS — live header/counter updates + stats view rendering
    ══════════════════════════════════════════════════════════ */
 import { t } from './i18n.js';
-import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, rarityChipClass, rarityChipStyle, _currentSeason } from './data.js';
+import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, MANUAL_BADGES, rarityChipClass, rarityChipStyle, _currentSeason } from './data.js';
 import { missingCards, doublesList, tradeList } from './collector.js';
 import {
   getTypeData, cardOwned, cardWishlist, cardDoubles, cardMissing, cardFavorite,
@@ -113,7 +113,7 @@ export function updateStats(){
   AUTO_BADGES.forEach(b => { if(isAutoBadgeUnlocked(b)) autoUnlocked++; });
   let manualUnlocked = Object.values(manualBadges).filter(v=>v).length;
   const badgeCountTab = document.getElementById('badgeCountTab');
-  if(badgeCountTab) badgeCountTab.textContent = `${autoUnlocked+manualUnlocked}/50`;
+  if(badgeCountTab) badgeCountTab.textContent = `${autoUnlocked+manualUnlocked}/${AUTO_BADGES.length+MANUAL_BADGES.length}`;
   // Refresh active views
   if(currentView === 'badges') renderBadges();
   if(currentView === 'stats') renderStats();

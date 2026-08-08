@@ -14,7 +14,7 @@ import {
   toggleQuickAdd, quickAddType, closeQuickAdd, initNavBead
 } from './render.js';
 import { updateStats } from './stats.js';
-import {
+import { seedNewAutoBadges,
   loadManualBadges, updateUserTitle, toggleManualBadge, removeAutoBadge,
   toggleBadgeDetail, pinBadge, unpinBadge, shareProfileCard,
   toggleTitlePicker, getUnlockedTitles, selectTitle
@@ -55,6 +55,10 @@ export function initApp() {
     log('Données chargées, CARDS_DB.length:', CARDS_DB.length);
     loadData();
     loadManualBadges();
+    // v3 : semis silencieux des badges nouvellement définis dont la
+    // condition est déjà satisfaite — « Débloqué » sans date, sans toast.
+    // AVANT le premier updateStats, pour couper court à toute rafale.
+    try { seedNewAutoBadges(); } catch(e){ console.error('badge seed failed', e); }
     initEvents();
     initNavBead();
     renderCollection();

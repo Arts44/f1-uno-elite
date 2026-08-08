@@ -135,7 +135,8 @@ export function _applyBadges(badgesData){
   MANUAL_BADGES = badgesData.manual;
 }
 
-function _applyCards(cardsData){
+// Exported for the test suite (fixture injection) — not used by the UI.
+export function _applyCards(cardsData){
   CARDS_DB.length = 0;
   cardsData.forEach(c => CARDS_DB.push(c));
 }

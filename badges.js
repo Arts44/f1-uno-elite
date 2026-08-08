@@ -1,13 +1,16 @@
 /* ══════════════════════════════════════════════════════════
-   BADGES SYSTEM — 50 badges (25 auto + 25 manual) + user titles
+   BADGES SYSTEM — v3 : 111 badges (59 auto + 52 manuels) + titres
    ══════════════════════════════════════════════════════════ */
 import { t, getLang } from './i18n.js';
 import { icon } from './icons.js';
 import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES } from './data.js';
 import {
   _storageKey, getTypeData,
-  cardOwned, cardWishlist, cardDoubles, cardFavorite
+  cardOwned, cardWishlist, cardDoubles, cardFavorite,
+  cardSetComplete, cardRarity
 } from './storage.js';
+import { getHistory } from './history.js';
+import { badgeDifficulty, difficultyLabelKey } from './difficulty.js';
 import { updateStats } from './stats.js';
 import { showToast, switchView } from './render.js';
 import { secureGet, secureSet } from './secure-store.js';
@@ -75,9 +78,83 @@ export function evaluateBadgeCondition(badge){
       }
       return {cur: Math.min(n, target), max: target};
     }
+    /* ── v3 : sets intégraux, Éternel, écuries, catégories, rythme ── */
+    case 'sets_complete_count': {
+      const n = CARDS_DB.filter(c => cardSetComplete(c.id)).length;
+      return {cur: Math.min(n, target), max: target};
+    }
+    case 'eternal_count': {
+      const n = CARDS_DB.filter(c => cardRarity(c) === 'eternal').length;
+      return {cur: Math.min(n, target), max: target};
+    }
+    case 'teams_owned_count': {
+      const teams = [...new Set(CARDS_DB.map(c => c.team).filter(Boolean))];
+      const n = teams.filter(tm => CARDS_DB.filter(c => c.team === tm).every(c => cardOwned(c.id))).length;
+      return {cur: Math.min(n, target), max: target};
+    }
+    case 'team_set': {
+      const all = CARDS_DB.filter(c => c.team === target);
+      const n = all.filter(c => cardSetComplete(c.id)).length;
+      return {cur: n, max: all.length || 1};
+    }
+    case 'teams_set_count': {
+      const teams = [...new Set(CARDS_DB.map(c => c.team).filter(Boolean))];
+      const n = teams.filter(tm => {
+        const cs = CARDS_DB.filter(c => c.team === tm);
+        return cs.length && cs.every(c => cardSetComplete(c.id));
+      }).length;
+      return {cur: Math.min(n, target), max: target};
+    }
+    case 'category_set': {
+      const all = CARDS_DB.filter(c => c.category === target);
+      const n = all.filter(c => cardSetComplete(c.id)).length;
+      return {cur: n, max: all.length || 1};
+    }
+    /* Rythme — depuis l'historique quotidien {date, owned}. Limites
+       honnêtes : démarre à l'installation de l'historique, « activité »
+       = tout jour avec écriture, gain = delta NET entre points. */
+    case 'history_day_gain': {
+      const h = getHistory();
+      let best = 0;
+      for(let i = 1; i < h.length; i++) best = Math.max(best, h[i].owned - h[i-1].owned);
+      return {cur: Math.min(best, target), max: target};
+    }
+    case 'history_streak': {
+      const h = getHistory();
+      let best = h.length ? 1 : 0, run = 1;
+      for(let i = 1; i < h.length; i++){
+        const prev = new Date(h[i-1].date), cur = new Date(h[i].date);
+        run = (cur - prev === 86400000) ? run + 1 : 1;
+        best = Math.max(best, run);
+      }
+      return {cur: Math.min(best, target), max: target};
+    }
+    case 'history_months': {
+      const months = new Set(getHistory().map(p => p.date.slice(0, 7)));
+      return {cur: Math.min(months.size, target), max: target};
+    }
     default:
       return {cur:0, max:1};
   }
+}
+
+/* ── SEMIS SILENCIEUX (rétrocompat v3) — appelé à l'init, AVANT toute
+   évaluation : un badge auto nouvellement défini dont la condition est
+   déjà satisfaite est enregistré avec la valeur legacy `true`
+   (« Débloqué » sans date) et SANS toast — pas de fausse date du jour
+   sur un exploit ancien, pas de rafale au premier lancement. Les
+   déblocages postérieurs suivent le chemin normal (date + toast). ── */
+export function seedNewAutoBadges(){
+  loadManualBadges();
+  let seeded = 0;
+  AUTO_BADGES.forEach(b => {
+    if(autoBadgeUnlocked[b.id]) return;
+    const p = evaluateBadgeCondition(b);
+    if(p.cur >= p.max){ autoBadgeUnlocked[b.id] = true; seeded++; }
+  });
+  if(seeded){ saveManualBadges(); }
+  AUTO_BADGES.forEach(b => { if(autoBadgeUnlocked[b.id]) _seenAutoBadges.add(b.id); });
+  return seeded;
 }
 
 // Load manual badges from localStorage
@@ -122,21 +199,32 @@ export function badgeUnlockDate(store, id){
    ══════════════════════════════════════════════════════════ */
 export const FAMILIES = [
   { id:'parcours', ico:'🛣️', cls:'bf-parcours', ladder:true,
-    ids:['first_card','collector_10','hunter_25','expert_50','master_75','legend_101'] },
+    ids:['first_card','collector_10','hunter_25','expert_50','master_75','legend_101'],
+    // v3 : tuiles sous l'échelle (l'échelle ne montre que les jalons possédés)
+    extraIds:['doubler_5','doubles_25','doubles_75','qty_150','qty_300','qty_500',
+              'rythme_jour10','rythme_semaine7','rythme_mois6'] },
   { id:'sets',     ico:'🧩', cls:'bf-sets',
-    ids:['pilote_all','reserve_all','director_all','gp_all','champ_all'] },
+    ids:['set_1','set_5','set_15','set_30','set_60',
+         'pilote_all','reserve_all','director_all','gp_all','champ_all',
+         'catset_pilote','catset_reserve','catset_directeur','catset_gp'] },
+  { id:'ecuries',  ico:'🛡️', cls:'bf-ecuries',
+    ids:['teams_owned_2','teams_owned_5','teams_owned_10',
+         'teamset_redbull','teamset_ferrari','teamset_mclaren','teamset_mercedes',
+         'teamset_astonmartin','teamset_alpine','teamset_haas','teamset_rb',
+         'teamset_williams','teamset_sauber','teamset_all'] },
   { id:'foils',    ico:'✦',  cls:'bf-foils',
-    ids:['foil_5','nitro_1','wild_3','promo_1'] },
+    ids:['foil_5','nitro_1','wild_3','promo_1','eternal_1','eternal_3','eternal_5'] },
   { id:'colors',   ico:'🎨', cls:'bf-colors',
     ids:['blue_20','green_20','red_20','yellow_20'] },
   { id:'passion',  ico:'❤️', cls:'bf-passion',
-    ids:['dreamer_5','ambitious_15','doubler_5','massive_50','fan_5','superfan_15'] },
+    ids:['dreamer_5','ambitious_15','massive_50','fan_5','superfan_15'] },
   { id:'exp',      ico:'🎟️', cls:'bf-exp', manual:true, ids:null }, // = tous les manuels
 ];
 export function familyBadges(fam){
   if(fam.manual) return MANUAL_BADGES;
-  const known = new Set(FAMILIES.flatMap(f => f.ids || []));
-  const list = fam.ids.map(id => AUTO_BADGES.find(b => b.id === id)).filter(Boolean);
+  const known = new Set(FAMILIES.flatMap(f => [...(f.ids || []), ...(f.extraIds || [])]));
+  const list = [...(fam.ids || []), ...(fam.extraIds || [])]
+    .map(id => AUTO_BADGES.find(b => b.id === id)).filter(Boolean);
   if(fam.id === 'passion') AUTO_BADGES.forEach(b => { if(!known.has(b.id)) list.push(b); });
   return list;
 }
@@ -164,14 +252,14 @@ export function pickNextBadge(pinnedId, badges, evalFn, unlockedFn){
   return best;
 }
 
-// Le badge débloqué le plus « difficile » : la plus grande cible
-// (101 cartes bat 20 bleues) — déterministe et explicable.
-export function hardestUnlockedBadge(badges, evalFn, unlockedFn){
-  let best = null, bestMax = -1;
+// Le badge débloqué le plus difficile — par le SCORE DE DIFFICULTÉ
+// intrinsèque (v3), autos comme manuels. scoreFn injectable (tests).
+export function hardestUnlockedBadge(badges, evalFn, unlockedFn, scoreFn = badgeDifficulty){
+  let best = null, bestScore = -1;
   badges.forEach(b => {
     if(!unlockedFn(b)) return;
-    const m = evalFn(b).max;
-    if(m > bestMax){ best = b; bestMax = m; }
+    const s = scoreFn(b);
+    if(s > bestScore){ best = b; bestScore = s; }
   });
   return best;
 }
@@ -277,8 +365,10 @@ function _detailHTML(b, fam){
   const store = isManual ? manualBadges : autoBadgeUnlocked;
   const unlocked = isManual ? !!manualBadges[b.id] : !!autoBadgeUnlocked[b.id];
   const tr = (window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {});
+  const diff = badgeDifficulty(b);
   let h = `<div class="bd-name">${b.emoji} ${tr.name || b.name}</div>
-    <div class="bd-desc">${tr.desc || b.desc || ''}</div>`;
+    <div class="bd-desc">${tr.desc || b.desc || ''}</div>
+    <div class="bd-diff"><span class="bd-diff-lb dl-${difficultyLabelKey(diff).slice(7)}">${t(difficultyLabelKey(diff))}</span><span class="bd-diff-pct">${t('b.difficulty')} ${diff} %</span></div>`;
   if(unlocked){
     const d = badgeUnlockDate(store, b.id);
     h += `<div class="bd-date">✓ ${d
@@ -382,7 +472,7 @@ export function renderBadges(opts = {}){
 
   // ── Hero : anneau + compteur + titre + plus difficile + partage ──
   const C = 2 * Math.PI * 38;
-  const hardest = hardestUnlockedBadge(AUTO_BADGES, evaluateBadgeCondition, isAutoBadgeUnlocked);
+  const hardest = hardestUnlockedBadge([...AUTO_BADGES, ...MANUAL_BADGES], evaluateBadgeCondition, b => !!(autoBadgeUnlocked[b.id] || manualBadges[b.id]));
   hero.innerHTML = `
     <div class="bh-ring">
       <svg width="86" height="86" viewBox="0 0 86 86" aria-hidden="true">
@@ -431,15 +521,26 @@ export function renderBadges(opts = {}){
       <div class="bfh"><span class="bfh-ico">${fam.ico}</span><span class="bfh-name">${t('b.fam_' + fam.id)}</span><span class="bfh-count">${un}/${list.length}</span></div>
       <div class="bfh-bar"><i style="width:${list.length ? un / list.length * 100 : 0}%"></i></div>`;
     if(fam.ladder){
+      // v3 : l'échelle ne montre que les JALONS (fam.ids) ; les badges
+      // de progression annexes (doubles, exemplaires, rythme) vivent en
+      // tuiles sous l'échelle.
+      const rungs = list.filter(b => fam.ids.includes(b.id));
+      const extras = list.filter(b => !fam.ids.includes(b.id));
       h += `<div class="badge-ladder" role="list">`;
-      list.forEach(b => {
+      rungs.forEach(b => {
         const unl = !!autoBadgeUnlocked[b.id];
         const p = evaluateBadgeCondition(b);
-        const cur = !unl && p.cur > 0 && list.filter(x => !autoBadgeUnlocked[x.id])[0]?.id === b.id;
+        const cur = !unl && p.cur > 0 && rungs.filter(x => !autoBadgeUnlocked[x.id])[0]?.id === b.id;
         h += `<div class="bl-rung ${unl ? 'done' : cur ? 'cur' : 'lock'}" data-action="toggleBadgeDetail" data-badge="${b.id}" role="listitem" tabindex="0">
           <div class="bl-dot">${b.emoji}</div><div class="bl-lbl">${p.max}</div></div>`;
       });
-      h += `</div><div class="badge-detail" id="bd-${fam.id}"></div>`;
+      h += `</div>`;
+      if(extras.length){
+        h += `<div class="badge-tiles" role="list">`;
+        extras.forEach(b => { h += _tileHTML(b, fam); });
+        h += `</div>`;
+      }
+      h += `<div class="badge-detail" id="bd-${fam.id}"></div>`;
     } else {
       h += `<div class="badge-tiles" role="list">`;
       list.forEach(b => { h += _tileHTML(b, fam); });
@@ -566,7 +667,7 @@ export async function shareProfileCard(){
   const TOTAL = AUTO_BADGES.length + MANUAL_BADGES.length;
   const unlockedList = [...AUTO_BADGES, ...MANUAL_BADGES]
     .filter(b => autoBadgeUnlocked[b.id] || manualBadges[b.id]);
-  const hardest = hardestUnlockedBadge(AUTO_BADGES, evaluateBadgeCondition, isAutoBadgeUnlocked);
+  const hardest = hardestUnlockedBadge([...AUTO_BADGES, ...MANUAL_BADGES], evaluateBadgeCondition, b => !!(autoBadgeUnlocked[b.id] || manualBadges[b.id]));
   const titleEl = document.querySelector('#headerTitle .ht-icon + span');
   const titleTxt = titleEl ? titleEl.textContent : 'Rookie';
   const dark = document.documentElement.getAttribute('data-theme') !== 'light';

@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.36.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'The badge system grows from 50 to 111: full-set milestones, Eternal counts, a whole new Teams family (own a team, complete a team — up to the Grand Slam: every team in full set, the absolute summit), perfect categories, doubles, copies and rhythm badges, plus 27 new real-world experiences to self-validate.',
+        'Every badge now carries an intrinsic difficulty score (0–100) with a quality label, computed from the real effort it demands — shown in the badge detail, and the hero\'s "hardest badge" now uses it.',
+        'Fair to veterans: on first launch, badges you had already earned unlock silently as "Unlocked" without a fake date — no toast storm, no rewritten history.',
+      ],
+      fr: [
+        'Le système de badges passe de 50 à 111 : jalons de sets intégraux, comptes d\'Éternels, une famille Écuries entière (posséder une écurie, la compléter — jusqu\'au Grand Chelem : toutes les écuries en set intégral, le sommet absolu), catégories parfaites, doubles, exemplaires et badges de rythme, plus 27 nouvelles expériences vécues à valider soi-même.',
+        'Chaque badge porte désormais un score de difficulté intrinsèque (0–100) avec un libellé qualitatif, calculé depuis l\'effort réel qu\'il exige — affiché dans le détail du badge, et le « badge le plus difficile » du hero l\'utilise désormais.',
+        'Loyal envers les anciens : au premier lancement, les badges que tu avais déjà mérités se débloquent silencieusement en « Débloqué » sans fausse date — pas de rafale de toasts, pas d\'histoire réécrite.',
+      ],
+      es: [
+        'El sistema de insignias pasa de 50 a 111: hitos de sets íntegros, recuentos de Eternas, toda una familia de Escuderías (poseer una escudería, completarla — hasta el Grand Slam: todas las escuderías en set íntegro, la cima absoluta), categorías perfectas, dobles, copias e insignias de ritmo, más 27 nuevas experiencias reales que validar uno mismo.',
+        'Cada insignia lleva ahora una puntuación de dificultad intrínseca (0–100) con etiqueta cualitativa, calculada desde el esfuerzo real que exige — visible en el detalle, y la «insignia más difícil» del héroe ahora la usa.',
+        'Justo con los veteranos: en el primer arranque, las insignias que ya habías ganado se desbloquean en silencio como «Desbloqueada» sin fecha falsa — sin ráfaga de avisos, sin reescribir la historia.',
+      ],
+      zh: [
+        '徽章系统从 50 枚扩展到 111 枚:全套里程碑、永恒计数、全新的车队家族(拥有一支车队、集齐一支车队——直至大满贯:所有车队全部集齐,系统的最高峰)、完美类别、重复卡、副本与节奏徽章,外加 27 个可自行确认的真实经历徽章。',
+        '每枚徽章现在都有一个内在难度分(0–100)和等级标签,由其实际所需的努力计算得出——显示在徽章详情中,页首的「最难徽章」也改用该分数。',
+        '对老玩家公平:首次启动时,你早已达成的徽章会静默解锁为「已解锁」且不带虚假日期——没有提示轰炸,不改写历史。',
+      ],
+      it: [
+        'Il sistema di badge passa da 50 a 111: traguardi di set integrali, conteggi di Eterni, un\'intera famiglia Scuderie (possedere una scuderia, completarla — fino al Grande Slam: tutte le scuderie in set integrale, la vetta assoluta), categorie perfette, doppie, esemplari e badge di ritmo, più 27 nuove esperienze reali da auto-validare.',
+        'Ogni badge porta ora un punteggio di difficoltà intrinseca (0–100) con etichetta qualitativa, calcolato dallo sforzo reale che richiede — mostrato nel dettaglio, e il «badge più difficile» dell\'hero ora lo usa.',
+        'Giusto con i veterani: al primo avvio, i badge già meritati si sbloccano in silenzio come «Sbloccato» senza data falsa — niente raffica di toast, niente storia riscritta.',
+      ],
+      nl: [
+        'Het badgesysteem groeit van 50 naar 111: mijlpalen voor volledige sets, Eeuwig-tellingen, een hele nieuwe Teams-familie (een team bezitten, een team voltooien — tot aan de Grand Slam: elk team in volledig set, de absolute top), perfecte categorieën, dubbelen, exemplaren en ritmebadges, plus 27 nieuwe echte ervaringen om zelf af te vinken.',
+        'Elke badge draagt nu een intrinsieke moeilijkheidsscore (0–100) met kwaliteitslabel, berekend uit de echte inspanning die hij vraagt — zichtbaar in het detail, en de «moeilijkste badge» van de hero gebruikt hem nu.',
+        'Eerlijk voor veteranen: bij de eerste start worden badges die je al verdiend had stil ontgrendeld als «Ontgrendeld» zonder valse datum — geen toast-regen, geen herschreven geschiedenis.',
+      ],
+      de: [
+        'Das Abzeichensystem wächst von 50 auf 111: Komplett-Set-Meilensteine, Ewig-Zählungen, eine ganze Team-Familie (ein Team besitzen, ein Team vervollständigen — bis zum Grand Slam: jedes Team im kompletten Set, der absolute Gipfel), perfekte Kategorien, Doppelte, Exemplare und Rhythmus-Abzeichen, plus 27 neue echte Erlebnisse zum Selbstbestätigen.',
+        'Jedes Abzeichen trägt jetzt einen intrinsischen Schwierigkeitswert (0–100) mit Qualitätslabel, berechnet aus dem realen Aufwand — sichtbar im Detail, und das „schwerste Abzeichen" des Heros nutzt ihn jetzt.',
+        'Fair zu Veteranen: beim ersten Start werden bereits verdiente Abzeichen still als „Freigeschaltet" ohne falsches Datum entsperrt — kein Toast-Gewitter, keine umgeschriebene Geschichte.',
+      ],
+    },
+  },
+  {
     version: '1.35.0',
     date: '2026-08-08',
     changes: {

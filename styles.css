@@ -1996,3 +1996,18 @@ button:not(:disabled):not(.bn-tab):active,
 [data-theme="dark"] .bt-chk{background:var(--green);}
 /* bouton danger : encre rouge profonde en clair */
 .setv-btn.danger{color:var(--red-ink);}
+
+/* ── BADGES v3 (1.36.0) : famille Écuries + ligne de difficulté ── */
+.bf-ecuries{--fam:#6692FF;}
+.bd-diff{display:flex;align-items:center;gap:8px;margin:6px 0 2px;}
+.bd-diff-lb{font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;}
+.dl-facile{background:var(--green-s);color:#1B7A3D;}
+.dl-modere{background:#FFF3D6;color:#946800;}
+.dl-difficile{background:var(--red-s);color:var(--red-ink,#C50026);}
+.dl-extreme{background:#F3E8FF;color:#6D28D9;}
+.dl-legendaire{background:#1a1816;color:var(--gold,#FACC15);}
+[data-theme="dark"] .dl-facile{background:#14301c;color:#5adf87;}
+[data-theme="dark"] .dl-modere{background:#33290a;color:#f7c948;}
+[data-theme="dark"] .dl-difficile{background:#3a0f18;color:#ff7f95;}
+[data-theme="dark"] .dl-extreme{background:#2a1745;color:#c4a6ff;}
+.bd-diff-pct{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums;}

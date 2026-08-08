@@ -1,56 +1,1090 @@
 {
   "auto": [
-    { "id": "first_card",    "emoji": "🏁", "name": "Première carte",     "desc": "Posséder au moins 1 carte",           "season": "all", "condition": { "metric": "owned_count",  "operator": ">=", "value": 1 } },
-    { "id": "collector_10",  "emoji": "📦", "name": "Collectionneur",     "desc": "Posséder 10 cartes",                  "season": "all", "condition": { "metric": "owned_count",  "operator": ">=", "value": 10 } },
-    { "id": "hunter_25",     "emoji": "🎯", "name": "Chasseur",           "desc": "Posséder 25 cartes",                  "season": "all", "condition": { "metric": "owned_count",  "operator": ">=", "value": 25 } },
-    { "id": "expert_50",     "emoji": "💎", "name": "Expert",             "desc": "Posséder 50 cartes",                  "season": "all", "condition": { "metric": "owned_count",  "operator": ">=", "value": 50 } },
-    { "id": "master_75",     "emoji": "👑", "name": "Maître",             "desc": "Posséder 75 cartes",                  "season": "all", "condition": { "metric": "owned_count",  "operator": ">=", "value": 75 } },
-    { "id": "legend_101",    "emoji": "🏆", "name": "Légende vivante",    "desc": "Posséder les 101 cartes",             "season": 2025,  "condition": { "metric": "owned_count",  "operator": ">=", "value": 101 } },
-    { "id": "dreamer_5",     "emoji": "⭐", "name": "Rêveur",             "desc": "Avoir 5 cartes en wishlist",          "season": "all", "condition": { "metric": "wishlist_count","operator": ">=", "value": 5 } },
-    { "id": "ambitious_15",  "emoji": "🌟", "name": "Ambitieux",          "desc": "Avoir 15 cartes en wishlist",         "season": "all", "condition": { "metric": "wishlist_count","operator": ">=", "value": 15 } },
-    { "id": "doubler_5",     "emoji": "🔄", "name": "Doubleur",           "desc": "Avoir 5 cartes en double",            "season": "all", "condition": { "metric": "doubles_count", "operator": ">=", "value": 5 } },
-    { "id": "massive_50",    "emoji": "📈", "name": "Collection massive", "desc": "Avoir 50 exemplaires au total",       "season": "all", "condition": { "metric": "total_qty",     "operator": ">=", "value": 50 } },
-    { "id": "fan_5",         "emoji": "❤️", "name": "Fan",                "desc": "Avoir 5 favoris",                     "season": "all", "condition": { "metric": "favorite_count", "operator": ">=", "value": 5 } },
-    { "id": "superfan_15",   "emoji": "💕", "name": "Super Fan",          "desc": "Avoir 15 favoris",                    "season": "all", "condition": { "metric": "favorite_count", "operator": ">=", "value": 15 } },
-    { "id": "pilote_all",    "emoji": "🏎️", "name": "Pilote collector",   "desc": "Posséder tous les pilotes",           "season": 2025,  "condition": { "metric": "category_owned","operator": "==", "value": "pilote", "allOfCategory": true } },
-    { "id": "reserve_all",   "emoji": "🔧", "name": "Réserve collector",  "desc": "Posséder tous les réservistes",       "season": 2025,  "condition": { "metric": "category_owned","operator": "==", "value": "reserve", "allOfCategory": true } },
-    { "id": "director_all",  "emoji": "🎯", "name": "Directeur collector","desc": "Posséder tous les directeurs",        "season": 2025,  "condition": { "metric": "category_owned","operator": "==", "value": "directeur", "allOfCategory": true } },
-    { "id": "gp_all",        "emoji": "🏁", "name": "GP collector",       "desc": "Posséder tous les Grand Prix",        "season": 2025,  "condition": { "metric": "category_owned","operator": "==", "value": "gp", "allOfCategory": true } },
-    { "id": "champ_all",     "emoji": "👑", "name": "Champion collector", "desc": "Posséder tous les champions",         "season": "all", "condition": { "metric": "champion_owned", "operator": "all", "value": null } },
-    { "id": "foil_5",        "emoji": "✦",  "name": "Foil hunter",       "desc": "Posséder 5 cartes foil",              "season": "all", "condition": { "metric": "type_owned",     "operator": ">=", "value": 5, "typeFilter": "foil" } },
-    { "id": "nitro_1",       "emoji": "❋",  "name": "Nitro master",      "desc": "Posséder 1 carte Nitro Foil",        "season": "all", "condition": { "metric": "type_owned",     "operator": ">=", "value": 1, "typeFilter": "nitro_foil" } },
-    { "id": "wild_3",        "emoji": "🃏", "name": "Wild card",          "desc": "Posséder 3 cartes Wild Foil",          "season": "all", "condition": { "metric": "type_owned",     "operator": ">=", "value": 3, "typeFilter": "wild_foil" } },
-    { "id": "promo_1",       "emoji": "★",  "name": "Promo king",        "desc": "Posséder une carte Promo",            "season": "all", "condition": { "metric": "type_owned",     "operator": ">=", "value": 1, "typeFilter": "promo" } },
-    { "id": "blue_20",       "emoji": "🔵", "name": "Blue team",          "desc": "Posséder 20 cartes Blue",             "season": "all", "condition": { "metric": "type_owned",     "operator": ">=", "value": 20, "typeFilter": "blue" } },
-    { "id": "green_20",      "emoji": "🟢", "name": "Green machine",      "desc": "Posséder 20 cartes Green",            "season": "all", "condition": { "metric": "type_owned",     "operator": ">=", "value": 20, "typeFilter": "green" } },
-    { "id": "red_20",        "emoji": "🔴", "name": "Red baron",          "desc": "Posséder 20 cartes Red",              "season": "all", "condition": { "metric": "type_owned",     "operator": ">=", "value": 20, "typeFilter": "red" } },
-    { "id": "yellow_20",     "emoji": "🟡", "name": "Yellow flash",       "desc": "Posséder 20 cartes Yellow",           "season": "all", "condition": { "metric": "type_owned",     "operator": ">=", "value": 20, "typeFilter": "yellow" } }
+    {
+      "id": "first_card",
+      "emoji": "🏁",
+      "name": "Première carte",
+      "desc": "Posséder au moins 1 carte",
+      "season": "all",
+      "condition": {
+        "metric": "owned_count",
+        "operator": ">=",
+        "value": 1
+      }
+    },
+    {
+      "id": "collector_10",
+      "emoji": "📦",
+      "name": "Collectionneur",
+      "desc": "Posséder 10 cartes",
+      "season": "all",
+      "condition": {
+        "metric": "owned_count",
+        "operator": ">=",
+        "value": 10
+      }
+    },
+    {
+      "id": "hunter_25",
+      "emoji": "🎯",
+      "name": "Chasseur",
+      "desc": "Posséder 25 cartes",
+      "season": "all",
+      "condition": {
+        "metric": "owned_count",
+        "operator": ">=",
+        "value": 25
+      }
+    },
+    {
+      "id": "expert_50",
+      "emoji": "💎",
+      "name": "Expert",
+      "desc": "Posséder 50 cartes",
+      "season": "all",
+      "condition": {
+        "metric": "owned_count",
+        "operator": ">=",
+        "value": 50
+      }
+    },
+    {
+      "id": "master_75",
+      "emoji": "👑",
+      "name": "Maître",
+      "desc": "Posséder 75 cartes",
+      "season": "all",
+      "condition": {
+        "metric": "owned_count",
+        "operator": ">=",
+        "value": 75
+      }
+    },
+    {
+      "id": "legend_101",
+      "emoji": "🏆",
+      "name": "Légende vivante",
+      "desc": "Posséder les 101 cartes",
+      "season": 2025,
+      "condition": {
+        "metric": "owned_count",
+        "operator": ">=",
+        "value": 101
+      }
+    },
+    {
+      "id": "dreamer_5",
+      "emoji": "⭐",
+      "name": "Rêveur",
+      "desc": "Avoir 5 cartes en wishlist",
+      "season": "all",
+      "condition": {
+        "metric": "wishlist_count",
+        "operator": ">=",
+        "value": 5
+      }
+    },
+    {
+      "id": "ambitious_15",
+      "emoji": "🌟",
+      "name": "Ambitieux",
+      "desc": "Avoir 15 cartes en wishlist",
+      "season": "all",
+      "condition": {
+        "metric": "wishlist_count",
+        "operator": ">=",
+        "value": 15
+      }
+    },
+    {
+      "id": "doubler_5",
+      "emoji": "🔄",
+      "name": "Doubleur",
+      "desc": "Avoir 5 cartes en double",
+      "season": "all",
+      "condition": {
+        "metric": "doubles_count",
+        "operator": ">=",
+        "value": 5
+      }
+    },
+    {
+      "id": "massive_50",
+      "emoji": "📈",
+      "name": "Collection massive",
+      "desc": "Avoir 50 exemplaires au total",
+      "season": "all",
+      "condition": {
+        "metric": "total_qty",
+        "operator": ">=",
+        "value": 50
+      }
+    },
+    {
+      "id": "fan_5",
+      "emoji": "❤️",
+      "name": "Fan",
+      "desc": "Avoir 5 favoris",
+      "season": "all",
+      "condition": {
+        "metric": "favorite_count",
+        "operator": ">=",
+        "value": 5
+      }
+    },
+    {
+      "id": "superfan_15",
+      "emoji": "💕",
+      "name": "Super Fan",
+      "desc": "Avoir 15 favoris",
+      "season": "all",
+      "condition": {
+        "metric": "favorite_count",
+        "operator": ">=",
+        "value": 15
+      }
+    },
+    {
+      "id": "pilote_all",
+      "emoji": "🏎️",
+      "name": "Pilote collector",
+      "desc": "Posséder tous les pilotes",
+      "season": 2025,
+      "condition": {
+        "metric": "category_owned",
+        "operator": "==",
+        "value": "pilote",
+        "allOfCategory": true
+      }
+    },
+    {
+      "id": "reserve_all",
+      "emoji": "🔧",
+      "name": "Réserve collector",
+      "desc": "Posséder tous les réservistes",
+      "season": 2025,
+      "condition": {
+        "metric": "category_owned",
+        "operator": "==",
+        "value": "reserve",
+        "allOfCategory": true
+      }
+    },
+    {
+      "id": "director_all",
+      "emoji": "🎯",
+      "name": "Directeur collector",
+      "desc": "Posséder tous les directeurs",
+      "season": 2025,
+      "condition": {
+        "metric": "category_owned",
+        "operator": "==",
+        "value": "directeur",
+        "allOfCategory": true
+      }
+    },
+    {
+      "id": "gp_all",
+      "emoji": "🏁",
+      "name": "GP collector",
+      "desc": "Posséder tous les Grand Prix",
+      "season": 2025,
+      "condition": {
+        "metric": "category_owned",
+        "operator": "==",
+        "value": "gp",
+        "allOfCategory": true
+      }
+    },
+    {
+      "id": "champ_all",
+      "emoji": "👑",
+      "name": "Champion collector",
+      "desc": "Posséder tous les champions",
+      "season": "all",
+      "condition": {
+        "metric": "champion_owned",
+        "operator": "all",
+        "value": null
+      }
+    },
+    {
+      "id": "foil_5",
+      "emoji": "✦",
+      "name": "Foil hunter",
+      "desc": "Posséder 5 cartes foil",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 5,
+        "typeFilter": "foil"
+      }
+    },
+    {
+      "id": "nitro_1",
+      "emoji": "❋",
+      "name": "Nitro master",
+      "desc": "Posséder 1 carte Nitro Foil",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 1,
+        "typeFilter": "nitro_foil"
+      }
+    },
+    {
+      "id": "wild_3",
+      "emoji": "🃏",
+      "name": "Wild card",
+      "desc": "Posséder 3 cartes Wild Foil",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 3,
+        "typeFilter": "wild_foil"
+      }
+    },
+    {
+      "id": "promo_1",
+      "emoji": "★",
+      "name": "Promo king",
+      "desc": "Posséder une carte Promo",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 1,
+        "typeFilter": "promo"
+      }
+    },
+    {
+      "id": "blue_20",
+      "emoji": "🔵",
+      "name": "Blue team",
+      "desc": "Posséder 20 cartes Blue",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 20,
+        "typeFilter": "blue"
+      }
+    },
+    {
+      "id": "green_20",
+      "emoji": "🟢",
+      "name": "Green machine",
+      "desc": "Posséder 20 cartes Green",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 20,
+        "typeFilter": "green"
+      }
+    },
+    {
+      "id": "red_20",
+      "emoji": "🔴",
+      "name": "Red baron",
+      "desc": "Posséder 20 cartes Red",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 20,
+        "typeFilter": "red"
+      }
+    },
+    {
+      "id": "yellow_20",
+      "emoji": "🟡",
+      "name": "Yellow flash",
+      "desc": "Posséder 20 cartes Yellow",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 20,
+        "typeFilter": "yellow"
+      }
+    },
+    {
+      "id": "set_1",
+      "emoji": "🧿",
+      "name": "Set complet",
+      "desc": "Compléter le set intégral d’une carte",
+      "season": "all",
+      "condition": {
+        "metric": "sets_complete_count",
+        "operator": ">=",
+        "value": 1
+      }
+    },
+    {
+      "id": "set_5",
+      "emoji": "🔷",
+      "name": "Perfectionniste",
+      "desc": "5 cartes en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "sets_complete_count",
+        "operator": ">=",
+        "value": 5
+      }
+    },
+    {
+      "id": "set_15",
+      "emoji": "💠",
+      "name": "Orfèvre",
+      "desc": "15 cartes en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "sets_complete_count",
+        "operator": ">=",
+        "value": 15
+      }
+    },
+    {
+      "id": "set_30",
+      "emoji": "🏛️",
+      "name": "Encyclopédiste",
+      "desc": "30 cartes en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "sets_complete_count",
+        "operator": ">=",
+        "value": 30
+      }
+    },
+    {
+      "id": "set_60",
+      "emoji": "⛩️",
+      "name": "Cathédrale",
+      "desc": "60 cartes en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "sets_complete_count",
+        "operator": ">=",
+        "value": 60
+      }
+    },
+    {
+      "id": "eternal_1",
+      "emoji": "✨",
+      "name": "Éternel",
+      "desc": "Porter une carte à la rareté Éternel",
+      "season": "all",
+      "condition": {
+        "metric": "eternal_count",
+        "operator": ">=",
+        "value": 1
+      }
+    },
+    {
+      "id": "eternal_3",
+      "emoji": "🌌",
+      "name": "Constellation",
+      "desc": "3 cartes à la rareté Éternel",
+      "season": "all",
+      "condition": {
+        "metric": "eternal_count",
+        "operator": ">=",
+        "value": 3
+      }
+    },
+    {
+      "id": "eternal_5",
+      "emoji": "🏵️",
+      "name": "Panthéon",
+      "desc": "5 cartes à la rareté Éternel",
+      "season": "all",
+      "condition": {
+        "metric": "eternal_count",
+        "operator": ">=",
+        "value": 5
+      }
+    },
+    {
+      "id": "teams_owned_2",
+      "emoji": "🤝",
+      "name": "Bicolore",
+      "desc": "Posséder toutes les cartes de 2 écuries",
+      "season": "all",
+      "condition": {
+        "metric": "teams_owned_count",
+        "operator": ">=",
+        "value": 2
+      }
+    },
+    {
+      "id": "teams_owned_5",
+      "emoji": "🖐️",
+      "name": "Mi-grille",
+      "desc": "Posséder toutes les cartes de 5 écuries",
+      "season": "all",
+      "condition": {
+        "metric": "teams_owned_count",
+        "operator": ">=",
+        "value": 5
+      }
+    },
+    {
+      "id": "teams_owned_10",
+      "emoji": "🌐",
+      "name": "Toute la grille",
+      "desc": "Posséder toutes les cartes des 10 écuries",
+      "season": "all",
+      "condition": {
+        "metric": "teams_owned_count",
+        "operator": ">=",
+        "value": 10
+      }
+    },
+    {
+      "id": "teamset_all",
+      "emoji": "🏆",
+      "name": "Grand Chelem",
+      "desc": "Toutes les écuries en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "teams_set_count",
+        "operator": ">=",
+        "value": 10
+      }
+    },
+    {
+      "id": "catset_pilote",
+      "emoji": "🏎️",
+      "name": "Grille parfaite",
+      "desc": "Tous les pilotes en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "category_set",
+        "operator": ">=",
+        "value": "pilote"
+      }
+    },
+    {
+      "id": "catset_reserve",
+      "emoji": "🔧",
+      "name": "Banc parfait",
+      "desc": "Tous les pilotes de réserve en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "category_set",
+        "operator": ">=",
+        "value": "reserve"
+      }
+    },
+    {
+      "id": "catset_directeur",
+      "emoji": "🎯",
+      "name": "Paddock parfait",
+      "desc": "Tous les directeurs en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "category_set",
+        "operator": ">=",
+        "value": "directeur"
+      }
+    },
+    {
+      "id": "catset_gp",
+      "emoji": "🗺️",
+      "name": "Calendrier parfait",
+      "desc": "Tous les Grands Prix en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "category_set",
+        "operator": ">=",
+        "value": "gp"
+      }
+    },
+    {
+      "id": "doubles_25",
+      "emoji": "📚",
+      "name": "Grossiste",
+      "desc": "25 cartes en double",
+      "season": "all",
+      "condition": {
+        "metric": "doubles_count",
+        "operator": ">=",
+        "value": 25
+      }
+    },
+    {
+      "id": "doubles_75",
+      "emoji": "🏬",
+      "name": "Entrepôt",
+      "desc": "75 cartes en double",
+      "season": "all",
+      "condition": {
+        "metric": "doubles_count",
+        "operator": ">=",
+        "value": 75
+      }
+    },
+    {
+      "id": "qty_150",
+      "emoji": "🗃️",
+      "name": "Trois classeurs",
+      "desc": "150 exemplaires au total",
+      "season": "all",
+      "condition": {
+        "metric": "total_qty",
+        "operator": ">=",
+        "value": 150
+      }
+    },
+    {
+      "id": "qty_300",
+      "emoji": "📦",
+      "name": "Demi-millier en vue",
+      "desc": "300 exemplaires au total",
+      "season": "all",
+      "condition": {
+        "metric": "total_qty",
+        "operator": ">=",
+        "value": 300
+      }
+    },
+    {
+      "id": "qty_500",
+      "emoji": "🧱",
+      "name": "Le Mur",
+      "desc": "500 exemplaires au total",
+      "season": "all",
+      "condition": {
+        "metric": "total_qty",
+        "operator": ">=",
+        "value": 500
+      }
+    },
+    {
+      "id": "rythme_jour10",
+      "emoji": "☄️",
+      "name": "Grosse journée",
+      "desc": "10 cartes gagnées le même jour",
+      "season": "all",
+      "condition": {
+        "metric": "history_day_gain",
+        "operator": ">=",
+        "value": 10
+      }
+    },
+    {
+      "id": "rythme_semaine7",
+      "emoji": "📅",
+      "name": "Semaine parfaite",
+      "desc": "7 jours consécutifs avec activité",
+      "season": "all",
+      "condition": {
+        "metric": "history_streak",
+        "operator": ">=",
+        "value": 7
+      }
+    },
+    {
+      "id": "rythme_mois6",
+      "emoji": "🗓️",
+      "name": "Saison régulière",
+      "desc": "Actif chaque mois pendant 6 mois",
+      "season": "all",
+      "condition": {
+        "metric": "history_months",
+        "operator": ">=",
+        "value": 6
+      }
+    },
+    {
+      "id": "teamset_redbull",
+      "emoji": "🛡️",
+      "name": "Red Bull intégral",
+      "desc": "Toutes les cartes Red Bull en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "Oracle Red Bull Racing"
+      }
+    },
+    {
+      "id": "teamset_ferrari",
+      "emoji": "🛡️",
+      "name": "Ferrari intégral",
+      "desc": "Toutes les cartes Ferrari en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "Scuderia Ferrari HP"
+      }
+    },
+    {
+      "id": "teamset_mclaren",
+      "emoji": "🛡️",
+      "name": "McLaren intégral",
+      "desc": "Toutes les cartes McLaren en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "McLaren F1"
+      }
+    },
+    {
+      "id": "teamset_mercedes",
+      "emoji": "🛡️",
+      "name": "Mercedes intégral",
+      "desc": "Toutes les cartes Mercedes en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "Mercedes-AMG Petronas Formula One Team"
+      }
+    },
+    {
+      "id": "teamset_astonmartin",
+      "emoji": "🛡️",
+      "name": "Aston Martin intégral",
+      "desc": "Toutes les cartes Aston Martin en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "Aston Martin Aramco Formula One Team"
+      }
+    },
+    {
+      "id": "teamset_alpine",
+      "emoji": "🛡️",
+      "name": "Alpine intégral",
+      "desc": "Toutes les cartes Alpine en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "BWT Alpine F1 Team"
+      }
+    },
+    {
+      "id": "teamset_haas",
+      "emoji": "🛡️",
+      "name": "Haas intégral",
+      "desc": "Toutes les cartes Haas en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "MoneyGram Haas F1 Team"
+      }
+    },
+    {
+      "id": "teamset_rb",
+      "emoji": "🛡️",
+      "name": "RB intégral",
+      "desc": "Toutes les cartes RB en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "Visa Cash App RB Formula One"
+      }
+    },
+    {
+      "id": "teamset_williams",
+      "emoji": "🛡️",
+      "name": "Williams intégral",
+      "desc": "Toutes les cartes Williams en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "Atlassian Williams Racing"
+      }
+    },
+    {
+      "id": "teamset_sauber",
+      "emoji": "🛡️",
+      "name": "Sauber intégral",
+      "desc": "Toutes les cartes Sauber en set intégral",
+      "season": "all",
+      "condition": {
+        "metric": "team_set",
+        "operator": ">=",
+        "value": "Stake F1 Team KICK Sauber"
+      }
+    }
   ],
   "manual": [
-    { "id": "spectateur",    "emoji": "🎫", "name": "Spectateur",        "desc": "J'ai assisté à un Grand Prix en vrai",           "season": "all" },
-    { "id": "premier_achat", "emoji": "🛒", "name": "Premier achat",     "desc": "J'ai acheté mon premier booster F1 UNO",        "season": "all" },
-    { "id": "cadeau",        "emoji": "🎁", "name": "Cadeau",            "desc": "J'ai reçu des cartes F1 UNO en cadeau",          "season": "all" },
-    { "id": "echange",       "emoji": "🤝", "name": "Échange",           "desc": "J'ai échangé des cartes avec quelqu'un",         "season": "all" },
-    { "id": "photo_pilote",  "emoji": "📸", "name": "Selfie pilote",     "desc": "J'ai pris une photo avec un pilote F1",          "season": "all" },
-    { "id": "circuit_visit", "emoji": "🏟️", "name": "Circuit visitor",   "desc": "J'ai visité un circuit de F1",                   "season": "all" },
-    { "id": "fan_tv",        "emoji": "📺", "name": "Fan TV",            "desc": "J'ai regardé une course en direct à la TV",      "season": "all" },
-    { "id": "gamer",         "emoji": "🎮", "name": "Gamer F1",           "desc": "J'ai joué à un jeu F1 officiel",                 "season": "all" },
-    { "id": "merch",         "emoji": "👕", "name": "Merch F1",           "desc": "Je possède un vêtement F1 officiel",             "season": "all" },
-    { "id": "app_f1tv",      "emoji": "📱", "name": "F1 TV",              "desc": "J'ai regardé F1 TV sur mobile ou tablette",      "season": "all" },
-    { "id": "launch_day",    "emoji": "🎉", "name": "Launch Day",         "desc": "J'étais là au lancement de la collection",       "season": 2025 },
-    { "id": "globe",         "emoji": "🌍", "name": "Globe-trotter",      "desc": "Je suis 3 ou plus influenceurs qui parlent de formule 1", "season": "all" },
-    { "id": "vip",           "emoji": "🏆", "name": "Accès VIP",          "desc": "J'ai eu un accès VIP à un Grand Prix",           "season": "all" },
-    { "id": "f1tv_pro",      "emoji": "📰", "name": "F1 TV Pro",          "desc": "Je suis abonné à F1 TV Pro",                    "season": "all" },
-    { "id": "rencontre",     "emoji": "🎤", "name": "Rencontre pilote",   "desc": "J'ai rencontré un pilote en personne",           "season": "all" },
-    { "id": "sim_racing",    "emoji": "🏎️", "name": "Sim Racing",         "desc": "J'ai fait du sim racing F1",                    "season": "all" },
-    { "id": "livre_f1",      "emoji": "📚", "name": "Connaisseur",        "desc": "J'ai lu un livre sur la F1",                    "season": "all" },
-    { "id": "fan_art",       "emoji": "🎨", "name": "Artiste F1",         "desc": "J'ai créé un fan art F1",                       "season": "all" },
-    { "id": "communaute",    "emoji": "🗣️", "name": "Communauté",         "desc": "Je suis membre d'une communauté F1",             "season": "all" },
-    { "id": "benevole",      "emoji": "🏅", "name": "Bénévole",           "desc": "J'ai été bénévole lors d'un GP",                 "season": "all" },
-    { "id": "cinema_f1",     "emoji": "🎬", "name": "Cinéma F1",          "desc": "J'ai vu le film F1 au cinéma",                  "season": "all" },
-    { "id": "podcast_f1",    "emoji": "📻", "name": "Podcast F1",         "desc": "J'ai déjà écouté un podcast de F1",             "season": "all" },
-    { "id": "stands_visit",  "emoji": "🧤", "name": "Dans les stands",    "desc": "J'ai visité les stands d'une écurie",            "season": "all" },
-    { "id": "prediction",    "emoji": "🎯", "name": "Prédiction",         "desc": "J'ai prédit le bon champion 2025",               "season": 2025 },
-    { "id": "karting",       "emoji": "🏁", "name": "Karting",            "desc": "J'ai fait du karting sur une piste F1",          "season": "all" }
+    {
+      "id": "spectateur",
+      "emoji": "🎫",
+      "name": "Spectateur",
+      "desc": "J'ai assisté à un Grand Prix en vrai",
+      "season": "all"
+    },
+    {
+      "id": "premier_achat",
+      "emoji": "🛒",
+      "name": "Premier achat",
+      "desc": "J'ai acheté mon premier booster F1 UNO",
+      "season": "all"
+    },
+    {
+      "id": "cadeau",
+      "emoji": "🎁",
+      "name": "Cadeau",
+      "desc": "J'ai reçu des cartes F1 UNO en cadeau",
+      "season": "all"
+    },
+    {
+      "id": "echange",
+      "emoji": "🤝",
+      "name": "Échange",
+      "desc": "J'ai échangé des cartes avec quelqu'un",
+      "season": "all"
+    },
+    {
+      "id": "photo_pilote",
+      "emoji": "📸",
+      "name": "Selfie pilote",
+      "desc": "J'ai pris une photo avec un pilote F1",
+      "season": "all"
+    },
+    {
+      "id": "circuit_visit",
+      "emoji": "🏟️",
+      "name": "Circuit visitor",
+      "desc": "J'ai visité un circuit de F1",
+      "season": "all"
+    },
+    {
+      "id": "fan_tv",
+      "emoji": "📺",
+      "name": "Fan TV",
+      "desc": "J'ai regardé une course en direct à la TV",
+      "season": "all"
+    },
+    {
+      "id": "gamer",
+      "emoji": "🎮",
+      "name": "Gamer F1",
+      "desc": "J'ai joué à un jeu F1 officiel",
+      "season": "all"
+    },
+    {
+      "id": "merch",
+      "emoji": "👕",
+      "name": "Merch F1",
+      "desc": "Je possède un vêtement F1 officiel",
+      "season": "all"
+    },
+    {
+      "id": "app_f1tv",
+      "emoji": "📱",
+      "name": "F1 TV",
+      "desc": "J'ai regardé F1 TV sur mobile ou tablette",
+      "season": "all"
+    },
+    {
+      "id": "launch_day",
+      "emoji": "🎉",
+      "name": "Launch Day",
+      "desc": "J'étais là au lancement de la collection",
+      "season": 2025
+    },
+    {
+      "id": "globe",
+      "emoji": "🌍",
+      "name": "Globe-trotter",
+      "desc": "Je suis 3 ou plus influenceurs qui parlent de formule 1",
+      "season": "all"
+    },
+    {
+      "id": "vip",
+      "emoji": "🏆",
+      "name": "Accès VIP",
+      "desc": "J'ai eu un accès VIP à un Grand Prix",
+      "season": "all"
+    },
+    {
+      "id": "f1tv_pro",
+      "emoji": "📰",
+      "name": "F1 TV Pro",
+      "desc": "Je suis abonné à F1 TV Pro",
+      "season": "all"
+    },
+    {
+      "id": "rencontre",
+      "emoji": "🎤",
+      "name": "Rencontre pilote",
+      "desc": "J'ai rencontré un pilote en personne",
+      "season": "all"
+    },
+    {
+      "id": "sim_racing",
+      "emoji": "🏎️",
+      "name": "Sim Racing",
+      "desc": "J'ai fait du sim racing F1",
+      "season": "all"
+    },
+    {
+      "id": "livre_f1",
+      "emoji": "📚",
+      "name": "Connaisseur",
+      "desc": "J'ai lu un livre sur la F1",
+      "season": "all"
+    },
+    {
+      "id": "fan_art",
+      "emoji": "🎨",
+      "name": "Artiste F1",
+      "desc": "J'ai créé un fan art F1",
+      "season": "all"
+    },
+    {
+      "id": "communaute",
+      "emoji": "🗣️",
+      "name": "Communauté",
+      "desc": "Je suis membre d'une communauté F1",
+      "season": "all"
+    },
+    {
+      "id": "benevole",
+      "emoji": "🏅",
+      "name": "Bénévole",
+      "desc": "J'ai été bénévole lors d'un GP",
+      "season": "all"
+    },
+    {
+      "id": "cinema_f1",
+      "emoji": "🎬",
+      "name": "Cinéma F1",
+      "desc": "J'ai vu le film F1 au cinéma",
+      "season": "all"
+    },
+    {
+      "id": "podcast_f1",
+      "emoji": "📻",
+      "name": "Podcast F1",
+      "desc": "J'ai déjà écouté un podcast de F1",
+      "season": "all"
+    },
+    {
+      "id": "stands_visit",
+      "emoji": "🧤",
+      "name": "Dans les stands",
+      "desc": "J'ai visité les stands d'une écurie",
+      "season": "all"
+    },
+    {
+      "id": "prediction",
+      "emoji": "🎯",
+      "name": "Prédiction",
+      "desc": "J'ai prédit le bon champion 2025",
+      "season": 2025
+    },
+    {
+      "id": "karting",
+      "emoji": "🏁",
+      "name": "Karting",
+      "desc": "J'ai fait du karting sur une piste F1",
+      "season": "all"
+    },
+    {
+      "id": "m_tribune",
+      "emoji": "🎫",
+      "name": "Tribune",
+      "desc": "Assister à un Grand Prix en tribune",
+      "season": "all"
+    },
+    {
+      "id": "m_paddock",
+      "emoji": "🎟️",
+      "name": "Paddock",
+      "desc": "Accéder au paddock un week-end de course",
+      "season": "all"
+    },
+    {
+      "id": "m_essai_libre",
+      "emoji": "🕐",
+      "name": "Vendredi libre",
+      "desc": "Assister à des essais libres",
+      "season": "all"
+    },
+    {
+      "id": "m_qualifs",
+      "emoji": "⏱️",
+      "name": "Samedi chrono",
+      "desc": "Assister à des qualifications",
+      "season": "all"
+    },
+    {
+      "id": "m_gp_pluie",
+      "emoji": "🌧️",
+      "name": "Sous la pluie",
+      "desc": "Assister à un GP sous la pluie",
+      "season": "all"
+    },
+    {
+      "id": "m_podium_vrai",
+      "emoji": "🍾",
+      "name": "Champagne",
+      "desc": "Voir un podium en vrai",
+      "season": "all"
+    },
+    {
+      "id": "m_autographe",
+      "emoji": "🖊️",
+      "name": "Autographe",
+      "desc": "Obtenir un autographe de pilote",
+      "season": "all"
+    },
+    {
+      "id": "m_trackday",
+      "emoji": "🏁",
+      "name": "Trackday",
+      "desc": "Rouler sur un circuit en trackday",
+      "season": "all"
+    },
+    {
+      "id": "m_karting_pluie",
+      "emoji": "💦",
+      "name": "Karting pluie",
+      "desc": "Faire du karting sous la pluie",
+      "season": "all"
+    },
+    {
+      "id": "m_simu_complet",
+      "emoji": "🕹️",
+      "name": "Cockpit",
+      "desc": "Monter un simulateur complet",
+      "season": "all"
+    },
+    {
+      "id": "m_usine",
+      "emoji": "🏭",
+      "name": "L’usine",
+      "desc": "Visiter une usine d’écurie",
+      "season": "all"
+    },
+    {
+      "id": "m_musee",
+      "emoji": "🏛️",
+      "name": "Musée",
+      "desc": "Visiter un musée du sport automobile",
+      "season": "all"
+    },
+    {
+      "id": "m_soiree_gp",
+      "emoji": "🛋️",
+      "name": "Maître de course",
+      "desc": "Organiser une soirée Grand Prix",
+      "season": "all"
+    },
+    {
+      "id": "m_converti",
+      "emoji": "🧲",
+      "name": "Recruteur",
+      "desc": "Convertir quelqu’un à la F1",
+      "season": "all"
+    },
+    {
+      "id": "m_nuit_blanche",
+      "emoji": "🌙",
+      "name": "Fuseau horaire",
+      "desc": "Nuit blanche pour un GP à l’autre bout du monde",
+      "season": "all"
+    },
+    {
+      "id": "m_radio_gp",
+      "emoji": "📻",
+      "name": "À la radio",
+      "desc": "Suivre un GP entier à la radio",
+      "season": "all"
+    },
+    {
+      "id": "m_marshal",
+      "emoji": "🚩",
+      "name": "Commissaire",
+      "desc": "Être commissaire de piste bénévole",
+      "season": "all"
+    },
+    {
+      "id": "m_pronostic_podium",
+      "emoji": "🔮",
+      "name": "Boule de cristal",
+      "desc": "Pronostiquer le podium exact d’un GP",
+      "season": "all"
+    },
+    {
+      "id": "m_booster_session",
+      "emoji": "🎴",
+      "name": "Ouverture",
+      "desc": "Ouvrir un booster complet en une session",
+      "season": "all"
+    },
+    {
+      "id": "m_echange_irl",
+      "emoji": "🤲",
+      "name": "Troc réel",
+      "desc": "Échanger une carte en personne",
+      "season": "all"
+    },
+    {
+      "id": "m_complete_echange",
+      "emoji": "🧩",
+      "name": "Négociateur",
+      "desc": "Compléter une carte grâce à un échange",
+      "season": "all"
+    },
+    {
+      "id": "m_classeur",
+      "emoji": "📒",
+      "name": "Classeur",
+      "desc": "Ranger sa collection en classeur",
+      "season": "all"
+    },
+    {
+      "id": "m_offert",
+      "emoji": "🎁",
+      "name": "Généreux",
+      "desc": "Offrir une carte de sa collection",
+      "season": "all"
+    },
+    {
+      "id": "m_recu_cadeau",
+      "emoji": "💝",
+      "name": "Chanceux",
+      "desc": "Recevoir une carte en cadeau",
+      "season": "all"
+    },
+    {
+      "id": "m_montre_collection",
+      "emoji": "🖼️",
+      "name": "Vitrine",
+      "desc": "Montrer sa collection à un autre collectionneur",
+      "season": "all"
+    },
+    {
+      "id": "m_mini_casque",
+      "emoji": "🪖",
+      "name": "Mini-casque",
+      "desc": "Posséder un casque miniature officiel",
+      "season": "all"
+    },
+    {
+      "id": "m_carte_protegee",
+      "emoji": "🛡️",
+      "name": "Sous protection",
+      "desc": "Protéger ses meilleures cartes (sleeves, toploaders)",
+      "season": "all"
+    }
   ]
 }
