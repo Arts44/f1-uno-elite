@@ -716,14 +716,14 @@ export function updateUserTitle(){
   const color = active.color || (active.source==='milestone' ? '#FF6B35' : '#E8002D');
   // Header pill
   const ht = document.getElementById('headerTitle');
-  if(ht) ht.innerHTML = `<span class="ht-icon">${active.emoji||active.icon||'🟡'}</span><span style="color:${color}">${active.name}</span>`;
+  if(ht) ht.innerHTML = `<span class="ht-icon">${active.emoji||active.icon||'🟡'}</span><span style="color:color-mix(in srgb, ${color} var(--ink-mix,100%), #000)">${active.name}</span>`;
   // Badges page card
   const uc = document.getElementById('userTitleCard');
   if(uc){
     const unlockedCount = unlocked.length;
     uc.innerHTML = `
       <span class="user-title-icon">${active.emoji||active.icon||'🟡'}</span>
-      <span class="user-title-text" style="color:${color}">${active.name}</span>
+      <span class="user-title-text" style="color:color-mix(in srgb, ${color} var(--ink-mix,100%), #000)">${active.name}</span>
       <span class="user-title-sub">${unlockedCount} ${t('b.titles_unlocked')||'titles unlocked'}</span>
       <div class="user-title-next" data-action="toggleTitlePicker">${t('b.choose')||'▼ Choose my title'}</div>
       <div class="title-picker" id="titlePicker" style="display:none"></div>`;
@@ -744,7 +744,7 @@ export function toggleTitlePicker(){
     const color = t.color || '#E8002D';
     const icon = t.emoji || t.icon || '🟡';
     html += `<div class="title-pick${isActive?' active':''}" data-action="selectTitle" data-title-id="${t.id}" style="border-color:${isActive?color:'var(--border)'}">
-      <span>${icon}</span><span style="color:${color}">${t.name}</span>
+      <span>${icon}</span><span style="color:color-mix(in srgb, ${color} var(--ink-mix,100%), #000)">${t.name}</span>
     </div>`;
   });
   html += '</div>';

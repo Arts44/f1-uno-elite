@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.35.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'Light theme, full accessibility pass: every screen was scanned text-by-text against WCAG AA. Secondary greys are deeper, coloured inks (titles, rarity labels in stats, active season pill, nav label, danger button, Badges ladder) automatically darken on light backgrounds. Dark theme is untouched.',
+      ],
+      fr: [
+        'Thème clair, passe d\'accessibilité complète : chaque écran a été scanné texte par texte contre WCAG AA. Les gris secondaires sont plus profonds, les encres colorées (titres, libellés de rareté des stats, pilule de saison active, libellé de navigation, bouton danger, échelle des Badges) s\'assombrissent automatiquement sur fond clair. Le thème sombre ne bouge pas.',
+      ],
+      es: [
+        'Tema claro, pasada completa de accesibilidad: cada pantalla se escaneó texto a texto contra WCAG AA. Los grises secundarios son más profundos y las tintas de color (títulos, etiquetas de rareza en estadísticas, píldora de temporada activa, etiqueta de navegación, botón de peligro, escalera de Insignias) se oscurecen automáticamente sobre fondo claro. El tema oscuro no cambia.',
+      ],
+      zh: [
+        '浅色主题完成完整的可访问性检查:每个界面都逐条文本对照 WCAG AA 扫描。次级灰色更深,彩色文字(标题、统计中的稀有度标签、当前赛季胶囊、导航标签、危险按钮、徽章阶梯)在浅色背景上自动加深。深色主题保持不变。',
+      ],
+      it: [
+        'Tema chiaro, passata completa di accessibilità: ogni schermata è stata scansionata testo per testo contro WCAG AA. I grigi secondari sono più profondi e gli inchiostri colorati (titoli, etichette di rarità nelle statistiche, pillola della stagione attiva, etichetta di navigazione, pulsante di pericolo, scala dei Badge) si scuriscono automaticamente su fondo chiaro. Il tema scuro non cambia.',
+      ],
+      nl: [
+        'Licht thema, volledige toegankelijkheidsronde: elk scherm is tekst voor tekst gescand tegen WCAG AA. Secundaire grijstinten zijn dieper en gekleurde inkten (titels, zeldzaamheidslabels in statistieken, actieve seizoenspil, navigatielabel, gevarenknop, Badges-ladder) worden automatisch donkerder op lichte achtergronden. Het donkere thema blijft onaangeroerd.',
+      ],
+      de: [
+        'Helles Design, kompletter Barrierefreiheits-Durchgang: jeder Bildschirm wurde Text für Text gegen WCAG AA geprüft. Sekundäre Grautöne sind tiefer, farbige Tinten (Titel, Seltenheits-Labels in den Statistiken, aktive Saison-Pille, Navigations-Label, Gefahren-Knopf, Abzeichen-Leiter) dunkeln auf hellem Grund automatisch nach. Das dunkle Design bleibt unberührt.',
+      ],
+    },
+  },
+  {
     version: '1.34.0',
     date: '2026-08-08',
     changes: {

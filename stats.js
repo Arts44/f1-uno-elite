@@ -244,7 +244,7 @@ export function renderStats(){
       : `<span class="sv-team-dot" style="background:${rar.color}"></span>`;
     const label = rKey==='divine' || rKey==='eternal'
       ? `<span class="rar-${rKey}-text">${t('rar.'+rKey)}</span>`
-      : `<span style="color:${rar.color}">${t('rar.'+rKey)}</span>`;
+      : `<span style="color:color-mix(in srgb, ${rar.color} var(--ink-mix,100%), #000)">${t('rar.'+rKey)}</span>`;
     return svRow(dot, label, ownedAtRar, reachable, rarPct);
   }).join('');
 

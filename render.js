@@ -361,7 +361,7 @@ export function openModal(id){
   // competing with the two figures that actually carry information.
   document.getElementById('moInfo').innerHTML=`
     <div class="mib"><div class="mib-l">${t('mo.types_avail')||'Types'}</div><div class="mib-v">${card.types.length} type(s)</div></div>
-    <div class="mib"><div class="mib-l">${t('mo.total_copies')||'Total copies'}</div><div class="mib-v" style="color:var(--red)">${cardTotalQty(id)}</div></div>
+    <div class="mib"><div class="mib-l">${t('mo.total_copies')||'Total copies'}</div><div class="mib-v" style="color:var(--red-ink,var(--red))">${cardTotalQty(id)}</div></div>
   `;
 
   renderModalTypes(card);
