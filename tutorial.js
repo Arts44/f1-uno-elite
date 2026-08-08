@@ -333,6 +333,10 @@ function _positionSpot(el){
 }
 
 function _showBubble(step, i, opts = {}){
+  // fix 1.32.0 : depuis le refactor spectateur (1.25.0), STEPS était une
+  // constante locale de _runStep — ici c'était une ReferenceError et le
+  // tutoriel mourait à la première bulle.
+  const STEPS = activeTutorialSteps();
   const isLast = i === STEPS.length - 1;
   const total = STEPS.length;
   const showNext = step.observe || isLast || opts.missing;

@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.32.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'Everything is easier to tap: the wishlist star, the favourite heart, the + buttons, the quantity steppers, toggles and small controls now respond to a finger-sized area (44 px) — without any visual growing a single pixel.',
+        'Views now glide: switching between Collection, Badges, Stats, Account and Settings slides softly in the same direction the navigation pill travels (~150 ms). Instant switch if your system prefers reduced motion.',
+        'Fixed: the guided tour crashed silently on launch since 1.25.0 — it now runs through all 23 steps again.',
+      ],
+      fr: [
+        'Tout est plus facile à toucher : l\'étoile wishlist, le cœur favori, les boutons +, les compteurs de quantité, les interrupteurs et les petits contrôles répondent désormais à une zone à la taille du doigt (44 px) — sans qu\'aucun visuel ne grossisse d\'un pixel.',
+        'Les vues glissent : passer de Collection à Badges, Stats, Compte ou Réglages coulisse doucement dans le sens du voyage de la pastille de navigation (~150 ms). Bascule instantanée si ton système préfère réduire les animations.',
+        'Corrigé : la visite guidée plantait silencieusement au lancement depuis la 1.25.0 — elle déroule à nouveau ses 23 étapes.',
+      ],
+      es: [
+        'Todo es más fácil de tocar: la estrella de la lista de deseos, el corazón de favoritos, los botones +, los contadores de cantidad, los interruptores y los controles pequeños responden ahora a una zona del tamaño de un dedo (44 px) — sin que ningún visual crezca un solo píxel.',
+        'Las vistas se deslizan: pasar entre Colección, Insignias, Estadísticas, Cuenta y Ajustes se desliza suavemente en la misma dirección en que viaja la píldora de navegación (~150 ms). Cambio instantáneo si tu sistema prefiere reducir las animaciones.',
+        'Corregido: la visita guiada fallaba en silencio al iniciarse desde la 1.25.0 — vuelve a recorrer sus 23 pasos.',
+      ],
+      zh: [
+        '一切都更好点按了:愿望清单的星星、收藏的爱心、+ 按钮、数量加减器、开关和各种小控件,现在都响应指尖大小的触区(44 像素)——而所有视觉元素一个像素都没有变大。',
+        '视图切换有了过渡:在收藏、徽章、统计、账户和设置之间切换时,页面会顺着导航圆点的移动方向轻轻滑入(约 150 毫秒)。若系统偏好减少动态效果,则瞬间切换。',
+        '修复:引导教程自 1.25.0 起启动即静默崩溃——现在 23 个步骤重新可以完整走完。',
+      ],
+      it: [
+        'Tutto è più facile da toccare: la stella della wishlist, il cuore dei preferiti, i pulsanti +, i contatori di quantità, gli interruttori e i piccoli controlli rispondono ora a un\'area grande quanto un dito (44 px) — senza che alcun elemento visivo cresca di un solo pixel.',
+        'Le viste scorrono: passare tra Collezione, Badge, Statistiche, Account e Impostazioni scivola dolcemente nella stessa direzione in cui viaggia la pillola di navigazione (~150 ms). Cambio istantaneo se il sistema preferisce ridurre le animazioni.',
+        'Corretto: il tour guidato si bloccava in silenzio all\'avvio dalla 1.25.0 — ora percorre di nuovo tutti i 23 passaggi.',
+      ],
+      nl: [
+        'Alles is makkelijker aan te tikken: de wishlist-ster, het favorietenhart, de +-knoppen, de aantaltellers, de schakelaars en kleine bedieningselementen reageren nu op een vingergrote zone (44 px) — zonder dat er ook maar één pixel visueel groeit.',
+        'Weergaven glijden nu: wisselen tussen Collectie, Badges, Statistieken, Account en Instellingen schuift zacht mee in de richting waarin de navigatiepil beweegt (~150 ms). Directe wissel als je systeem minder beweging verkiest.',
+        'Opgelost: de rondleiding crashte sinds 1.25.0 stilletjes bij het starten — ze doorloopt weer alle 23 stappen.',
+      ],
+      de: [
+        'Alles lässt sich leichter antippen: der Wunschlisten-Stern, das Favoriten-Herz, die +-Knöpfe, die Mengenzähler, die Schalter und kleine Bedienelemente reagieren jetzt auf eine fingergroße Zone (44 px) — ohne dass irgendein Element auch nur einen Pixel wächst.',
+        'Ansichten gleiten jetzt: der Wechsel zwischen Sammlung, Abzeichen, Statistiken, Konto und Einstellungen gleitet sanft in die Richtung, in die die Navigationspille wandert (~150 ms). Sofortiger Wechsel, wenn dein System reduzierte Bewegung bevorzugt.',
+        'Behoben: die geführte Tour stürzte seit 1.25.0 beim Start stumm ab — sie durchläuft wieder alle 23 Schritte.',
+      ],
+    },
+  },
+  {
     version: '1.31.0',
     date: '2026-08-08',
     changes: {

@@ -1903,3 +1903,57 @@ button:not(:disabled):not(.bn-tab):active,
   color:rgba(255,255,255,.82);text-align:center;line-height:1.25;max-width:94%;
   text-shadow:0 1px 6px rgba(0,0,0,.8);}
 .modal-visual .team-name{font-size:10px;}
+
+/* ══════════════════════════════════════════════════════════
+   v2.3 PHASE C ① — ZONES TACTILES ≥ 44 px
+   Le visuel ne bouge pas d'un pixel : la zone de hit est étendue
+   par pseudo-élément transparent (il participe au hit-testing de
+   son parent). Les extensions horizontales s'arrêtent à mi-chemin
+   du voisin interactif pour ne jamais détourner un tap.
+   ══════════════════════════════════════════════════════════ */
+.schip,.qbtn,.qadd-type,.mqbtn,.modal-close,.sv-tool-tab,
+.user-title-next,.bh-share,.season-pill,.logo,.setv-btn,.toast-action{position:relative;}
+.schip::after,.qbtn::after,.qadd-type::after,.mqbtn::after,.modal-close::after,
+.sv-tool-tab::after,.user-title-next::after,.bh-share::after,.season-pill::after,
+.logo::after,.setv-btn::after,.toast-action::after,.setv-toggle::before{
+  content:'';position:absolute;inset:-5px;}
+/* ⭐/❤️ des tuiles (24 px) : 44×44 chacune — l'étoile s'étend vers la
+   zone morte à sa gauche, le cœur vers le bord de carte à sa droite ;
+   entre les deux, coupure à mi-écart (aucun chevauchement). */
+.schip[data-s="wishlist"]::after{top:-10px;bottom:-10px;left:-17px;right:-3px;}
+.schip[data-s="favorite"]::after{top:-10px;bottom:-10px;left:-3px;right:-17px;}
+/* + de tuile (34 px) et partage badges (34 px) → 44 */
+.qbtn::after,.bh-share::after{inset:-5px;}
+/* variantes du popover + (30 px) : 44 en vertical, mi-écart en horizontal */
+.qadd-type::after{top:-7px;bottom:-7px;left:-3px;right:-3px;}
+/* − / + de la fiche (22 px) : 44 en vertical, extension vers le compteur
+   (non interactif) — les voisins des cellules adjacentes restent hors
+   d'atteinte grâce au padding des cellules */
+.mqbtn::after{top:-11px;bottom:-11px;left:-6px;right:-6px;}
+/* fermeture de fiche (29 px) → 45 */
+.modal-close::after{inset:-8px;}
+/* interrupteurs (46×26) : 44 en vertical (::after = curseur, donc ::before) */
+.setv-toggle::before{top:-9px;bottom:-9px;left:0;right:0;}
+/* onglets outils (32 px), pilule saison (28 px), boutons réglages (34 px),
+   action de toast : 44 en vertical */
+.sv-tool-tab::after{top:-6px;bottom:-6px;left:0;right:0;}
+.season-pill::after{top:-8px;bottom:-8px;left:-2px;right:-2px;}
+.setv-btn::after{top:-5px;bottom:-5px;left:-2px;right:-2px;}
+.toast-action::after{top:-12px;bottom:-12px;left:-8px;right:-8px;}
+/* lockup du header (lien, 26 px de haut) et « ▼ choisir mon titre » (12 px) */
+.logo::after{top:-9px;bottom:-9px;left:-6px;right:-6px;}
+.user-title-next::after{top:-16px;bottom:-16px;left:-8px;right:-8px;}
+/* cases à cocher du contenu des sauvegardes : le label EST la cible —
+   padding + marge négative = même rendu, hit de 44 px */
+.import-set-row{padding:12px 0;margin:-12px 0;position:relative;z-index:1;}
+
+/* ── PHASE C ② — transition d'entrée entre vues ──
+   Même côté d'arrivée que le voyage de la pastille de navigation.
+   Transform + opacity uniquement : aucune incidence de layout. */
+@keyframes view-in-r{from{opacity:0;transform:translateX(14px);}to{opacity:1;transform:none;}}
+@keyframes view-in-l{from{opacity:0;transform:translateX(-14px);}to{opacity:1;transform:none;}}
+.view-in-r{animation:view-in-r 150ms ease-out;}
+.view-in-l{animation:view-in-l 150ms ease-out;}
+@media (prefers-reduced-motion:reduce){
+  .view-in-r,.view-in-l{animation:none;}
+}

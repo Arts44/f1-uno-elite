@@ -907,6 +907,25 @@ export function showToast(msg, opts){
 }
 
 /* ══════════════════════════════════════════════════════════ VIEWS */
+/* Transition d'entrée entre vues (phase C) : fondu + léger glissement
+   ~150 ms ease-out, DIRECTIONNEL — la vue arrive du même côté que la
+   pastille de navigation voyage, une seule grammaire de mouvement.
+   Transform/opacity uniquement (zéro layout shift, le skeleton ne
+   réapparaît pas) ; prefers-reduced-motion coupe l'animation en CSS. */
+const VIEW_ORDER = ['collection', 'badges', 'stats', 'account', 'settings'];
+function _animateViewIn(view, fromView){
+  if(view === fromView) return;
+  const el = view === 'collection'
+    ? document.getElementById('collectionView')
+    : document.getElementById(view + 'View');
+  if(!el) return;
+  const dir = VIEW_ORDER.indexOf(view) >= VIEW_ORDER.indexOf(fromView) ? 'r' : 'l';
+  el.classList.remove('view-in-l', 'view-in-r');
+  void el.offsetWidth;                       // rejouable : redémarre l'animation
+  el.classList.add('view-in-' + dir);
+  el.addEventListener('animationend', () => el.classList.remove('view-in-l', 'view-in-r'), { once: true });
+}
+
 export function switchView(view){
   // Garde unique : le mode spectateur ne donne jamais accès aux Réglages,
   // quel que soit le chemin (clic, glissement, appel direct). Le garde
@@ -916,6 +935,7 @@ export function switchView(view){
     return;
   }
   if(currentView === 'badges' && view !== 'badges') resetHeroAnimation();
+  const fromView = currentView;
   currentView = view;
   const collectionView = document.getElementById('collectionView');
   const badgesView = document.getElementById('badgesView');
@@ -955,4 +975,5 @@ export function switchView(view){
     default:
       collectionView.style.display = '';
   }
+  _animateViewIn(view, fromView);
 }
