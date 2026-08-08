@@ -167,6 +167,12 @@ npm test        # 166 个测试，node --test，无需框架
 
 ---
 
+## 🔩 工程说明
+
+运行时零依赖(仅构建时使用 esbuild);版本间零布局偏移,精确到像素测量;快速添加经性能剖析优化(中端手机约 300 毫秒 → 约 45 毫秒);可选的本地加密与 PIN 绑定(PBKDF2 + AES-GCM);旁观者模式在逻辑层锁定而非 CSS;截图由仓库内确定性脚本重新生成;377 个测试基于原生 JS 与 Node 内置测试运行器。完整细节见[英文 README](README.md)。
+
+---
+
 ## 📜 许可证与商标
 
 以 **MIT 许可证**发布 — 见 [LICENSE](LICENSE)。© 2026 Arthur — [@Arts44](https://github.com/Arts44)。

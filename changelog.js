@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.41.1',
+    date: '2026-08-08',
+    changes: {
+      en: ['Documentation only: the full screenshot set was regenerated (the READMEs now show the current tiles, icons and the 120 badges), three animated demos were added to the README, and an "Engineering notes" section documents the technical choices in all 7 languages. Nothing in the app itself changed.'],
+      fr: ['Documentation seulement : le jeu complet de captures a été régénéré (les README montrent désormais les tuiles actuelles, les icônes et les 120 badges), trois démos animées rejoignent le README, et une section « Notes d\'ingénierie » documente les choix techniques dans les 7 langues. Rien n\'a changé dans l\'app elle-même.'],
+      es: ['Solo documentación: se regeneró el conjunto completo de capturas (los README muestran ya las casillas actuales, los iconos y las 120 insignias), se añadieron tres demos animadas al README y una sección de «Notas de ingeniería» documenta las decisiones técnicas en los 7 idiomas. Nada cambió en la app.'],
+      zh: ['仅文档更新:整套截图已重新生成(README 现在展示当前的卡格、图标和 120 枚徽章),README 新增三个动画演示,并新增「工程说明」章节以 7 种语言记录技术决策。应用本身没有任何改动。'],
+      it: ['Solo documentazione: l\'intero set di schermate è stato rigenerato (i README mostrano ora le tessere attuali, le icone e i 120 badge), tre demo animate si aggiungono al README e una sezione «Note di ingegneria» documenta le scelte tecniche nelle 7 lingue. Nulla è cambiato nell\'app.'],
+      nl: ['Alleen documentatie: de volledige set schermafbeeldingen is opnieuw gegenereerd (de README\'s tonen nu de huidige tegels, iconen en de 120 badges), drie geanimeerde demo\'s zijn aan de README toegevoegd en een sectie "Engineering-notities" documenteert de technische keuzes in alle 7 talen. In de app zelf is niets veranderd.'],
+      de: ['Nur Dokumentation: der komplette Screenshot-Satz wurde neu erzeugt (die READMEs zeigen jetzt die aktuellen Kacheln, Icons und die 120 Abzeichen), drei animierte Demos kamen ins README, und ein Abschnitt „Engineering-Notizen" dokumentiert die technischen Entscheidungen in allen 7 Sprachen. In der App selbst hat sich nichts geändert.'],
+    },
+  },
+  {
     version: '1.41.0',
     date: '2026-08-08',
     changes: {

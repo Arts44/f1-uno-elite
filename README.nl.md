@@ -167,6 +167,12 @@ npm test        # 166 tests, node --test, zonder framework
 
 ---
 
+## 🔩 Engineering-notities
+
+Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); nul layoutverschuiving, per pixel gemeten tussen versies; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo; 377 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
+
+---
+
 ## 📜 Licentie & merken
 
 Uitgebracht onder de **MIT-licentie** — zie [LICENSE](LICENSE). © 2026 Arthur — [@Arts44](https://github.com/Arts44).

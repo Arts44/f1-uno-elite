@@ -167,6 +167,12 @@ npm test        # 166 test, node --test, senza framework
 
 ---
 
+## 🔩 Note di ingegneria
+
+Zero dipendenze a runtime (solo esbuild, in build); zero spostamenti di layout, misurati al pixel tra le versioni; l'aggiunta rapida profilata e ottimizzata (~300 ms → ~45 ms su un telefono medio); cifratura locale opzionale legata al PIN (PBKDF2 + AES-GCM); modalità spettatore bloccata nella logica, non nel CSS; screenshot rigenerati da uno script deterministico nel repo; 377 test in JS vanilla con il runner integrato di Node. Dettagli completi nel [README inglese](README.md).
+
+---
+
 ## 📜 Licenza e marchi
 
 Rilasciato sotto **licenza MIT** — vedi [LICENSE](LICENSE). © 2026 Arthur — [@Arts44](https://github.com/Arts44).
