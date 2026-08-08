@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.43.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'The whole app is now usable with a keyboard. Card tiles could not be reached or opened without a mouse — the app\'s main action. They are now proper buttons: Tab reaches them, Enter or Space opens the card sheet, and the wishlist and favourite chips toggle the same way, announcing their on/off state to screen readers. Your focus even stays put after a toggle, so you can keep going without tabbing back.',
+      ],
+      fr: [
+        'Toute l\'app s\'utilise désormais au clavier. Les tuiles de carte étaient inatteignables sans souris — alors que les ouvrir est l\'action principale. Ce sont maintenant de vrais boutons : Tab les atteint, Entrée ou Espace ouvre la fiche, et les puces wishlist et favori basculent pareil en annonçant leur état aux lecteurs d\'écran. Le focus reste même en place après une bascule, pour enchaîner sans re-tabuler.',
+      ],
+      es: [
+        'Toda la app se usa ahora con teclado. Las cartas no se podían alcanzar ni abrir sin ratón — siendo la acción principal. Ahora son botones de verdad: Tab las alcanza, Enter o Espacio abre la ficha, y las marcas de lista de deseos y favoritos alternan igual, anunciando su estado a los lectores de pantalla. El foco se mantiene tras alternar.',
+      ],
+      zh: [
+        '整个应用现已支持键盘操作。此前没有鼠标就无法选中或打开卡片——而这正是应用的主要动作。现在卡片是真正的按钮:Tab 可聚焦,回车或空格打开卡片详情,愿望清单与收藏标记同样支持,并向屏幕阅读器播报开关状态。切换后焦点还会保持原位,无需重新 Tab。',
+      ],
+      it: [
+        'Tutta l\'app è ora utilizzabile da tastiera. Le carte non erano raggiungibili né apribili senza mouse — pur essendo l\'azione principale. Ora sono veri pulsanti: Tab le raggiunge, Invio o Spazio apre la scheda, e i segni wishlist e preferiti si attivano allo stesso modo, annunciando il loro stato agli screen reader. Il focus resta al suo posto dopo un cambio.',
+      ],
+      nl: [
+        'De hele app is nu met een toetsenbord te bedienen. Kaarttegels waren zonder muis niet bereikbaar of te openen — terwijl dat de hoofdactie is. Het zijn nu echte knoppen: Tab bereikt ze, Enter of spatie opent de kaartfiche, en de wishlist- en favorietenmarkeringen schakelen net zo, met hun aan/uit-status voor schermlezers. De focus blijft staan na het schakelen.',
+      ],
+      de: [
+        'Die ganze App ist jetzt mit Tastatur bedienbar. Kartenkacheln waren ohne Maus weder erreichbar noch zu öffnen — obwohl das die Hauptaktion ist. Sie sind jetzt echte Schaltflächen: Tab erreicht sie, Enter oder Leertaste öffnet das Kartenblatt, und die Wunschlisten- und Favoriten-Marken schalten genauso, samt An/Aus-Status für Screenreader. Der Fokus bleibt nach dem Umschalten stehen.',
+      ],
+    },
+  },
+  {
     version: '1.42.2',
     date: '2026-08-08',
     changes: {

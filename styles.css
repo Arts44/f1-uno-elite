@@ -2142,3 +2142,10 @@ button:not(:disabled):not(.bn-tab):active,
 .pk-sum-badges b{color:var(--gold);}
 .pk-sum-acts{display:flex;gap:10px;width:100%;}
 .pk-sum-acts .pk-act{flex:1;grid-column:auto;}
+
+/* ══ A11Y (audit 1.42.2) — la tuile et ses puces d'état sont devenues
+   des cibles clavier : il leur faut un anneau de focus visible. Le
+   liseré de la tuile est décalé vers l'extérieur pour ne pas se
+   confondre avec le liseré « set complet ». ══ */
+.card:focus-visible{outline:2px solid var(--red);outline-offset:4px;}
+.schip:focus-visible{outline:2px solid var(--red);outline-offset:2px;}

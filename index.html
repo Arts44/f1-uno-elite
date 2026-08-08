@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Track your F1 UNO Élite trading-card collection — offline-first, installable, zero dependencies. Owned cards, doubles, wishlist, 120 badges, stats and backups.">
 <title data-i18n="app.title">F1 UNO Élite — Collection</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#E8002D">
@@ -23,15 +24,15 @@
     <path fill="var(--helm-lip,#222)" d="M28 84l52-3-1 7-49 3Z"/>
   </symbol></svg>
 <!-- LOGIN SCREEN -->
-<div id="login-screen" role="dialog" aria-label="" data-i18n-aria="login.screen" aria-modal="true">
+<div id="login-screen" role="dialog" aria-label="Sign in" data-i18n-aria="login.screen" aria-modal="true">
   <div class="login-box">
     <span class="lockup lk-lg" aria-label="F1 UNO Élite"><span class="lk-top"><span class="lk-f1">F1</span><span class="lk-uno">UNO</span><span class="lk-elite">Élite</span></span><span class="lk-bar" aria-hidden="true"></span></span>
-    <button class="theme-switch" id="loginThemeSwitch" type="button" aria-label="" data-i18n-aria="theme.toggle" data-action="toggleTheme">
+    <button class="theme-switch" id="loginThemeSwitch" type="button" aria-label="Toggle theme" data-i18n-aria="theme.toggle" data-action="toggleTheme">
       <span class="theme-icon" id="loginThemeIcon" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
     </button>
     <svg class="pin-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     <label class="pin-label" for="pin-keypad" data-i18n="login.pin">PIN Code</label>
-    <div class="otp-wrap pin-segs" id="pin-segs" role="status" aria-live="polite" aria-label="" data-i18n-aria="login.pin_input">
+    <div class="otp-wrap pin-segs" id="pin-segs" role="status" aria-live="polite" aria-label="PIN code input" data-i18n-aria="login.pin_input">
       <div class="otp-boxes" aria-hidden="true"><span class="otp-box"><span class="otp-caret"></span></span><span class="otp-box"><span class="otp-caret"></span></span><span class="otp-box"><span class="otp-caret"></span></span><span class="otp-box"><span class="otp-caret"></span></span></div>
     </div>
     <div class="pin-keypad" id="pin-keypad" role="group" aria-label="Clavier numérique">
@@ -44,7 +45,7 @@
       <button class="pin-key" data-digit="7" type="button">7</button>
       <button class="pin-key" data-digit="8" type="button">8</button>
       <button class="pin-key" data-digit="9" type="button">9</button>
-      <button class="pin-key del" data-action="pinDel" type="button" aria-label="" data-i18n-aria="login.delete">⌫</button>
+      <button class="pin-key del" data-action="pinDel" type="button" aria-label="Delete last digit" data-i18n-aria="login.delete">⌫</button>
       <button class="pin-key zero" data-digit="0" type="button">0</button>
     </div>
     <div class="pin-error-msg" id="pin-error" role="alert" aria-live="assertive"></div>
@@ -60,15 +61,15 @@
 <header class="header" role="banner">
   <div class="header-inner">
     <div class="header-left">
-      <a class="logo" href="#" aria-label="" data-i18n-aria="app.home">
-        <span class="lockup lk-hd" aria-label="F1 UNO Élite"><span class="lk-top"><span class="lk-f1">F1</span><span class="lk-uno">UNO</span><span class="lk-elite">Élite</span></span><span class="lk-bar" aria-hidden="true"></span></span>
+      <a class="logo" href="#" aria-label="F1 UNO Élite — Home" data-i18n-aria="app.home">
+        <span class="lockup lk-hd" aria-hidden="true"><span class="lk-top"><span class="lk-f1">F1</span><span class="lk-uno">UNO</span><span class="lk-elite">Élite</span></span><span class="lk-bar" aria-hidden="true"></span></span>
       </a>
     </div>
     <div class="header-right">
       <div class="header-title" id="headerTitle"></div>
       <div class="season-pills" id="seasonPills" role="tablist" aria-label="Sélection de saison"></div>
       <span class="header-divider" aria-hidden="true"></span>
-      <div class="header-count" id="totalCount" aria-label="" data-i18n-aria="header.total_aria">0</div>
+      <div class="header-count" id="totalCount" aria-label="Collection progress" data-i18n-aria="header.total_aria">0</div>
     </div>
   </div>
   <div class="header-progress" aria-hidden="true"><div class="header-progress-bar" id="headerProgressBar"></div></div>
@@ -86,39 +87,39 @@
     </div>
     <div class="card-grid" id="cardGrid" role="list" aria-label="Grille de cartes"></div>
   </main>
-  <section class="badges-view" id="badgesView" role="tabpanel" aria-label="" data-i18n-aria="b.view">
+  <section class="badges-view" id="badgesView" role="tabpanel" aria-label="Badges" data-i18n-aria="b.view">
     <div class="badges-hero" id="badgesHero"></div>
     <div class="badges-next" id="badgesNext"></div>
     <div id="badgesFams"></div>
   </section>
-  <section class="stats-view" id="statsView" role="tabpanel" aria-label="" data-i18n-aria="st.view"></section>
-  <section class="settings-view" id="accountView" role="tabpanel" aria-label="" data-i18n-aria="acc.view"></section>
-  <section class="settings-view" id="settingsView" role="tabpanel" aria-label="" data-i18n-aria="s.view"></section>
+  <section class="stats-view" id="statsView" role="tabpanel" aria-label="Statistics" data-i18n-aria="st.view"></section>
+  <section class="settings-view" id="accountView" role="tabpanel" aria-label="Account view" data-i18n-aria="acc.view"></section>
+  <section class="settings-view" id="settingsView" role="tabpanel" aria-label="Settings" data-i18n-aria="s.view"></section>
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="" data-i18n-aria="nav.main">
+<nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="Main navigation" data-i18n-aria="nav.main">
   <div class="bead-nav-inner" id="beadInner">
     <svg class="bead-bar" id="beadBar" aria-hidden="true"></svg>
     <div class="bead" id="navBead" aria-hidden="true"></div>
     <div class="bottom-nav-pill" role="tablist">
-      <button class="bn-tab active" data-action="switchView" data-view="collection" type="button">
+      <button class="bn-tab active" data-action="switchView" data-view="collection" role="tab" type="button">
       <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
       <span class="bn-label" data-i18n="nav.collection">Collection</span>
     </button>
-      <button class="bn-tab" data-action="switchView" data-view="badges" type="button">
+      <button class="bn-tab" data-action="switchView" data-view="badges" role="tab" type="button">
       <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
       <span class="bn-label" data-i18n="nav.badges">Badges</span>
     </button>
-      <button class="bn-tab" data-action="switchView" data-view="stats" type="button">
+      <button class="bn-tab" data-action="switchView" data-view="stats" role="tab" type="button">
       <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
       <span class="bn-label" data-i18n="nav.stats">Stats</span>
     </button>
-      <button class="bn-tab" data-action="switchView" data-view="account" type="button">
+      <button class="bn-tab" data-action="switchView" data-view="account" role="tab" type="button">
       <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="bn-label" data-i18n="nav.account">Account</span>
     </button>
-      <button class="bn-tab" data-action="switchView" data-view="settings" type="button">
+      <button class="bn-tab" data-action="switchView" data-view="settings" role="tab" type="button">
       <svg class="bn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M2 14h4"/><path d="M10 8h4"/><path d="M18 16h4"/></svg>
       <span class="bn-label" data-i18n="nav.settings">Settings</span>
     </button>
@@ -127,10 +128,10 @@
 </nav>
 
 <!-- MODAL -->
-<div class="mo" id="mo" role="dialog" aria-modal="true" aria-label="" data-i18n-aria="m.modal">
+<div class="mo" id="mo" role="dialog" aria-modal="true" aria-label="Card details" data-i18n-aria="m.modal">
   <div class="modal">
     <div class="modal-visual tv-blue" id="moVis">
-      <button class="modal-close" id="modalCloseBtn" type="button" aria-label="" data-i18n-aria="m.close">✕</button>
+      <button class="modal-close" id="modalCloseBtn" type="button" aria-label="Close modal" data-i18n-aria="m.close">✕</button>
       <div id="moEmoji" aria-hidden="true"></div>
     </div>
     <div class="modal-body">
@@ -143,7 +144,7 @@
       <div class="mo-desc" id="moDesc"></div>
       <div class="mo-tags" id="moTags"></div>
       <div class="mo-variants-title" data-i18n="m.copies">My copies by type</div>
-      <div class="mo-type-rows" id="moTypeRows" role="list" aria-label="" data-i18n-aria="m.types_list"></div>
+      <div class="mo-type-rows" id="moTypeRows" role="list" aria-label="Copies by type" data-i18n-aria="m.types_list"></div>
     </div>
   </div>
 </div>

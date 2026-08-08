@@ -99,6 +99,19 @@ let _eventsInitialized = false;
 function initEvents(){
   if(_eventsInitialized) return;
   _eventsInitialized = true;
+  /* a11y (audit 1.42.2) : un <div role="button"> ne s'active PAS au
+     clavier tout seul — contrairement à un <button>. Ce listener unique
+     convertit Entrée/Espace en clic pour toutes ces cibles (tuiles de
+     carte, puces wishlist/favori), donc la délégation ci-dessous les
+     traite exactement comme une souris, gardes spectateur comprises. */
+  document.addEventListener('keydown', e => {
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    const el = e.target.closest('[role="button"][tabindex]');
+    if(!el || el.tagName === 'BUTTON' || el.tagName === 'A') return;
+    e.preventDefault();
+    el.click();
+  });
+
   // ── Global event delegation for data-action ──
   document.addEventListener('click', e => {
     // Quick-add : un clic hors du sélecteur/bouton + le referme

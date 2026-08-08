@@ -283,9 +283,21 @@ function buildCardEl(card){
     }
     el.className=cardClass;
     el.dataset.card=card.id;
-    el.onclick=e=>{
-      if(!e.target.closest('.schip')&&!e.target.closest('.qbtn')&&!e.target.closest('.qadd-pop')) openModal(card.id);
+    // a11y (audit 1.42.2) : la tuile portait un onclick sur un <div> sans
+    // tabindex — l'action PRINCIPALE de l'app était donc hors d'atteinte
+    // au clavier et muette pour un lecteur d'écran. Elle devient un
+    // bouton de plein droit : focusable, nommé, activable Entrée/Espace.
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', `${card.name} — #${card.id}`);
+    const openThis = e => {
+      if(e.target.closest('.schip') || e.target.closest('.qbtn') || e.target.closest('.qadd-pop')) return;
+      openModal(card.id);
     };
+    el.onclick = openThis;
+    // L'activation clavier (Entrée/Espace) est gérée par UN listener
+    // délégué dans app.js — même grammaire que les clics, aucune
+    // duplication par tuile.
 
     // Owned types summary. Set complet : posséder 1× chaque type est
     // implicite, donc on n'affiche que les types en exemplaires
@@ -325,8 +337,8 @@ function buildCardEl(card){
         <div class="card-rarity-row">
           <span class="card-rarity${rarityChipClass(rKey)}" style="${rarityChipStyle(rKey,rarity.color)}">${t('rar.'+rKey)} ${isEternal?`<span class="eternal-stars">${'✦'.repeat(rarity.stars)}</span>`:'★'.repeat(rarity.stars)}</span>
           <div class="status-chips">
-            <div class="schip${isWish?' on':''}" data-s="wishlist" data-action="quickToggle" data-card="${card.id}" data-status="wishlist" title="Wishlist">${icon('star')}</div>
-            <div class="schip${isFav?' on':''}" data-s="favorite" data-action="quickToggle" data-card="${card.id}" data-status="favorite" title="Favori">${icon('heart')}</div>
+            <div class="schip${isWish?' on':''}" role="button" tabindex="0" aria-pressed="${isWish}" aria-label="${t('status.wishlist')}" data-s="wishlist" data-action="quickToggle" data-card="${card.id}" data-status="wishlist" title="${t('status.wishlist')}">${icon('star')}</div>
+            <div class="schip${isFav?' on':''}" role="button" tabindex="0" aria-pressed="${isFav}" aria-label="${t('status.fav')}" data-s="favorite" data-action="quickToggle" data-card="${card.id}" data-status="favorite" title="${t('status.fav')}">${icon('heart')}</div>
           </div>
         </div>
         ${ownedSummary?`<div class="card-owned-summary">${ownedSummary}</div>`:''}
@@ -344,7 +356,23 @@ export function updateCardTile(cardId){
   const card=CARDS_DB.find(c=>c.id===cardId);
   const old=grid && grid.querySelector(`.card[data-card="${cardId}"]`);
   if(!grid || !card || !old){ renderCollection(); return; }
-  old.replaceWith(buildCardEl(card));
+  // a11y (audit 1.42.2) : remplacer le nœud DÉTRUIT le focus — au
+  // clavier, cocher la wishlist renvoyait au <body>, obligeant à
+  // re-tabuler depuis le début. On note où était le focus et on le
+  // repose sur l'élément équivalent de la tuile reconstruite.
+  const act = document.activeElement;
+  let restore = null;
+  if(act && old.contains(act)){
+    if(act === old) restore = '';
+    else if(act.classList.contains('schip')) restore = `.schip[data-status="${act.dataset.status}"]`;
+    else if(act.classList.contains('qbtn')) restore = '.qbtn';
+  }
+  const fresh = buildCardEl(card);
+  old.replaceWith(fresh);
+  if(restore !== null){
+    const target = restore === '' ? fresh : fresh.querySelector(restore);
+    try { target?.focus({ preventScroll: true }); } catch(e){}
+  }
 }
 
 /* Quick toggle: applies to the FIRST type of the card (or opens modal for more control) */
