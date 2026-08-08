@@ -15,6 +15,7 @@
 import { log } from './logger.js';
 import { t, getLang } from './i18n.js';
 import { CHANGELOG, APP_VERSION, compareVersions, entriesSince, changesFor } from './changelog.js';
+import { icon } from './icons.js';
 
 const SEEN_KEY = 'f1uno_seen_version';
 const CHECK_EVERY_MS = 60 * 60 * 1000; // hourly while the app stays open
@@ -155,7 +156,7 @@ function _showUpdateBanner(){
   b.id = 'updateBanner';
   b.setAttribute('role', 'status');
   b.innerHTML = `
-    <span class="install-banner-icon" aria-hidden="true">🔄</span>
+    <span class="install-banner-icon" aria-hidden="true">${icon('refresh')}</span>
     <span class="install-banner-text">${t('upd.banner')}</span>
     <button class="install-banner-btn" id="updateReloadBtn" type="button">${t('upd.reload')}</button>
     <button class="install-banner-close" id="updateCloseBtn" type="button" aria-label="${t('upd.later')}">✕</button>`;
@@ -187,7 +188,7 @@ export function maybeOfferWhatsNew(){
   b.id = 'whatsNewBanner';
   b.setAttribute('role', 'status');
   b.innerHTML = `
-    <span class="install-banner-icon" aria-hidden="true">✨</span>
+    <span class="install-banner-icon" aria-hidden="true">${icon('sparkles')}</span>
     <span class="install-banner-text">${t('upd.updated')}</span>
     <button class="install-banner-btn" id="whatsNewSeeBtn" type="button">${t('upd.whatsnew')}</button>
     <button class="install-banner-close" id="whatsNewCloseBtn" type="button" aria-label="${t('upd.later')}">✕</button>`;
@@ -206,7 +207,7 @@ export function openChangelog(entries = CHANGELOG){
   overlay.className = 'import-dialog-overlay changelog-overlay';
   overlay.innerHTML = `
     <div class="import-dialog changelog-dialog">
-      <div class="import-dialog-title">✨ ${t('upd.whatsnew')}</div>
+      <div class="import-dialog-title">${icon('sparkles')} ${t('upd.whatsnew')}</div>
       <div class="changelog-list">
         ${entries.map(e => `
         <div class="changelog-entry">

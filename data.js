@@ -64,6 +64,10 @@ export let TEAM_COLORS = {};
 // étaient hotlinkés depuis formula1.com : marques déposées, dépendance
 // externe, et hors-ligne cassé. Du texte + la couleur d'équipe, rien de plus.
 export let TEAM_MONOGRAMS = {};
+// Livrées d'écurie (v2.3 phase B) — un « geste » géométrique inventé par
+// équipe (c1 fond, c2 accent, g = classe du geste). Générique par la
+// forme, évocateur par les couleurs : aucune livrée réelle copiée.
+export let TEAM_LIVERIES = {};
 export let ROLE_BASE_RARITY = {};
 
 // Card database (mutated in place, never reassigned)
@@ -96,6 +100,7 @@ export function _applyMetadata(meta){
   DRIVER_NUMBERS = meta.driverNumbers;
   TEAM_COLORS = meta.teamColors;
   TEAM_MONOGRAMS = meta.teamMonograms || {};
+  TEAM_LIVERIES = meta.teamLiveries || {};
   ROLE_BASE_RARITY = meta.roleBaseRarity;
 }
 

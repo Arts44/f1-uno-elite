@@ -5,8 +5,9 @@ import { DEBUG, log } from './logger.js';
 import { t } from './i18n.js';
 import {
   CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityChipClass, rarityChipStyle,
-  CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_MONOGRAMS
+  CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_MONOGRAMS, TEAM_LIVERIES
 } from './data.js';
+import { icon, typeIcon, HELMET_SVG } from './icons.js';
 import {
   getTypeData, setTypeData,
   cardOwned, cardWishlist, cardDoubles, cardFavorite, cardTotalQty,
@@ -25,18 +26,34 @@ import { renderAccount } from './account.js';
    externe, et un hors-ligne qui n'en était pas un. Le numéro de course
    (déjà la plus belle partie de la carte) devient le visuel principal,
    et les écuries sont représentées par leur monogramme + leur couleur. */
+/* Livrée d'écurie (phase B) : un geste géométrique propre à chaque
+   équipe, sur ses deux couleurs réelles. Couche de FOND du visuel —
+   pleine quand la tuile est neutre, atténuée en CSS quand un type ou
+   un foil possède la surface (le foil reste dominant et lisible).
+   Les gestes courbes (vague, houle) passent par un petit SVG enfant. */
+const LIVERY_CURVES = {
+  vague: '<svg class="lvx" viewBox="0 0 174 120" preserveAspectRatio="none" aria-hidden="true"><path d="M-6 126 C 30 118 66 96 96 66 C 118 44 136 20 146 -6 L 180 -6 C 172 34 148 72 118 98 C 94 118 60 130 -6 138 Z"/></svg>',
+  houle: '<svg class="lvx" viewBox="0 0 174 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 86 C 26 70 52 102 87 86 C 122 70 148 102 174 86 L 174 120 L 0 120 Z"/></svg>',
+};
+export function liveryHTML(team){
+  const lv = TEAM_LIVERIES[team];
+  if(!lv) return '';
+  return `<div class="lv lv-${lv.g}" style="--c1:${lv.c1};--c2:${lv.c2}" aria-hidden="true">${LIVERY_CURVES[lv.g]||''}</div>`;
+}
+
 export function driverNumberHTML(card){
   const d=DRIVER_NUMBERS[card.name];
   if(!d) return null;
   const col=TEAM_COLORS[card.team]||'#fff';
-  return `<div class="driver-number no-img" style="--tc:${col}"><span class="dn-num ${d.cls}">${d.n}</span></div>`;
+  // Casque C1 générique (icons.js) sur la livrée de l'écurie, numéro à droite.
+  return `<div class="driver-number no-img" style="--tc:${col}">${liveryHTML(card.team)}${HELMET_SVG}<span class="dn-num ${d.cls}">${d.n}</span></div>`;
 }
 
 export function teamLogoHTML(team){
   const mono=TEAM_MONOGRAMS[team];
   if(!mono) return null;
   const col=TEAM_COLORS[team]||'#fff';
-  return `<div class="team-mono-wrap" style="--tc:${col}"><span class="team-mono">${mono}</span></div>`;
+  return `<div class="team-mono-wrap" style="--tc:${col}">${liveryHTML(team)}<div class="team-emblem"><span class="team-mono">${mono}</span><span class="team-rule" aria-hidden="true"></span><span class="team-name">${team}</span></div></div>`;
 }
 
 export function circuitSVG(cardId, size='card'){
@@ -99,7 +116,7 @@ export function toggleTheme(){
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
   html.setAttribute('data-theme', newTheme);
   const loginThemeIcon = document.getElementById('loginThemeIcon');
-  if (loginThemeIcon) loginThemeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+  if (loginThemeIcon) loginThemeIcon.innerHTML = icon(newTheme === 'dark' ? 'sun' : 'moon');
   // Sync settings toggle if visible
   const settingsToggle = document.querySelector('#settingsView .setv-toggle');
   if(settingsToggle) settingsToggle.classList.toggle('on', newTheme === 'dark');
@@ -239,28 +256,28 @@ export function renderGrid(cards){
       if(t==='nitro_foil') cls='nitro';
       if(t==='promo_blue' || t==='promo_green' || t==='promo_red' || t==='promo_yellow') cls='promo';
       const d=getTypeData(card.id,t);
-      return `<span class="owned-tag ${cls}">${ctt.icon}${d.qty>1?' ×'+d.qty:''}</span>`;
+      return `<span class="owned-tag ${cls}">${typeIcon(t)}${d.qty>1?' ×'+d.qty:''}</span>`;
     }).join('');
 
     el.innerHTML=`
       ${isEternal?'<span class="eternal-spark s1" aria-hidden="true">✦</span><span class="eternal-spark s2" aria-hidden="true">✦</span><span class="eternal-spark s3" aria-hidden="true">✦</span>':''}
       <div class="card-visual ${bestType?ct.css:''}${!isOwned?' not-owned':''}">
-        ${card.champion?'<span class="crown">👑</span>':''}
-        ${card.category==='reserve'?'<span class="replacement-icon">🔄</span>':''}
-        ${isSet?`<span class="set-flag" role="img" aria-label="${t('set.complete')}" title="${t('set.complete')}">🏁</span>`:''}
+        ${card.champion?`<span class="crown" aria-hidden="true">${icon('crown')}</span>`:''}
+        ${card.category==='reserve'?`<span class="replacement-icon" aria-hidden="true">${icon('refresh')}</span>`:''}
+        ${isSet?`<span class="set-flag" role="img" aria-label="${t('set.complete')}" title="${t('set.complete')}">${icon('seal')}</span>`:''}
         ${card.category==='gp' && circuitSVG(card.id,'card') ? circuitSVG(card.id,'card') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : `<span style="font-size:40px">${catEmoji(card.category)}</span>`}
         <button class="qbtn" type="button" data-action="quickAdd" data-card="${card.id}" aria-label="${t('quick.add')}" title="${t('quick.add')}">+</button>
       </div>
       <div class="card-body">
-        <div class="card-num">#${card.id} ${card.champion?'· 👑':''}</div>
+        <div class="card-num">#${card.id} ${card.champion?`· ${icon('crown','ic-crown')}`:''}</div>
         <div class="card-name">${card.name} ${card.category==='pilote'?card.nationality||'':''} ${card.retired?`<span class="retired-badge">${t('m.retired')}</span>`:''}</div>
         <div class="card-year">${card.season||2025}</div>
         <div class="card-team">${TEAM_COLORS[card.team]?`<span class="team-dot" style="background:${TEAM_COLORS[card.team]}"></span>`:''}${card.team||''}</div>
         <div class="card-rarity-row">
           <span class="card-rarity${rarityChipClass(rKey)}" style="${rarityChipStyle(rKey,rarity.color)}">${t('rar.'+rKey)} ${isEternal?`<span class="eternal-stars">${'✦'.repeat(rarity.stars)}</span>`:'★'.repeat(rarity.stars)}</span>
           <div class="status-chips">
-            <div class="schip${isWish?' on':''}" data-s="wishlist" data-action="quickToggle" data-card="${card.id}" data-status="wishlist" title="Wishlist">⭐</div>
-            <div class="schip${isFav?' on':''}" data-s="favorite" data-action="quickToggle" data-card="${card.id}" data-status="favorite" title="Favori">❤️</div>
+            <div class="schip${isWish?' on':''}" data-s="wishlist" data-action="quickToggle" data-card="${card.id}" data-status="wishlist" title="Wishlist">${icon('star')}</div>
+            <div class="schip${isFav?' on':''}" data-s="favorite" data-action="quickToggle" data-card="${card.id}" data-status="favorite" title="Favori">${icon('heart')}</div>
           </div>
         </div>
         ${ownedSummary?`<div class="card-owned-summary">${ownedSummary}</div>`:''}
@@ -366,7 +383,7 @@ export function renderModalTypes(card){
     const cell=document.createElement('div');
     cell.className=`mo-type-cell${qty>0?' has-qty':''}`;
     cell.innerHTML=`
-      <div class="mo-cell-icon" style="background:${ct.color}20;border:1.5px solid ${ct.color}40;">${ct.icon}</div>
+      <div class="mo-cell-icon" style="background:${ct.color}20;border:1.5px solid ${ct.color}40;color:${ct.color};">${typeIcon(typeId)}</div>
       <div class="mo-cell-label">${ct.label}</div>
       <div class="mo-qty-wrap">
         <button class="mqbtn" data-action="changeMoQty" data-card="${card.id}" data-type="${typeId}" data-delta="-1">−</button>
@@ -438,7 +455,12 @@ function _renderModalTags(card){
   if(!tagsEl) return;
   tagsEl.innerHTML='';
   const addTag=(cls,txt)=>{const s=document.createElement('span');s.className=`mtag ${cls}`;s.textContent=txt;tagsEl.appendChild(s);};
-  if(card.champion) addTag('champion',`👑 Champion ${card.championYears.join(', ')}`);
+  if(card.champion){
+    const s=document.createElement('span');
+    s.className='mtag champion';
+    s.innerHTML=`${icon('crown')} Champion ${card.championYears.join(', ')}`;
+    tagsEl.appendChild(s);
+  }
   const tagMap={legend:'⭐ Légende',fan_favorite:'❤️ Fan Favorite',rising_star:'🌟 Rising Star',top_driver:'🎯 Top Driver',legendary:'🔱 Légendaire',prestige:'💫 Prestige',night_race:'🌙 Nuit',high_speed:'⚡ Vitesse'};
   (card.tags||[]).forEach(t=>{if(tagMap[t]) addTag(t,tagMap[t]);});
 
@@ -471,15 +493,15 @@ function _renderModalStatus(card){
   if(!el) return;
   el.innerHTML='';
   const states=[
-    ['owned',    '✓',  cardOwned(card.id),    'status.owned'],
-    ['doubles',  '🔄', cardDoubles(card.id),  'status.doubles'],
-    ['wishlist', '⭐', cardWishlist(card.id), 'status.wishlist'],
-    ['favorite', '❤️', cardFavorite(card.id), 'status.fav'],
+    ['owned',    'check',   cardOwned(card.id),    'status.owned'],
+    ['doubles',  'refresh', cardDoubles(card.id),  'status.doubles'],
+    ['wishlist', 'star',    cardWishlist(card.id), 'status.wishlist'],
+    ['favorite', 'heart',   cardFavorite(card.id), 'status.fav'],
   ];
-  states.forEach(([id,icon,on,key])=>{
+  states.forEach(([id,ic,on,key])=>{
     const s=document.createElement('span');
     s.className=`mo-st${on?' on':''}`;
-    s.textContent=`${icon} ${t(key)||id}`;
+    s.innerHTML=`${icon(ic)} ${t(key)||id}`;
     el.appendChild(s);
   });
 }
@@ -514,7 +536,7 @@ function updateModalVisual(card){
     flag.setAttribute('role','img');
     flag.setAttribute('aria-label',t('set.complete'));
     flag.title=t('set.complete');
-    flag.textContent='🏁';
+    flag.innerHTML=icon('seal');
     vis.appendChild(flag);
   } else if(!isSet && flag){
     flag.remove();
@@ -844,7 +866,7 @@ export function toggleQuickAdd(cardId, btnEl){
   pop.innerHTML=card.types.map(ty=>{
     const ct=CARD_TYPES[ty];
     const d=getTypeData(cardId,ty);
-    return `<button type="button" class="qadd-type" role="menuitem" data-action="quickAddType" data-card="${cardId}" data-type="${ty}" title="${ct.label}" aria-label="${ct.label}">${ct.icon}${(d.qty||0)>0?`<span class="qadd-qty">${d.qty}</span>`:''}</button>`;
+    return `<button type="button" class="qadd-type" role="menuitem" data-action="quickAddType" data-card="${cardId}" data-type="${ty}" title="${ct.label}" aria-label="${ct.label}" style="color:${ct.color}">${typeIcon(ty)}${(d.qty||0)>0?`<span class="qadd-qty">${d.qty}</span>`:''}</button>`;
   }).join('');
   btnEl.closest('.card-visual').appendChild(pop);
   const first=pop.querySelector('.qadd-type');
@@ -858,8 +880,7 @@ export function closeQuickAdd(target){
 
 export function quickAddType(cardId, typeId){
   const prev=quickAddVariant(cardId, typeId);
-  const ct=CARD_TYPES[typeId];
-  showToast(`${ct?ct.icon+' ':''}${t('quick.added')}`, {
+  showToast(t('quick.added'), {
     actionLabel:t('quick.undo'),
     onAction:()=>{ undoQuickAdd(cardId, typeId, prev); updateStats(); renderCollection(); }
   });

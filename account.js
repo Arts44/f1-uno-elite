@@ -15,6 +15,7 @@ import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection, isCloudSignedIn, cloudDeleteAll } from './cloud.js';
 import { feedbackSectionHTML, bindFeedbackSection } from './feedback.js';
 import { showAdminPinScreen } from './pin.js';
+import { icon } from './icons.js';
 
 /* ── Deletion logic (pure, unit-tested) ── */
 export const DELETE_SCOPES = ['local', 'cloud', 'both'];
@@ -65,7 +66,7 @@ export function renderAccount(){
     return;
   }
   el.innerHTML = `
-    <h2 class="setv-title">👤 ${t('acc.title')}</h2>
+    <h2 class="setv-title">${icon('user')} ${t('acc.title')}</h2>
 
     <div class="acc-accent acc-cloud">${cloudSectionHTML()}</div>
 
@@ -132,7 +133,7 @@ export function renderAccount(){
 
     <div class="acc-accent acc-danger">
     <div class="setv-section danger-zone">
-      <div class="setv-section-title">⚠️ ${t('danger.title')}</div>
+      <div class="setv-section-title">${icon('danger')} ${t('danger.title')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('danger.delete_label')}</div>
@@ -232,7 +233,7 @@ export function openDeleteModal(){
   const word = t('danger.word');
   overlay.innerHTML = `
     <div class="danger-mo-box">
-      <div class="danger-mo-title">⚠️ ${t('danger.modal_title')}</div>
+      <div class="danger-mo-title">${icon('danger')} ${t('danger.modal_title')}</div>
       <div class="danger-scopes" role="radiogroup" aria-label="${t('danger.scope_label')}">
         <label class="danger-scope"><input type="radio" name="dangerScope" value="local" checked> <span>${t('danger.scope_local')}</span></label>
         <label class="danger-scope${signedIn?'':' off'}"><input type="radio" name="dangerScope" value="cloud"${signedIn?'':' disabled'}> <span>${t('danger.scope_cloud')}${signedIn?'':' — '+t('danger.scope_needs_login')}</span></label>

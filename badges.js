@@ -2,6 +2,7 @@
    BADGES SYSTEM — 50 badges (25 auto + 25 manual) + user titles
    ══════════════════════════════════════════════════════════ */
 import { t, getLang } from './i18n.js';
+import { icon } from './icons.js';
 import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES } from './data.js';
 import {
   _storageKey, getTypeData,
@@ -413,7 +414,7 @@ export function renderBadges(opts = {}){
       <div class="bn-next" data-action="toggleBadgeDetail" data-badge="${nx.badge.id}" role="button" tabindex="0">
         <div class="bn-med">${nx.badge.emoji}</div>
         <div class="bn-body">
-          <div class="bn-k">${nx.pinned ? '📌 ' + t('b.objective') : t('b.next_badge')}</div>
+          <div class="bn-k">${nx.pinned ? icon('pin') + ' ' + t('b.objective') : t('b.next_badge')}</div>
           <div class="bn-n">${_bt(nx.badge).name || nx.badge.name}</div>
           <div class="bn-bar"><i style="width:${pct}%"></i></div>
           <div class="bn-s"><b>${nx.p.cur}/${nx.p.max}</b> · ${t('b.remaining', { n: nx.p.max - nx.p.cur })}</div>

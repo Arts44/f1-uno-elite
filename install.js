@@ -10,6 +10,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { t } from './i18n.js';
+import { icon } from './icons.js';
 
 const DISMISS_KEY = 'f1uno_install_dismissed';
 
@@ -163,7 +164,7 @@ export function maybeShowInstallBanner(){
   b.className = 'install-banner';
   b.id = 'installBanner';
   b.innerHTML = `
-    <span class="install-banner-icon" aria-hidden="true">📲</span>
+    <span class="install-banner-icon" aria-hidden="true">${icon('smartphone')}</span>
     <span class="install-banner-text">${t('install.banner')}</span>
     <button class="install-banner-btn" id="installBannerBtn" type="button">${t('install.btn')}</button>
     <button class="install-banner-close" id="installBannerClose" type="button" aria-label="${t('install.later')}">✕</button>`;

@@ -20,6 +20,7 @@ import { noteChange, markBackupDone } from './backup.js';
 import { recordHistoryPoint } from './history.js';
 import { gatherSettings, applySettings, backupIncludes } from './settings-sync.js';
 import { secureGet, secureSet } from './secure-store.js';
+import { icon } from './icons.js';
 
 /* ── Versioning & season-scoped keys ── */
 const STORAGE_VERSION = 2;
@@ -73,7 +74,7 @@ export function loadData(){
   if(savedTheme) {
     document.documentElement.setAttribute('data-theme', savedTheme);
     const loginThemeIcon = document.getElementById('loginThemeIcon');
-    if(loginThemeIcon) loginThemeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    if(loginThemeIcon) loginThemeIcon.innerHTML = icon(savedTheme === 'dark' ? 'sun' : 'moon');
   }
 }
 export function saveData(){
@@ -238,7 +239,7 @@ export function _handleImportFile(file){
       if(!data.owned) throw new Error('Format invalide');
       _showImportDialog(data);
     } catch {
-      showToast('❌ Fichier invalide ou corrompu');
+      showToast(t('imp.invalid'));
     }
   };
   reader.readAsText(file);

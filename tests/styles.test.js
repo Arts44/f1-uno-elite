@@ -13,7 +13,8 @@ describe('styles.css custom properties', () => {
 
   // Tokens supplied at runtime by JS (element.style.setProperty) rather
   // than declared in the sheet — legitimately "used but not defined".
-  const RUNTIME_SET = new Set(['--tc', '--rarc', '--px', '--py', '--dur', '--delay', '--logo-bg']);
+  // --c1/--c2 : couleurs de livrée posées inline par liveryHTML() (render.js).
+  const RUNTIME_SET = new Set(['--tc', '--rarc', '--px', '--py', '--dur', '--delay', '--logo-bg', '--c1', '--c2']);
 
   test('every var(--token) used is defined somewhere (or set at runtime)', () => {
     const defined = new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map(m => m[1]));

@@ -1771,3 +1771,135 @@ button:not(:disabled):not(.bn-tab):active,
 @media (prefers-reduced-motion:reduce){
   .sk-visual,.sk-line,.sk-chip{animation:none;background:var(--surface2);}
 }
+
+/* ══════════════════════════════════════════════════════════
+   v2.3 PHASE B — système d'icônes SVG + livrées + casque C1
+   Surcharges volontairement regroupées ICI (fin de cascade) :
+   les règles historiques au-dessus restent intactes.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Icônes SVG (icons.js) : 1em, currentColor, alignées au texte ── */
+.ic{display:inline-block;width:1em;height:1em;vertical-align:-0.125em;flex:none;}
+/* La couronne inline reproduit la boîte de ligne de l'ancien émoji 👑
+   (17 px sur la ligne card-num) : dimension figée, PAS 1em — le
+   remplacement ne doit pas bouger la hauteur des tuiles champions. */
+.ic-crown{color:var(--gold,#FACC15);width:17px;height:17px;vertical-align:-5px;}
+.crown{color:var(--gold,#FACC15);}
+.crown .ic{width:15px;height:15px;display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));}
+.replacement-icon .ic{width:12px;height:12px;display:block;}
+.set-flag{color:var(--gold,#B8860B);}
+.set-flag .ic{width:14px;height:14px;display:block;}
+.modal-visual .set-flag .ic{width:16px;height:16px;}
+.ic-seal .ic-hole{stroke:var(--surface,#fff);stroke-width:2.2;}
+.ic-danger{color:var(--red);}
+.ic-danger .ic-hole{stroke:#fff;stroke-width:2;}
+.schip .ic{width:13px;height:13px;display:block;color:var(--tx3);}
+.schip[data-s="wishlist"].on .ic{color:#EC4899;}
+.schip[data-s="favorite"].on .ic{color:var(--red);}
+.mo-st .ic{width:12px;height:12px;}
+.mo-cell-icon .ic{width:16px;height:16px;display:block;}
+.qadd-type .ic{width:16px;height:16px;display:block;}
+.owned-tag .ic{width:12px;height:12px;}
+.theme-icon .ic{width:16px;height:16px;display:block;}
+.install-banner-icon .ic{width:18px;height:18px;display:block;}
+.setv-section-title .ic,.setv-title .ic,.sv-section-title .ic{margin-right:2px;}
+
+/* ── Pastilles CSS des 4 couleurs de base (remplacent 🔵🟢🔴🟡) ── */
+.cdot{display:inline-block;width:.85em;height:.85em;border-radius:50%;flex:none;vertical-align:-0.05em;
+  box-shadow:inset 0 -1px 2px rgba(0,0,0,.28),inset 0 1px 1px rgba(255,255,255,.35);
+  border:1px solid rgba(0,0,0,.15);}
+.cdot-blue{background:#2E86FF;}
+.cdot-green{background:#2ECC71;}
+.cdot-red{background:#FF4D4D;}
+.cdot-yellow{background:#FFD000;}
+.mo-cell-icon .cdot,.qadd-type .cdot{width:13px;height:13px;}
+.owned-tag .cdot{width:9px;height:9px;}
+
+/* ── Sélecteur de langue : pastille ISO typographique (remplace les
+   drapeaux). Les drapeaux de nationalité SUR les cartes sont du
+   contenu et ne changent pas. ── */
+.lang-iso{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:24px;
+  padding:0 7px;border-radius:7px;background:var(--surface2);border:1px solid var(--border);
+  font-family:var(--font-d);font-weight:800;font-size:11px;letter-spacing:.09em;color:var(--tx2);}
+.lang-opt:hover .lang-iso{color:var(--red);border-color:var(--red);}
+.lang-globe{color:var(--red);}
+.lang-globe .ic{width:34px;height:34px;}
+
+/* ── LIVRÉES D'ÉCURIE — 10 gestes géométriques inventés, un par
+   équipe (data/metadata.json → teamLiveries). Couche de fond du
+   visuel : pleine sur tuile neutre, atténuée quand un type/foil
+   possède la surface, fantôme grisé si la carte n'est pas possédée. ── */
+.lv{position:absolute;inset:0;z-index:0;background:linear-gradient(150deg,var(--c1),color-mix(in srgb,var(--c1) 52%,#08080a));}
+.lv::before{content:'';position:absolute;inset:0;z-index:3;background:radial-gradient(120% 90% at 50% 24%,rgba(0,0,0,0) 0%,rgba(0,0,0,.45) 100%);}
+.lv::after{content:'';position:absolute;inset:0;background:var(--c2);opacity:.92;}
+.lvx{position:absolute;inset:0;width:100%;height:100%;}
+.lvx path{fill:var(--c2);opacity:.92;}
+/* RBR — la lame : une seule diagonale franche, montante */
+.lv-lame::after{clip-path:polygon(56% 0,79% 0,38% 100%,15% 100%);}
+/* SF — le coin : angle sombre du coin haut droit + filet de base */
+.lv-coin{background:linear-gradient(0deg,var(--c2) 0 7px,transparent 7px),linear-gradient(150deg,var(--c1),color-mix(in srgb,var(--c1) 62%,#1a0206));}
+.lv-coin::after{clip-path:polygon(100% 0,100% 58%,52% 0);}
+/* MCL — la vague : swoosh courbe montant (SVG enfant .lvx) */
+.lv-vague::after{display:none;}
+/* MER — les traits : 3 hachures fines parallèles */
+.lv-traits::after{background:none;opacity:.95;background-image:
+  linear-gradient(115deg,transparent 0 30%,var(--c2) 30% 33.5%,transparent 33.5%),
+  linear-gradient(115deg,transparent 0 44%,var(--c2) 44% 47.5%,transparent 47.5%),
+  linear-gradient(115deg,transparent 0 58%,var(--c2) 58% 61.5%,transparent 61.5%);}
+/* AMR — la lisière : filet fin qui traverse avec un décroché */
+.lv-lisiere::after{clip-path:polygon(0 66%,52% 66%,68% 42%,100% 42%,100% 49%,71% 49%,56% 73%,0 73%);}
+/* ALP — la coupe franche */
+.lv-coupe{background:linear-gradient(118deg,var(--c1) 0 46%,var(--c2) 46% 100%);}
+.lv-coupe::after{display:none;}
+/* HAA — le V : chevron descendant unique, massif */
+.lv-vee::after{clip-path:polygon(0 0,17% 0,50% 60%,83% 0,100% 0,100% 13%,50% 88%,0 13%);}
+/* RB — la marche : escalier orthogonal descendant */
+.lv-marche::after{clip-path:polygon(0 44%,26% 44%,26% 60%,51% 60%,51% 74%,76% 74%,76% 88%,100% 88%,100% 100%,0 100%);}
+/* WIL — la houle : vague douce basse (SVG enfant .lvx) */
+.lv-houle::after{display:none;}
+/* SAU — l'éclair : coupe verticale à arête zigzag, double décroché */
+.lv-eclair::after{clip-path:polygon(70% 0,100% 0,100% 100%,38% 100%,58% 64%,42% 56%,62% 30%,48% 24%,70% 0);}
+/* Un type/foil possède la surface : la livrée passe en fond discret,
+   le foil reste dominant et lisible (cumuls, duals, nitro, wild). */
+.card-visual[class*="tv-"] .lv,
+.modal-visual[class*="tv-"] .lv{opacity:.28;}
+/* Carte non possédée : livrée fantôme */
+.card-visual.not-owned .lv,
+.modal-visual.not-owned .lv{filter:grayscale(.9);opacity:.4;}
+
+/* ── CASQUE C1 « Visière XL » — silhouette générique, couleurs d'écurie ── */
+.helm{position:absolute;left:6px;bottom:2px;width:92px;height:92px;z-index:1;
+  filter:drop-shadow(0 5px 14px rgba(0,0,0,.5));}
+.helm .shell{fill:color-mix(in srgb,var(--tc,#fff) 55%,#0c0c0e);}
+.helm .visor{fill:color-mix(in srgb,var(--tc,#fff) 88%,#fff);}
+.helm .det{fill:color-mix(in srgb,var(--tc,#fff) 88%,#fff);opacity:.72;}
+.helm .lip{fill:color-mix(in srgb,var(--tc,#fff) 30%,#000);opacity:.9;}
+.modal-visual .helm{left:18px;bottom:4px;width:140px;height:140px;}
+/* Tuiles étroites (2 colonnes à 320 px) : casque réduit, le numéro respire */
+@media (max-width:420px){
+  .card-visual .helm{width:72px;height:72px;left:2px;}
+  .card-visual .driver-number{padding-right:10px;}
+}
+
+/* ── Pilote : numéro à droite, blanc, italique de vitesse, sur la livrée ── */
+.driver-number{flex-direction:row;justify-content:flex-end;padding-right:14px;gap:0;}
+.card-visual .driver-number.no-img .dn-num{font-size:44px;letter-spacing:-.04em;}
+.modal-visual .driver-number.no-img .dn-num{font-size:92px;letter-spacing:-.04em;}
+/* Fiche : l'italique de vitesse déborde de sa boîte et le ✕ occupe le
+   coin — le numéro respire à gauche de la colonne du bouton. */
+.modal-visual .driver-number{padding-right:52px;}
+.driver-number.no-img .dn-num{position:relative;z-index:2;color:#fff;transform:skewX(-8deg);
+  text-shadow:0 0 12px rgba(0,0,0,.7),0 2px 10px rgba(0,0,0,.85);}
+
+/* ── Écurie : monogramme redessiné + filet + nom complet ── */
+.team-emblem{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:5px;width:100%;padding:0 8px;}
+.team-mono{color:#fff;letter-spacing:.06em;transform:skewX(-7deg);
+  text-shadow:0 2px 12px rgba(0,0,0,.75);line-height:1;}
+.card-visual .team-mono{font-size:30px;}
+.modal-visual .team-mono{font-size:52px;}
+.team-rule{width:44px;height:2.5px;border-radius:2px;background:#fff;opacity:.9;}
+.modal-visual .team-rule{width:70px;}
+.team-name{font-size:7.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+  color:rgba(255,255,255,.82);text-align:center;line-height:1.25;max-width:94%;
+  text-shadow:0 1px 6px rgba(0,0,0,.8);}
+.modal-visual .team-name{font-size:10px;}

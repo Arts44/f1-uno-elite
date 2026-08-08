@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.31.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'Cards get a real visual world: every driver now wears a generic helmet in their team\'s colours over an abstract team livery — ten invented geometric signatures, one per team (a blade, a chevron, a wave…), evocative through colour alone, copying nothing. Team cards pair a reworked monogram with the full team name.',
+        'The interface speaks one visual language: emojis are replaced by a crafted set of monochrome icons — variant symbols, colour dots, a golden seal for complete sets, a filled warning triangle, and ISO codes instead of flags in the language picker. Emojis stay where they are content: badges, titles and card flags.',
+      ],
+      fr: [
+        'Les cartes gagnent un vrai monde visuel : chaque pilote porte désormais un casque générique aux couleurs de son écurie sur une livrée abstraite — dix signatures géométriques inventées, une par équipe (une lame, un chevron, une vague…), évocatrices par la seule couleur, sans rien copier. Les cartes d\'écurie associent un monogramme retravaillé au nom complet de l\'équipe.',
+        'L\'interface parle une seule langue visuelle : les émojis laissent place à un jeu d\'icônes monochromes dessinées — symboles de variantes, pastilles de couleurs, sceau doré des sets complets, triangle d\'avertissement plein, et codes ISO à la place des drapeaux dans le choix de langue. Les émojis restent là où ils sont du contenu : badges, titres et drapeaux des cartes.',
+      ],
+      es: [
+        'Las cartas ganan un mundo visual propio: cada piloto lleva ahora un casco genérico con los colores de su escudería sobre una librea abstracta — diez firmas geométricas inventadas, una por equipo (una hoja, un chevrón, una ola…), evocadoras solo por el color, sin copiar nada. Las cartas de escudería combinan un monograma retrabajado con el nombre completo del equipo.',
+        'La interfaz habla un único lenguaje visual: los emojis dan paso a un juego de iconos monocromos dibujados — símbolos de variantes, puntos de color, un sello dorado para los sets completos, un triángulo de aviso relleno y códigos ISO en lugar de banderas en el selector de idioma. Los emojis se quedan donde son contenido: insignias, títulos y banderas de las cartas.',
+      ],
+      zh: [
+        '卡片拥有了真正的视觉世界:每位车手都戴上了以车队配色绘制的通用头盔,背景是抽象的车队涂装——十种原创几何签名,每队一种(利刃、山形纹、波浪……),仅靠颜色唤起联想,不复制任何真实涂装。车队卡则将重新设计的字母缩写与车队全名搭配呈现。',
+        '界面统一为一种视觉语言:表情符号被一套精心绘制的单色图标取代——版本符号、色点、成套收藏的金色印章、实心警告三角,语言选择也改用 ISO 代码代替旗帜。属于内容的表情符号保留:徽章、称号和卡片上的国旗。',
+      ],
+      it: [
+        'Le carte guadagnano un vero mondo visivo: ogni pilota indossa ora un casco generico nei colori della sua scuderia su una livrea astratta — dieci firme geometriche inventate, una per squadra (una lama, un chevron, un\'onda…), evocative con il solo colore, senza copiare nulla. Le carte scuderia abbinano un monogramma ridisegnato al nome completo del team.',
+        'L\'interfaccia parla un solo linguaggio visivo: le emoji lasciano il posto a un set di icone monocrome disegnate — simboli delle varianti, punti colore, un sigillo dorato per i set completi, un triangolo di avviso pieno e codici ISO al posto delle bandiere nella scelta della lingua. Le emoji restano dove sono contenuto: badge, titoli e bandiere delle carte.',
+      ],
+      nl: [
+        'De kaarten krijgen een echte visuele wereld: elke coureur draagt nu een generieke helm in de kleuren van zijn team op een abstracte livery — tien bedachte geometrische signaturen, één per team (een kling, een chevron, een golf…), herkenbaar door alleen de kleur, zonder iets te kopiëren. Teamkaarten combineren een herwerkt monogram met de volledige teamnaam.',
+        'De interface spreekt één visuele taal: emoji\'s maken plaats voor een getekende set monochrome iconen — variantsymbolen, kleurstippen, een gouden zegel voor complete sets, een gevulde waarschuwingsdriehoek, en ISO-codes in plaats van vlaggen in de taalkeuze. Emoji\'s blijven waar ze inhoud zijn: badges, titels en kaartvlaggen.',
+      ],
+      de: [
+        'Die Karten bekommen eine echte Bildwelt: jeder Fahrer trägt jetzt einen generischen Helm in den Farben seines Teams auf einer abstrakten Lackierung — zehn erfundene geometrische Signaturen, eine pro Team (eine Klinge, ein Chevron, eine Welle…), allein durch Farbe erkennbar, ohne etwas zu kopieren. Teamkarten kombinieren ein überarbeitetes Monogramm mit dem vollen Teamnamen.',
+        'Die Oberfläche spricht eine visuelle Sprache: Emojis weichen einem gezeichneten Satz monochromer Icons — Variantensymbole, Farbpunkte, ein goldenes Siegel für komplette Sets, ein gefülltes Warndreieck und ISO-Codes statt Flaggen in der Sprachauswahl. Emojis bleiben, wo sie Inhalt sind: Abzeichen, Titel und Kartenflaggen.',
+      ],
+    },
+  },
+  {
     version: '1.30.0',
     date: '2026-08-07',
     changes: {

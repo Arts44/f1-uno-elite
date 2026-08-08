@@ -361,5 +361,57 @@
     "Visa Cash App RB Formula One": "RB",
     "Atlassian Williams Racing": "WIL",
     "Stake F1 Team KICK Sauber": "SAU"
+  },
+  "teamLiveries": {
+    "Oracle Red Bull Racing": {
+      "c1": "#0A1F5B",
+      "c2": "#DB0A40",
+      "g": "lame"
+    },
+    "Scuderia Ferrari HP": {
+      "c1": "#E8002D",
+      "c2": "#14151A",
+      "g": "coin"
+    },
+    "McLaren F1": {
+      "c1": "#FF8000",
+      "c2": "#14151A",
+      "g": "vague"
+    },
+    "Mercedes-AMG Petronas Formula One Team": {
+      "c1": "#0E4F4A",
+      "c2": "#27F4D2",
+      "g": "traits"
+    },
+    "Aston Martin Aramco Formula One Team": {
+      "c1": "#0B4B36",
+      "c2": "#CEDC00",
+      "g": "lisiere"
+    },
+    "BWT Alpine F1 Team": {
+      "c1": "#0A3D91",
+      "c2": "#FF87BC",
+      "g": "coupe"
+    },
+    "MoneyGram Haas F1 Team": {
+      "c1": "#4A4E52",
+      "c2": "#E6002B",
+      "g": "vee"
+    },
+    "Visa Cash App RB Formula One": {
+      "c1": "#1B2A63",
+      "c2": "#6692FF",
+      "g": "marche"
+    },
+    "Atlassian Williams Racing": {
+      "c1": "#041E42",
+      "c2": "#64C4FF",
+      "g": "houle"
+    },
+    "Stake F1 Team KICK Sauber": {
+      "c1": "#123B1E",
+      "c2": "#52E252",
+      "g": "eclair"
+    }
   }
 }

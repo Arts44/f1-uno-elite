@@ -12,6 +12,7 @@ import { installRowHTML, bindInstallRow } from './install.js';
 import { openChangelog, checkForUpdatesNow, isUpdateCheckSupported } from './update.js';
 import { APP_VERSION } from './changelog.js';
 import { segDisplay, segActiveIndex } from './otp-input.js';
+import { icon } from './icons.js';
 import {
   isEncEnabled, unlockSecureStore, enableEncryption, disableEncryption,
   rekeyEncryption, quarantineEncryptedData
@@ -216,7 +217,11 @@ export function needsLanguageChoice(){
   return !isSetupDone() && !localStorage.getItem('f1uno_lang');
 }
 
-const LANG_FLAGS = {en:'🇬🇧',fr:'🇫🇷',es:'🇪🇸',zh:'🇨🇳',it:'🇮🇹',nl:'🇳🇱',de:'🇩🇪'};
+/* Pastilles ISO typographiques (phase B) — les drapeaux émojis ne
+   rendent pas pareil d'une plateforme à l'autre (et pas du tout sur
+   Windows) ; le code ISO est neutre, lisible et thémable. Les drapeaux
+   de nationalité SUR les cartes sont du contenu et restent. */
+const LANG_ISO = {en:'EN',fr:'FR',es:'ES',zh:'中文',it:'IT',nl:'NL',de:'DE'};
 // The prompt is deliberately shown in ALL 7 languages at once (plus the
 // native language names): the screen is language-neutral by design, so
 // there is no "wrong language flash" before the user chooses.
@@ -227,12 +232,12 @@ export function showLanguageScreen(){
   if(!ls) return;
   const buttons = Object.entries(LANGS).map(([code,label]) => `
       <button class="lang-opt" data-lang="${code}" type="button">
-        <span class="lang-flag" aria-hidden="true">${LANG_FLAGS[code]||'🌐'}</span>
+        <span class="lang-iso" aria-hidden="true" lang="${code}">${LANG_ISO[code]||code.toUpperCase()}</span>
         <span class="lang-name" lang="${code}">${label}</span>
       </button>`).join('');
   ls.querySelector('.login-box').innerHTML = `
     <span class="lockup lk-lg" aria-label="F1 UNO Élite"><span class="lk-top"><span class="lk-f1">F1</span><span class="lk-uno">UNO</span><span class="lk-elite">Élite</span></span><span class="lk-bar" aria-hidden="true"></span></span>
-    <div class="lang-globe" aria-hidden="true">🌐</div>
+    <div class="lang-globe" aria-hidden="true">${icon('globe')}</div>
     <div class="lang-prompt">${LANG_PROMPTS.join(' · ')}</div>
     <div class="lang-grid" role="group" aria-label="Language">${buttons}</div>`;
   ls.querySelectorAll('.lang-opt').forEach(btn => btn.addEventListener('click', () => {
@@ -626,10 +631,10 @@ export function renderSettings(){
   ).join('');
 
   el.innerHTML = `
-    <div class="setv-title">⚙️ <span>${t('nav.settings').replace('⚙️ ','')}</span></div>
+    <div class="setv-title">${icon('settings')} <span>${t('nav.settings').replace('⚙️ ','')}</span></div>
 
     <div class="setv-section set-appearance">
-      <div class="setv-section-title">🎨 ${t('s.appearance')}</div>
+      <div class="setv-section-title">${icon('palette')} ${t('s.appearance')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('s.dark')}</div>
@@ -669,7 +674,7 @@ export function renderSettings(){
     ${installRowHTML()}
 
     <div class="setv-section set-security">
-      <div class="setv-section-title">🔐 ${t('s.security')}</div>
+      <div class="setv-section-title">${icon('shield')} ${t('s.security')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('s.pin')} <span class="sec-chip${pinOn?' on':''}">${t(pinOn?'pin.state_on':'pin.state_off')}</span></div>
@@ -710,7 +715,7 @@ export function renderSettings(){
 
 
     <div class="setv-section set-about">
-      <div class="setv-section-title">ℹ️ ${t('s.about')}</div>
+      <div class="setv-section-title">${icon('info')} ${t('s.about')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('s.version')}</div>
@@ -737,7 +742,7 @@ export function renderSettings(){
 
     ${pinOn ? `
     <div class="setv-section set-session">
-      <div class="setv-section-title">🔒 ${t('s.session')}</div>
+      <div class="setv-section-title">${icon('lock')} ${t('s.session')}</div>
       <div class="setv-row">
         <div class="setv-row-left">
           <div class="setv-row-label">${t('s.lock')}</div>

@@ -11,6 +11,7 @@ import {
 import { getHistory } from './history.js';
 import { loadManualBadges, isAutoBadgeUnlocked, manualBadges, renderBadges, updateUserTitle, checkNewAutoBadges } from './badges.js';
 import { currentView } from './render.js';
+import { icon, typeIcon } from './icons.js';
 
 // Pure aggregates over the current CARDS_DB + collection state —
 // extracted from updateStats() (DOM-free, unit-testable).
@@ -51,17 +52,17 @@ export function updateStats(){
 
   // Vérifications de sécurité avant de modifier le DOM
   const statOwned = document.getElementById('statOwned');
-  if (statOwned) statOwned.textContent=`✓ ${owned} / ${total}`;
+  if (statOwned) statOwned.innerHTML=`${icon('check')} ${owned} / ${total}`;
 
   // Mettre à jour la stat possédées dans le header
   const ownedCount = document.getElementById('ownedCount');
   if (ownedCount) ownedCount.textContent=`${owned} possédées`;
 
   const statWish = document.getElementById('statWish');
-  if (statWish) statWish.textContent=`♡ ${wish} wishlist`;
+  if (statWish) statWish.innerHTML=`${icon('heart')} ${wish} wishlist`;
 
   const statExemplaires = document.getElementById('statExemplaires');
-  if (statExemplaires) statExemplaires.textContent=`📦 ${totalExemplaires} exemplaires`;
+  if (statExemplaires) statExemplaires.innerHTML=`${icon('box')} ${totalExemplaires} exemplaires`;
 
   const statTotal = document.getElementById('statTotal');
   if (statTotal) statTotal.textContent=`${pct}%`;
@@ -103,7 +104,7 @@ export function updateStats(){
   const champFilter = document.getElementById('champFilter');
   if (champFilter) {
     const champCount = CARDS_DB.filter(c=>c.champion).length;
-    champFilter.textContent=`🏆 ${champCount} Champions`;
+    champFilter.innerHTML=`${icon('trophy')} ${champCount} Champions`;
   }
 
   // Update badge tab count
@@ -173,7 +174,7 @@ export function renderStats(){
     return svRow(cat.emoji, t('cat.'+catId), catOwned, catCards.length, Math.round((catOwned/catCards.length)*100));
   });
   const champPct = champions > 0 ? Math.round((champOwned/champions)*100) : 0;
-  catRowsArr.push(svRow('🏆', t('st.champions'), champOwned, champions, champPct));
+  catRowsArr.push(svRow(icon('trophy'), t('st.champions'), champOwned, champions, champPct));
   const catRows = catRowsArr.join('');
 
   // — Par type de carte —
@@ -200,8 +201,8 @@ export function renderStats(){
     const bgStyle = TYPE_VIVID[typeId] || ct.color;
     const isGradient = bgStyle.includes('gradient');
     const dotStyle = isGradient ? `background:${bgStyle}` : `background:${bgStyle}`;
-    const icon = `<span class="sv-type-dot${ct.foil?' sv-type-dot-foil':''}" style="${dotStyle}"></span>`;
-    return svRow(icon, t('type.'+typeId)||ct.label, ownedWithType, cardsWithType.length, typePct);
+    const dotIcon = `<span class="sv-type-dot${ct.foil?' sv-type-dot-foil':''}" style="${dotStyle}"></span>`;
+    return svRow(dotIcon, t('type.'+typeId)||ct.label, ownedWithType, cardsWithType.length, typePct);
   }).join('');
 
   // — Par équipe —
@@ -267,7 +268,7 @@ export function renderStats(){
       <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_most_copies')}</div>
         <div class="sv-feat-name">${CATS[most.category]?.emoji||'🃏'} #${most.id} ${most.name}</div>
-        <div class="sv-feat-sub">📦 ×${cardTotalQty(most.id)}</div>
+        <div class="sv-feat-sub">${icon('box')} ×${cardTotalQty(most.id)}</div>
       </div>
     </div>`;
   }
@@ -355,7 +356,7 @@ export function renderStats(){
 
   // — Outils de collectionneur : onglets Manquantes / Doubles / Échange —
   const toolsHtml = `
-    <div class="sv-section-title">🧰 ${t('st.tools')}</div>
+    <div class="sv-section-title">${icon('wrench')} ${t('st.tools')}</div>
     <div class="sv-tools">
       <div class="sv-tools-tabs" role="tablist" aria-label="${t('st.tools')}">
         <button class="sv-tool-tab active" data-tool="missing" role="tab" aria-selected="true" type="button">${t('tools.missing')} <span class="sv-tool-n">${missing}</span></button>
@@ -439,27 +440,27 @@ function _toolRow(item, extra = ''){
     ${extra}
   </div>`;
 }
-const _missingExtra = r => r.wishlist ? `<span class="sv-tool-wish" title="${t('status.wishlist')}">⭐</span>` : '';
+const _missingExtra = r => r.wishlist ? `<span class="sv-tool-wish" title="${t('status.wishlist')}">${icon('star')}</span>` : '';
 const _doublesExtra = r => `<span class="sv-tool-types">${r.types.map(ty =>
-  `<span class="sv-tool-type">${CARD_TYPES[ty.type]?.icon||'?'}&nbsp;×${ty.qty}</span>`).join('')}</span>`;
+  `<span class="sv-tool-type">${typeIcon(ty.type)}&nbsp;×${ty.qty}</span>`).join('')}</span>`;
 
 function _toolPanelHTML(tool){
   if(tool === 'doubles'){
     const rows = doublesList();
-    if(!rows.length) return `<div class="sv-tool-empty">🔄 ${t('st.doubles_empty')}</div>`;
+    if(!rows.length) return `<div class="sv-tool-empty">${icon('refresh')} ${t('st.doubles_empty')}</div>`;
     return rows.map(r => _toolRow(r, _doublesExtra(r))).join('');
   }
   if(tool === 'trade'){
     const { want, offer } = tradeList();
-    if(!want.length && !offer.length) return `<div class="sv-tool-empty">🤝 ${t('st.trade_empty')}</div>`;
+    if(!want.length && !offer.length) return `<div class="sv-tool-empty">${icon('handshake')} ${t('st.trade_empty')}</div>`;
     return `
-      <div class="sv-tool-subtitle">🔎 ${t('tools.want')} <span class="sv-tool-n">${want.length}</span></div>
+      <div class="sv-tool-subtitle">${icon('search')} ${t('tools.want')} <span class="sv-tool-n">${want.length}</span></div>
       ${want.length ? want.map(r => _toolRow(r, _missingExtra(r))).join('') : `<div class="sv-tool-empty">${t('st.missing_empty')}</div>`}
-      <div class="sv-tool-subtitle">🔄 ${t('tools.offer')} <span class="sv-tool-n">${offer.length}</span></div>
+      <div class="sv-tool-subtitle">${icon('refresh')} ${t('tools.offer')} <span class="sv-tool-n">${offer.length}</span></div>
       ${offer.length ? offer.map(r => _toolRow(r, _doublesExtra(r))).join('') : `<div class="sv-tool-empty">${t('st.doubles_empty')}</div>`}`;
   }
   const rows = missingCards();
-  if(!rows.length) return `<div class="sv-tool-empty">🏆 ${t('st.missing_empty')}</div>`;
+  if(!rows.length) return `<div class="sv-tool-empty">${icon('trophy')} ${t('st.missing_empty')}</div>`;
   return rows.map(r => _toolRow(r, _missingExtra(r))).join('');
 }
 

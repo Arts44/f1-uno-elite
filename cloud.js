@@ -17,6 +17,7 @@ import { deniedForViewer } from './session.js';
 import { t } from './i18n.js';
 import { collectionSnapshot, _showImportDialog } from './storage.js';
 import { backupIncludes } from './settings-sync.js';
+import { icon } from './icons.js';
 import { markBackupDone } from './backup.js';
 import { _currentSeason } from './data.js';
 import { createSegmentedInput } from './otp-input.js';
@@ -428,7 +429,7 @@ export async function fetchCloudMeta(){
 export function cloudSectionHTML(){
   return `
     <div class="setv-section">
-      <div class="setv-section-title">☁️ ${t('cloud.title')}</div>
+      <div class="setv-section-title">${icon('cloud')} ${t('cloud.title')}</div>
       <div class="setv-row" style="flex-direction:column;align-items:stretch;gap:10px;" id="cloudArea">
         ${_cloudAreaHTML()}
       </div>
