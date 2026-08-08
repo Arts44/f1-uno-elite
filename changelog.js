@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.39.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'New sort above the grid: "Card number" or "Missing first" — a discreet two-state switch, remembered on your device.',
+        'If you skipped the guided tour, a small one-time bubble now points at the + button the first time you see the grid — dismiss it, or it disappears by itself on your first quick add.',
+      ],
+      fr: [
+        'Nouveau tri au-dessus de la grille : « N° de carte » ou « Manquantes d\'abord » — un interrupteur discret à deux états, mémorisé sur ton appareil.',
+        'Si tu as sauté la visite guidée, une petite bulle unique pointe désormais le bouton + à ta première grille — ferme-la, ou elle disparaît d\'elle-même à ton premier ajout rapide.',
+      ],
+      es: [
+        'Nuevo orden encima de la cuadrícula: «N.º de carta» o «Faltantes primero» — un conmutador discreto de dos estados, recordado en tu dispositivo.',
+        'Si te saltaste la visita guiada, una pequeña burbuja única señala ahora el botón + la primera vez que ves la cuadrícula — ciérrala, o desaparece sola con tu primer añadido rápido.',
+      ],
+      zh: [
+        '网格上方新增排序:「按编号」或「缺失优先」——低调的双态开关,记忆在你的设备上。',
+        '如果你跳过了引导教程,第一次看到网格时会有一个一次性小气泡指向 + 按钮——可以关闭,或在你第一次快速添加时自动消失。',
+      ],
+      it: [
+        'Nuovo ordinamento sopra la griglia: «N. carta» o «Mancanti prima» — un interruttore discreto a due stati, ricordato sul tuo dispositivo.',
+        'Se hai saltato il tour guidato, una piccola bolla unica indica ora il pulsante + alla tua prima griglia — chiudila, o sparisce da sola al tuo primo aggiunta rapida.',
+      ],
+      nl: [
+        'Nieuwe sortering boven het raster: "Kaartnummer" of "Ontbrekende eerst" — een discrete tweestandenschakelaar, onthouden op je apparaat.',
+        'Als je de rondleiding oversloeg, wijst nu een klein eenmalig tekstballonnetje naar de +-knop bij je eerste raster — sluit het, of het verdwijnt vanzelf bij je eerste snelle toevoeging.',
+      ],
+      de: [
+        'Neue Sortierung über dem Raster: „Kartennummer" oder „Fehlende zuerst" — ein dezenter Zwei-Zustands-Schalter, auf deinem Gerät gemerkt.',
+        'Wer die geführte Tour übersprungen hat, bekommt beim ersten Raster eine kleine einmalige Blase am +-Knopf — schließbar, oder sie verschwindet von selbst beim ersten schnellen Hinzufügen.',
+      ],
+    },
+  },
+  {
     version: '1.38.1',
     date: '2026-08-08',
     changes: {

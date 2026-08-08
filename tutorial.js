@@ -271,6 +271,12 @@ function _teardown(){
 
 function _end(skipped){
   log('tutorial: end, skipped=', skipped);
+  // phase E : le hint d'ajout rapide ne vise QUE ceux qui ont sauté la
+  // visite — on mémorise le saut (et on efface si elle a été finie).
+  try {
+    if(skipped) localStorage.setItem('f1uno_tut_skipped', 'true');
+    else localStorage.removeItem('f1uno_tut_skipped');
+  } catch(e){}
   restoreState(_snapshot);
   _snapshot = null;
   _teardown();

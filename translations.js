@@ -66,7 +66,7 @@ en:{'acc.locked_title':'Read-only mode','acc.locked_msg':'Your account, backups 
 's.font':'Font','s.font_sub':'Typeface for titles and text (driver numbers keep their own style)',
 
 'tools.missing':'Missing cards','tools.doubles':'Doubles to trade','tools.trade':'Trade list',
-'tools.copy':'Copy','tools.copied':'✓ Copied','tools.want':'Looking for','tools.offer':'Offering',
+'tools.copy':'Copy','sort.label':'Sort','sort.num':'Card number','sort.missing':'Missing first','quick.hint':'The + button adds a copy in one tap — try it!','tools.copied':'✓ Copied','tools.want':'Looking for','tools.offer':'Offering',
 'tools.season':'Season {season}','tools.none':'Nothing to list here yet',
 's.security':'Security','s.pin':'PIN Code','s.pin_sub':'Protect the app on startup',
 's.change_pin':'Change PIN','s.change_btn':'Edit',
@@ -191,7 +191,7 @@ fr:{'acc.locked_title':'Mode lecture seule','acc.locked_msg':'Le compte, les sau
 's.font':'Police','s.font_sub':'Typographie des titres et du texte (les numéros de pilotes gardent leur style)',
 
 'tools.missing':'Cartes manquantes','tools.doubles':'Doubles à échanger','tools.trade':'Liste de troc',
-'tools.copy':'Copier','tools.copied':'✓ Copié','tools.want':'Je cherche','tools.offer':'J’offre',
+'tools.copy':'Copier','sort.label':'Tri','sort.num':'N° de carte','sort.missing':'Manquantes d’abord','quick.hint':'Le bouton + ajoute un exemplaire en un geste — essaie !','tools.copied':'✓ Copié','tools.want':'Je cherche','tools.offer':'J’offre',
 'tools.season':'Saison {season}','tools.none':'Rien à lister ici pour le moment',
 's.security':'Sécurité','s.pin':'Code PIN','s.pin_sub':'Protéger l\'app au démarrage',
 's.change_pin':'Modifier le PIN','s.change_btn':'Modifier',
@@ -316,7 +316,7 @@ es:{'acc.locked_title':'Modo solo lectura','acc.locked_msg':'La cuenta, las copi
 's.font':'Tipografía','s.font_sub':'Fuente de títulos y texto (los números de los pilotos mantienen su estilo)',
 
 'tools.missing':'Cartas que faltan','tools.doubles':'Repetidas para cambiar','tools.trade':'Lista de intercambio',
-'tools.copy':'Copiar','tools.copied':'✓ Copiado','tools.want':'Busco','tools.offer':'Ofrezco',
+'tools.copy':'Copiar','sort.label':'Orden','sort.num':'N.º de carta','sort.missing':'Faltantes primero','quick.hint':'El botón + añade una copia con un toque — ¡pruébalo!','tools.copied':'✓ Copiado','tools.want':'Busco','tools.offer':'Ofrezco',
 'tools.season':'Temporada {season}','tools.none':'Nada que listar aquí todavía',
 's.security':'Seguridad','s.pin':'Código PIN','s.pin_sub':'Proteger la app al inicio',
 's.change_pin':'Cambiar PIN','s.change_btn':'Editar',
@@ -441,7 +441,7 @@ zh:{'acc.locked_title':'只读模式','acc.locked_msg':'账户、备份和云同
 's.font':'字体','s.font_sub':'标题与正文的字体（车手号码保持其专属样式）',
 
 'tools.missing':'缺失的卡牌','tools.doubles':'可交换的重复卡','tools.trade':'交换清单',
-'tools.copy':'复制','tools.copied':'✓ 已复制','tools.want':'我想要','tools.offer':'我提供',
+'tools.copy':'复制','sort.label':'排序','sort.num':'按编号','sort.missing':'缺失优先','quick.hint':'+ 按钮一键添加一张——试试看!','tools.copied':'✓ 已复制','tools.want':'我想要','tools.offer':'我提供',
 'tools.season':'{season} 赛季','tools.none':'暂时没有可列出的内容',
 's.security':'安全','s.pin':'PIN码','s.pin_sub':'启动时保护应用',
 's.change_pin':'修改PIN','s.change_btn':'修改',
@@ -566,7 +566,7 @@ it:{'acc.locked_title':'Modalità sola lettura','acc.locked_msg':'Account, backu
 's.font':'Carattere','s.font_sub':'Font di titoli e testo (i numeri dei piloti mantengono il loro stile)',
 
 'tools.missing':'Carte mancanti','tools.doubles':'Doppioni da scambiare','tools.trade':'Lista scambi',
-'tools.copy':'Copia','tools.copied':'✓ Copiato','tools.want':'Cerco','tools.offer':'Offro',
+'tools.copy':'Copia','sort.label':'Ordina','sort.num':'N. carta','sort.missing':'Mancanti prima','quick.hint':'Il pulsante + aggiunge un esemplare con un tocco — provalo!','tools.copied':'✓ Copiato','tools.want':'Cerco','tools.offer':'Offro',
 'tools.season':'Stagione {season}','tools.none':'Niente da elencare qui per ora',
 's.security':'Sicurezza','s.pin':'Codice PIN','s.pin_sub':'Proteggi l\'app all\'avvio',
 's.change_pin':'Cambia PIN','s.change_btn':'Modifica',
@@ -691,7 +691,7 @@ nl:{'acc.locked_title':'Alleen-lezen modus','acc.locked_msg':'Account, back-ups 
 's.font':'Lettertype','s.font_sub':'Lettertype voor titels en tekst (rijdersnummers behouden hun eigen stijl)',
 
 'tools.missing':'Ontbrekende kaarten','tools.doubles':'Dubbels om te ruilen','tools.trade':'Ruillijst',
-'tools.copy':'Kopiëren','tools.copied':'✓ Gekopieerd','tools.want':'Ik zoek','tools.offer':'Ik bied',
+'tools.copy':'Kopiëren','sort.label':'Sorteren','sort.num':'Kaartnummer','sort.missing':'Ontbrekende eerst','quick.hint':'De +-knop voegt met één tik een exemplaar toe — probeer het!','tools.copied':'✓ Gekopieerd','tools.want':'Ik zoek','tools.offer':'Ik bied',
 'tools.season':'Seizoen {season}','tools.none':'Nog niets om hier te tonen',
 's.security':'Beveiliging','s.pin':'PIN-code','s.pin_sub':'App beveiligen bij opstarten',
 's.change_pin':'PIN wijzigen','s.change_btn':'Bewerken',
@@ -816,7 +816,7 @@ de:{'acc.locked_title':'Nur-Lesen-Modus','acc.locked_msg':'Konto, Backups und Cl
 's.font':'Schriftart','s.font_sub':'Schrift für Titel und Text (Fahrernummern behalten ihren eigenen Stil)',
 
 'tools.missing':'Fehlende Karten','tools.doubles':'Doppelte zum Tauschen','tools.trade':'Tauschliste',
-'tools.copy':'Kopieren','tools.copied':'✓ Kopiert','tools.want':'Ich suche','tools.offer':'Ich biete',
+'tools.copy':'Kopieren','sort.label':'Sortierung','sort.num':'Kartennummer','sort.missing':'Fehlende zuerst','quick.hint':'Der +-Knopf fügt mit einem Tipp ein Exemplar hinzu — probier es!','tools.copied':'✓ Kopiert','tools.want':'Ich suche','tools.offer':'Ich biete',
 'tools.season':'Saison {season}','tools.none':'Hier gibt es noch nichts aufzulisten',
 's.security':'Sicherheit','s.pin':'PIN-Code','s.pin_sub':'App beim Start schützen',
 's.change_pin':'PIN ändern','s.change_btn':'Bearbeiten',

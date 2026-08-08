@@ -119,9 +119,51 @@ export function toggleTheme(){
   localStorage.setItem('f1uno_theme', newTheme);
 }
 
+/* ── Tri de la grille (phase E) : n° de carte ou manquantes d'abord.
+   Préférence locale persistée (f1uno_sort). La mise à jour ciblée
+   d'une tuile ne re-trie PAS sous le doigt : l'ordre se rafraîchit au
+   prochain rendu complet — une tuile qui saute pendant un ajout serait
+   pire que quelques secondes d'ordre périmé. ── */
+export function getSortPref(){ return localStorage.getItem('f1uno_sort') === 'missing' ? 'missing' : 'num'; }
+export function sortForGrid(cards, pref, ownedFn){
+  const byId = (a, b) => a.id.localeCompare(b.id);
+  const out = [...cards].sort(byId);
+  if(pref === 'missing') out.sort((a, b) => (ownedFn(a.id) ? 1 : 0) - (ownedFn(b.id) ? 1 : 0) || byId(a, b));
+  return out;
+}
+function _syncSortSeg(){
+  const pref = getSortPref();
+  document.getElementById('sortNum')?.classList.toggle('active', pref === 'num');
+  document.getElementById('sortMissing')?.classList.toggle('active', pref === 'missing');
+}
+export function setSortPref(v){
+  localStorage.setItem('f1uno_sort', v === 'missing' ? 'missing' : 'num');
+  renderCollection();
+}
+
+/* ── Hint d'ajout rapide (phase E) : une seule fois, uniquement pour
+   qui a SAUTÉ la visite guidée. Bulle ancrée sur le + de la première
+   tuile, fermable, disparaît d'elle-même au premier ajout rapide. ── */
+export function maybeShowQuickAddHint(){
+  try {
+    if(localStorage.getItem('f1uno_qa_hint') === 'shown') return;
+    if(localStorage.getItem('f1uno_tut_skipped') !== 'true') return;
+    const vis = document.querySelector('#cardGrid .card .card-visual');
+    if(!vis) return;
+    localStorage.setItem('f1uno_qa_hint', 'shown');   // une seule fois, quoi qu'il arrive
+    const tip = document.createElement('div');
+    tip.className = 'qa-hint';
+    tip.setAttribute('role', 'note');
+    tip.innerHTML = `<span>${t('quick.hint')}</span><button type="button" class="qa-hint-x" data-action="dismissQaHint" aria-label="✕">✕</button>`;
+    vis.appendChild(tip);
+  } catch(e){}
+}
+export function dismissQuickAddHint(){ document.querySelector('.qa-hint')?.remove(); }
+
 /* ── Collection render: full grid, sorted by card number, + total ── */
 export function renderCollection(){
-  const result=[...CARDS_DB].sort((a,b)=>a.id.localeCompare(b.id));
+  const result = sortForGrid(CARDS_DB, getSortPref(), cardOwned);
+  _syncSortSeg();
   renderGrid(result);
   // Header counter (owned/total + progress hairline) lives in updateStats()
   // so it refreshes on every collection change, not only on re-renders.
@@ -885,6 +927,7 @@ export function closeQuickAdd(target){
 }
 
 export function quickAddType(cardId, typeId){
+  dismissQuickAddHint();
   const prev=quickAddVariant(cardId, typeId);
   showToast(t('quick.added'), {
     actionLabel:t('quick.undo'),

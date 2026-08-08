@@ -7,7 +7,7 @@ import { isViewer } from './session.js';
 import { t, applyLanguage } from './i18n.js';
 import { loadAppData, _renderSeasonPills, switchSeason, CARDS_DB } from './data.js';
 import { loadData, coll, exportCollection, _handleImportFile } from './storage.js';
-import {
+import { setSortPref, maybeShowQuickAddHint, dismissQuickAddHint,
   showGridSkeleton, hideGridSkeleton,
   renderCollection, switchView, closeMo,
   toggleTheme, quickToggle, changeMoQty, showToast,
@@ -71,6 +71,8 @@ export function initApp() {
     applyLanguage();
     // Load and apply user title
     updateUserTitle();
+    // phase E : hint d'ajout rapide (une fois, si la visite a été sautée)
+    maybeShowQuickAddHint();
 
     log('App initialisée, coll contient:', Object.keys(coll).length, 'cartes');
 
@@ -129,6 +131,14 @@ function initEvents(){
       }
       case 'quickAdd': {
         toggleQuickAdd(el.getAttribute('data-card'), el);
+        break;
+      }
+      case 'setSort': {
+        setSortPref(el.getAttribute('data-sort'));
+        break;
+      }
+      case 'dismissQaHint': {
+        dismissQuickAddHint();
         break;
       }
       case 'quickAddType': {
