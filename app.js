@@ -2,6 +2,7 @@
    APP — entry point: init sequence, global event wiring, boot.
    Loaded as an ES module (<script type="module" src="app.js">).
    ══════════════════════════════════════════════════════════ */
+import { openPack } from './pack.js';
 import { log } from './logger.js';
 import { isViewer } from './session.js';
 import { t, applyLanguage } from './i18n.js';
@@ -109,7 +110,7 @@ function initEvents(){
     // Block write actions in viewer mode
     const VIEWER_BLOCKED = new Set(['quickToggle','changeMoQty','quickAdd','quickAddType','toggleManualBadge','removeAutoBadge','pinBadge','unpinBadge','toggleTitlePicker','selectTitle',
       // l'export sort la collection de l'appareil : une fuite, pas une écriture
-      'exportCollection']);
+      'exportCollection', 'openPack']);
     if(isViewer() && VIEWER_BLOCKED.has(action)){
       showToast(t('toast.readonly'));
       return;
@@ -139,6 +140,10 @@ function initEvents(){
       }
       case 'dismissQaHint': {
         dismissQuickAddHint();
+        break;
+      }
+      case 'openPack': {
+        openPack();
         break;
       }
       case 'quickAddType': {

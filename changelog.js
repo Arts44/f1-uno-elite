@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.42.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'New Pack mode — the feature for opening a booster at the table. One button above the grid opens a full-screen flow: type the card number on the big keypad, it is recognised at the third digit, and one large button adds a copy (with a haptic tap). "Variant…" picks a specific type, "Skip" moves on.',
+        'Nothing can go wrong: every action is listed at the top and can be undone one by one, badges unlocked during the session are held back and delivered together on the summary screen (no burst of toasts), and "Undo everything" restores your collection exactly as it was before you opened the pack.',
+      ],
+      fr: [
+        'Nouveau mode Pochette — la fonction pour ouvrir un booster à table. Un bouton au-dessus de la grille ouvre un flux plein écran : tu tapes le numéro de la carte sur le grand pavé, elle est reconnue dès le 3e chiffre, et un seul gros bouton ajoute un exemplaire (avec un retour haptique). « Variante… » choisit un type précis, « Passer » enchaîne.',
+        'Rien ne peut mal tourner : chaque geste s\'affiche en haut et s\'annule un par un, les badges débloqués pendant la session sont retenus et livrés ensemble sur l\'écran de résumé (pas de rafale de notifications), et « Tout annuler » restaure ta collection exactement comme elle était avant l\'ouverture.',
+      ],
+      es: [
+        'Nuevo modo Sobre — la función para abrir un sobre en la mesa. Un botón encima de la cuadrícula abre un flujo a pantalla completa: escribes el número de la carta en el teclado grande, se reconoce en la tercera cifra, y un solo botón grande añade un ejemplar (con respuesta háptica). «Variante…» elige un tipo concreto, «Saltar» continúa.',
+        'Nada puede salir mal: cada acción aparece arriba y se deshace una a una, las insignias desbloqueadas durante la sesión se retienen y se entregan juntas en el resumen (sin ráfaga de avisos), y «Deshacer todo» restaura tu colección exactamente como estaba antes de abrir el sobre.',
+      ],
+      zh: [
+        '全新开包模式——为在牌桌上拆包而生。网格上方的按钮打开全屏流程:在大号数字键盘输入卡片编号,满三位即识别,一个大按钮即可添加一张(带触感反馈)。「版本…」可指定具体版本,「跳过」直接进入下一张。',
+        '不会出错:每一步都显示在顶部并可逐一撤销;开包期间解锁的徽章会被暂存,在结算页一并呈现(不会连环弹窗);「全部撤销」会把收藏还原成开包前的样子。',
+      ],
+      it: [
+        'Nuova modalità Bustina — la funzione per aprire un pacchetto al tavolo. Un pulsante sopra la griglia apre un flusso a schermo intero: digiti il numero della carta sul tastierino grande, viene riconosciuta alla terza cifra, e un solo grande pulsante aggiunge un esemplare (con risposta aptica). «Variante…» sceglie un tipo preciso, «Salta» prosegue.',
+        'Niente può andare storto: ogni gesto compare in alto e si annulla uno per uno, i badge sbloccati durante la sessione vengono trattenuti e consegnati insieme nel riepilogo (nessuna raffica di notifiche), e «Annulla tutto» ripristina la collezione esattamente com\'era prima di aprire la bustina.',
+      ],
+      nl: [
+        'Nieuwe Zakje-modus — de functie om aan tafel een boosterpakje te openen. Eén knop boven het raster opent een schermvullende flow: je typt het kaartnummer op het grote toetsenblok, bij het derde cijfer wordt de kaart herkend, en één grote knop voegt een exemplaar toe (met haptische tik). "Variant…" kiest een specifiek type, "Overslaan" gaat verder.',
+        'Er kan niets misgaan: elke handeling staat bovenaan en is één voor één ongedaan te maken, badges die tijdens de sessie vrijkomen worden vastgehouden en samen op het overzicht getoond (geen stortvloed aan meldingen), en "Alles ongedaan maken" zet je collectie exact terug zoals ze was.',
+      ],
+      de: [
+        'Neuer Päckchen-Modus — die Funktion zum Öffnen eines Boosters am Tisch. Ein Knopf über dem Raster öffnet einen Vollbild-Ablauf: du tippst die Kartennummer auf dem großen Ziffernblock, ab der dritten Ziffer wird die Karte erkannt, und ein einziger großer Knopf fügt ein Exemplar hinzu (mit haptischem Impuls). „Variante…" wählt einen bestimmten Typ, „Überspringen" geht weiter.',
+        'Nichts kann schiefgehen: jede Aktion steht oben und lässt sich einzeln rückgängig machen, während der Sitzung freigeschaltete Abzeichen werden zurückgehalten und gemeinsam in der Zusammenfassung gezeigt (keine Benachrichtigungssalve), und „Alles rückgängig" stellt deine Sammlung exakt so wieder her, wie sie vorher war.',
+      ],
+    },
+  },
+  {
     version: '1.41.1',
     date: '2026-08-08',
     changes: {

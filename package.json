@@ -4,9 +4,12 @@
     "build": "esbuild app.js --bundle --format=iife --outfile=app.bundle.js --global-name=F1App --minify --sourcemap",
     "dev": "esbuild app.js --bundle --format=iife --outfile=app.bundle.js --global-name=F1App --sourcemap --watch",
     "test": "node --test \"tests/*.test.js\"",
-    "test:watch": "node --test --watch \"tests/*.test.js\""
+    "test:watch": "node --test --watch \"tests/*.test.js\"",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write ."
   },
   "devDependencies": {
-    "esbuild": "^0.28.1"
+    "esbuild": "^0.28.1",
+    "@biomejs/biome": "^2.5.7"
   }
 }
