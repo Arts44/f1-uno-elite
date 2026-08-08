@@ -23,11 +23,20 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install (esbuild, the only devDependency)
+      - name: Install (esbuild + Biome, the only devDependencies)
         run: npm ci
 
       - name: Unit tests (node --test)
         run: npm test
+
+      # Biome is a LINTER here, not a formatter (see biome.json). It reports
+      # ~99 real findings inherited from ~40 versions — dead locals, silent
+      # catches, CSS specificity. Non-blocking ON PURPOSE while that backlog
+      # is worked down: a step that is permanently red teaches everyone to
+      # ignore CI. Flip continue-on-error to false once the count reaches 0.
+      - name: Lint (Biome — non-blocking for now)
+        run: npm run lint
+        continue-on-error: true
 
       - name: Production build (esbuild)
         run: npm run build
