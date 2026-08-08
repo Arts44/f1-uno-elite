@@ -71,8 +71,15 @@ export function evaluateBadgeCondition(badge){
     case 'type_owned': {
       const tf = cond.typeFilter;
       let n = 0;
-      if(tf === 'foil'){
-        CARDS_DB.forEach(c => { c.types.forEach(t => { if(CARD_TYPES[t] && CARD_TYPES[t].foil){ const d=getTypeData(c.id,t); if(d.owned) n+=(d.qty||1); }}); });
+      // Groupes : 'foil' = tout foil · 'promo' = les 4 promos · 'dual' =
+      // les 2 bicolores. (fix 1.37.0 : promo_1 filtrait sur un type
+      // « promo » inexistant — il ne comptait jamais rien.)
+      const grp = tf === 'foil' ? (t => CARD_TYPES[t] && CARD_TYPES[t].foil)
+        : tf === 'promo' ? (t => t.startsWith('promo_'))
+        : tf === 'dual' ? (t => t === 'blue_red_foil' || t === 'green_yellow_foil')
+        : null;
+      if(grp){
+        CARDS_DB.forEach(c => { c.types.forEach(t => { if(grp(t)){ const d=getTypeData(c.id,t); if(d.owned) n+=(d.qty||1); }}); });
       } else {
         CARDS_DB.forEach(c => { const d=getTypeData(c.id, tf); if(d.owned) n+=(d.qty||1); });
       }
@@ -109,6 +116,10 @@ export function evaluateBadgeCondition(badge){
       const all = CARDS_DB.filter(c => c.category === target);
       const n = all.filter(c => cardSetComplete(c.id)).length;
       return {cur: n, max: all.length || 1};
+    }
+    case 'rarity_count': {
+      const n = CARDS_DB.filter(c => cardRarity(c) === cond.rarity).length;
+      return {cur: Math.min(n, target), max: target};
     }
     /* Rythme — depuis l'historique quotidien {date, owned}. Limites
        honnêtes : démarre à l'installation de l'historique, « activité »
@@ -213,7 +224,8 @@ export const FAMILIES = [
          'teamset_astonmartin','teamset_alpine','teamset_haas','teamset_rb',
          'teamset_williams','teamset_sauber','teamset_all'] },
   { id:'foils',    ico:'✦',  cls:'bf-foils',
-    ids:['foil_5','nitro_1','wild_3','promo_1','eternal_1','eternal_3','eternal_5'] },
+    ids:['foil_5','foil_15','foil_30','dual_5','wild_3','wild_10','nitro_1','nitro_5',
+         'promo_1','promo_5','cosmic_5','divine_1','divine_3','eternal_1','eternal_3','eternal_5'] },
   { id:'colors',   ico:'🎨', cls:'bf-colors',
     ids:['blue_20','green_20','red_20','yellow_20'] },
   { id:'passion',  ico:'❤️', cls:'bf-passion',
@@ -453,6 +465,7 @@ function _tileHTML(b, fam){
     <div class="bt-med"><span>${b.emoji}</span></div>
     ${cls === 'prog' ? `<span class="bt-pp">${p.cur}/${p.max}</span>` : ''}
     <div class="bt-name">${_bt(b).name || b.name}</div>
+    <span class="bt-diff dl-${difficultyLabelKey(badgeDifficulty(b)).slice(7)}">${badgeDifficulty(b)}%</span>
   </div>`;
 }
 

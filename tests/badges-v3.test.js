@@ -30,8 +30,8 @@ const ownFullSet = card => txBatch(() => card.types.forEach(ty => { setTypeData(
 describe('badges v3 — données', () => {
   beforeEach(() => { resetStorage(); loadRealData(); _resetDifficultyCache(); });
 
-  test('111 badges (59 auto + 52 manuels), ids uniques', () => {
-    assert.equal(badgesJson.auto.length, 59);
+  test('120 badges (68 auto + 52 manuels), ids uniques', () => {
+    assert.equal(badgesJson.auto.length, 68);
     assert.equal(badgesJson.manual.length, 52);
     const ids = [...badgesJson.auto, ...badgesJson.manual].map(b => b.id);
     assert.equal(new Set(ids).size, ids.length);
@@ -39,7 +39,7 @@ describe('badges v3 — données', () => {
 
   test('chaque nouveau badge a ses 7 traductions', () => {
     const NEW = [...badgesJson.auto, ...badgesJson.manual].map(b => b.id)
-      .filter(id => id.startsWith('m_') || /^(set_|eternal_|teams_|teamset_|catset_|doubles_25|doubles_75|qty_|rythme_)/.test(id));
+      .filter(id => id.startsWith('m_') || /^(set_|eternal_|teams_|teamset_|catset_|doubles_25|doubles_75|qty_|rythme_|foil_15|foil_30|dual_5|wild_10|nitro_5|promo_5|divine_|cosmic_)/.test(id));
     const T = globalThis.window.__BADGE_T || {};
     NEW.forEach(id => {
       const e = T[id];

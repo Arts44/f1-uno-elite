@@ -74,9 +74,12 @@ export function badgeEffort(badge){
     case 'champion_owned': return SCOPED * CARDS_DB.filter(x => x.champion).length;
     case 'type_owned': {
       const tf = c.typeFilter;
-      const u = tf === 'foil' ? 2 : (UNIT[tf] || 1);
+      const u = tf === 'foil' ? 2 : tf === 'promo' ? 5 : tf === 'dual' ? 3 : (UNIT[tf] || 1);
       return u * v;
     }
+    /* Divin ≈ variante +3 (wild/nitro/promo) sur la bonne carte ;
+       Cosmique ≈ palier dual. Mêmes unités que l'échelle des types. */
+    case 'rarity_count': return (c.rarity === 'divine' ? 8 : c.rarity === 'cosmic' ? 5 : 3) * v;
     case 'sets_complete_count': return _cheapestSets(CARDS_DB, v);
     case 'eternal_count': return _cheapestSets(CARDS_DB.filter(x => x.champion), v);
     case 'teams_owned_count': {

@@ -24,7 +24,7 @@ const read = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
 const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
 
 describe('familles — le regroupement couvre tout, une seule fois', () => {
-  test('les 59 badges auto RÉELS sont répartis sans doublon ni oubli', () => {
+  test('les 68 badges auto RÉELS sont répartis sans doublon ni oubli', () => {
     const real = JSON.parse(readFileSync(new URL('../data/badges.json', import.meta.url), 'utf8'));
     const famIds = FAMILIES.filter(f => !f.manual).flatMap(f => [...(f.ids || []), ...(f.extraIds || [])]); // v3 : extraIds (tuiles sous l'échelle)
     assert.equal(new Set(famIds).size, famIds.length, 'aucun badge dans deux familles');

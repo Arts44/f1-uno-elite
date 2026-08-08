@@ -2011,3 +2011,6 @@ button:not(:disabled):not(.bn-tab):active,
 [data-theme="dark"] .dl-difficile{background:#3a0f18;color:#ff7f95;}
 [data-theme="dark"] .dl-extreme{background:#2a1745;color:#c4a6ff;}
 .bd-diff-pct{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums;}
+
+/* indicateur de difficulté sur chaque tuile (1.37.0) */
+.bt-diff{font-size:8px;font-weight:800;letter-spacing:.03em;padding:1px 6px;border-radius:99px;margin-top:2px;}

@@ -719,6 +719,123 @@
         "operator": ">=",
         "value": "Stake F1 Team KICK Sauber"
       }
+    },
+    {
+      "id": "foil_15",
+      "emoji": "🌠",
+      "name": "Prisme",
+      "desc": "Posséder 15 foils",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 15,
+        "typeFilter": "foil"
+      }
+    },
+    {
+      "id": "foil_30",
+      "emoji": "💫",
+      "name": "Aurore",
+      "desc": "Posséder 30 foils",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 30,
+        "typeFilter": "foil"
+      }
+    },
+    {
+      "id": "dual_5",
+      "emoji": "☯️",
+      "name": "Deux mondes",
+      "desc": "Posséder 5 duals",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 5,
+        "typeFilter": "dual"
+      }
+    },
+    {
+      "id": "wild_10",
+      "emoji": "🃏",
+      "name": "Maison des jokers",
+      "desc": "Posséder 10 wild",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 10,
+        "typeFilter": "wild_foil"
+      }
+    },
+    {
+      "id": "nitro_5",
+      "emoji": "⚡",
+      "name": "Pleine charge",
+      "desc": "Posséder 5 nitro",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 5,
+        "typeFilter": "nitro_foil"
+      }
+    },
+    {
+      "id": "promo_5",
+      "emoji": "🏷️",
+      "name": "Rayon promo",
+      "desc": "Posséder 5 promos",
+      "season": "all",
+      "condition": {
+        "metric": "type_owned",
+        "operator": ">=",
+        "value": 5,
+        "typeFilter": "promo"
+      }
+    },
+    {
+      "id": "divine_1",
+      "emoji": "🌞",
+      "name": "Divin",
+      "desc": "Porter une carte à la rareté Divin",
+      "season": "all",
+      "condition": {
+        "metric": "rarity_count",
+        "operator": ">=",
+        "value": 1,
+        "rarity": "divine"
+      }
+    },
+    {
+      "id": "divine_3",
+      "emoji": "🔆",
+      "name": "Triple couronne solaire",
+      "desc": "3 cartes à la rareté Divin",
+      "season": "all",
+      "condition": {
+        "metric": "rarity_count",
+        "operator": ">=",
+        "value": 3,
+        "rarity": "divine"
+      }
+    },
+    {
+      "id": "cosmic_5",
+      "emoji": "🪐",
+      "name": "Nébuleuse",
+      "desc": "5 cartes à la rareté Cosmique",
+      "season": "all",
+      "condition": {
+        "metric": "rarity_count",
+        "operator": ">=",
+        "value": 5,
+        "rarity": "cosmic"
+      }
     }
   ],
   "manual": [

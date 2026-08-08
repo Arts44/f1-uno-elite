@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.37.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'A round 120: nine new Foils & rarities badges — foil milestones (15, 30), duals, wilds, nitros, promos, Divine (1, 3) and Cosmic (5).',
+        'The difficulty indicator now sits on every badge tile (coloured percentage), not just in the detail.',
+        'Fixed: the "Promo king" badge could never unlock — its filter counted a card type that does not exist. It now counts all four promos, and if you already own one, it unlocks silently on launch.',
+      ],
+      fr: [
+        'Un compte rond de 120 : neuf nouveaux badges Foils & raretés — jalons de foils (15, 30), duals, wild, nitro, promos, Divin (1, 3) et Cosmique (5).',
+        'L\'indicateur de difficulté s\'affiche désormais sur chaque tuile de badge (pourcentage coloré), pas seulement dans le détail.',
+        'Corrigé : le badge « Promo king » ne pouvait jamais se débloquer — son filtre comptait un type de carte inexistant. Il compte désormais les quatre promos, et si tu en possèdes déjà une, il se débloque silencieusement au lancement.',
+      ],
+      es: [
+        'Un total redondo de 120: nueve nuevas insignias de Foils y rarezas — hitos de foils (15, 30), duales, wild, nitro, promos, Divina (1, 3) y Cósmica (5).',
+        'El indicador de dificultad aparece ahora en cada casilla de insignia (porcentaje coloreado), no solo en el detalle.',
+        'Corregido: la insignia «Promo king» nunca podía desbloquearse — su filtro contaba un tipo de carta inexistente. Ahora cuenta las cuatro promos, y si ya tienes una, se desbloquea en silencio al arrancar.',
+      ],
+      zh: [
+        '凑成整数 120:新增九枚闪卡与稀有度徽章——闪卡里程碑(15、30)、双色、Wild、Nitro、Promo、神圣(1、3)和宇宙(5)。',
+        '难度指示现在显示在每一块徽章卡格上(彩色百分比),不再只在详情里。',
+        '修复:「Promo king」徽章从未能解锁——它的筛选器统计的是一个不存在的卡片类型。现在统计全部四种 Promo;若你已拥有,启动时会静默解锁。',
+      ],
+      it: [
+        'Un totale tondo di 120: nove nuovi badge Foil e rarità — traguardi di foil (15, 30), dual, wild, nitro, promo, Divino (1, 3) e Cosmico (5).',
+        'L\'indicatore di difficoltà appare ora su ogni tessera di badge (percentuale colorata), non solo nel dettaglio.',
+        'Corretto: il badge «Promo king» non poteva mai sbloccarsi — il suo filtro contava un tipo di carta inesistente. Ora conta le quattro promo, e se ne possiedi già una si sblocca in silenzio all\'avvio.',
+      ],
+      nl: [
+        'Een rond totaal van 120: negen nieuwe Foils & zeldzaamheden-badges — foilmijlpalen (15, 30), duals, wilds, nitro\'s, promo\'s, Goddelijk (1, 3) en Kosmisch (5).',
+        'De moeilijkheidsindicator staat nu op elke badgetegel (gekleurd percentage), niet alleen in het detail.',
+        'Opgelost: de badge «Promo king» kon nooit ontgrendelen — zijn filter telde een niet-bestaand kaarttype. Hij telt nu alle vier promo\'s, en als je er al één bezit, ontgrendelt hij stil bij het opstarten.',
+      ],
+      de: [
+        'Eine runde 120: neun neue Foils-&-Seltenheiten-Abzeichen — Foil-Meilensteine (15, 30), Duals, Wilds, Nitros, Promos, Göttlich (1, 3) und Kosmisch (5).',
+        'Der Schwierigkeitsindikator sitzt jetzt auf jeder Abzeichen-Kachel (farbige Prozentzahl), nicht nur im Detail.',
+        'Behoben: das Abzeichen „Promo king" konnte nie freigeschaltet werden — sein Filter zählte einen nicht existierenden Kartentyp. Jetzt zählt es alle vier Promos, und wer schon eine besitzt, bekommt es beim Start still freigeschaltet.',
+      ],
+    },
+  },
+  {
     version: '1.36.0',
     date: '2026-08-08',
     changes: {
