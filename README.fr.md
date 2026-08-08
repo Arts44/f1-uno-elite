@@ -23,6 +23,17 @@ C'est une **PWA** : installez-la depuis votre navigateur et elle fonctionne comm
 
 <sub>Plus de captures dans [`screenshots/`](screenshots/) — thèmes clair et sombre, ordinateur et mobile.</sub>
 
+### ✨ En mouvement
+
+| Ajout rapide — un geste, un exemplaire | Navigation à pastille | Badges — 120, sept familles |
+|---|---|---|
+| ![Démo ajout rapide](screenshots/demo-quick-add.gif) | ![Démo navigation](screenshots/demo-nav.gif) | ![Démo badges](screenshots/demo-badges.gif) |
+
+**Mode pochette** — on tape le numéro, un bouton l'ajoute, le résumé tombe à la fin :
+
+![Démo mode pochette](screenshots/demo-pack.gif)
+
+
 ### Nouveautés 1.29 — la passe v2
 
 | Badges — familles, progression, objectif épinglé | Détail d’un badge — date de déblocage, cartes contributives |
@@ -61,12 +72,13 @@ Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chac
 
 - 📇 **Gestion complète de la collection** — possédées / doubles / wishlist / favoris, quantités par variante, l’ensemble de la collection toujours visible.
 - ➕ **Ajout rapide en un geste** — un bouton + sur chaque tuile ouvre un sélecteur de variantes : un appui ajoute un exemplaire, avec un toast « Annuler ». Le header affiche la progression en direct (possédées/total) au-dessus d’un fin liseré de progression.
+- 🎴 **Mode pochette — le flux de table.** Ouvrir un booster est un moment physique : il a donc son propre flux plein écran. On tape le numéro de la carte sur un grand pavé, elle est reconnue dès le 3ᵉ chiffre, et un seul gros bouton ajoute un exemplaire avec un retour haptique. Chaque geste s'annule un par un, les badges débloqués pendant la session sont retenus et livrés ensemble au résumé, et *Tout annuler* restaure la collection exactement — depuis un instantané pris à l'ouverture.
 - ✨ **Système de rareté animé à 7 niveaux** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calculé depuis la meilleure variante possédée, +1 niveau quand le set est complet (toutes les variantes possédées) — `eternal` n'est atteignable que comme ça. Les cartes foil portent des reflets de lumière animés, `divine` s'affiche en dégradé irisé mouvant et `eternal` en noir & or scintillant (le tout respectant `prefers-reduced-motion`).
 - 📴 **Fonctionne entièrement hors-ligne** — toute l'app est précachée par un service worker ; après la première visite, le mode avion ne change rien.
 - 🔄 **Mises à jour transparentes** — les nouvelles versions sont détectées en arrière-plan et appliquées d'un tap, avec un changelog intégré qui montre ce qui a changé depuis *votre* dernière version.
 - 🌍 **7 langues** — anglais, français, espagnol, chinois, italien, néerlandais, allemand. Chaque texte, badge et entrée de changelog.
 - 🎓 **Tutoriel interactif en 23 étapes** — une visite guidée où vous *réalisez* les vraies actions, dans un bac à sable qui annule chaque modification à la fin.
-- 🏅 **Une page Badges qui raconte votre collection** — 50 badges en 6 familles : parcours, sets complets, foils, couleurs, passion, et expériences vécues que vous validez vous-même. Un anneau de progression avec votre titre, une carte *Prochain badge* qui met toujours en avant le plus proche — ou l'objectif que vous avez épinglé —, une échelle de jalons de 1 à 101 cartes, les dates de déblocage, et une vraie célébration quand l'un tombe : toast groupé, courte vibration, et explosion sur la tuile. Votre carte de collectionneur s'exporte en image partageable.
+- 🏅 **Une page Badges qui raconte votre collection** — 120 badges en 7 familles : parcours, sets complets, écuries, foils, couleurs, passion, et expériences vécues que vous validez vous-même. Chaque badge porte un **score de difficulté intrinsèque** (0–100) calculé depuis l'effort d'acquisition qu'il exige — pas depuis une télémétrie, que cette app ne collecte pas. Un anneau de progression avec votre titre, une carte *Prochain badge* qui met toujours en avant le plus proche — ou l'objectif que vous avez épinglé —, une échelle de jalons de 1 à 101 cartes, les dates de déblocage, et une vraie célébration quand l'un tombe : toast groupé, courte vibration, et explosion sur la tuile. Votre carte de collectionneur s'exporte en image partageable.
 - 📊 **Tableau de bord Stats** — progression globale, donut des raretés, complétion par catégorie, temps forts, une courbe de progression jour par jour (SVG pur, aucune bibliothèque de graphiques), et les outils de collectionneur en onglets internes : listes manquantes, doubles et échanges.
 - 👤 **Une page Compte dédiée** — connexion cloud par code e-mail, sauvegarde/restauration, export/import JSON, transfert par QR, avis intégré, et une zone danger offrant trois portées de suppression, chacune protégée par un mot à retaper. En mode spectateur, toute la page est remplacée par un état verrouillé — les contrôles sont absents, pas grisés.
 - 🔁 **Sauvegardes partout** — export/import JSON, un code de sauvegarde compressé d'appareil à appareil, le même code en QR scannable, et une sauvegarde cloud optionnelle.
@@ -87,7 +99,7 @@ Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chac
 | Crypto | **Web Crypto** natif — SHA-256 (PIN), PBKDF2 + AES-GCM (chiffrement au repos optionnel) |
 | Codes QR | Encodeur mono-fichier vendorisé ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Polices | WOFF2 auto-hébergées (SIL OFL) — aucune requête Google Fonts, 5 thèmes au choix |
-| Tests | **Runner de test intégré à Node** (`node --test`) — 166 tests, aucun framework de test |
+| Tests | **Runner de test intégré à Node** (`node --test`) — 385 tests, aucun framework de test |
 | CI | GitHub Actions — tests + build + vérification de fraîcheur du bundle commité à chaque push/PR |
 
 **Zéro dépendance à l'exécution est une règle de conception, pas un hasard.** Tout ce qu'un framework ou un SDK fournirait — rendu, navigation entre vues, i18n, cache hors-ligne, auth REST, chiffrement, génération de QR — est construit directement sur les API de la plateforme web. L'app que vous installez est exactement le code de ce dépôt.
@@ -101,7 +113,7 @@ Le code est un ensemble de **modules ES** ciblés derrière un point d'entrée u
 | Couche | Modules |
 |---|---|
 | État & données | `storage.js` (localStorage, scoppé par saison, migration v1→v2), `data.js`, `history.js` |
-| Interface | `render.js` (grille, filtres, fiche carte), `stats.js`, `badges.js`, `pin.js` (réglages) |
+| Interface | `render.js` (grille, filtres, fiche carte), `stats.js`, `badges.js`, `pack.js`, `pin.js` (réglages) |
 | Plateforme | `sw.js` (précache), `update.js` (mises à jour), `install.js`, `secure-store.js` |
 | Cloud optionnel | `cloud.js`, `feedback.js`, `settings-sync.js` — tous en REST brut |
 
@@ -134,7 +146,7 @@ Migrer des centaines de valeurs d'espacement en dur vers des tokens, avec pour s
 
 ### Tester une app navigateur sans navigateur
 Tenir la promesse zéro dépendance exclut Jest, Vitest et les harnais de navigateur headless.
-**Solution :** la logique a été factorisée pour être indépendante du navigateur et couverte par **166 tests sur le runner intégré de Node** — aucune dépendance de test, aucun réseau réel. La CI reconstruit aussi le bundle et échoue si l'artefact commité est périmé.
+**Solution :** la logique a été factorisée pour être indépendante du navigateur et couverte par **385 tests sur le runner intégré de Node** — aucune dépendance de test, aucun réseau réel. La CI reconstruit aussi le bundle et échoue si l'artefact commité est périmé.
 
 ---
 
@@ -152,7 +164,7 @@ npm install     # installe esbuild, l'unique devDependency
 npm run build   # app.js → app.bundle.js (minifié + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 166 tests, node --test, sans framework
+npm test        # 385 tests, node --test, sans framework
 ```
 
 **Déploiement.** Le dépôt se déploie tel quel sur GitHub Pages : toutes les URL sont relatives, l'app tourne donc à l'identique à la racine d'un domaine, sous un sous-chemin et en localhost. Routine de release : ajouter une entrée de changelog (c'*est* le bump de version) → incrémenter `SW_VERSION` → build → push.
@@ -169,7 +181,7 @@ npm test        # 166 tests, node --test, sans framework
 
 ## 🔩 Notes d'ingénierie
 
-Zéro dépendance à l'exécution (esbuild seul, au build) ; zéro décalage de mise en page, mesuré au pixel entre les versions ; l'ajout rapide profilé et optimisé (~300 ms → ~45 ms sur mobile moyen) ; chiffrement local optionnel lié au PIN (PBKDF2 + AES-GCM) ; mode spectateur verrouillé dans la logique, pas en CSS ; captures régénérées par un script déterministe versionné ; 377 tests en JS vanilla avec le runner intégré de Node. Détails complets dans le [README anglais](README.md).
+Zéro dépendance à l'exécution (esbuild seul, au build) ; zéro décalage de mise en page, mesuré au pixel entre les versions ; l'ajout rapide profilé et optimisé (~300 ms → ~45 ms sur mobile moyen) ; chiffrement local optionnel lié au PIN (PBKDF2 + AES-GCM) ; mode spectateur verrouillé dans la logique, pas en CSS ; captures régénérées par un script déterministe versionné ; 385 tests en JS vanilla avec le runner intégré de Node. Détails complets dans le [README anglais](README.md).
 
 ---
 

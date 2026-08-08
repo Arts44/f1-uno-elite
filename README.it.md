@@ -23,6 +23,17 @@
 
 <sub>Altre catture in [`screenshots/`](screenshots/) — temi chiaro e scuro, desktop e mobile.</sub>
 
+### ✨ In movimento
+
+| Aggiunta rapida — un tocco, un esemplare | Navigazione a pillola | Badge — 120, sette famiglie |
+|---|---|---|
+| ![Demo aggiunta rapida](screenshots/demo-quick-add.gif) | ![Demo navigazione](screenshots/demo-nav.gif) | ![Demo badge](screenshots/demo-badges.gif) |
+
+**Modalità bustina** — digiti il numero, un pulsante la aggiunge, il riepilogo arriva alla fine:
+
+![Demo modalità bustina](screenshots/demo-pack.gif)
+
+
 ### Novità 1.29 — la revisione v2
 
 | Badge — famiglie, progresso, obiettivo fissato | Dettaglio badge — data di sblocco, carte contributive |
@@ -61,12 +72,13 @@ Tenere traccia di una collezione completa di carte **F1 UNO Élite** — 101 car
 
 - 📇 **Gestione completa della collezione** — possedute / doppioni / wishlist / preferite, quantità per variante, l’intera collezione sempre in vista.
 - ➕ **Aggiunta rapida con un gesto** — un pulsante + su ogni tessera apre un selettore di varianti: un tocco aggiunge una copia, con toast «Annulla». L’intestazione mostra i progressi in tempo reale (possedute/totale) sopra una sottile linea di avanzamento.
+- 🎴 **Modalità bustina — il flusso da tavolo.** Aprire un pacchetto è un momento fisico: ha un flusso a schermo intero dedicato. Digiti il numero della carta su un tastierino grande, viene riconosciuta alla terza cifra e un solo grande pulsante aggiunge un esemplare con risposta aptica. Ogni gesto si annulla uno per uno, i badge sbloccati durante la sessione arrivano insieme nel riepilogo, e *Annulla tutto* ripristina la collezione esattamente com'era.
 - ✨ **Sistema di rarità animato a 7 livelli** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calcolato dalla migliore variante posseduta, +1 livello quando il set è completo (tutte le varianti possedute) — `eternal` si raggiunge solo così. Le carte foil hanno riflessi di luce animati, `divine` si mostra come un gradiente iridescente ed `eternal` in nero e oro scintillante (il tutto rispettando `prefers-reduced-motion`).
 - 📴 **Funziona completamente offline** — l'intera app è precachata da un service worker; dopo la prima visita, la modalità aereo non cambia nulla.
 - 🔄 **Aggiornamenti trasparenti** — le nuove versioni vengono rilevate in background e applicate con un tocco, con un changelog integrato che mostra cosa è cambiato dalla *tua* ultima versione.
 - 🌍 **7 lingue** — inglese, francese, spagnolo, cinese, italiano, olandese, tedesco. Ogni testo, badge e voce del changelog.
 - 🎓 **Tutorial interattivo in 23 passi** — una visita guidata in cui *esegui* le azioni reali, in un ambiente isolato che annulla ogni modifica alla fine.
-- 🏅 **Una pagina Badge che racconta la tua collezione** — 50 badge in 6 famiglie: percorso, set completi, foil, colori, passione ed esperienze vissute che convalidi tu stesso. Un anello di progresso con il tuo titolo, una scheda *Prossimo badge* che mette sempre in evidenza il più vicino — o l'obiettivo che hai fissato —, una scala di traguardi da 1 a 101 carte, le date di sblocco e una vera festa quando ne arriva uno: avviso raggruppato, breve vibrazione ed esplosione sulla tessera. La tua carta da collezionista si esporta come immagine condivisibile.
+- 🏅 **Una pagina Badge che racconta la tua collezione** — 120 badge in 7 famiglie: percorso, set completi, foil, colori, passione ed esperienze vissute che convalidi tu stesso. Un anello di progresso con il tuo titolo, una scheda *Prossimo badge* che mette sempre in evidenza il più vicino — o l'obiettivo che hai fissato —, una scala di traguardi da 1 a 101 carte, le date di sblocco e una vera festa quando ne arriva uno: avviso raggruppato, breve vibrazione ed esplosione sulla tessera. La tua carta da collezionista si esporta come immagine condivisibile.
 - 📊 **Cruscotto statistiche** — progresso globale, donut delle rarità, completamento per categoria, momenti salienti, una curva di progresso giorno per giorno (SVG puro, nessuna libreria di grafici) e gli strumenti da collezionista come schede interne: liste mancanti, doppioni e scambi.
 - 👤 **Una pagina Account dedicata** — accesso cloud tramite codice e-mail, backup/ripristino, esportazione/importazione JSON, trasferimento via QR, feedback integrato e una zona pericolo con tre ambiti di eliminazione, ciascuno protetto da una parola da digitare. In modalità spettatore l'intera pagina è sostituita da uno stato bloccato: i controlli sono assenti, non disattivati.
 - 🔁 **Backup ovunque** — export/import JSON, un codice di backup compresso da dispositivo a dispositivo, lo stesso codice come QR scansionabile, e backup cloud opzionale.
@@ -87,7 +99,7 @@ Tenere traccia di una collezione completa di carte **F1 UNO Élite** — 101 car
 | Crittografia | **Web Crypto** nativo — SHA-256 (PIN), PBKDF2 + AES-GCM (crittografia a riposo opzionale) |
 | Codici QR | Encoder a file singolo vendorizzato ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Font | WOFF2 self-hosted (SIL OFL) — nessuna richiesta a Google Fonts, 5 temi a scelta |
-| Test | **Test runner integrato di Node** (`node --test`) — 166 test, nessun framework di test |
+| Test | **Test runner integrato di Node** (`node --test`) — 385 test, nessun framework di test |
 | CI | GitHub Actions — test + build + verifica di freschezza del bundle committato a ogni push/PR |
 
 **Zero dipendenze a runtime è una regola di progettazione, non un caso.** Tutto ciò che un framework o un SDK fornirebbe — rendering, navigazione tra viste, i18n, cache offline, auth via REST, crittografia, generazione di QR — è costruito direttamente sulle API della piattaforma web. L'app che installi è esattamente il codice di questo repository.
@@ -101,7 +113,7 @@ Il codice è un insieme di **moduli ES** mirati dietro un unico punto di ingress
 | Livello | Moduli |
 |---|---|
 | Stato e dati | `storage.js` (localStorage, per stagione, migrazione v1→v2), `data.js`, `history.js` |
-| Interfaccia | `render.js` (griglia, filtri, scheda carta), `stats.js`, `badges.js`, `pin.js` (impostazioni) |
+| Interfaccia | `render.js` (griglia, filtri, scheda carta), `stats.js`, `badges.js`, `pack.js`, `pin.js` (impostazioni) |
 | Piattaforma | `sw.js` (precache), `update.js` (aggiornamenti), `install.js`, `secure-store.js` |
 | Cloud opzionale | `cloud.js`, `feedback.js`, `settings-sync.js` — tutti in REST puro |
 
@@ -134,7 +146,7 @@ Migrare centinaia di valori di spaziatura scritti a mano verso token, con «a me
 
 ### Testare un'app per browser senza browser
 Mantenere la promessa di zero dipendenze esclude Jest, Vitest e i sistemi con browser headless.
-**Soluzione:** la logica è stata fattorizzata per essere indipendente dal browser ed è coperta da **166 test sul runner integrato di Node** — nessuna dipendenza di test, nessuna rete reale. La CI ricostruisce anche il bundle e fallisce se l'artefatto committato è obsoleto.
+**Soluzione:** la logica è stata fattorizzata per essere indipendente dal browser ed è coperta da **385 test sul runner integrato di Node** — nessuna dipendenza di test, nessuna rete reale. La CI ricostruisce anche il bundle e fallisce se l'artefatto committato è obsoleto.
 
 ---
 
@@ -152,7 +164,7 @@ npm install     # installa esbuild, l'unica devDependency
 npm run build   # app.js → app.bundle.js (minificato + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 166 test, node --test, senza framework
+npm test        # 385 test, node --test, senza framework
 ```
 
 **Deployment.** Il repository si deploya così com'è su GitHub Pages: tutti gli URL sono relativi, quindi l'app gira identica alla radice di un dominio, sotto un sottopercorso e in localhost. Routine di release: aggiungere una voce al changelog (quello *è* il bump di versione) → incrementare `SW_VERSION` → build → push.
@@ -169,7 +181,7 @@ npm test        # 166 test, node --test, senza framework
 
 ## 🔩 Note di ingegneria
 
-Zero dipendenze a runtime (solo esbuild, in build); zero spostamenti di layout, misurati al pixel tra le versioni; l'aggiunta rapida profilata e ottimizzata (~300 ms → ~45 ms su un telefono medio); cifratura locale opzionale legata al PIN (PBKDF2 + AES-GCM); modalità spettatore bloccata nella logica, non nel CSS; screenshot rigenerati da uno script deterministico nel repo; 377 test in JS vanilla con il runner integrato di Node. Dettagli completi nel [README inglese](README.md).
+Zero dipendenze a runtime (solo esbuild, in build); zero spostamenti di layout, misurati al pixel tra le versioni; l'aggiunta rapida profilata e ottimizzata (~300 ms → ~45 ms su un telefono medio); cifratura locale opzionale legata al PIN (PBKDF2 + AES-GCM); modalità spettatore bloccata nella logica, non nel CSS; screenshot rigenerati da uno script deterministico nel repo; 385 test in JS vanilla con il runner integrato di Node. Dettagli completi nel [README inglese](README.md).
 
 ---
 

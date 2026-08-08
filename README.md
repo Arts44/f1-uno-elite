@@ -25,9 +25,13 @@ It's a **PWA**: install it from your browser and it runs like a native app, full
 
 ### ✨ In motion
 
-| Quick add — one tap, one copy | Bead navigation | Badges — 120, six families |
+| Quick add — one tap, one copy | Bead navigation | Badges — 120, seven families |
 |---|---|---|
 | ![Quick add demo](screenshots/demo-quick-add.gif) | ![Navigation demo](screenshots/demo-nav.gif) | ![Badges demo](screenshots/demo-badges.gif) |
+
+**Pack mode** — type the number, one button adds it, the summary lands at the end:
+
+![Pack mode demo](screenshots/demo-pack.gif)
 
 
 ### Badges — families, progress, difficulty
@@ -68,12 +72,13 @@ Track a complete **F1 UNO Élite** trading-card collection — 101 cards, each e
 
 - 📇 **Full collection management** — owned / doubles / wishlist / favourites, per-variant quantities, the whole collection always in view.
 - ➕ **One-gesture quick add** — a + button on every tile opens a variant picker: one tap adds a copy, with an Undo toast. The header shows your live progress (owned/total) over a thin progress line.
+- 🎴 **Pack mode — the table-side flow.** Opening a booster is a physical moment, so it gets its own full-screen flow: type the card number on a large keypad, it is recognised at the third digit, and one big button adds a copy with a haptic tap. Every action is undoable one by one, badges unlocked during the session are held back and delivered together on the summary, and *Undo everything* restores the collection exactly as it was — from a snapshot taken when the pack opened.
 - ✨ **Animated 7-level rarity system** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, computed from the best owned variant, +1 level when the set is complete (every variant owned) — `eternal` is only reachable that way. Foil cards carry live light-sweep visuals and the top tier renders as a shifting iridescent gradient (all respecting `prefers-reduced-motion`).
 - 📴 **Works fully offline** — the whole app is precached by a service worker; after the first visit, airplane mode changes nothing.
 - 🔄 **Transparent auto-updates** — new versions are detected in the background and applied with one tap, plus an in-app changelog showing what changed since *your* last version.
 - 🌍 **7 languages** — English, French, Spanish, Chinese, Italian, Dutch, German. Every string, badge and changelog entry.
 - 🎓 **Interactive 23-step tutorial** — a guided tour where you *perform* the real actions, running in a sandbox that reverts every change when it ends.
-- 🏅 **A badges page that tells your story** — 50 badges in 6 families: journey, complete sets, foils, colours, passion, and real-world experiences you validate yourself. A progress ring with your title, a *Next badge* card that always surfaces the closest one — or the goal you pinned — a milestone ladder from 1 to 101 cards, unlock dates, and a real celebration when one drops: a grouped toast, a short haptic tap, and a burst on the tile. Your collector card exports as a shareable image.
+- 🏅 **A badges page that tells your story** — 120 badges in 7 families: journey, complete sets, teams, foils, colours, passion, and real-world experiences you validate yourself. Every badge carries an **intrinsic difficulty score** (0–100) computed from the acquisition effort it demands — not from telemetry, which this app does not collect. A progress ring with your title, a *Next badge* card that always surfaces the closest one — or the goal you pinned — a milestone ladder from 1 to 101 cards, unlock dates, and a real celebration when one drops: a grouped toast, a short haptic tap, and a burst on the tile. Your collector card exports as a shareable image.
 - 📊 **Stats dashboard** — global progress, rarity donut, per-category completion, highlights, a day-by-day progression curve (pure SVG, no chart library), and the collector tools as inner tabs: missing, doubles and trade lists.
 - 👤 **A dedicated Account page** — cloud sign-in by email code, push/pull backups, JSON export/import, the QR transfer, in-app feedback, and a danger zone offering three deletion scopes, each gated behind a word you must type. In viewer mode the whole page is replaced by a locked state — the controls are absent, not disabled.
 - 🔁 **Backups everywhere** — JSON export/import, a compressed device-to-device backup code, the same code as a scannable QR link, and optional cloud backup.
@@ -94,7 +99,7 @@ Track a complete **F1 UNO Élite** trading-card collection — 101 cards, each e
 | Crypto | Native **Web Crypto** — SHA-256 (PIN), PBKDF2 + AES-GCM (optional at-rest encryption) |
 | QR codes | Vendored single-file encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Fonts | Self-hosted WOFF2 (SIL OFL) — no Google Fonts request, 5 switchable themes |
-| Tests | **Node's built-in test runner** (`node --test`) — 166 tests, no test framework |
+| Tests | **Node's built-in test runner** (`node --test`) — 385 tests, no test framework |
 | CI | GitHub Actions — tests + build + committed-bundle freshness check on every push/PR |
 
 **Zero runtime dependencies is a design rule, not an accident.** Everything a framework or SDK would normally provide — rendering, view routing, i18n, offline caching, auth over REST, encryption, QR generation — is built directly on web platform APIs. The app you install is exactly the code in this repo.
@@ -108,7 +113,7 @@ The source is a set of focused **ES modules** behind a single entry point, `app.
 | Layer | Modules |
 |---|---|
 | State & data | `storage.js` (localStorage, season-scoped, v1→v2 migration), `data.js`, `history.js` |
-| UI | `render.js` (grid, card sheet), `stats.js`, `badges.js`, `pin.js` (settings) |
+| UI | `render.js` (grid, card sheet), `stats.js`, `badges.js`, `pack.js` (pack mode), `pin.js` (settings), `icons.js` |
 | Platform | `sw.js` (precache), `update.js` (update flow), `install.js`, `secure-store.js` |
 | Optional cloud | `cloud.js`, `feedback.js`, `settings-sync.js` — all raw REST |
 
@@ -141,7 +146,7 @@ Migrating hundreds of hard-coded spacing values to design tokens, with "it looks
 
 ### Testing a browser app without a browser
 Keeping a zero-dependency promise rules out Jest, Vitest and headless-browser harnesses.
-**Solution:** the logic was factored to be browser-free and is covered by **166 tests on Node's built-in runner** — no test dependencies, no real network. CI also rebuilds the bundle and fails if the committed artifact is stale.
+**Solution:** the logic was factored to be browser-free and is covered by **385 tests on Node's built-in runner** — no test dependencies, no real network. CI also rebuilds the bundle and fails if the committed artifact is stale.
 
 ---
 
@@ -155,7 +160,7 @@ The choices a technical reader might want spelled out:
 - **Optional at-rest encryption keyed to the PIN** (PBKDF2 + AES-GCM via Web Crypto), with the trade-offs documented honestly below rather than oversold.
 - **Viewer (read-only) mode is enforced in logic**, not hidden by CSS: every write action passes one guard set, and direct function calls refuse too.
 - **The visual freeze is reproducible.** Every screenshot in this README is regenerated by a deterministic in-repo script whose seed is computed from the card data and honesty-checked (a badge may not appear unlocked unless its condition truly holds).
-- **377 tests on vanilla JS, no test framework** — Node's built-in runner over the browser-free logic: storage migrations, rarity ladder, badge conditions and difficulty model, cloud failure scenarios with stubbed `fetch`, backup codes, i18n coverage. A WCAG-AA contrast scan runs against both themes.
+- **385 tests on vanilla JS, no test framework** — Node's built-in runner over the browser-free logic: storage migrations, rarity ladder, badge conditions and difficulty model, cloud failure scenarios with stubbed `fetch`, backup codes, i18n coverage. A WCAG-AA contrast scan runs against both themes.
 
 ## 🚀 Getting started
 
@@ -171,7 +176,7 @@ npm install     # installs esbuild, the only devDependency
 npm run build   # app.js → app.bundle.js (minified + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 166 tests, node --test, no framework
+npm test        # 385 tests, node --test, no framework
 ```
 
 **Deployment.** The repo deploys as-is to GitHub Pages: every URL is relative, so the app runs identically at a domain root, under a sub-path, and on localhost. Release routine: add a changelog entry (that *is* the version bump) → bump `SW_VERSION` → build → push.

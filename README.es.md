@@ -23,6 +23,17 @@ Es una **PWA**: instálala desde tu navegador y funciona como una app nativa, to
 
 <sub>Más capturas en [`screenshots/`](screenshots/) — temas claro y oscuro, escritorio y móvil.</sub>
 
+### ✨ En movimiento
+
+| Añadido rápido — un toque, un ejemplar | Navegación con píldora | Insignias — 120, siete familias |
+|---|---|---|
+| ![Demo añadido rápido](screenshots/demo-quick-add.gif) | ![Demo navegación](screenshots/demo-nav.gif) | ![Demo insignias](screenshots/demo-badges.gif) |
+
+**Modo sobre** — escribes el número, un botón lo añade, el resumen llega al final:
+
+![Demo modo sobre](screenshots/demo-pack.gif)
+
+
 ### Novedades 1.29 — la pasada v2
 
 | Insignias — familias, progreso, objetivo fijado | Detalle de insignia — fecha de desbloqueo, cartas contributivas |
@@ -61,12 +72,13 @@ Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas, cada 
 
 - 📇 **Gestión completa de la colección** — en propiedad / repetidas / wishlist / favoritas, cantidades por variante, toda la colección siempre a la vista.
 - ➕ **Añadido rápido con un gesto** — un botón + en cada casilla abre un selector de variantes: un toque añade un ejemplar, con aviso «Deshacer». La cabecera muestra tu progreso en vivo (poseídas/total) sobre una fina línea de progreso.
+- 🎴 **Modo sobre — el flujo de mesa.** Abrir un sobre es un momento físico: tiene su propio flujo a pantalla completa. Escribes el número de la carta en un teclado grande, se reconoce en la tercera cifra y un solo botón grande añade un ejemplar con respuesta háptica. Cada acción se deshace una a una, las insignias desbloqueadas durante la sesión se entregan juntas en el resumen, y *Deshacer todo* restaura la colección exactamente como estaba.
 - ✨ **Sistema de rareza animado de 7 niveles** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calculado a partir de la mejor variante en propiedad, +1 nivel cuando la serie está completa (todas las variantes en propiedad) — `eternal` solo se alcanza así. Las cartas foil llevan barridos de luz animados, `divine` se muestra como un degradado iridiscente y `eternal` en negro y oro centelleante (todo respetando `prefers-reduced-motion`).
 - 📴 **Funciona totalmente sin conexión** — toda la app queda precacheada por un service worker; tras la primera visita, el modo avión no cambia nada.
 - 🔄 **Actualizaciones transparentes** — las nuevas versiones se detectan en segundo plano y se aplican con un toque, con un changelog integrado que muestra qué ha cambiado desde *tu* última versión.
 - 🌍 **7 idiomas** — inglés, francés, español, chino, italiano, neerlandés, alemán. Cada texto, insignia y entrada del changelog.
 - 🎓 **Tutorial interactivo de 23 pasos** — una visita guiada donde *realizas* las acciones reales, en un entorno aislado que revierte todos los cambios al terminar.
-- 🏅 **Una página de insignias que cuenta tu colección** — 50 insignias en 6 familias: trayectoria, sets completos, foils, colores, pasión y experiencias vividas que validas tú mismo. Un anillo de progreso con tu título, una tarjeta *Próxima insignia* que destaca siempre la más cercana — o el objetivo que fijaste —, una escalera de hitos de 1 a 101 cartas, las fechas de desbloqueo y una celebración de verdad cuando cae una: aviso agrupado, vibración breve y estallido en la ficha. Tu tarjeta de coleccionista se exporta como imagen para compartir.
+- 🏅 **Una página de insignias que cuenta tu colección** — 120 insignias en 7 familias: trayectoria, sets completos, foils, colores, pasión y experiencias vividas que validas tú mismo. Un anillo de progreso con tu título, una tarjeta *Próxima insignia* que destaca siempre la más cercana — o el objetivo que fijaste —, una escalera de hitos de 1 a 101 cartas, las fechas de desbloqueo y una celebración de verdad cuando cae una: aviso agrupado, vibración breve y estallido en la ficha. Tu tarjeta de coleccionista se exporta como imagen para compartir.
 - 📊 **Panel de estadísticas** — progreso global, donut de rarezas, completitud por categoría, momentos destacados, una curva de progreso día a día (SVG puro, sin librería de gráficos) y las herramientas de coleccionista como pestañas internas: listas de faltantes, repetidas e intercambios.
 - 👤 **Una página Cuenta dedicada** — inicio de sesión en la nube por código de correo, copia/restauración, exportación/importación JSON, transferencia por QR, opiniones integradas y una zona de peligro con tres alcances de borrado, cada uno protegido por una palabra que hay que escribir. En modo espectador toda la página se sustituye por un estado bloqueado: los controles están ausentes, no desactivados.
 - 🔁 **Copias de seguridad por todas partes** — exportación/importación JSON, un código de respaldo comprimido de dispositivo a dispositivo, el mismo código como QR escaneable, y copia en la nube opcional.
@@ -87,7 +99,7 @@ Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas, cada 
 | Cripto | **Web Crypto** nativo — SHA-256 (PIN), PBKDF2 + AES-GCM (cifrado en reposo opcional) |
 | Códigos QR | Codificador de un solo archivo vendorizado ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Fuentes | WOFF2 autoalojadas (SIL OFL) — ninguna petición a Google Fonts, 5 temas a elegir |
-| Tests | **Runner de tests integrado en Node** (`node --test`) — 166 tests, sin framework de test |
+| Tests | **Runner de tests integrado en Node** (`node --test`) — 385 tests, sin framework de test |
 | CI | GitHub Actions — tests + build + verificación de frescura del bundle commiteado en cada push/PR |
 
 **Cero dependencias en runtime es una regla de diseño, no una casualidad.** Todo lo que un framework o SDK proporcionaría — renderizado, navegación entre vistas, i18n, caché offline, auth por REST, cifrado, generación de QR — está construido directamente sobre las API de la plataforma web. La app que instalas es exactamente el código de este repositorio.
@@ -101,7 +113,7 @@ El código es un conjunto de **módulos ES** enfocados tras un único punto de e
 | Capa | Módulos |
 |---|---|
 | Estado y datos | `storage.js` (localStorage, por temporada, migración v1→v2), `data.js`, `history.js` |
-| Interfaz | `render.js` (cuadrícula, filtros, ficha de carta), `stats.js`, `badges.js`, `pin.js` (ajustes) |
+| Interfaz | `render.js` (cuadrícula, filtros, ficha de carta), `stats.js`, `badges.js`, `pack.js`, `pin.js` (ajustes) |
 | Plataforma | `sw.js` (precache), `update.js` (actualizaciones), `install.js`, `secure-store.js` |
 | Nube opcional | `cloud.js`, `feedback.js`, `settings-sync.js` — todos en REST puro |
 
@@ -134,7 +146,7 @@ Migrar cientos de valores de espaciado escritos a mano hacia tokens, con «a mí
 
 ### Probar una app de navegador sin navegador
 Mantener la promesa de cero dependencias descarta Jest, Vitest y los arneses de navegador headless.
-**Solución:** la lógica se factorizó para ser independiente del navegador y está cubierta por **166 tests en el runner integrado de Node** — sin dependencias de test, sin red real. La CI también reconstruye el bundle y falla si el artefacto commiteado está obsoleto.
+**Solución:** la lógica se factorizó para ser independiente del navegador y está cubierta por **385 tests en el runner integrado de Node** — sin dependencias de test, sin red real. La CI también reconstruye el bundle y falla si el artefacto commiteado está obsoleto.
 
 ---
 
@@ -152,7 +164,7 @@ npm install     # instala esbuild, la única devDependency
 npm run build   # app.js → app.bundle.js (minificado + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 166 tests, node --test, sin framework
+npm test        # 385 tests, node --test, sin framework
 ```
 
 **Despliegue.** El repositorio se despliega tal cual en GitHub Pages: todas las URL son relativas, así que la app funciona igual en la raíz de un dominio, bajo un subdirectorio y en localhost. Rutina de release: añadir una entrada al changelog (eso *es* el bump de versión) → subir `SW_VERSION` → build → push.
@@ -169,7 +181,7 @@ npm test        # 166 tests, node --test, sin framework
 
 ## 🔩 Notas de ingeniería
 
-Cero dependencias en ejecución (solo esbuild, al compilar); cero desplazamiento de diseño, medido al píxel entre versiones; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado; 377 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
+Cero dependencias en ejecución (solo esbuild, al compilar); cero desplazamiento de diseño, medido al píxel entre versiones; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado; 385 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
 
 ---
 

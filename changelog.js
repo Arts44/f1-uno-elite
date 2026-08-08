@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.42.1',
+    date: '2026-08-08',
+    changes: {
+      en: ['Documentation only: the READMEs in all 7 languages now cover Pack mode (with an animated demo) and carry the right badge and test counts. Nothing changed in the app itself.'],
+      fr: ['Documentation seulement : les README des 7 langues couvrent désormais le mode pochette (avec une démo animée) et portent les bons comptes de badges et de tests. Rien n’a changé dans l’app elle-même.'],
+      es: ['Solo documentación: los README de los 7 idiomas ya cubren el modo sobre (con una demo animada) y llevan los recuentos correctos de insignias y tests. Nada cambió en la app.'],
+      zh: ['仅文档更新:7 种语言的 README 现已涵盖开包模式(附动画演示),徽章与测试数量也已更正。应用本身没有任何改动。'],
+      it: ['Solo documentazione: i README di tutte e 7 le lingue ora coprono la modalità bustina (con una demo animata) e riportano i conteggi corretti di badge e test. Nulla è cambiato nell’app.'],
+      nl: ['Alleen documentatie: de README’s in alle 7 talen behandelen nu de zakje-modus (met een geanimeerde demo) en bevatten de juiste badge- en testaantallen. In de app zelf is niets veranderd.'],
+      de: ['Nur Dokumentation: die READMEs in allen 7 Sprachen decken jetzt den Päckchen-Modus ab (mit animierter Demo) und tragen die korrekten Abzeichen- und Testzahlen. In der App selbst hat sich nichts geändert.'],
+    },
+  },
+  {
     version: '1.42.0',
     date: '2026-08-08',
     changes: {

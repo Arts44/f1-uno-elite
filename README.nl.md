@@ -23,6 +23,17 @@ Het is een **PWA**: installeer haar vanuit je browser en ze draait als een nativ
 
 <sub>Meer schermafbeeldingen in [`screenshots/`](screenshots/) — licht en donker thema, desktop en mobiel.</sub>
 
+### ✨ In beweging
+
+| Snel toevoegen — één tik, één exemplaar | Navigatie met bolletje | Badges — 120, zeven families |
+|---|---|---|
+| ![Demo snel toevoegen](screenshots/demo-quick-add.gif) | ![Demo navigatie](screenshots/demo-nav.gif) | ![Demo badges](screenshots/demo-badges.gif) |
+
+**Zakje-modus** — typ het nummer, één knop voegt toe, het overzicht volgt aan het eind:
+
+![Demo zakje-modus](screenshots/demo-pack.gif)
+
+
 ### Nieuw in 1.29 — de v2-ronde
 
 | Badges — families, voortgang, vastgezet doel | Badgedetail — ontgrendeldatum, bijdragende kaarten |
@@ -61,12 +72,13 @@ Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten, e
 
 - 📇 **Volledig collectiebeheer** — in bezit / dubbelen / verlanglijst / favorieten, aantallen per variant, de hele collectie altijd in beeld.
 - ➕ **Snel toevoegen met één gebaar** — een +-knop op elke tegel opent een variantkiezer: één tik voegt een exemplaar toe, met een “Ongedaan maken”-melding. De koptekst toont je live voortgang (in bezit/totaal) boven een dunne voortgangslijn.
+- 🎴 **Zakje-modus — de flow aan tafel.** Een boosterpakje openen is een fysiek moment en krijgt daarom een eigen schermvullende flow: typ het kaartnummer op een groot toetsenblok, bij het derde cijfer wordt de kaart herkend, en één grote knop voegt een exemplaar toe met een haptische tik. Elke handeling is één voor één ongedaan te maken, badges uit de sessie komen samen in het overzicht, en *Alles ongedaan maken* zet de collectie exact terug.
 - ✨ **Geanimeerd zeldzaamheidssysteem met 7 niveaus** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, berekend uit de beste variant in bezit, +1 niveau wanneer de set compleet is (elke variant in bezit) — `eternal` is alleen zo bereikbaar. Foil-kaarten dragen bewegende lichtglans-effecten, `divine` toont een iriserend verloop en `eternal` fonkelend zwart-goud (alles met respect voor `prefers-reduced-motion`).
 - 📴 **Werkt volledig offline** — de hele app wordt door een service worker geprecachet; na het eerste bezoek verandert vliegtuigmodus niets.
 - 🔄 **Transparante auto-updates** — nieuwe versies worden op de achtergrond gedetecteerd en met één tik toegepast, met een ingebouwde changelog die toont wat er sinds *jouw* laatste versie veranderde.
 - 🌍 **7 talen** — Engels, Frans, Spaans, Chinees, Italiaans, Nederlands, Duits. Elke tekst, badge en changelog-vermelding.
 - 🎓 **Interactieve tutorial in 23 stappen** — een rondleiding waarin je de *echte* acties uitvoert, in een zandbak die elke wijziging aan het eind terugdraait.
-- 🏅 **Een badgepagina die je verzameling vertelt** — 50 badges in 6 families: parcours, complete sets, foils, kleuren, passie en zelf te bevestigen ervaringen. Een voortgangsring met je titel, een *Volgende badge*-kaart die altijd de dichtstbijzijnde toont — of het doel dat je zelf vastzette —, een mijlpalenladder van 1 tot 101 kaarten, ontgrendeldata en een echte viering als er één valt: gebundelde melding, korte trilling en een uitbarsting op de tegel. Je verzamelaarskaart exporteert als deelbare afbeelding.
+- 🏅 **Een badgepagina die je verzameling vertelt** — 120 badges in 7 families: parcours, complete sets, foils, kleuren, passie en zelf te bevestigen ervaringen. Een voortgangsring met je titel, een *Volgende badge*-kaart die altijd de dichtstbijzijnde toont — of het doel dat je zelf vastzette —, een mijlpalenladder van 1 tot 101 kaarten, ontgrendeldata en een echte viering als er één valt: gebundelde melding, korte trilling en een uitbarsting op de tegel. Je verzamelaarskaart exporteert als deelbare afbeelding.
 - 📊 **Statistiekendashboard** — algemene voortgang, zeldzaamheidsdonut, voltooiing per categorie, hoogtepunten, een dag-voor-dag voortgangscurve (pure SVG, geen grafiekbibliotheek) en de verzamelaarstools als interne tabbladen: ontbrekende kaarten, dubbels en ruillijsten.
 - 👤 **Een aparte Account-pagina** — cloud-aanmelding via e-mailcode, back-up/herstel, JSON-export/import, QR-overdracht, feedback in de app en een gevarenzone met drie verwijderbereiken, elk beveiligd met een woord dat je moet intypen. In de kijkmodus wordt de hele pagina vervangen door een vergrendelde staat: de knoppen zijn afwezig, niet uitgeschakeld.
 - 🔁 **Back-ups overal** — JSON-export/-import, een gecomprimeerde back-upcode van toestel naar toestel, dezelfde code als scanbare QR, en optionele cloudback-up.
@@ -87,7 +99,7 @@ Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten, e
 | Crypto | Native **Web Crypto** — SHA-256 (pincode), PBKDF2 + AES-GCM (optionele versleuteling in rust) |
 | QR-codes | Gevendorde single-file-encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Lettertypen | Zelf gehoste WOFF2 (SIL OFL) — geen Google Fonts-verzoek, 5 thema's naar keuze |
-| Tests | **Ingebouwde testrunner van Node** (`node --test`) — 166 tests, geen testframework |
+| Tests | **Ingebouwde testrunner van Node** (`node --test`) — 385 tests, geen testframework |
 | CI | GitHub Actions — tests + build + versheidscontrole van de gecommitte bundle bij elke push/PR |
 
 **Nul runtime-afhankelijkheden is een ontwerpregel, geen toeval.** Alles wat een framework of SDK normaal levert — rendering, navigatie tussen weergaven, i18n, offline caching, auth via REST, versleuteling, QR-generatie — is rechtstreeks op de webplatform-API's gebouwd. De app die je installeert is exact de code in deze repository.
@@ -101,7 +113,7 @@ De code bestaat uit gerichte **ES-modules** achter één ingangspunt, `app.js`, 
 | Laag | Modules |
 |---|---|
 | Staat en data | `storage.js` (localStorage, per seizoen, migratie v1→v2), `data.js`, `history.js` |
-| Interface | `render.js` (raster, filters, kaartfiche), `stats.js`, `badges.js`, `pin.js` (instellingen) |
+| Interface | `render.js` (raster, filters, kaartfiche), `stats.js`, `badges.js`, `pack.js`, `pin.js` (instellingen) |
 | Platform | `sw.js` (precache), `update.js` (updates), `install.js`, `secure-store.js` |
 | Optionele cloud | `cloud.js`, `feedback.js`, `settings-sync.js` — alle via kale REST |
 
@@ -134,7 +146,7 @@ Honderden hardgecodeerde spatiëringswaarden migreren naar tokens, met „het zi
 
 ### Een browserapp testen zonder browser
 De belofte van nul afhankelijkheden sluit Jest, Vitest en headless-browsertuigages uit.
-**Oplossing:** de logica is zo gefactoriseerd dat ze browservrij is en wordt gedekt door **166 tests op de ingebouwde runner van Node** — geen testafhankelijkheden, geen echt netwerk. De CI herbouwt bovendien de bundle en faalt als het gecommitte artefact verouderd is.
+**Oplossing:** de logica is zo gefactoriseerd dat ze browservrij is en wordt gedekt door **385 tests op de ingebouwde runner van Node** — geen testafhankelijkheden, geen echt netwerk. De CI herbouwt bovendien de bundle en faalt als het gecommitte artefact verouderd is.
 
 ---
 
@@ -152,7 +164,7 @@ npm install     # installeert esbuild, de enige devDependency
 npm run build   # app.js → app.bundle.js (geminificeerd + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 166 tests, node --test, zonder framework
+npm test        # 385 tests, node --test, zonder framework
 ```
 
 **Deployment.** De repository deployt as-is naar GitHub Pages: elke URL is relatief, dus de app draait identiek op een domeinroot, onder een subpad en op localhost. Releaseroutine: een changelog-vermelding toevoegen (dat *is* de versiebump) → `SW_VERSION` ophogen → builden → pushen.
@@ -169,7 +181,7 @@ npm test        # 166 tests, node --test, zonder framework
 
 ## 🔩 Engineering-notities
 
-Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); nul layoutverschuiving, per pixel gemeten tussen versies; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo; 377 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
+Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); nul layoutverschuiving, per pixel gemeten tussen versies; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo; 385 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
 
 ---
 
