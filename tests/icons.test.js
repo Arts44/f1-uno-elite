@@ -62,12 +62,12 @@ describe('teamLiveries — parité et couverture CSS', () => {
     assert.deepEqual(JSON.parse(m[1]), meta.teamLiveries);
   });
 
-  test('chaque geste a sa classe .lv-<g> dans styles.css et des couleurs valides', () => {
+  test('couleurs valides et bande .lvb présente (arbitrage P1 — les gestes ne peignent plus la tuile)', () => {
     for (const [team, lv] of Object.entries(meta.teamLiveries)) {
       assert.match(lv.c1, /^#[0-9A-Fa-f]{6}$/, team);
       assert.match(lv.c2, /^#[0-9A-Fa-f]{6}$/, team);
-      assert.ok(css.includes(`.lv-${lv.g}`), `geste ${lv.g} (${team}) sans classe CSS`);
     }
+    assert.ok(css.includes('.lvb'), 'colonne de livrée .lvb absente de styles.css');
   });
 
   test('10 gestes distincts — aucune géométrie partagée entre écuries', () => {

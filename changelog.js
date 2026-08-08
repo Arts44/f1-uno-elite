@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.33.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'Card tiles follow one clear colour rule: the background now encodes RARITY (a sober halo, identical across all ten teams), the team lives in a fully saturated helmet plus a slim two-colour livery stripe, and foils shine on the card body. No more three-different-backgrounds for the same driver.',
+        'Quick add is instant: one tap used to rebuild all 101 tiles and re-evaluate all 50 badges up to five times — it now updates only the tile you touched, in a single pass. Around 300 ms → under 50 ms on a mid-range phone.',
+        'Variant types now appear in one canonical order everywhere (base colours, foils, duals, wild, nitro, promos) — on tiles, in the card sheet, the + picker and the stats. And reduced-motion now stops every foil animation, including the wild/nitro glow that kept running.',
+      ],
+      fr: [
+        'Les tuiles suivent une règle de couleur unique : le fond encode désormais la RARETÉ (halo sobre, identique pour les dix écuries), l\'écurie vit dans un casque pleinement saturé plus une fine bande de livrée bicolore, et les foils brillent sur le corps de la carte. Fini les trois fonds différents pour le même pilote.',
+        'L\'ajout rapide est instantané : un tap reconstruisait les 101 tuiles et réévaluait les 50 badges jusqu\'à cinq fois — il ne met plus à jour que la tuile touchée, en une seule passe. Environ 300 ms → moins de 50 ms sur un téléphone moyen.',
+        'Les types de variante s\'affichent partout dans un ordre canonique unique (couleurs de base, foils, duals, wild, nitro, promos) — tuiles, fiche carte, sélecteur + et stats. Et la réduction des animations arrête désormais TOUS les effets foil, y compris le halo wild/nitro qui continuait de tourner.',
+      ],
+      es: [
+        'Las casillas siguen una única regla de color: el fondo codifica ahora la RAREZA (halo sobrio, idéntico para las diez escuderías), la escudería vive en un casco totalmente saturado más una fina banda de librea bicolor, y los foils brillan en el cuerpo de la carta. Se acabaron los tres fondos distintos para el mismo piloto.',
+        'El añadido rápido es instantáneo: un toque reconstruía las 101 casillas y reevaluaba las 50 insignias hasta cinco veces — ahora solo actualiza la casilla tocada, en una única pasada. De unos 300 ms a menos de 50 ms en un móvil medio.',
+        'Los tipos de variante aparecen en un orden canónico único en todas partes (colores base, foils, duales, wild, nitro, promos) — casillas, ficha, selector + y estadísticas. Y la reducción de animaciones detiene ahora TODOS los efectos foil, incluido el brillo wild/nitro que seguía girando.',
+      ],
+      zh: [
+        '卡格遵循统一的颜色规则:背景现在编码稀有度(低调的光晕,十支车队完全一致),车队体现在完全饱和的头盔和一条细双色涂装条上,闪卡效果则在卡片主体上闪耀。同一位车手三种不同背景的时代结束了。',
+        '快速添加即刻响应:过去一次点按会重建全部 101 个卡格、并把 50 个徽章重新评估多达五次——现在只更新你按下的那一格,一次完成。中端手机上约 300 毫秒降至 50 毫秒以内。',
+        '版本类型在所有界面按统一的规范顺序显示(基础色、闪卡、双色、wild、nitro、promo)——卡格、卡片详情、+ 选择器和统计。且减少动态效果模式现在会停止所有闪卡动画,包括此前仍在转动的 wild/nitro 光晕。',
+      ],
+      it: [
+        'Le tessere seguono un\'unica regola di colore: lo sfondo codifica ora la RARITÀ (alone sobrio, identico per le dieci scuderie), la scuderia vive in un casco pienamente saturo più una sottile banda di livrea bicolore, e i foil brillano sul corpo della carta. Basta tre sfondi diversi per lo stesso pilota.',
+        'L\'aggiunta rapida è istantanea: un tocco ricostruiva le 101 tessere e rivalutava i 50 badge fino a cinque volte — ora aggiorna solo la tessera toccata, in un unico passaggio. Da circa 300 ms a meno di 50 ms su un telefono medio.',
+        'I tipi di variante appaiono ovunque in un unico ordine canonico (colori base, foil, dual, wild, nitro, promo) — tessere, scheda, selettore + e statistiche. E la riduzione delle animazioni ferma ora TUTTI gli effetti foil, incluso il bagliore wild/nitro che continuava a girare.',
+      ],
+      nl: [
+        'De tegels volgen één duidelijke kleurregel: de achtergrond codeert nu ZELDZAAMHEID (een sobere gloed, identiek voor alle tien teams), het team leeft in een volledig verzadigde helm plus een smalle tweekleurige livery-streep, en foils schitteren op de kaartromp. Geen drie verschillende achtergronden meer voor dezelfde coureur.',
+        'Snel toevoegen is nu direct: één tik herbouwde alle 101 tegels en evalueerde de 50 badges tot vijf keer opnieuw — nu wordt alleen de aangeraakte tegel bijgewerkt, in één keer. Van zo\'n 300 ms naar minder dan 50 ms op een middenklasse-telefoon.',
+        'Varianttypes verschijnen overal in één canonieke volgorde (basiskleuren, foils, duals, wild, nitro, promo\'s) — tegels, kaartfiche, +-kiezer en statistieken. En verminderde beweging stopt nu ALLE foil-animaties, inclusief de wild/nitro-gloed die bleef draaien.',
+      ],
+      de: [
+        'Die Kacheln folgen einer einzigen Farbregel: der Hintergrund codiert jetzt die SELTENHEIT (ein dezenter Schein, identisch für alle zehn Teams), das Team lebt in einem voll gesättigten Helm plus einem schmalen zweifarbigen Lackierungsstreifen, und Foils glänzen auf dem Kartenkörper. Schluss mit drei verschiedenen Hintergründen für denselben Fahrer.',
+        'Schnelles Hinzufügen ist jetzt sofort: ein Tipp baute alle 101 Kacheln neu und bewertete die 50 Abzeichen bis zu fünfmal neu — jetzt wird nur die berührte Kachel aktualisiert, in einem Durchgang. Von rund 300 ms auf unter 50 ms auf einem Mittelklasse-Handy.',
+        'Variantentypen erscheinen überall in einer einzigen kanonischen Reihenfolge (Grundfarben, Foils, Duals, Wild, Nitro, Promos) — Kacheln, Kartenblatt, +-Auswahl und Statistiken. Und reduzierte Bewegung stoppt jetzt ALLE Foil-Animationen, einschließlich des Wild/Nitro-Scheins, der weiterlief.',
+      ],
+    },
+  },
+  {
     version: '1.32.0',
     date: '2026-08-08',
     changes: {

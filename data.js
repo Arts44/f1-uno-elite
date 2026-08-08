@@ -70,6 +70,24 @@ export let TEAM_MONOGRAMS = {};
 export let TEAM_LIVERIES = {};
 export let ROLE_BASE_RARITY = {};
 
+/* Ordre CANONIQUE des types de variante — puissance croissante :
+   couleurs de base, foils simples, duals, wild, nitro, promos.
+   (= l'ordre des clés de metadata.json ; wild avant nitro car l'échelle
+   des pastilles de type classe nitro au-dessus — cohérent avec le
+   tie-break de variantRarity.) Unique source de vérité : chips de
+   tuile, fiche carte, popover +, stats et outils s'y alignent tous. */
+export const TYPE_CANONICAL = [
+  'blue', 'green', 'red', 'yellow',
+  'blue_foil', 'green_foil', 'red_foil', 'yellow_foil',
+  'blue_red_foil', 'green_yellow_foil',
+  'wild_foil', 'nitro_foil',
+  'promo_blue', 'promo_green', 'promo_red', 'promo_yellow',
+];
+const _TYPE_IDX = Object.fromEntries(TYPE_CANONICAL.map((t, i) => [t, i]));
+export function sortTypesCanonical(types){
+  return [...types].sort((a, b) => (_TYPE_IDX[a] ?? 99) - (_TYPE_IDX[b] ?? 99));
+}
+
 // Card database (mutated in place, never reassigned)
 export const CARDS_DB = [];
 

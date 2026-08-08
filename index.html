@@ -15,6 +15,13 @@
 <script>(function(){try{var e=document.documentElement;var t=localStorage.getItem('f1uno_theme');if(t)e.setAttribute('data-theme',t);var F={circuit:["'Space Grotesk',sans-serif","'Inter',sans-serif"],sprint:["'Chakra Petch',sans-serif","'IBM Plex Sans',sans-serif"],prestige:["'Fraunces',serif","'Source Sans 3',sans-serif"],minimal:["'Manrope',sans-serif","'Manrope',sans-serif"],original:["'Syne',sans-serif","'DM Sans',sans-serif"]};var f=localStorage.getItem('f1uno_font')||'circuit';e.setAttribute('data-font',f);var v=F[f];if(v){e.style.setProperty('--font-d',v[0]);e.style.setProperty('--font-b',v[1]);}/* Boot target decided HERE, before the first paint: the bundle loads at the end of <body>, so leaving the login screen visible by default made it flash for ~0.5s whenever the PIN was off (and inverting the defaults would only move the flash to the PIN-on case). */var done=localStorage.getItem('f1uno_setup_done')==='true';var pin=localStorage.getItem('f1uno_pin_enabled')==='true';e.setAttribute('data-boot',(!done||pin)?'login':'app');}catch(e){e&&e.message;document.documentElement.setAttribute('data-boot','login');}})();</script>
 </head>
 <body>
+  <!-- Tracé partagé du casque C1 (1 symbol, 61 <use>) — colorisé par variables --helm-* -->
+  <svg style="display:none" aria-hidden="true"><symbol id="icHelmC1" viewBox="0 0 120 120">
+    <path fill="var(--helm-shell,#888)" d="M20 76c-3-11-2-24 4-34C32 28 47 20 64 20c17 0 31 8 37 21 4 9 4 19 1 28l-3 9c-2 6-7 9-14 10l-46 3c-8 1-14-3-17-10Z"/>
+    <path fill="var(--helm-visor,#333)" d="M35 51c2-8 9-13 18-13l37 1c7 0 11 5 10 12l-3 14c-2 7-7 11-15 11l-35 1c-9 0-13-5-12-13Z"/>
+    <path fill="var(--helm-det,#eee)" opacity=".85" d="M58 20c8-.5 16 .5 23 4l-3 6c-6-3-12-4-19-3Z"/>
+    <path fill="var(--helm-lip,#222)" d="M28 84l52-3-1 7-49 3Z"/>
+  </symbol></svg>
 <!-- LOGIN SCREEN -->
 <div id="login-screen" role="dialog" aria-label="" data-i18n-aria="login.screen" aria-modal="true">
   <div class="login-box">

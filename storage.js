@@ -86,11 +86,29 @@ export function saveData(){
 export function getTypeData(cardId, typeId){
   return (coll[cardId]&&coll[cardId][typeId]) || {owned:false,wishlist:false,doubles:false,favorite:false,qty:0};
 }
+
+/* Écritures groupées (1.33.0) : un geste utilisateur (+1, toggle…)
+   écrit 3-4 champs — chaque setTypeData déclenchait saveData
+   (stringify complet + chiffrement éventuel) ET updateStats
+   (évaluation des 50 badges) : jusqu'à 5 passes complètes par tap,
+   le vrai lag de l'ajout rapide. txBatch fusionne : UNE sauvegarde
+   à la fin, et updateStats reste à la charge de l'appelant (les
+   gestes interactifs l'appellent déjà). Hors batch, setTypeData
+   garde exactement son comportement historique. */
+let _txDepth = 0;
+export function txBatch(fn){
+  _txDepth++;
+  try { fn(); }
+  finally {
+    _txDepth--;
+    if(_txDepth === 0) saveData();
+  }
+}
 export function setTypeData(cardId, typeId, key, value){
   if(!coll[cardId]) coll[cardId]={};
   if(!coll[cardId][typeId]) coll[cardId][typeId]={owned:false,wishlist:false,doubles:false,favorite:false,qty:0};
   coll[cardId][typeId][key]=value;
-  saveData(); updateStats();
+  if(_txDepth === 0){ saveData(); updateStats(); }
 }
 
 // ── Suppression des données locales de collection (zone danger) ──
@@ -118,17 +136,21 @@ export function deleteLocalCollectionData(){
 export function quickAddVariant(cardId, typeId){
   const prev = { ...getTypeData(cardId, typeId) };
   const newQty = (prev.qty||0)+1;
-  setTypeData(cardId, typeId, 'qty', newQty);
-  setTypeData(cardId, typeId, 'owned', true);
-  setTypeData(cardId, typeId, 'doubles', newQty>1);
-  setTypeData(cardId, typeId, 'wishlist', false);
+  txBatch(() => {
+    setTypeData(cardId, typeId, 'qty', newQty);
+    setTypeData(cardId, typeId, 'owned', true);
+    setTypeData(cardId, typeId, 'doubles', newQty>1);
+    setTypeData(cardId, typeId, 'wishlist', false);
+  });
   return prev;
 }
 export function undoQuickAdd(cardId, typeId, prev){
-  setTypeData(cardId, typeId, 'qty', prev.qty||0);
-  setTypeData(cardId, typeId, 'owned', !!prev.owned);
-  setTypeData(cardId, typeId, 'doubles', !!prev.doubles);
-  setTypeData(cardId, typeId, 'wishlist', !!prev.wishlist);
+  txBatch(() => {
+    setTypeData(cardId, typeId, 'qty', prev.qty||0);
+    setTypeData(cardId, typeId, 'owned', !!prev.owned);
+    setTypeData(cardId, typeId, 'doubles', !!prev.doubles);
+    setTypeData(cardId, typeId, 'wishlist', !!prev.wishlist);
+  });
 }
 
 // Card-level

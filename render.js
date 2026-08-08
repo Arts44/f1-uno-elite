@@ -5,14 +5,14 @@ import { DEBUG, log } from './logger.js';
 import { t } from './i18n.js';
 import {
   CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityChipClass, rarityChipStyle,
-  CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_MONOGRAMS, TEAM_LIVERIES
+  CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_MONOGRAMS, TEAM_LIVERIES, sortTypesCanonical
 } from './data.js';
 import { icon, typeIcon, HELMET_SVG } from './icons.js';
 import {
   getTypeData, setTypeData,
   cardOwned, cardWishlist, cardDoubles, cardFavorite, cardTotalQty,
   cardSetComplete, cardRarity, variantRarity,
-  quickAddVariant, undoQuickAdd
+  quickAddVariant, undoQuickAdd, txBatch
 } from './storage.js';
 import { updateStats, renderStats } from './stats.js';
 import { renderBadges, resetHeroAnimation } from './badges.js';
@@ -26,19 +26,15 @@ import { renderAccount } from './account.js';
    externe, et un hors-ligne qui n'en était pas un. Le numéro de course
    (déjà la plus belle partie de la carte) devient le visuel principal,
    et les écuries sont représentées par leur monogramme + leur couleur. */
-/* Livrée d'écurie (phase B) : un geste géométrique propre à chaque
-   équipe, sur ses deux couleurs réelles. Couche de FOND du visuel —
-   pleine quand la tuile est neutre, atténuée en CSS quand un type ou
-   un foil possède la surface (le foil reste dominant et lisible).
-   Les gestes courbes (vague, houle) passent par un petit SVG enfant. */
-const LIVERY_CURVES = {
-  vague: '<svg class="lvx" viewBox="0 0 174 120" preserveAspectRatio="none" aria-hidden="true"><path d="M-6 126 C 30 118 66 96 96 66 C 118 44 136 20 146 -6 L 180 -6 C 172 34 148 72 118 98 C 94 118 60 130 -6 138 Z"/></svg>',
-  houle: '<svg class="lvx" viewBox="0 0 174 120" preserveAspectRatio="none" aria-hidden="true"><path d="M0 86 C 26 70 52 102 87 86 C 122 70 148 102 174 86 L 174 120 L 0 120 Z"/></svg>',
-};
+/* Livrée d'écurie (arbitrage P1, 1.33.0) : une COLONNE de 7 px sur le
+   bord gauche du visuel, c1 puis c2 — l'écurie signe la tuile sans
+   jamais concurrencer le fond, qui appartient à la RARETÉ. Le casque
+   saturé porte la couleur d'équipe. (Les gestes géométriques restent
+   décrits dans teamLiveries — seule la surface d'expression change.) */
 export function liveryHTML(team){
   const lv = TEAM_LIVERIES[team];
   if(!lv) return '';
-  return `<div class="lv lv-${lv.g}" style="--c1:${lv.c1};--c2:${lv.c2}" aria-hidden="true">${LIVERY_CURVES[lv.g]||''}</div>`;
+  return `<span class="lvb" style="--c1:${lv.c1};--c2:${lv.c2}" aria-hidden="true"></span>`;
 }
 
 export function driverNumberHTML(card){
@@ -204,15 +200,21 @@ export function renderGrid(cards){
 
   log('Starting to render cards...');
   let renderedCount = 0;
-  cards.forEach((card, index)=>{
-    log('Rendering card', index, ':', card.id, card.name);
+  cards.forEach((card)=>{
+    renderedCount++;
+    grid.appendChild(buildCardEl(card));
+  });
+  log('Finished rendering', renderedCount, 'cards');
+}
+
+/* Construit LA tuile d'une carte — extrait de renderGrid pour que
+   l'ajout rapide puisse remplacer une seule tuile au lieu de
+   reconstruire les 101 (le +1 coûtait ~300 ms en classe mobile). */
+function buildCardEl(card){
     const isOwned=cardOwned(card.id);
     const isWish=cardWishlist(card.id);
     const isFav=cardFavorite(card.id);
     const isSet=cardSetComplete(card.id);
-    const qty=cardTotalQty(card.id);
-    renderedCount++;
-    log('Card', index, 'isOwned:', isOwned, 'isWish:', isWish, 'isFav:', isFav, 'qty:', qty);
     const bestType=bestOwnedType(card);
     const displayType=bestType||defaultBaseType(card);
     const ct=CARD_TYPES[displayType];
@@ -234,6 +236,7 @@ export function renderGrid(cards){
       cardClass+=` ${CARD_TYPES[bestType].css}`;
     }
     el.className=cardClass;
+    el.dataset.card=card.id;
     el.onclick=e=>{
       if(!e.target.closest('.schip')&&!e.target.closest('.qbtn')&&!e.target.closest('.qadd-pop')) openModal(card.id);
     };
@@ -245,7 +248,7 @@ export function renderGrid(cards){
       const d=getTypeData(card.id,t);
       return d.owned && (!isSet || (d.qty||0)>1);
     });
-    const ownedSummary=ownedTypes.map(t=>{
+    const ownedSummary=sortTypesCanonical(ownedTypes).map(t=>{
       const ctt=CARD_TYPES[t];
       let cls='';
       if(t==='blue'||t==='blue_foil') cls='blue';
@@ -261,7 +264,7 @@ export function renderGrid(cards){
 
     el.innerHTML=`
       ${isEternal?'<span class="eternal-spark s1" aria-hidden="true">✦</span><span class="eternal-spark s2" aria-hidden="true">✦</span><span class="eternal-spark s3" aria-hidden="true">✦</span>':''}
-      <div class="card-visual ${bestType?ct.css:''}${!isOwned?' not-owned':''}">
+      <div class="card-visual ${bestType?ct.css:''}${!isOwned?' not-owned':''}" style="--rarc:${rarity.color}">
         ${card.champion?`<span class="crown" aria-hidden="true">${icon('crown')}</span>`:''}
         ${card.category==='reserve'?`<span class="replacement-icon" aria-hidden="true">${icon('refresh')}</span>`:''}
         ${isSet?`<span class="set-flag" role="img" aria-label="${t('set.complete')}" title="${t('set.complete')}">${icon('seal')}</span>`:''}
@@ -284,25 +287,18 @@ export function renderGrid(cards){
       </div>
     `;
 
-    grid.appendChild(el);
-  });
-  log('Finished rendering', renderedCount, 'cards');
-  if(DEBUG && renderedCount > 0) {
-    const firstCard = grid.querySelector('.card');
-    if(firstCard) {
-      log('First card computed styles:', window.getComputedStyle(firstCard));
-      log('First card display:', window.getComputedStyle(firstCard).display);
-      log('First card visibility:', window.getComputedStyle(firstCard).visibility);
-      log('First card opacity:', window.getComputedStyle(firstCard).opacity);
-      log('First card height:', firstCard.offsetHeight);
-      log('First card z-index:', window.getComputedStyle(firstCard).zIndex);
-      log('First card position:', window.getComputedStyle(firstCard).position);
-      log('First card top:', window.getComputedStyle(firstCard).top);
-      log('First card left:', window.getComputedStyle(firstCard).left);
-      log('Grid overflow:', window.getComputedStyle(grid).overflow);
-      log('Grid position:', window.getComputedStyle(grid).position);
-    }
-  }
+    return el;
+}
+
+/* Mise à jour CIBLÉE d'une tuile après une écriture (ajout rapide,
+   toggle, quantité en fiche) : remplace le seul nœud concerné.
+   Repli honnête : tuile absente du DOM → re-rendu complet. */
+export function updateCardTile(cardId){
+  const grid=document.getElementById('cardGrid');
+  const card=CARDS_DB.find(c=>c.id===cardId);
+  const old=grid && grid.querySelector(`.card[data-card="${cardId}"]`);
+  if(!grid || !card || !old){ renderCollection(); return; }
+  old.replaceWith(buildCardEl(card));
 }
 
 /* Quick toggle: applies to the FIRST type of the card (or opens modal for more control) */
@@ -313,10 +309,12 @@ export function quickToggle(cardId, status, e){
   const d=getTypeData(cardId, firstType);
   const newVal=!d[status];
   if(status==='wishlist'&&newVal&&cardOwned(cardId)){showToast('Déjà possédée !');return;}
-  setTypeData(cardId, firstType, status, newVal);
-  if(status==='owned'&&newVal){ setTypeData(cardId,firstType,'qty',Math.max(1,d.qty||0)); setTypeData(cardId,firstType,'wishlist',false); }
-  if(status==='owned'&&!newVal){ setTypeData(cardId,firstType,'qty',0); setTypeData(cardId,firstType,'doubles',false); }
-  renderCollection();
+  txBatch(()=>{
+    setTypeData(cardId, firstType, status, newVal);
+    if(status==='owned'&&newVal){ setTypeData(cardId,firstType,'qty',Math.max(1,d.qty||0)); setTypeData(cardId,firstType,'wishlist',false); }
+    if(status==='owned'&&!newVal){ setTypeData(cardId,firstType,'qty',0); setTypeData(cardId,firstType,'doubles',false); }
+  });
+  updateStats(); updateCardTile(cardId);
   showToast(newVal?'✓ Mis à jour':'Retiré');
 }
 
@@ -326,12 +324,14 @@ export function quickQty(cardId, delta, e){
   const firstType=card.types[0];
   const d=getTypeData(cardId, firstType);
   const newQty=Math.max(0,(d.qty||0)+delta);
-  setTypeData(cardId, firstType, 'qty', newQty);
-  if(newQty>0) setTypeData(cardId, firstType, 'owned', true);
-  if(newQty>1) setTypeData(cardId, firstType, 'doubles', true);
-  if(newQty<=1) setTypeData(cardId, firstType, 'doubles', false);
-  if(newQty===0){ setTypeData(cardId, firstType, 'owned', false); setTypeData(cardId, firstType, 'doubles', false); }
-  updateStats(); renderCollection();
+  txBatch(()=>{
+    setTypeData(cardId, firstType, 'qty', newQty);
+    if(newQty>0) setTypeData(cardId, firstType, 'owned', true);
+    if(newQty>1) setTypeData(cardId, firstType, 'doubles', true);
+    if(newQty<=1) setTypeData(cardId, firstType, 'doubles', false);
+    if(newQty===0){ setTypeData(cardId, firstType, 'owned', false); setTypeData(cardId, firstType, 'doubles', false); }
+  });
+  updateStats(); updateCardTile(cardId);
 }
 
 /* ══════════════════════════════════════════════════════════ MODAL */
@@ -373,7 +373,8 @@ export function renderModalTypes(card){
 
   const COLS = ['blue','green','red','yellow'];
   const BASE_FOIL_MAP = {blue:'blue_foil',green:'green_foil',red:'red_foil',yellow:'yellow_foil'};
-  const SPECIALS = ['blue_red_foil','green_yellow_foil','nitro_foil','wild_foil','promo_blue','promo_green','promo_red','promo_yellow'];
+  // Ordre canonique (TYPE_CANONICAL) : duals, wild, nitro, promos.
+  const SPECIALS = ['blue_red_foil','green_yellow_foil','wild_foil','nitro_foil','promo_blue','promo_green','promo_red','promo_yellow'];
 
   function makeCell(typeId){
     const ct=CARD_TYPES[typeId];
@@ -433,15 +434,10 @@ export function renderModalTypes(card){
     label.className='mo-grid-row-label';
     label.textContent='Spécial';
     grid.appendChild(label);
-    const others=cardSpecials.filter(s=>s!=='promo');
-    others.forEach(s=>grid.appendChild(makeCell(s)));
-    // Fill remaining slots to complete the row
-    const remaining = (4 - others.length % 4) % 4;
+    cardSpecials.forEach(s=>grid.appendChild(makeCell(s)));
+    // Compléter la dernière rangée (jamais de case orpheline flottante)
+    const remaining = (4 - cardSpecials.length % 4) % 4;
     for(let i=0;i<remaining;i++) grid.appendChild(makeEmpty());
-    // Promo on its own full-width row below
-    if(cardSpecials.includes('promo')){
-      grid.appendChild(makeCell('promo'));
-    }
   }
 }
 
@@ -515,8 +511,10 @@ function updateModalVisual(card){
   if(!vis) return;
   const best=bestOwnedType(card);
   const isSet=cardSetComplete(card.id);
-  const isEternal=cardRarity(card)==='eternal';
+  const rKey=cardRarity(card);
+  const isEternal=rKey==='eternal';
   vis.className = (best ? `modal-visual ${CARD_TYPES[best].css}` : 'modal-visual not-owned') + (isSet?' set-complete':'') + (isEternal?' rar-eternal-fx':'');
+  vis.style.setProperty('--rarc', (RARITIES[rKey]||{}).color || '#8E8E93'); // fond = rareté (P1)
   // Étoiles ✦ éternel — mêmes marqueurs que sur la tuile
   vis.querySelectorAll('.eternal-spark').forEach(s=>s.remove());
   if(isEternal){
@@ -547,26 +545,30 @@ export function toggleMoType(cardId, typeId, status){
   const d=getTypeData(cardId,typeId);
   const newVal=!d[status];
   if(status==='wishlist'&&newVal&&cardOwned(cardId)){showToast('Déjà possédée !');return;}
-  setTypeData(cardId,typeId,status,newVal);
-  if(status==='owned'&&newVal){ setTypeData(cardId,typeId,'qty',Math.max(1,d.qty||0)); setTypeData(cardId,typeId,'wishlist',false); }
-  if(status==='owned'&&!newVal){ setTypeData(cardId,typeId,'qty',0); setTypeData(cardId,typeId,'doubles',false); }
+  txBatch(()=>{
+    setTypeData(cardId,typeId,status,newVal);
+    if(status==='owned'&&newVal){ setTypeData(cardId,typeId,'qty',Math.max(1,d.qty||0)); setTypeData(cardId,typeId,'wishlist',false); }
+    if(status==='owned'&&!newVal){ setTypeData(cardId,typeId,'qty',0); setTypeData(cardId,typeId,'doubles',false); }
+  });
   // update modal visual
   const card=CARDS_DB.find(c=>c.id===cardId);
   renderModalTypes(card);
   updateModalVisual(card);
   _renderModalTags(card);
-  renderCollection();
+  updateStats(); updateCardTile(cardId);
   showToast(newVal?'✓ Mis à jour':'Retiré');
 }
 
 export function changeMoQty(cardId, typeId, delta){
   const d=getTypeData(cardId,typeId);
   const newQty=Math.max(0,(d.qty||0)+delta);
-  setTypeData(cardId,typeId,'qty',newQty);
-  if(newQty>0) setTypeData(cardId,typeId,'owned',true);
-  if(newQty>1) setTypeData(cardId,typeId,'doubles',true);
-  if(newQty<=1) setTypeData(cardId,typeId,'doubles',false);
-  if(newQty===0){ setTypeData(cardId,typeId,'owned',false); setTypeData(cardId,typeId,'doubles',false); }
+  txBatch(()=>{
+    setTypeData(cardId,typeId,'qty',newQty);
+    if(newQty>0) setTypeData(cardId,typeId,'owned',true);
+    if(newQty>1) setTypeData(cardId,typeId,'doubles',true);
+    if(newQty<=1) setTypeData(cardId,typeId,'doubles',false);
+    if(newQty===0){ setTypeData(cardId,typeId,'owned',false); setTypeData(cardId,typeId,'doubles',false); }
+  });
   const el=document.getElementById(`mqv-${cardId}-${typeId}`);
   if(el) el.textContent=newQty;
   // refresh total in moInfo
@@ -575,7 +577,7 @@ export function changeMoQty(cardId, typeId, delta){
   renderModalTypes(card);
   updateModalVisual(card);
   _renderModalTags(card);
-  updateStats(); renderCollection();
+  updateStats(); updateCardTile(cardId);
 }
 
 export function closeMoOverlay(e){ if(e.target===document.getElementById('mo')) closeMo(); }
@@ -863,7 +865,7 @@ export function toggleQuickAdd(cardId, btnEl){
   pop.dataset.card=cardId;
   pop.setAttribute('role','menu');
   pop.setAttribute('aria-label',t('quick.pick'));
-  pop.innerHTML=card.types.map(ty=>{
+  pop.innerHTML=sortTypesCanonical(card.types).map(ty=>{
     const ct=CARD_TYPES[ty];
     const d=getTypeData(cardId,ty);
     return `<button type="button" class="qadd-type" role="menuitem" data-action="quickAddType" data-card="${cardId}" data-type="${ty}" title="${ct.label}" aria-label="${ct.label}" style="color:${ct.color}">${typeIcon(ty)}${(d.qty||0)>0?`<span class="qadd-qty">${d.qty}</span>`:''}</button>`;
@@ -882,9 +884,9 @@ export function quickAddType(cardId, typeId){
   const prev=quickAddVariant(cardId, typeId);
   showToast(t('quick.added'), {
     actionLabel:t('quick.undo'),
-    onAction:()=>{ undoQuickAdd(cardId, typeId, prev); updateStats(); renderCollection(); }
+    onAction:()=>{ undoQuickAdd(cardId, typeId, prev); updateStats(); updateCardTile(cardId); }
   });
-  updateStats(); renderCollection(); // re-render : le popover disparaît avec la grille
+  updateStats(); updateCardTile(cardId); // la tuile remplacée emporte son popover
 }
 
 /* TOAST — msg simple, ou avec bouton d'action ({actionLabel, onAction}) */

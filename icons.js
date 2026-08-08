@@ -87,13 +87,17 @@ const SEAL = '<path fill="currentColor" stroke="none" d="M12 2.5 14.1 4l2.5-.3.9
 /* Casque C1 « Visière XL » (base Classique validée) : silhouette
    générique inventée — dôme rond, grande visière inclinée, lèvre de
    mentonnière. Identique pour les 61 pilotes, seules les couleurs
-   d'écurie changent (via CSS .helm .shell/.visor/.det/.lip). */
-export const HELMET_SVG = `<svg class="helm" viewBox="0 0 120 120" aria-hidden="true">
-  <g class="shell"><path d="M20 76c-3-11-2-24 4-34C32 28 47 20 64 20c17 0 31 8 37 21 4 9 4 19 1 28l-3 9c-2 6-7 9-14 10l-46 3c-8 1-14-3-17-10Z"/></g>
-  <path class="visor" d="M35 51c2-8 9-13 18-13l37 1c7 0 11 5 10 12l-3 14c-2 7-7 11-15 11l-35 1c-9 0-13-5-12-13Z"/>
-  <path class="det" d="M58 20c8-.5 16 .5 23 4l-3 6c-6-3-12-4-19-3Z"/>
-  <path class="lip" d="M28 84l52-3-1 7-49 3Z"/>
-</svg>`;
+   d'écurie changent. 1.33.0 : UN SEUL tracé partagé via <symbol>
+   (HELMET_DEFS, injecté une fois dans le HTML) + 61 <use> — les
+   sélecteurs CSS ne traversant pas le shadow DOM de <use>, la
+   colorisation passe par des variables --helm-* héritées. */
+export const HELMET_DEFS = `<svg style="display:none" aria-hidden="true"><symbol id="icHelmC1" viewBox="0 0 120 120">
+  <path fill="var(--helm-shell,#888)" d="M20 76c-3-11-2-24 4-34C32 28 47 20 64 20c17 0 31 8 37 21 4 9 4 19 1 28l-3 9c-2 6-7 9-14 10l-46 3c-8 1-14-3-17-10Z"/>
+  <path fill="var(--helm-visor,#333)" d="M35 51c2-8 9-13 18-13l37 1c7 0 11 5 10 12l-3 14c-2 7-7 11-15 11l-35 1c-9 0-13-5-12-13Z"/>
+  <path fill="var(--helm-det,#eee)" opacity=".85" d="M58 20c8-.5 16 .5 23 4l-3 6c-6-3-12-4-19-3Z"/>
+  <path fill="var(--helm-lip,#222)" d="M28 84l52-3-1 7-49 3Z"/>
+</symbol></svg>`;
+export const HELMET_SVG = '<svg class="helm" viewBox="0 0 120 120" aria-hidden="true"><use href="#icHelmC1"/></svg>';
 
 /* ── Sortie ── */
 function svg(inner, cls){

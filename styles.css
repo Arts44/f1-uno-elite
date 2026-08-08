@@ -535,17 +535,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    backdrop blur stays exclusive to wild/nitro — a grid full of blurred
    foils would be costly on mobile, plain translucency reads just as
    well. Non-foil types keep the neutral body. */
-.card.tv-blue_foil .card-visual,
-.card.tv-green_foil .card-visual,
-.card.tv-red_foil .card-visual,
-.card.tv-yellow_foil .card-visual,
-.card.tv-blue_red_foil .card-visual,
-.card.tv-green_yellow_foil .card-visual,
-.card.tv-nitro_foil .card-visual,
-.card.tv-promo-blue .card-visual,
-.card.tv-promo-green .card-visual,
-.card.tv-promo-red .card-visual,
-.card.tv-promo-yellow .card-visual{background:transparent !important;}
+.card.tv-nitro_foil .card-visual{background:transparent !important;}
 .card.tv-blue_foil .card-body,
 .card.tv-green_foil .card-body,
 .card.tv-red_foil .card-body,
@@ -1825,55 +1815,38 @@ button:not(:disabled):not(.bn-tab):active,
 .lang-globe{color:var(--red);}
 .lang-globe .ic{width:34px;height:34px;}
 
-/* ── LIVRÉES D'ÉCURIE — 10 gestes géométriques inventés, un par
-   équipe (data/metadata.json → teamLiveries). Couche de fond du
-   visuel : pleine sur tuile neutre, atténuée quand un type/foil
-   possède la surface, fantôme grisé si la carte n'est pas possédée. ── */
-.lv{position:absolute;inset:0;z-index:0;background:linear-gradient(150deg,var(--c1),color-mix(in srgb,var(--c1) 52%,#08080a));}
-.lv::before{content:'';position:absolute;inset:0;z-index:3;background:radial-gradient(120% 90% at 50% 24%,rgba(0,0,0,0) 0%,rgba(0,0,0,.45) 100%);}
-.lv::after{content:'';position:absolute;inset:0;background:var(--c2);opacity:.92;}
-.lvx{position:absolute;inset:0;width:100%;height:100%;}
-.lvx path{fill:var(--c2);opacity:.92;}
-/* RBR — la lame : une seule diagonale franche, montante */
-.lv-lame::after{clip-path:polygon(56% 0,79% 0,38% 100%,15% 100%);}
-/* SF — le coin : angle sombre du coin haut droit + filet de base */
-.lv-coin{background:linear-gradient(0deg,var(--c2) 0 7px,transparent 7px),linear-gradient(150deg,var(--c1),color-mix(in srgb,var(--c1) 62%,#1a0206));}
-.lv-coin::after{clip-path:polygon(100% 0,100% 58%,52% 0);}
-/* MCL — la vague : swoosh courbe montant (SVG enfant .lvx) */
-.lv-vague::after{display:none;}
-/* MER — les traits : 3 hachures fines parallèles */
-.lv-traits::after{background:none;opacity:.95;background-image:
-  linear-gradient(115deg,transparent 0 30%,var(--c2) 30% 33.5%,transparent 33.5%),
-  linear-gradient(115deg,transparent 0 44%,var(--c2) 44% 47.5%,transparent 47.5%),
-  linear-gradient(115deg,transparent 0 58%,var(--c2) 58% 61.5%,transparent 61.5%);}
-/* AMR — la lisière : filet fin qui traverse avec un décroché */
-.lv-lisiere::after{clip-path:polygon(0 66%,52% 66%,68% 42%,100% 42%,100% 49%,71% 49%,56% 73%,0 73%);}
-/* ALP — la coupe franche */
-.lv-coupe{background:linear-gradient(118deg,var(--c1) 0 46%,var(--c2) 46% 100%);}
-.lv-coupe::after{display:none;}
-/* HAA — le V : chevron descendant unique, massif */
-.lv-vee::after{clip-path:polygon(0 0,17% 0,50% 60%,83% 0,100% 0,100% 13%,50% 88%,0 13%);}
-/* RB — la marche : escalier orthogonal descendant */
-.lv-marche::after{clip-path:polygon(0 44%,26% 44%,26% 60%,51% 60%,51% 74%,76% 74%,76% 88%,100% 88%,100% 100%,0 100%);}
-/* WIL — la houle : vague douce basse (SVG enfant .lvx) */
-.lv-houle::after{display:none;}
-/* SAU — l'éclair : coupe verticale à arête zigzag, double décroché */
-.lv-eclair::after{clip-path:polygon(70% 0,100% 0,100% 100%,38% 100%,58% 64%,42% 56%,62% 30%,48% 24%,70% 0);}
-/* Un type/foil possède la surface : la livrée passe en fond discret,
-   le foil reste dominant et lisible (cumuls, duals, nitro, wild). */
-.card-visual[class*="tv-"] .lv,
-.modal-visual[class*="tv-"] .lv{opacity:.28;}
-/* Carte non possédée : livrée fantôme */
-.card-visual.not-owned .lv,
-.modal-visual.not-owned .lv{filter:grayscale(.9);opacity:.4;}
+/* ── LIVRÉE (arbitrage P1, 1.33.0) : colonne de 7 px, c1/c2 — l'écurie
+   signe le bord gauche, le FOND du visuel appartient à la rareté. ── */
+.lvb{position:absolute;left:0;top:0;bottom:0;width:7px;z-index:1;
+  background:linear-gradient(180deg,var(--c1) 0 58%,var(--c2) 58% 100%);}
+.card-visual.not-owned .lvb,
+.modal-visual.not-owned .lvb{filter:grayscale(.9);opacity:.5;}
+
+/* FOND DU VISUEL = RARETÉ (halo sobre en coin, identique pour les 10
+   écuries — --rarc est posé inline par buildCardEl/updateModalVisual).
+   Règle unique : jamais l'écurie, jamais la variante. wild/nitro
+   restent les deux exceptions spectaculaires assumées. */
+.card-visual,.modal-visual{background:
+  radial-gradient(120% 130% at 85% -20%, color-mix(in srgb,var(--rarc,#8E8E93) 26%,transparent) 0%, transparent 55%),
+  linear-gradient(150deg,#191a1f,#101014);}
+/* Non possédée : même surface neutre sombre, SANS halo de rareté —
+   la carte fantôme ne réclame rien (casque grisé, numéro éteint).
+   Remplace l'ancien aplat clair var(--not-owned), pensé pour l'époque
+   des petits visuels émoji. */
+.card-visual.not-owned,.modal-visual.not-owned{background:linear-gradient(150deg,#17181c,#101014);}
+.card-visual.not-owned .dn-num,.modal-visual.not-owned .dn-num{opacity:.45;text-shadow:none;}
+.card-visual.not-owned .team-emblem,.modal-visual.not-owned .team-emblem{opacity:.45;}
 
 /* ── CASQUE C1 « Visière XL » — silhouette générique, couleurs d'écurie ── */
-.helm{position:absolute;left:6px;bottom:2px;width:92px;height:92px;z-index:1;
-  filter:drop-shadow(0 5px 14px rgba(0,0,0,.5));}
-.helm .shell{fill:color-mix(in srgb,var(--tc,#fff) 55%,#0c0c0e);}
-.helm .visor{fill:color-mix(in srgb,var(--tc,#fff) 88%,#fff);}
-.helm .det{fill:color-mix(in srgb,var(--tc,#fff) 88%,#fff);opacity:.72;}
-.helm .lip{fill:color-mix(in srgb,var(--tc,#fff) 30%,#000);opacity:.9;}
+.helm{position:absolute;left:6px;bottom:2px;width:92px;height:92px;z-index:2;
+  filter:drop-shadow(0 4px 10px rgba(0,0,0,.45));
+  /* colorisation du <use> partagé : SATURÉE — la couleur d'écurie pure
+     porte l'identité (le turquoise est turquoise, le rosso est rouge) */
+  --helm-shell:var(--tc,#888);
+  --helm-visor:color-mix(in srgb,#0b0d12 78%,var(--tc,#888));
+  --helm-det:color-mix(in srgb,#fff 82%,var(--tc,#888));
+  --helm-lip:color-mix(in srgb,var(--tc,#888) 45%,#000);}
+.card-visual.not-owned .helm{filter:grayscale(1) opacity(.55);}
 .modal-visual .helm{left:18px;bottom:4px;width:140px;height:140px;}
 /* Tuiles étroites (2 colonnes à 320 px) : casque réduit, le numéro respire */
 @media (max-width:420px){
@@ -1957,3 +1930,15 @@ button:not(:disabled):not(.bn-tab):active,
 @media (prefers-reduced-motion:reduce){
   .view-in-r,.view-in-l{animation:none;}
 }
+
+/* Mode réduction des animations = mode performance de fait : TOUTES les
+   animations de foil s'arrêtent (la sheen l'était déjà ; wild-glow —
+   liseré wild/nitro — fuyait encore). */
+@media (prefers-reduced-motion:reduce){
+  .card.tv-wild_foil,.card.tv-nitro_foil,
+  .modal-visual.tv-wild_foil,.modal-visual.tv-nitro_foil{animation:none !important;}
+}
+
+/* Fiche à 320 px : libellés de types sur 2 lignes plutôt que tronqués */
+.mo-cell-label{white-space:normal;line-height:1.15;display:-webkit-box;
+  -webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
