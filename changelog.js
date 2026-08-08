@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.38.1',
+    date: '2026-08-08',
+    changes: {
+      en: ['Fixed: some titles from the new badges showed their internal key (like "title.foil_15") instead of their name in the header and the title picker.'],
+      fr: ['Corrigé : certains titres issus des nouveaux badges affichaient leur clé interne (du genre « title.foil_15 ») au lieu de leur nom dans le header et le sélecteur de titre.'],
+      es: ['Corregido: algunos títulos de las nuevas insignias mostraban su clave interna (tipo «title.foil_15») en lugar de su nombre en la cabecera y el selector de título.'],
+      zh: ['修复:部分来自新徽章的称号在页首和称号选择器中显示内部键名(如「title.foil_15」)而非名称。'],
+      it: ['Corretto: alcuni titoli dei nuovi badge mostravano la loro chiave interna (tipo «title.foil_15») invece del nome nell\'intestazione e nel selettore di titolo.'],
+      nl: ['Opgelost: sommige titels van de nieuwe badges toonden hun interne sleutel (zoals "title.foil_15") in plaats van hun naam in de header en de titelkiezer.'],
+      de: ['Behoben: einige Titel der neuen Abzeichen zeigten ihren internen Schlüssel (etwa „title.foil_15") statt ihres Namens in der Kopfzeile und der Titelauswahl.'],
+    },
+  },
+  {
     version: '1.38.0',
     date: '2026-08-08',
     changes: {

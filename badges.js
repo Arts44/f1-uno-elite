@@ -781,7 +781,11 @@ export function getUnlockedTitles(){
   // Per-badge titles
   // v3 : CHAQUE badge débloqué offre un titre — l'entrée explicite de
   // BADGE_TITLES garde la priorité, sinon le nom traduit du badge.
-  const titleOf = b => (BADGE_TITLES[b.id] ? (t('title.'+b.id)||BADGE_TITLES[b.id]) : ((window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {}).name || b.name));
+  // t() renvoie la CLÉ quand la traduction manque — on la traite comme
+  // absente (sinon les nouveaux badges affichent « title.foil_15 »).
+  const trOrEmpty = k => { const v = t(k); return v === k ? '' : v; };
+  const titleOf = b => trOrEmpty('title.'+b.id) || BADGE_TITLES[b.id]
+    || (window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {}).name || b.name;
   AUTO_BADGES.forEach(b => {
     if(isAutoBadgeUnlocked(b))
       titles.push({id:b.id, name:titleOf(b), emoji:b.emoji, source:'badge'});
@@ -822,7 +826,7 @@ export function updateUserTitle(){
 
   // Regenerate name with current translation for active title
   if(active.source === 'badge' && active.id !== 'rookie'){
-    active.name = t('title.'+active.id) || active.name;
+    { const v = t('title.'+active.id); if(v !== 'title.'+active.id) active.name = v; }
   } else if(active.source === 'milestone'){
     if(active.id === 'milestone_25_badges') active.name = t('milestone.25_badges') || active.name;
     else if(active.id === 'milestone_50_badges') active.name = t('milestone.50_badges') || active.name;
