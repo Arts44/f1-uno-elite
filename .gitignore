@@ -19,3 +19,9 @@ package-lock.json.log
 # GitHub Pages serves static files only (no npm build step), so the
 # repo must contain the built bundle. Rebuild with `npm run build`
 # before every commit that touches a JS source file.
+
+# Maquettes de travail (directions visuelles explorées puis tranchées).
+# Jetables : non liées à l'app, non servies, non testées — elles n'ont
+# pas à polluer un scan du dépôt. Les directions retenues vivent dans
+# le code ; les captures des validations sont dans screenshots/.
+_*.html
