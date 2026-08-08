@@ -779,13 +779,16 @@ export function getUnlockedTitles(){
   loadManualBadges();
   const titles = [];
   // Per-badge titles
+  // v3 : CHAQUE badge débloqué offre un titre — l'entrée explicite de
+  // BADGE_TITLES garde la priorité, sinon le nom traduit du badge.
+  const titleOf = b => (BADGE_TITLES[b.id] ? (t('title.'+b.id)||BADGE_TITLES[b.id]) : ((window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {}).name || b.name));
   AUTO_BADGES.forEach(b => {
-    if(isAutoBadgeUnlocked(b) && BADGE_TITLES[b.id])
-      titles.push({id:b.id, name:t('title.'+b.id)||BADGE_TITLES[b.id], emoji:b.emoji, source:'badge'});
+    if(isAutoBadgeUnlocked(b))
+      titles.push({id:b.id, name:titleOf(b), emoji:b.emoji, source:'badge'});
   });
   MANUAL_BADGES.forEach(b => {
-    if(!!manualBadges[b.id] && BADGE_TITLES[b.id])
-      titles.push({id:b.id, name:t('title.'+b.id)||BADGE_TITLES[b.id], emoji:b.emoji, source:'badge'});
+    if(manualBadges[b.id])
+      titles.push({id:b.id, name:titleOf(b), emoji:b.emoji, source:'badge'});
   });
   // Milestone titles
   const autoCount = AUTO_BADGES.filter(b=>isAutoBadgeUnlocked(b)).length;
@@ -852,14 +855,31 @@ export function toggleTitlePicker(){
   }
   const unlocked = getUnlockedTitles();
   loadSelectedTitle();
+  const unlockedIds = new Set(unlocked.map(x => x.id));
+  // Jalons (25/50 badges…) d'abord — hors échelle de difficulté
   let html = '<div class="title-picker-grid">';
-  unlocked.forEach(t => {
+  unlocked.filter(x => x.source === 'milestone').forEach(t => {
     const isActive = selectedTitle && selectedTitle.id === t.id;
     const color = t.color || '#E8002D';
-    const icon = t.emoji || t.icon || '🟡';
     html += `<div class="title-pick${isActive?' active':''}" data-action="selectTitle" data-title-id="${t.id}" style="border-color:${isActive?color:'var(--border)'}">
-      <span>${icon}</span><span style="color:color-mix(in srgb, ${color} var(--ink-mix,100%), #000)">${t.name}</span>
+      <span>${t.emoji || t.icon || '🏆'}</span><span style="color:color-mix(in srgb, ${color} var(--ink-mix,100%), #000)">${t.name}</span>
     </div>`;
+  });
+  // Puis TOUS les badges, du plus difficile au plus facile (nom en départage)
+  const nameOf = b => (window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {}).name || b.name;
+  const all = [...AUTO_BADGES, ...MANUAL_BADGES]
+    .map(b => ({ b, d: badgeDifficulty(b), nm: nameOf(b), un: unlockedIds.has(b.id) }))
+    .sort((a, z) => z.d - a.d || a.nm.localeCompare(z.nm));
+  all.forEach(({ b, d, nm, un }) => {
+    const isActive = un && selectedTitle && selectedTitle.id === b.id;
+    const diff = `<span class="tp-diff dl-${difficultyLabelKey(d).slice(7)}">${d}%</span>`;
+    if(un){
+      html += `<div class="title-pick${isActive?' active':''}" data-action="selectTitle" data-title-id="${b.id}">
+        <span>${b.emoji}</span><span>${nm}</span>${diff}</div>`;
+    } else {
+      html += `<div class="title-pick tp-locked" aria-disabled="true">
+        <span>${b.emoji}</span><span>${nm}</span>${diff}</div>`;
+    }
   });
   html += '</div>';
   picker.innerHTML = html;

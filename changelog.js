@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.38.0',
+    date: '2026-08-08',
+    changes: {
+      en: [
+        'The title picker now shows ALL 120 badges, sorted from hardest to easiest with their difficulty on every row — unlocked ones are selectable, locked ones appear greyed out so you can see what you are aiming for. And every unlocked badge now grants its title, not just a chosen few.',
+      ],
+      fr: [
+        'Le sélecteur de titre affiche désormais LES 120 badges, triés du plus difficile au plus facile avec leur difficulté sur chaque ligne — les débloqués sont sélectionnables, les verrouillés apparaissent grisés pour voir ce qui t\'attend. Et chaque badge débloqué offre désormais son titre, plus seulement quelques élus.',
+      ],
+      es: [
+        'El selector de título muestra ahora LAS 120 insignias, ordenadas de la más difícil a la más fácil con su dificultad en cada línea — las desbloqueadas son seleccionables, las bloqueadas aparecen en gris para ver lo que te espera. Y cada insignia desbloqueada otorga ahora su título, no solo unas pocas elegidas.',
+      ],
+      zh: [
+        '称号选择器现在显示全部 120 枚徽章,按从最难到最易排序,每行都标注难度——已解锁的可以选择,未解锁的以灰色显示,让你看清前方目标。而且每枚已解锁的徽章现在都授予称号,不再只有少数几枚。',
+      ],
+      it: [
+        'Il selettore di titolo mostra ora TUTTI i 120 badge, ordinati dal più difficile al più facile con la difficoltà su ogni riga — gli sbloccati sono selezionabili, i bloccati appaiono in grigio per vedere cosa ti aspetta. E ogni badge sbloccato conferisce ora il suo titolo, non solo pochi eletti.',
+      ],
+      nl: [
+        'De titelkiezer toont nu ALLE 120 badges, gesorteerd van moeilijkst naar makkelijkst met hun moeilijkheid op elke regel — ontgrendelde zijn selecteerbaar, vergrendelde staan grijs zodat je ziet wat je te wachten staat. En elke ontgrendelde badge geeft nu zijn titel, niet slechts een paar uitverkorenen.',
+      ],
+      de: [
+        'Die Titelauswahl zeigt jetzt ALLE 120 Abzeichen, sortiert vom schwersten zum leichtesten mit ihrer Schwierigkeit in jeder Zeile — freigeschaltete sind wählbar, gesperrte erscheinen ausgegraut, damit man sieht, was einen erwartet. Und jedes freigeschaltete Abzeichen verleiht jetzt seinen Titel, nicht mehr nur wenige Auserwählte.',
+      ],
+    },
+  },
+  {
     version: '1.37.0',
     date: '2026-08-08',
     changes: {
