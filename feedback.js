@@ -14,7 +14,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
-import { t, getLang, escapeHtml } from './i18n.js';
+import { t, getLang, escapeHtml, setSafeHTML } from './i18n.js';
 import { APP_VERSION } from './changelog.js';
 import {
   cloudConfig, isCloudConfigured, authHeaders, getValidSession,
@@ -201,7 +201,7 @@ export function bindFeedbackSection(){
     const area = document.getElementById('fbMineArea');
     if(area.style.display !== 'none'){ area.style.display = 'none'; return; }
     area.style.display = 'flex';
-    area.innerHTML = `<span class="setv-row-sub">${t('fb.sending')}</span>`;
+    setSafeHTML(area, `<span class="setv-row-sub">${t('fb.sending')}</span>`);
     try {
       const rows = await fetchMyFeedback();
       area.innerHTML = rows.length
@@ -209,7 +209,7 @@ export function bindFeedbackSection(){
             <strong>${t('fb.type_' + (FEEDBACK_TYPES.includes(r.type) ? r.type : 'other'))}</strong> · ${new Date(r.created_at).toLocaleDateString()}<br>${escapeHtml(r.message)}</div>`).join('')
         : `<span class="setv-row-sub">${t('fb.mine_empty')}</span>`;
     } catch(e){
-      area.innerHTML = `<span class="setv-row-sub">${t('fb.err_failed')}</span>`;
+      setSafeHTML(area, `<span class="setv-row-sub">${t('fb.err_failed')}</span>`);
     }
   });
 }

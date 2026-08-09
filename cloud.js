@@ -14,7 +14,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
-import { t, escapeHtml } from './i18n.js';
+import { t, escapeHtml, setSafeHTML } from './i18n.js';
 import { collectionSnapshot, _showImportDialog } from './storage.js';
 import { backupIncludes } from './settings-sync.js';
 import { icon } from './icons.js';
@@ -501,7 +501,7 @@ function _cloudAreaHTML(){
 
 function _refreshCloudArea(){
   const area = document.getElementById('cloudArea');
-  if(area){ area.innerHTML = _cloudAreaHTML(); bindCloudSection(); }
+  if(area){ setSafeHTML(area, _cloudAreaHTML()); bindCloudSection(); }
 }
 
 // Reflect the send cool-down on the button (label countdown, disabled),

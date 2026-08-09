@@ -5,7 +5,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
-import { t, tEsc } from './i18n.js';
+import { t, tEsc, setSafeHTML } from './i18n.js';
 import {
   _currentSeason, setCurrentSeason,
   CARDS_DB, CARD_TYPES, RARITY_ORDER, RARITY_KEYS, ROLE_BASE_RARITY
@@ -290,7 +290,7 @@ export function _showImportDialog(data){
         <label class="import-set-row"><input type="checkbox" id="impSetSec"> <span>${t('imp.set_sec')}</span></label>
         <div class="import-sec-warn" id="impSecWarn" style="display:none;">${t('imp.sec_warn')}</div>` : ''}
       </div>` : '';
-  overlay.innerHTML=`
+  setSafeHTML(overlay, `
     <div class="import-dialog">
       <div class="import-dialog-title">${t('imp.title')}</div>
       <div class="import-dialog-sub">${tEsc('imp.sub',{season:data.season||'?',date:data.exportDate?new Date(data.exportDate).toLocaleDateString():'?'})}<br>${t('imp.q')}</div>
@@ -300,7 +300,7 @@ export function _showImportDialog(data){
         <button class="import-dialog-btn primary" id="importReplaceBtn">${t('imp.replace')}</button>
       </div>
       <button class="import-dialog-btn" id="importCancelBtn" style="margin-top:4px">${t('imp.cancel')}</button>
-    </div>`;
+    </div>`);
   document.body.appendChild(overlay);
   const secBox = overlay.querySelector('#impSetSec');
   if(secBox){

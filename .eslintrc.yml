@@ -1,0 +1,118 @@
+# ══════════════════════════════════════════════════════════════════
+# ESLint — configuration lue par Codacy
+#
+# Le dépôt lint avec Biome au quotidien (npm run lint). Ce fichier
+# existe pour UNE raison : donner à Codacy la configuration de règles
+# qu'il applique par défaut sans contexte, et expliquer par écrit
+# chaque désactivation.
+#
+# Principe : on ne désactive JAMAIS une règle qui couvre un vrai
+# risque sur cette architecture. On désactive celles qui produisent
+# du faux positif SYSTÉMIQUE, c'est-à-dire dont la totalité des
+# occurrences est structurellement sûre ici — et on dit pourquoi.
+# ══════════════════════════════════════════════════════════════════
+root: true
+
+env:
+  browser: true
+  es2022: true
+
+parserOptions:
+  ecmaVersion: 2022
+  sourceType: module
+
+rules:
+  # ── security/detect-object-injection ─────────────────────────────
+  # LA source de bruit numéro un sur ce dépôt.
+  #
+  # La règle signale toute lecture `objet[variable]`. Ici, ces accès
+  # portent TOUS sur des tables de correspondance internes, indexées
+  # par des clés qui viennent des données du dépôt :
+  #   RARITY_ORDER[rKey]      rKey ∈ RARITY_KEYS (metadata.json)
+  #   TEAM_COLORS[card.team]  card.team ∈ cards-2025.json
+  #   CARD_TYPES[typeId]      typeId ∈ card.types
+  #   CATS[card.category]     idem
+  #   PREF_KEYS[name]         name est une clé littérale du module
+  # Aucune de ces clés ne vient d'une saisie, d'un import ou du
+  # réseau ; toutes proviennent de JSON versionnés dans le dépôt et
+  # validés par les tests de parité data/ ↔ data-embedded.js.
+  #
+  # Le risque réel que la règle vise — atteindre __proto__ ou
+  # constructor via une clé contrôlée par l'attaquant — n'existe pas :
+  # une clé hostile ne peut pas entrer dans ces tables, et une clé
+  # inconnue rend `undefined`, que tous les appels gèrent déjà
+  # (`CATS[c]?.emoji || '🃏'`).
+  #
+  # La contourner exigerait d'ajouter des `Object.hasOwn()` partout —
+  # exactement le « code défensif inutile » qu'on refuse.
+  security/detect-object-injection: 'off'
+
+  # ── no-unsanitized/property et security/detect-non-literal-* ─────
+  # Signalent toute affectation innerHTML.
+  #
+  # Sur les 78 affectations des modules livrés, un balayage de
+  # provenance (voir tests/security-hardening.test.js) donne :
+  #   40 markup CONSTANT écrit dans le dépôt (icônes SVG, gabarits) ;
+  #   35 interpolant des données INTERNES (catalogue de cartes,
+  #      traductions, définitions de badges — toutes versionnées) ;
+  #    3 interpolant des données EXTERNES, et ces trois-là sont
+  #      échappées : import JSON (tEsc), session cloud (escapeHtml),
+  #      retours de feedback (escapeHtml).
+  #
+  # La règle ne sait pas distinguer les trois cas. C'est pour la
+  # rendre lisible À L'ŒIL que setSafeHTML() a été introduit dans
+  # i18n.js : un appel setSafeHTML() déclare « ce HTML vient du
+  # dépôt », escapeHtml/tEsc déclare « cette donnée vient d'ailleurs ».
+  #
+  # Ce qui remplace la règle : le test de provenance ci-dessus, qui
+  # échoue si un site à donnée externe perd son échappement.
+  no-unsanitized/property: 'off'
+  no-unsanitized/method: 'off'
+
+  # ── Règles de style sans portée ici ──────────────────────────────
+  # Le dépôt a son propre style (2 espaces, points-virgules, quotes
+  # simples), appliqué par Biome. Laisser Codacy arbitrer en plus
+  # produirait des avis contradictoires sur 12 000 lignes.
+  no-magic-numbers: 'off'
+  max-lines: 'off'
+  max-lines-per-function: 'off'
+  complexity: 'off'
+  camelcase: 'off'
+
+  # ══════════════════════════════════════════════════════════════
+  # CE QUI RESTE ACTIF — délibérément.
+  # Ces règles couvrent des risques réels sur cette architecture :
+  # une alerte de leur part est à corriger, pas à faire taire.
+  # ══════════════════════════════════════════════════════════════
+  no-eval: 'error'
+  no-implied-eval: 'error'
+  no-new-func: 'error'
+  no-script-url: 'error'
+  no-prototype-builtins: 'error'
+  security/detect-eval-with-expression: 'error'
+  security/detect-non-literal-require: 'error'
+  security/detect-unsafe-regex: 'error'
+  security/detect-possible-timing-attacks: 'error'   # a trouvé pin.js — gardée
+  no-unused-vars:
+    - 'warn'
+    - args: 'none'
+      varsIgnorePattern: '^_'
+
+overrides:
+  # Scripts classiques (non-modules) : ils posent volontairement des
+  # globales window.__* lues par les modules ES. Leurs fonctions de
+  # premier niveau ne sont pas « inutilisées » — c'est ainsi qu'elles
+  # sont exposées. (Rappel : getCardDesc a déjà été signalé à tort
+  # comme mort pour cette raison exacte.)
+  - files:
+      - 'translations.js'
+      - 'card-descriptions.js'
+      - 'cloud-config.js'
+      - 'sw.js'
+    env:
+      browser: true
+      serviceworker: true
+    parserOptions:
+      sourceType: 'script'
+    rules:
+      no-unused-vars: 'off'

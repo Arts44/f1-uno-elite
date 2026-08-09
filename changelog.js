@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.47.1',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'Security pass. A hostile backup file could hide code inside your worn title and run it when the app displayed it — the same route as the link flaw fixed earlier. Titles now store only their name tag, and what you see always comes from the badges you actually unlocked. Your current title is kept.',
+        'Two smaller hardenings while we were there: the PIN check no longer takes a measurably different time depending on how much of the code is right, and card images are restricted to files shipped with the app.',
+      ],
+      fr: [
+        'Passe de sécurité. Un fichier de sauvegarde hostile pouvait cacher du code dans ton titre porté et le faire exécuter au moment de l\'afficher — la même voie que la faille du lien corrigée plus tôt. Les titres ne gardent plus que leur étiquette, et ce que tu vois vient toujours des badges que tu as vraiment débloqués. Ton titre actuel est conservé.',
+        'Deux durcissements plus discrets au passage : la vérification du code PIN ne prend plus un temps mesurablement différent selon la part du code qui est juste, et les images de cartes sont restreintes aux fichiers livrés avec l\'application.',
+      ],
+      es: [
+        'Pasada de seguridad. Un archivo de copia hostil podía esconder código en tu título llevado y ejecutarlo al mostrarlo — la misma vía que el fallo del enlace ya corregido. Los títulos solo guardan su etiqueta, y lo que ves viene siempre de las insignias que de verdad has desbloqueado. Tu título actual se conserva.',
+        'Dos refuerzos menores de paso: la comprobación del PIN ya no tarda un tiempo medible distinto según qué parte del código sea correcta, y las imágenes de carta se limitan a los archivos que vienen con la aplicación.',
+      ],
+      zh: [
+        '安全加固。一个恶意备份文件可以把代码藏进你佩戴的称号里,并在显示时执行——与此前修复的链接漏洞是同一条路径。称号现在只保存标识,你看到的内容始终来自你真正解锁的徽章。你当前的称号会保留。',
+        '顺带两项较小的加固:PIN 校验不再因输入正确的位数不同而耗时可测地不同;卡面图片仅限应用自带的文件。',
+      ],
+      it: [
+        'Passata di sicurezza. Un file di backup ostile poteva nascondere codice nel titolo che porti ed eseguirlo al momento di mostrarlo — la stessa via della falla del link già corretta. I titoli conservano solo la loro etichetta, e ciò che vedi viene sempre dai distintivi che hai davvero sbloccato. Il titolo attuale è mantenuto.',
+        'Due irrobustimenti minori strada facendo: la verifica del PIN non impiega più un tempo misurabilmente diverso a seconda di quanta parte del codice è giusta, e le immagini delle carte sono limitate ai file forniti con l\'app.',
+      ],
+      nl: [
+        'Beveiligingsronde. Een vijandig back-upbestand kon code verstoppen in je gedragen titel en die laten uitvoeren zodra hij werd getoond — dezelfde route als het eerder verholpen linklek. Titels bewaren nog alleen hun label, en wat je ziet komt altijd uit de badges die je echt hebt vrijgespeeld. Je huidige titel blijft behouden.',
+        'Twee kleinere verstevigingen onderweg: de pincontrole duurt niet langer meetbaar anders naargelang hoeveel van de code klopt, en kaartafbeeldingen zijn beperkt tot bestanden die met de app worden meegeleverd.',
+      ],
+      de: [
+        'Sicherheitsdurchgang. Eine feindliche Sicherungsdatei konnte Code in deinem getragenen Titel verstecken und beim Anzeigen ausführen lassen — derselbe Weg wie die zuvor behobene Link-Lücke. Titel speichern nur noch ihr Kürzel, und was du siehst, stammt immer aus den Abzeichen, die du wirklich freigeschaltet hast. Dein aktueller Titel bleibt erhalten.',
+        'Zwei kleinere Härtungen nebenbei: Die PIN-Prüfung braucht nicht mehr messbar unterschiedlich lange, je nachdem wie viel des Codes stimmt, und Kartenbilder sind auf mitgelieferte Dateien beschränkt.',
+      ],
+    },
+  },
+  {
     version: '1.47.0',
     date: '2026-08-09',
     changes: {

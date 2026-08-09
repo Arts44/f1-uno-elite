@@ -1,0 +1,85 @@
+---
+# ══════════════════════════════════════════════════════════════════
+# CODACY — périmètre d'analyse
+#
+# Règle de la maison : on ne tord pas le code pour satisfaire un
+# outil. Un faux positif se traite ici, par exclusion JUSTIFIÉE ; un
+# vrai défaut se traite dans le code. Chaque ligne ci-dessous porte
+# sa raison, pour que la décision reste défendable dans six mois.
+#
+# Ce qui reste analysé : les 12 000 lignes de modules applicatifs
+# effectivement livrés au navigateur. C'est le seul périmètre où une
+# alerte a une conséquence pour un utilisateur.
+# ══════════════════════════════════════════════════════════════════
+
+exclude_paths:
+  # ── Artefact de build, jamais édité à la main ──────────────────
+  # app.bundle.js est la sortie minifiée d'esbuild. Elle est
+  # COMMITÉE (GitHub Pages ne construit rien) mais toute alerte la
+  # concernant est un doublon de son source, illisible et non
+  # corrigeable : on corrige app.js, pas le bundle.
+  - 'app.bundle.js'
+  - 'app.bundle.js.map'
+
+  # ── Bibliothèque vendorisée, non modifiée ─────────────────────
+  # qrcodegen.js est le QR encoder de Project Nayuki (MIT), copié
+  # tel quel. Le modifier nous couperait de l'amont et n'est pas
+  # notre travail. Il n'a qu'un point d'entrée (encodeText) et ne
+  # touche ni au DOM, ni au réseau, ni au stockage.
+  - 'qrcodegen.js'
+
+  # ── Fichier généré ─────────────────────────────────────────────
+  # data-embedded.js est produit par extract_data.mjs : une seule
+  # affectation window.__F1UNO_EMBEDDED d'un littéral JSON. Le
+  # corriger à la main serait écrasé à la prochaine génération.
+  - 'data-embedded.js'
+
+  # ── Outils de développement, jamais livrés au client ───────────
+  # extract_*.mjs tournent sous Node à la main pour régénérer les
+  # données ; capture_screenshots.py pilote Playwright pour les
+  # captures du README. Aucun des trois n'atteint le navigateur d'un
+  # utilisateur : leurs alertes (chemins en dur, littéraux, appels
+  # système) n'ont pas de conséquence exploitable.
+  - 'extract_data.mjs'
+  - 'extract_circuits.mjs'
+  - 'capture_screenshots.py'
+
+  # ── Suite de tests ─────────────────────────────────────────────
+  # tests/ existe pour ÊTRE du code d'assertion : littéraux
+  # numériques en pagaille, expressions régulières construites,
+  # charges XSS volontaires (tests/xss.test.js contient une vraie
+  # charge — c'est le sujet du test). Analyser ces fichiers produit
+  # du bruit par construction. Ils tournent en CI à chaque push.
+  - 'tests/**'
+
+  # ── Brouillons de travail, gitignorés ──────────────────────────
+  # _*.html et _*.css sont des maquettes jetables (voir .gitignore).
+  - '_*'
+
+  # ── Documentation et données ───────────────────────────────────
+  - 'docs/**'
+  - 'data/**'
+  - 'screenshots/**'
+  - 'icons/**'
+  - 'fonts/**'
+  - 'node_modules/**'
+
+engines:
+  eslint:
+    enabled: true
+    # La configuration fine (règles désactivées + justifications)
+    # vit dans .eslintrc.yml, à côté du code qu'elle concerne.
+    exclude_paths:
+      - 'app.bundle.js'
+      - 'qrcodegen.js'
+      - 'data-embedded.js'
+      - 'tests/**'
+      - '_*'
+  stylelint:
+    enabled: true
+  # Analyse Python : le seul fichier .py du dépôt est un outil de
+  # capture d'écran hors runtime, déjà exclu ci-dessus.
+  pylint:
+    enabled: false
+  bandit:
+    enabled: false

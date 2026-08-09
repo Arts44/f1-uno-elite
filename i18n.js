@@ -86,3 +86,41 @@ export function applyLanguage(){
   // Re-render user title to update badge title translation
   updateUserTitle();
 }
+
+/* ══════════════════════════════════════════════════════════
+   DEUX VOIES EXPLICITES VERS innerHTML
+
+   Le dépôt mélangeait deux choses très différentes sous le même
+   appel : du markup FIGÉ écrit ici (icônes, gabarits) et du
+   markup nourri par des données EXTERNES (sauvegarde importée,
+   cloud, saisie). Un relecteur — humain ou outil — ne pouvait
+   pas les distinguer d'un coup d'œil.
+
+   - setSafeHTML(el, html) : le HTML vient du dépôt, point.
+   - escapeHtml / tEsc     : la seule voie pour une donnée qui
+                             vient d'ailleurs.
+
+   Ce n'est pas une protection (setSafeHTML fait exactement ce
+   que faisait innerHTML) : c'est une DÉCLARATION D'INTENTION,
+   qui rend le mélange visible.
+   ══════════════════════════════════════════════════════════ */
+export function setSafeHTML(el, html){
+  if(el) el.innerHTML = html;
+  return el;
+}
+
+/* Une source d'image de confiance : chemin RELATIF, rien d'autre.
+   card.image vient aujourd'hui du dépôt, mais rien dans le code ne
+   le garantissait — une URL absolue ou un `javascript:` y passait.
+   On refuse tout schéma, tout //hôte, tout chemin absolu, et les
+   remontées de répertoire. Retourne '' si la valeur est refusée. */
+export function safeImagePath(src){
+  const v = String(src == null ? '' : src).trim();
+  if(!v) return '';
+  if(/^[a-z][a-z0-9+.-]*:/i.test(v)) return '';   // http:, data:, javascript:…
+  if(v.startsWith('//')) return '';                // protocole-relatif
+  if(v.startsWith('/')) return '';                 // absolu : casse aussi GitHub Pages
+  if(v.split('/').includes('..')) return '';       // remontée de répertoire
+  if(/[<>"'`\s\\]/.test(v)) return '';              // rien qui puisse casser l'attribut
+  return v;
+}

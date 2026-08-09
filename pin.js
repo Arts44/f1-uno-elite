@@ -25,6 +25,22 @@ export function isSetupDone(){ return localStorage.getItem('f1uno_setup_done')==
 export function isViewerModeAllowed(){ return localStorage.getItem('f1uno_viewer_enabled')==='true'; }
 export function getStoredPinHash(){ return localStorage.getItem('f1uno_pin_hash')||''; }
 
+/* Comparaison à TEMPS CONSTANT de deux empreintes hexadécimales.
+   `a === b` s'arrête au premier caractère qui diffère : le temps de
+   réponse fuit la longueur du préfixe commun, ce qui permet en théorie
+   de reconstruire l'empreinte caractère par caractère. Le risque est
+   faible ici — l'empreinte est déjà en clair dans le localStorage de la
+   machine, donc quiconque peut mesurer peut aussi la lire — mais la
+   correction ne coûte rien et supprime la question. */
+export function timingSafeEqual(a, b){
+  const x = String(a), y = String(b);
+  // La longueur, elle, n'est pas un secret (SHA-256 hex = 64 partout).
+  if(x.length !== y.length) return false;
+  let diff = 0;
+  for(let i = 0; i < x.length; i++) diff |= x.charCodeAt(i) ^ y.charCodeAt(i);
+  return diff === 0;
+}
+
 let pinEntry = '';
 let _authenticated = false;
 // Le drapeau vit dans session.js (module feuille) — réexporté ici
@@ -139,7 +155,7 @@ async function checkPin(opts={}) {
   if(window._adminOverlayActive && window._adminPinCallback){ await window._adminPinCallback(); return; }
   const hash = await sha256(pinEntry);
   const stored = getStoredPinHash();
-  if (stored && hash === stored) {
+  if (stored && timingSafeEqual(hash, stored)) {
     if(opts.onSuccess) { opts.onSuccess(pinEntry); pinEntry=''; return; }
     // Encrypted store: derive the key and decrypt BEFORE the app boots.
     // On failure (PIN/data desync, corruption) the ciphertexts are left
@@ -418,7 +434,7 @@ function _askPin(onOk){
   window._adminOverlayActive = true;
   window._adminPinCallback = async ()=>{
     const hash = await sha256(pinEntry);
-    if(hash === getStoredPinHash()){
+    if(timingSafeEqual(hash, getStoredPinHash())){
       const pin = pinEntry;
       close();
       await onOk(pin);
@@ -486,7 +502,7 @@ function _pinFlow(title, steps, onDone){
 
 // Les trois briques d'étape partagées
 const _stepVerify = { prompt: 'pin.flow_verify', check: async pin =>
-  (await sha256(pin)) === getStoredPinHash() ? true : { err: 'pin.wrong' } };
+  timingSafeEqual(await sha256(pin), getStoredPinHash()) ? true : { err: 'pin.wrong' } };
 const _stepNew = { prompt: 's.new_pin', check: (pin, ctx) => { ctx.pin = pin; return true; } };
 const _stepConfirm = goto => ({ prompt: 's.confirm_pin', check: (pin, ctx) =>
   pin === ctx.pin ? true : { err: 'pin.mismatch', goto } });
@@ -541,7 +557,7 @@ export function showAdminPinScreen(){
   window._adminOverlayActive = true;
   window._adminPinCallback = async ()=>{
     const hash = await sha256(pinEntry);
-    if(hash === getStoredPinHash()){
+    if(timingSafeEqual(hash, getStoredPinHash())){
       overlay.remove();
       window._adminOverlayActive = false;
       window._adminPinCallback = null;

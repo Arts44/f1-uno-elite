@@ -2,7 +2,7 @@
    RENDER — grid, modal, views, toast
    ══════════════════════════════════════════════════════════ */
 import { DEBUG, log } from './logger.js';
-import { t } from './i18n.js';
+import { t, escapeHtml, safeImagePath } from './i18n.js';
 import {
   CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityChipClass, rarityChipStyle,
   CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_MONOGRAMS, TEAM_LIVERIES, sortTypesCanonical
@@ -428,7 +428,8 @@ export function openModal(id){
   updateModalVisual(card);
   const rarity=RARITIES[cardRarity(card)];
 
-  document.getElementById('moEmoji').innerHTML = card.image ? `<img src="${card.image}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-xl) var(--r-xl) 0 0;">` : (card.category==='gp' && circuitSVG(card.id,'modal') ? circuitSVG(card.id,'modal') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : catEmoji(card.category));
+  const _img = safeImagePath(card.image);
+  document.getElementById('moEmoji').innerHTML = _img ? `<img src="${_img}" alt="${escapeHtml(card.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-xl) var(--r-xl) 0 0;">` : (card.category==='gp' && circuitSVG(card.id,'modal') ? circuitSVG(card.id,'modal') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : catEmoji(card.category));
   document.getElementById('moNum').textContent=`#${card.id} · ${CATS[card.category]?.label||card.category}`;
   document.getElementById('moName').textContent=card.name + (card.category==='pilote'?` ${card.nationality||''}`:'');
   document.getElementById('moTeam').textContent=card.team||'';

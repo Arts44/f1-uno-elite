@@ -774,12 +774,37 @@ const MILESTONE_TITLES = [
   {id:'all_manual',name:'Explorateur',   icon:'🧭', color:'#FF9500', desc:'Tous les badges manuels'},
 ];
 
-let selectedTitle = null; // {id, name, icon?, color?, source:'badge'|'milestone'}
+// Seul l'IDENTIFIANT du titre choisi est gardé : l'objet affiché est
+// toujours retrouvé dans getUnlockedTitles(). Voir loadSelectedTitle().
+let selectedTitleId = null;
 
+/* ── f1uno_title : on ne persiste QUE l'identifiant ───────────
+   Avant, l'OBJET titre entier était sérialisé dans le localStorage,
+   puis relu et affiché tel quel. Le garde ne vérifiait que son `id`
+   contre les titres débloqués — mais c'est l'objet STOCKÉ qui était
+   ensuite interpolé en innerHTML. Or f1uno_title fait partie des
+   préférences restaurées par un import (settings-sync.js, PREF_KEYS) :
+   une sauvegarde ou un lien #backup= hostile pouvait donc y placer
+   {id:"<un id valide>", name:"<img src=x onerror=…>"} et faire exécuter
+   du script. Même vecteur que la XSS #backup= corrigée en 1.42.
+   Le titre est une donnée DÉRIVÉE : seul son id a besoin d'être
+   persisté, et l'objet affiché vient toujours de getUnlockedTitles(). */
 function loadSelectedTitle(){
-  try{ const s=localStorage.getItem('f1uno_title'); if(s) selectedTitle=JSON.parse(s); }catch(e){}
+  selectedTitleId = null;
+  try {
+    const raw = localStorage.getItem('f1uno_title');
+    if(!raw) return;
+    const v = JSON.parse(raw);
+    // Ancien format (objet complet) ET nouveau (id nu) : on ne retient
+    // que l'identifiant, et seulement s'il ressemble à un identifiant.
+    const id = typeof v === 'string' ? v : (v && typeof v.id === 'string' ? v.id : null);
+    if(id && /^[a-z0-9_]{1,64}$/i.test(id)) selectedTitleId = id;
+  } catch(e){}
 }
-function saveSelectedTitle(){ localStorage.setItem('f1uno_title',JSON.stringify(selectedTitle)); }
+function saveSelectedTitle(){
+  if(selectedTitleId) localStorage.setItem('f1uno_title', JSON.stringify(selectedTitleId));
+  else localStorage.removeItem('f1uno_title');
+}
 
 export function getUnlockedTitles(){
   loadManualBadges();
@@ -812,7 +837,7 @@ export function getUnlockedTitles(){
 }
 
 export function selectTitle(titleObj){
-  selectedTitle = titleObj;
+  selectedTitleId = titleObj && titleObj.id ? titleObj.id : null;
   saveSelectedTitle();
   updateUserTitle();
 }
@@ -820,15 +845,12 @@ export function selectTitle(titleObj){
 export function updateUserTitle(){
   loadSelectedTitle();
   const unlocked = getUnlockedTitles();
-  // If selected title is no longer unlocked, reset
-  if(selectedTitle && !unlocked.find(t=>t.id===selectedTitle.id)){
-    selectedTitle = null;
-    saveSelectedTitle();
-  }
-  // Default: first unlocked or "Rookie"
-  const active = selectedTitle && unlocked.find(t=>t.id===selectedTitle.id)
-    ? selectedTitle
-    : (unlocked.length > 0 ? unlocked[0] : {id:'rookie',name:'Rookie',emoji:'🟡',source:'default'});
+  // Le titre affiché vient TOUJOURS de la liste débloquée, jamais du
+  // localStorage : celui-ci ne fournit qu'un identifiant à retrouver.
+  const chosen = selectedTitleId ? unlocked.find(t => t.id === selectedTitleId) : null;
+  if(selectedTitleId && !chosen){ selectedTitleId = null; saveSelectedTitle(); }
+  const active = chosen
+    || (unlocked.length > 0 ? unlocked[0] : {id:'rookie',name:'Rookie',emoji:'🟡',source:'default'});
 
   // Regenerate name with current translation for active title
   if(active.source === 'badge' && active.id !== 'rookie'){
@@ -869,7 +891,7 @@ export function toggleTitlePicker(){
   // Jalons (25/50 badges…) d'abord — hors échelle de difficulté
   let html = '<div class="title-picker-grid">';
   unlocked.filter(x => x.source === 'milestone').forEach(t => {
-    const isActive = selectedTitle && selectedTitle.id === t.id;
+    const isActive = selectedTitleId === t.id;
     const color = t.color || '#E8002D';
     html += `<div class="title-pick${isActive?' active':''}" data-action="selectTitle" data-title-id="${t.id}" style="border-color:${isActive?color:'var(--border)'}">
       <span>${t.emoji || t.icon || '🏆'}</span><span style="color:color-mix(in srgb, ${color} var(--ink-mix,100%), #000)">${t.name}</span>
@@ -881,7 +903,7 @@ export function toggleTitlePicker(){
     .map(b => ({ b, d: badgeDifficulty(b), nm: nameOf(b), un: unlockedIds.has(b.id) }))
     .sort((a, z) => z.d - a.d || a.nm.localeCompare(z.nm));
   all.forEach(({ b, d, nm, un }) => {
-    const isActive = un && selectedTitle && selectedTitle.id === b.id;
+    const isActive = un && selectedTitleId === b.id;
     const diff = `<span class="tp-diff dl-${difficultyLabelKey(d).slice(7)}">${d}%</span>`;
     if(un){
       html += `<div class="title-pick${isActive?' active':''}" data-action="selectTitle" data-title-id="${b.id}">
