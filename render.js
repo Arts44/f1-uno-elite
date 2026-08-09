@@ -402,22 +402,6 @@ export function quickToggle(cardId, status, e){
   showToast(newVal?'✓ Mis à jour':'Retiré');
 }
 
-export function quickQty(cardId, delta, e){
-  if(e) e.stopPropagation();
-  const card=CARDS_DB.find(c=>c.id===cardId);
-  const firstType=card.types[0];
-  const d=getTypeData(cardId, firstType);
-  const newQty=Math.max(0,(d.qty||0)+delta);
-  txBatch(()=>{
-    setTypeData(cardId, firstType, 'qty', newQty);
-    if(newQty>0) setTypeData(cardId, firstType, 'owned', true);
-    if(newQty>1) setTypeData(cardId, firstType, 'doubles', true);
-    if(newQty<=1) setTypeData(cardId, firstType, 'doubles', false);
-    if(newQty===0){ setTypeData(cardId, firstType, 'owned', false); setTypeData(cardId, firstType, 'doubles', false); }
-  });
-  updateStats(); updateCardTile(cardId);
-}
-
 /* ══════════════════════════════════════════════════════════ MODAL */
 export function openModal(id){
   const card=CARDS_DB.find(c=>c.id===id);
@@ -479,9 +463,9 @@ export function renderModalTypes(card){
       <div class="mo-cell-icon" style="background:${ct.color}20;border:1.5px solid ${ct.color}40;color:${ct.color};">${typeIcon(typeId)}</div>
       <div class="mo-cell-label">${ct.label}</div>
       <div class="mo-qty-wrap">
-        <button class="mqbtn" data-action="changeMoQty" data-card="${card.id}" data-type="${typeId}" data-delta="-1">−</button>
+        <button class="mqbtn" data-action="changeMoQty" data-card="${card.id}" data-type="${typeId}" data-delta="-1" aria-label="${t('mo.qty_dec')}" title="${t('mo.qty_dec')}">−</button>
         <span class="mqval" id="mqv-${card.id}-${typeId}">${qty}</span>
-        <button class="mqbtn" data-action="changeMoQty" data-card="${card.id}" data-type="${typeId}" data-delta="1">+</button>
+        <button class="mqbtn" data-action="changeMoQty" data-card="${card.id}" data-type="${typeId}" data-delta="1" aria-label="${t('mo.qty_inc')}" title="${t('mo.qty_inc')}">+</button>
       </div>`;
     return cell;
   }
@@ -631,24 +615,6 @@ function updateModalVisual(card){
   } else if(!isSet && flag){
     flag.remove();
   }
-}
-
-export function toggleMoType(cardId, typeId, status){
-  const d=getTypeData(cardId,typeId);
-  const newVal=!d[status];
-  if(status==='wishlist'&&newVal&&cardOwned(cardId)){showToast('Déjà possédée !');return;}
-  txBatch(()=>{
-    setTypeData(cardId,typeId,status,newVal);
-    if(status==='owned'&&newVal){ setTypeData(cardId,typeId,'qty',Math.max(1,d.qty||0)); setTypeData(cardId,typeId,'wishlist',false); }
-    if(status==='owned'&&!newVal){ setTypeData(cardId,typeId,'qty',0); setTypeData(cardId,typeId,'doubles',false); }
-  });
-  // update modal visual
-  const card=CARDS_DB.find(c=>c.id===cardId);
-  renderModalTypes(card);
-  updateModalVisual(card);
-  _renderModalTags(card);
-  updateStats(); updateCardTile(cardId);
-  showToast(newVal?'✓ Mis à jour':'Retiré');
 }
 
 export function changeMoQty(cardId, typeId, delta){

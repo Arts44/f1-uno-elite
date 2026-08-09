@@ -61,9 +61,6 @@ export function timingSafeEqual(a, b){
 
 let pinEntry = '';
 let _authenticated = false;
-// Le drapeau vit dans session.js (module feuille) — réexporté ici
-// pour ne pas casser les appelants historiques.
-export { isViewer as isViewerMode };
 export function setAuthenticated(v){ _authenticated = v; }
 
 // SHA-256 helper using Web Crypto API

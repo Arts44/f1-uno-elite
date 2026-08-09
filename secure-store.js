@@ -123,12 +123,6 @@ export function secureSet(key, value){
   localStorage.setItem(key, value);
 }
 
-export function secureRemove(key){
-  _cache.delete(key);
-  _pending.delete(key);
-  localStorage.removeItem(key);
-}
-
 /* Coalesced async flush: one encrypt in flight, always writing the
    LATEST value per key. saveData can fire in bursts without piling up
    crypto work. */

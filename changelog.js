@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.48.0',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'The quantity buttons in a card\'s detail view now announce what they do to screen readers, instead of reading as a bare “plus” and “minus”.',
+        'Four controls were easier to miss than to hit — the email field, the language menu, the backup checkboxes and those quantity buttons. All four now meet the 44-pixel touch target.',
+      ],
+      fr: [
+        'Les boutons de quantité d\'une carte annoncent enfin ce qu\'ils font aux lecteurs d\'écran, au lieu de se lire « plus » et « moins » sans contexte.',
+        'Quatre contrôles se rataient plus facilement qu\'ils ne s\'atteignaient — le champ e-mail, le menu de langue, les cases de sauvegarde et ces boutons de quantité. Les quatre respectent maintenant la cible tactile de 44 pixels.',
+      ],
+      es: [
+        'Los botones de cantidad de una carta ya anuncian lo que hacen a los lectores de pantalla, en lugar de leerse como un simple «más» y «menos».',
+        'Cuatro controles se fallaban más fácilmente de lo que se acertaban — el campo de correo, el menú de idioma, las casillas de copia de seguridad y esos botones de cantidad. Los cuatro cumplen ahora el objetivo táctil de 44 píxeles.',
+      ],
+      zh: [
+        '卡片详情里的数量按钮现在会向屏幕阅读器说明自己的作用，而不再只读作孤零零的「加」和「减」。',
+        '有四个控件更容易点偏而不是点中——邮箱输入框、语言菜单、备份复选框，以及那两个数量按钮。四者现在都达到了 44 像素的触控目标。',
+      ],
+      it: [
+        'I pulsanti di quantità di una carta annunciano finalmente cosa fanno agli screen reader, invece di leggersi come un nudo «più» e «meno».',
+        'Quattro controlli si mancavano più facilmente di quanto si centrassero — il campo e-mail, il menu della lingua, le caselle di backup e quei pulsanti di quantità. Tutti e quattro rispettano ora il bersaglio tattile di 44 pixel.',
+      ],
+      nl: [
+        'De aantalknoppen bij een kaart vertellen schermlezers nu wat ze doen, in plaats van als een kaal «plus» en «min» te klinken.',
+        'Vier bedieningselementen werden makkelijker gemist dan geraakt — het e-mailveld, het taalmenu, de back-upvinkjes en die aantalknoppen. Alle vier halen nu het aanraakdoel van 44 pixels.',
+      ],
+      de: [
+        'Die Mengen-Schaltflächen einer Karte kündigen Screenreadern jetzt an, was sie tun, statt als nacktes «Plus» und «Minus» gelesen zu werden.',
+        'Vier Bedienelemente wurden leichter verfehlt als getroffen — das E-Mail-Feld, das Sprachmenü, die Backup-Kästchen und eben jene Mengen-Schaltflächen. Alle vier erreichen nun das 44-Pixel-Touchziel.',
+      ],
+    },
+  },
+  {
     version: '1.47.5',
     date: '2026-08-09',
     changes: {

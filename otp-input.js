@@ -35,67 +35,6 @@ export function segSanitize(value, length){
   return String(value || '').replace(/\D+/g, '').slice(0, length);
 }
 
-/* ── Adaptateur clavier-écran (PIN) ──
-   Même rendu, mêmes classes, mêmes helpers — mais piloté par set(v)
-   au lieu d'un <input> : au boot, la source de saisie est le pavé
-   numérique à l'écran (pinKey/pinDel), pas le clavier système. Pas
-   de badge dans le markup : le succès reste discret (cases vertes),
-   comme il se doit sur un écran de déverrouillage. */
-export function createKeypadSegments(host, opts = {}){
-  const length = opts.length || 4;
-  const mask = opts.mask !== false;   // PIN : masqué par défaut
-  const revealMs = opts.revealMs || 200;
-  const reduce = typeof window !== 'undefined' && window.matchMedia
-    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  host.classList.add('otp-wrap', 'pin-segs');
-  host.innerHTML = `<div class="otp-boxes" aria-hidden="true">${
-    `<span class="otp-box"><span class="otp-caret"></span></span>`.repeat(length)}</div>`;
-  const boxes = [...host.querySelectorAll('.otp-box')];
-  let value = '', revealIdx = -1, revealTimer = 0, state = 'idle';
-
-  const render = () => {
-    const active = segActiveIndex(value, length);
-    boxes.forEach((b, i) => {
-      const shown = segDisplay(value, i, { mask, revealIdx });
-      const txt = b.lastChild && b.lastChild.nodeType === 3 ? b.lastChild : null;
-      if((txt ? txt.data : '') !== shown){
-        if(txt) txt.data = shown; else b.appendChild(document.createTextNode(shown));
-        if(shown && !reduce){ b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); }
-      }
-      b.classList.toggle('filled', !!value[i]);
-      b.classList.toggle('active', i === active && state === 'idle');
-    });
-  };
-
-  const api = {
-    el: host,
-    set(v){
-      const grew = String(v).length > value.length;
-      value = segSanitize(v, length);
-      if(mask && grew){
-        clearTimeout(revealTimer);
-        revealIdx = value.length - 1;
-        revealTimer = setTimeout(() => { revealIdx = -1; render(); }, reduce ? 0 : revealMs);
-      }
-      render();
-    },
-    setState(next){
-      state = next;
-      host.classList.toggle('seg-success', next === 'success');
-      if(next === 'error'){
-        host.classList.remove('seg-error'); void host.offsetWidth; host.classList.add('seg-error');
-      } else {
-        host.classList.remove('seg-error');
-      }
-      if(next === 'idle') render();
-    },
-    destroy(){ clearTimeout(revealTimer); host.innerHTML = ''; host.classList.remove('otp-wrap', 'pin-segs', 'seg-success', 'seg-error'); },
-  };
-  render();
-  return api;
-}
-
 /* ── Fabrique ── */
 
 // createSegmentedInput(host, opts) → api
