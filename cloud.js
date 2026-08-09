@@ -24,7 +24,16 @@ import { createSegmentedInput } from './otp-input.js';
 
 export const SESSION_KEY = 'f1uno_cloud_session';
 
-/* ── Config (filled by the user in cloud-config.js) ── */
+/* ── Config (filled by the user in cloud-config.js) ──
+   PROVENANCE DE cfg.url — la réponse aux alertes SSRF portées sur les
+   fetch() de ce module. L'URL vient d'UNE seule source : le littéral
+   écrit dans cloud-config.js, un fichier VERSIONNÉ dans le dépôt et
+   servi avec l'app. Elle n'est jamais lue depuis une saisie, une
+   sauvegarde importée, un lien #backup=, une réponse réseau ni le
+   localStorage. Un attaquant capable de la modifier a déjà réécrit les
+   fichiers servis : il n'a plus besoin d'un SSRF.
+   Le seul traitement appliqué est la suppression des « / » finaux, pour
+   que la concaténation des chemins reste stable. ── */
 export function cloudConfig(){
   const c = (typeof window !== 'undefined' && window.__F1UNO_CLOUD) || {};
   return (c.url && c.anonKey) ? { url: c.url.replace(/\/+$/, ''), anonKey: c.anonKey } : null;

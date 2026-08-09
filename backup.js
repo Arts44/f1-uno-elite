@@ -134,6 +134,7 @@ export async function maybeHandleBackupHash(){
 /* ══════════════════════════════════════════════════════════
    BACKUP REMINDER — nudge after N changes or N days
    ══════════════════════════════════════════════════════════ */
+const DAY_MS = 86400000;            // 24 h en millisecondes
 const REMIND_AFTER_CHANGES = 30;
 const REMIND_AFTER_DAYS = 14;
 const K_CHANGES = 'f1uno_changes_since_backup';
@@ -146,7 +147,7 @@ export function noteChange(){
   localStorage.setItem(K_CHANGES, String(n));
   if(_remindedThisSession) return;
   const last = parseInt(localStorage.getItem(K_LAST)||'0', 10);
-  const daysSince = last ? (Date.now() - last) / 86400000 : Infinity;
+  const daysSince = last ? (Date.now() - last) / DAY_MS : Infinity;
   if(n >= REMIND_AFTER_CHANGES || (last && daysSince >= REMIND_AFTER_DAYS)){
     _remindedThisSession = true;
     showToast(t('bk.reminder'));

@@ -59,7 +59,6 @@ export function badgeEffort(badge){
   const c = badge.condition;
   if(!c) return 1;
   const v = c.value;
-  const byTeam = {};
   const teamOf = t => CARDS_DB.filter(x => x.team === t);
   switch(c.metric){
     case 'owned_count': return CHOICE * v;

@@ -105,13 +105,18 @@ export function applyLanguage(){
    qui rend le mélange visible.
    ══════════════════════════════════════════════════════════ */
 export function setSafeHTML(el, html){
-  // Exclusion ciblée, une ligne, justifiée : CETTE ligne EST le point
-  // d'assignation que la règle cherche. C'est précisément pour la
-  // rendre unique et nommée qu'elle existe — un analyseur qui crie ici
-  // crie sur la déclaration d'intention, pas sur un risque. Toute
-  // donnée externe passe par escapeHtml/tEsc AVANT d'arriver ici, ce
-  // que verrouille tests/security-hardening.test.js.
-  // eslint-disable-next-line no-unsanitized/property
+  // CETTE ligne EST le point d'assignation que les analyseurs
+  // cherchent. C'est précisément pour la rendre unique et nommée
+  // qu'elle existe — un analyseur qui crie ici crie sur la déclaration
+  // d'intention, pas sur un risque. Toute donnée externe passe par
+  // escapeHtml/tEsc AVANT d'arriver ici, ce que verrouille
+  // tests/security-hardening.test.js.
+  //
+  // Pas de directive eslint-disable : les alertes restantes viennent
+  // des patterns NATIFS de Codacy, pas d'ESLint. Une directive ne les
+  // atteint pas, et le plugin no-unsanitized n'étant pas chargé côté
+  // Codacy, elle y produisait sa propre alerte. Traité côté service,
+  // dans Code patterns (voir .codacy.yml).
   if(el) el.innerHTML = html;
   return el;
 }

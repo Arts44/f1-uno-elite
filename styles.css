@@ -1910,7 +1910,7 @@ input:focus-visible,textarea:focus-visible,select:focus-visible{
   box-shadow:0 0 0 3px var(--red-glow);
   filter:brightness(0.97);
 }
-button:not(:disabled):not(.bn-tab):active,
+button:not(:disabled, .bn-tab):active,
 .schip:active,.qbtn:active,
 .pin-key:active,.setv-btn:active,.lang-opt:active,.font-opt:active{
   transform:scale(0.955);

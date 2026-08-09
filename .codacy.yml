@@ -64,6 +64,50 @@ exclude_paths:
   - 'fonts/**'
   - 'node_modules/**'
 
+# ══════════════════════════════════════════════════════════════════
+# PATTERNS NATIFS CODACY — ce fichier ne peut PAS les désactiver.
+#
+# Codacy applique, en plus d'ESLint, ses propres patterns. Ils ne
+# lisent ni .eslintrc.yml ni les directives eslint-disable en ligne :
+# ces directives ont même produit leur propre alerte ici, le plugin
+# no-unsanitized n'étant pas installé côté service. Elles ont donc été
+# retirées du code (i18n.js, render.js), leur justification conservée
+# en commentaire simple.
+#
+# Les quatre patterns ci-dessous se désactivent UNIQUEMENT dans
+# l'interface : Repository → Settings → Code patterns. La raison est
+# consignée ici pour que la décision reste défendable sans accès au
+# service :
+#
+#   · « Avoid assigning user-controlled data to innerHTML » (55×)
+#   · « Avoid Using Insecure Document Methods » (55×)
+#       → Un audit de provenance des 78 affectations innerHTML des
+#         modules livrés donne : 40 markup CONSTANT du dépôt,
+#         35 données INTERNES versionnées, 3 données EXTERNES, toutes
+#         les trois déjà échappées (import JSON → tEsc, session cloud
+#         et retours de feedback → escapeHtml). Le pattern ne sait pas
+#         distinguer les trois cas et signale les 78.
+#         CE QUI REMPLACE LE PATTERN : le test de provenance de
+#         tests/security-hardening.test.js, qui ÉCHOUE si un site à
+#         donnée externe perd son échappement. Un test qui casse le
+#         build vaut mieux qu'une alerte qu'on apprend à ignorer.
+#
+#   · « Hardcoded JWT » sur cloud-config.js:23
+#       → C'est la clé « anon public » de Supabase, publique par
+#         conception et protégée par Row Level Security côté serveur.
+#         Décodage du token : {"role":"anon"} — vérifié, ce n'est PAS
+#         service_role. Une app 100 % cliente ne peut pas la cacher.
+#
+#   · « Server-Side Request Forgery » sur cloud.js (fetch vers cfg.url)
+#       → cfg.url provient d'un littéral de cloud-config.js, fichier
+#         versionné et servi avec l'app. Jamais d'une saisie, d'une
+#         sauvegarde importée, d'un lien #backup= ni du réseau.
+#         Provenance détaillée au-dessus de cloudConfig().
+#
+# NON DÉSACTIVÉ, délibérément : tout ce qui touche eval, les fonctions
+# construites depuis une chaîne, les URL javascript:, et les
+# comparaisons d'empreintes. Ces alertes-là sont à corriger.
+
 engines:
   eslint:
     enabled: true
