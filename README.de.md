@@ -4,7 +4,11 @@
 
 **Ein offline-first, installierbarer Sammelkarten-Tracker, gebaut mit Vanilla JavaScript und null Laufzeitabhängigkeiten — kein Framework, kein SDK, kein CDN, kein Backend.**
 
-[![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
+[| Führung — fünf Kapitel, eins pro Seite | Die fünf Foil-Familien, auf der beruhigten Stufe |
+|---|---|
+| ![Führung — fünf Kapitel, eins pro Seite](screenshots/tutorial-chapter.jpg) | ![Die fünf Foil-Familien, auf der beruhigten Stufe](screenshots/foil-family.jpg) |
+
+![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![PWA](https://img.shields.io/badge/PWA-installable%20%2B%20offline%20%E2%9C%93-brightgreen)
 ![Zero runtime deps](https://img.shields.io/badge/runtime%20dependencies-0-blue)
@@ -94,7 +98,7 @@ Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten — 101 Karten, 
 | Krypto | Natives **Web Crypto** — SHA-256 (PIN), PBKDF2 + AES-GCM (optionale Verschlüsselung im Ruhezustand) |
 | QR-Codes | Einbezogener Ein-Datei-Encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Schriften | Selbst gehostete WOFF2 (SIL OFL) — keine Google-Fonts-Anfrage, 5 Themes zur Auswahl |
-| Tests | **Nodes eingebauter Test-Runner** (`node --test`) — 385 Tests, kein Test-Framework |
+| Tests | **Nodes eingebauter Test-Runner** (`node --test`) — 470 Tests, kein Test-Framework |
 | CI | GitHub Actions — Tests + Build + Aktualitätsprüfung des committeten Bundles bei jedem Push/PR |
 
 **Null Laufzeitabhängigkeiten ist eine Designregel, kein Zufall.** Alles, was ein Framework oder SDK üblicherweise liefert — Rendering, Navigation zwischen Ansichten, i18n, Offline-Caching, Auth über REST, Verschlüsselung, QR-Erzeugung — ist direkt auf den Webplattform-APIs umgesetzt. Die App, die du installierst, ist exakt der Code in diesem Repository.
@@ -113,6 +117,37 @@ Der Quellcode besteht aus fokussierten **ES-Modulen** hinter einem einzigen Eins
 | Optionale Cloud | `cloud.js`, `feedback.js`, `settings-sync.js` — alle über rohes REST |
 
 Aktionen laufen über **einen einzigen delegierten Listener** auf `[data-action]` statt über Inline-Handler — was auch den Betrachtermodus möglich macht, da ein einziges `VIEWER_BLOCKED`-Set jeden Schreibzugriff sperrt. Oberflächentext steht nie im Code: er läuft über `t()` gegen Wörterbücher, die alle 7 Sprachen abdecken.
+
+### Die Form des Projekts
+
+Vier klassische Skripte veröffentlichen `window.__*`-Globals vor den Modulen; alles andere ist ein ES-Modul hinter einem einzigen Einstiegspunkt.
+
+```mermaid
+flowchart TB
+  subgraph BOOT["Start"]
+    H["index.html"] --> C["translations.js<br/>card-descriptions.js<br/>data-embedded.js<br/>cloud-config.js"]
+    H --> B["app.bundle.js"]
+  end
+  B --> APP["app.js"]
+  APP --> UI
+  APP --> ST
+  APP --> PL
+  subgraph UI["Ansichten"]
+    R["render.js"]; S["stats.js"]; BG["badges.js"]; PN["pin.js"]; AC["account.js"]; TU["tutorial.js"]; PH["pagehead.js"]; IC["icons.js"]
+  end
+  subgraph ST["Zustand"]
+    STO["storage.js"]; DA["data.js"]; HI["history.js"]; SEC["secure-store.js"]; I18["i18n.js"]
+  end
+  subgraph PL["Plattform"]
+    SW["sw.js"]; UP["update.js"]; IN["install.js"]; BK["backup.js"]
+  end
+  subgraph CL["Optionale Cloud"]
+    CLO["cloud.js"]; FB["feedback.js"]; SS["settings-sync.js"]
+  end
+  ST --> CL
+  STO --> SEC
+```
+
 
 ---
 
@@ -141,9 +176,16 @@ Hunderte hartkodierte Abstandswerte auf Tokens migrieren, mit „sieht für mich
 
 ### Eine Browser-App ohne Browser testen
 Das Null-Abhängigkeiten-Versprechen schließt Jest, Vitest und Headless-Browser-Gespanne aus.
-**Lösung:** Die Logik wurde browserfrei faktorisiert und wird von **385 Tests auf Nodes eingebautem Runner** abgedeckt — keine Testabhängigkeiten, kein echtes Netzwerk. Die CI baut zudem das Bundle neu und schlägt fehl, wenn das committete Artefakt veraltet ist.
+**Lösung:** Die Logik wurde browserfrei faktorisiert und wird von **470 Tests auf Nodes eingebautem Runner** abgedeckt — keine Testabhängigkeiten, kein echtes Netzwerk. Die CI baut zudem das Bundle neu und schlägt fehl, wenn das committete Artefakt veraltet ist.
 
 ---
+
+### Was die Tests abdecken — und was nicht
+
+470 Tests auf Nodes eingebautem Runner, ohne Framework. Genauigkeit über die Grenze zählt mehr als die Zahl:
+
+- **Abgedeckt:** Speichermigrationen und das saisonbezogene Schlüsselschema; die siebenstufige Seltenheitsleiter samt Aufstieg durch ein vollständiges Set; alle Abzeichenbedingungen und das Schwierigkeitsmodell; die Sammlerlisten (fehlend, doppelt, Tausch); die Kodierungsdurchläufe der Sicherungscodes; die Cloud-Helfer gegen ein nachgebildetes `fetch` samt Fehlerpfaden; die Gleichheit der i18n-Schlüssel über 7 Sprachen und das Erkennen doppelter Schlüssel; der Precache des Service Workers gegen den echten Importgraphen; die Markup-Verträge des Tastaturzugangs; die Herkunft jedes von außen gespeisten `innerHTML`; WCAG-AA-Kontrast in beiden Themen.
+- **Nicht abgedeckt:** das tatsächliche Rendern (keine DOM-Zusicherungen über Markup-Strings hinaus), das Laufzeitverhalten des Service Workers, echte Netzwerkaufrufe, IndexedDB, Installationsaufforderungen und alles, was eine Browser-Engine braucht — das wird von Hand und durch den deterministischen Screenshot-Durchlauf geprüft, nicht durch die Suite. Der Abdeckungsprozentsatz wird bewusst nicht veröffentlicht: Er würde die browserfreie Schicht messen und sich lesen, als messe er die App.
 
 ## 🚀 Loslegen
 
@@ -159,7 +201,7 @@ npm install     # installiert esbuild, die einzige devDependency
 npm run build   # app.js → app.bundle.js (minifiziert + Sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 385 Tests, node --test, ohne Framework
+npm test        # 470 Tests, node --test, ohne Framework
 ```
 
 **Deployment.** Das Repository wird unverändert auf GitHub Pages deployt: Alle URLs sind relativ, die App läuft also identisch auf einer Domain-Root, unter einem Unterpfad und auf localhost. Release-Routine: einen Changelog-Eintrag hinzufügen (das *ist* der Versionssprung) → `SW_VERSION` erhöhen → bauen → pushen.
@@ -176,7 +218,7 @@ npm test        # 385 Tests, node --test, ohne Framework
 
 ## 🔩 Engineering-Notizen
 
-Null Laufzeitabhängigkeiten (nur esbuild, beim Build); null Layoutverschiebung, pixelgenau zwischen Versionen gemessen; das schnelle Hinzufügen profiliert und optimiert (~300 ms → ~45 ms auf einem Mittelklasse-Handy); optionale lokale Verschlüsselung am PIN (PBKDF2 + AES-GCM); Zuschauermodus in der Logik verriegelt, nicht im CSS; Screenshots von einem deterministischen Skript im Repo regeneriert; 385 Tests in Vanilla-JS mit Nodes eingebautem Runner. Alle Details im [englischen README](README.md).
+Null Laufzeitabhängigkeiten (nur esbuild, beim Build); null Layoutverschiebung, pixelgenau zwischen Versionen gemessen; das schnelle Hinzufügen profiliert und optimiert (~300 ms → ~45 ms auf einem Mittelklasse-Handy); optionale lokale Verschlüsselung am PIN (PBKDF2 + AES-GCM); Zuschauermodus in der Logik verriegelt, nicht im CSS; Screenshots von einem deterministischen Skript im Repo regeneriert; 470 Tests in Vanilla-JS mit Nodes eingebautem Runner. Alle Details im [englischen README](README.md).
 
 ---
 

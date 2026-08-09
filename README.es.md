@@ -4,7 +4,11 @@
 
 **Un gestor de colección de cartas instalable y offline-first, construido con JavaScript vanilla y cero dependencias en tiempo de ejecución — sin framework, sin SDK, sin CDN, sin backend.**
 
-[![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
+[| Visita guiada — cinco capítulos, uno por página | Las cinco familias de foil, en el nivel atenuado |
+|---|---|
+| ![Visita guiada — cinco capítulos, uno por página](screenshots/tutorial-chapter.jpg) | ![Las cinco familias de foil, en el nivel atenuado](screenshots/foil-family.jpg) |
+
+![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![PWA](https://img.shields.io/badge/PWA-installable%20%2B%20offline%20%E2%9C%93-brightgreen)
 ![Zero runtime deps](https://img.shields.io/badge/runtime%20dependencies-0-blue)
@@ -67,7 +71,7 @@ Es una **PWA**: instálala desde tu navegador y funciona como una app nativa, to
 Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas, cada una en hasta 16 variantes (colores base, foils, duales, Wild, Nitro, promos):
 
 - 📇 **Gestión completa de la colección** — en propiedad / repetidas / wishlist / favoritas, cantidades por variante, toda la colección siempre a la vista.
-- ➕ **Añadido rápido con un gesto** — un botón + en cada casilla abre un selector de variantes: un toque añade un ejemplar, con aviso «Deshacer». La cabecera muestra tu progreso en vivo (poseídas/total) sobre una fina línea de progreso.
+- ➕ **Añadido rápido con un gesto** — un botón + en cada casilla abre un selector de variantes: un toque añade un ejemplar, con aviso «Deshacer». La cabecera de la página Colección muestra tu progreso en vivo: una barra más poseídas / que faltan / repetidas.
 - ✨ **Sistema de rareza animado de 7 niveles** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calculado a partir de la mejor variante en propiedad, +1 nivel cuando la serie está completa (todas las variantes en propiedad) — `eternal` solo se alcanza así. Las cartas foil llevan barridos de luz animados, `divine` se muestra como un degradado iridiscente y `eternal` en negro y oro centelleante (todo respetando `prefers-reduced-motion`).
 - 📴 **Funciona totalmente sin conexión** — toda la app queda precacheada por un service worker; tras la primera visita, el modo avión no cambia nada.
 - 🔄 **Actualizaciones transparentes** — las nuevas versiones se detectan en segundo plano y se aplican con un toque, con un changelog integrado que muestra qué ha cambiado desde *tu* última versión.
@@ -94,7 +98,7 @@ Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas, cada 
 | Cripto | **Web Crypto** nativo — SHA-256 (PIN), PBKDF2 + AES-GCM (cifrado en reposo opcional) |
 | Códigos QR | Codificador de un solo archivo vendorizado ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Fuentes | WOFF2 autoalojadas (SIL OFL) — ninguna petición a Google Fonts, 5 temas a elegir |
-| Tests | **Runner de tests integrado en Node** (`node --test`) — 385 tests, sin framework de test |
+| Tests | **Runner de tests integrado en Node** (`node --test`) — 470 tests, sin framework de test |
 | CI | GitHub Actions — tests + build + verificación de frescura del bundle commiteado en cada push/PR |
 
 **Cero dependencias en runtime es una regla de diseño, no una casualidad.** Todo lo que un framework o SDK proporcionaría — renderizado, navegación entre vistas, i18n, caché offline, auth por REST, cifrado, generación de QR — está construido directamente sobre las API de la plataforma web. La app que instalas es exactamente el código de este repositorio.
@@ -113,6 +117,37 @@ El código es un conjunto de **módulos ES** enfocados tras un único punto de e
 | Nube opcional | `cloud.js`, `feedback.js`, `settings-sync.js` — todos en REST puro |
 
 Las acciones pasan por **un único listener delegado** sobre `[data-action]` en lugar de manejadores en línea — que es también lo que hace posible el modo lector, ya que un solo conjunto `VIEWER_BLOCKED` bloquea toda escritura. El texto de interfaz nunca aparece en el código: pasa por `t()` sobre diccionarios que cubren los 7 idiomas.
+
+### La forma del proyecto
+
+Cuatro scripts clásicos publican globales `window.__*` antes que los módulos; todo lo demás es un módulo ES tras un único punto de entrada.
+
+```mermaid
+flowchart TB
+  subgraph BOOT["Arranque"]
+    H["index.html"] --> C["translations.js<br/>card-descriptions.js<br/>data-embedded.js<br/>cloud-config.js"]
+    H --> B["app.bundle.js"]
+  end
+  B --> APP["app.js"]
+  APP --> UI
+  APP --> ST
+  APP --> PL
+  subgraph UI["Vistas"]
+    R["render.js"]; S["stats.js"]; BG["badges.js"]; PN["pin.js"]; AC["account.js"]; TU["tutorial.js"]; PH["pagehead.js"]; IC["icons.js"]
+  end
+  subgraph ST["Estado"]
+    STO["storage.js"]; DA["data.js"]; HI["history.js"]; SEC["secure-store.js"]; I18["i18n.js"]
+  end
+  subgraph PL["Plataforma"]
+    SW["sw.js"]; UP["update.js"]; IN["install.js"]; BK["backup.js"]
+  end
+  subgraph CL["Nube opcional"]
+    CLO["cloud.js"]; FB["feedback.js"]; SS["settings-sync.js"]
+  end
+  ST --> CL
+  STO --> SEC
+```
+
 
 ---
 
@@ -141,9 +176,16 @@ Migrar cientos de valores de espaciado escritos a mano hacia tokens, con «a mí
 
 ### Probar una app de navegador sin navegador
 Mantener la promesa de cero dependencias descarta Jest, Vitest y los arneses de navegador headless.
-**Solución:** la lógica se factorizó para ser independiente del navegador y está cubierta por **385 tests en el runner integrado de Node** — sin dependencias de test, sin red real. La CI también reconstruye el bundle y falla si el artefacto commiteado está obsoleto.
+**Solución:** la lógica se factorizó para ser independiente del navegador y está cubierta por **470 tests en el runner integrado de Node** — sin dependencias de test, sin red real. La CI también reconstruye el bundle y falla si el artefacto commiteado está obsoleto.
 
 ---
+
+### Qué cubren las pruebas — y qué no
+
+470 pruebas sobre el ejecutor integrado de Node, sin framework. Ser preciso sobre el límite importa más que el número:
+
+- **Cubierto:** migraciones de almacenamiento y esquema de claves por temporada; la escala de rareza de siete niveles, incluido el ascenso por set completo; todas las condiciones de insignia y el modelo de dificultad; las listas del coleccionista (que faltan, repetidas, intercambio); los ciclos de codificación de los códigos de copia; los ayudantes de nube contra un `fetch` simulado, incluidos los caminos de fallo; la paridad de claves i18n en los 7 idiomas y la detección de duplicados; la precaché del service worker frente al grafo real de importaciones; los contratos de marcado del acceso por teclado; la procedencia de cada `innerHTML` alimentado desde fuera; el contraste WCAG AA en ambos temas.
+- **No cubierto:** el renderizado real (ninguna aserción DOM más allá de cadenas de marcado), el comportamiento del service worker en ejecución, llamadas de red reales, IndexedDB, los avisos de instalación, y todo lo que exija un motor de navegador — eso se verifica a mano y con la pasada determinista de capturas, no con la suite. El porcentaje de cobertura no se publica a propósito: mediría la parte sin navegador y se leería como si midiera la aplicación.
 
 ## 🚀 Primeros pasos
 
@@ -159,7 +201,7 @@ npm install     # instala esbuild, la única devDependency
 npm run build   # app.js → app.bundle.js (minificado + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 385 tests, node --test, sin framework
+npm test        # 470 tests, node --test, sin framework
 ```
 
 **Despliegue.** El repositorio se despliega tal cual en GitHub Pages: todas las URL son relativas, así que la app funciona igual en la raíz de un dominio, bajo un subdirectorio y en localhost. Rutina de release: añadir una entrada al changelog (eso *es* el bump de versión) → subir `SW_VERSION` → build → push.
@@ -176,7 +218,7 @@ npm test        # 385 tests, node --test, sin framework
 
 ## 🔩 Notas de ingeniería
 
-Cero dependencias en ejecución (solo esbuild, al compilar); cero desplazamiento de diseño, medido al píxel entre versiones; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado; 385 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
+Cero dependencias en ejecución (solo esbuild, al compilar); cero desplazamiento de diseño, medido al píxel entre versiones; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado; 470 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
 
 ---
 

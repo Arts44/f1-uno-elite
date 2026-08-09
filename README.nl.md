@@ -4,7 +4,11 @@
 
 **Een offline-first, installeerbare tracker voor een ruilkaartencollectie, gebouwd met vanilla JavaScript en nul runtime-afhankelijkheden — geen framework, geen SDK, geen CDN, geen backend.**
 
-[![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
+[| Rondleiding — vijf hoofdstukken, één per pagina | De vijf foilfamilies, op het gekalmeerde niveau |
+|---|---|
+| ![Rondleiding — vijf hoofdstukken, één per pagina](screenshots/tutorial-chapter.jpg) | ![De vijf foilfamilies, op het gekalmeerde niveau](screenshots/foil-family.jpg) |
+
+![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![PWA](https://img.shields.io/badge/PWA-installable%20%2B%20offline%20%E2%9C%93-brightgreen)
 ![Zero runtime deps](https://img.shields.io/badge/runtime%20dependencies-0-blue)
@@ -94,7 +98,7 @@ Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten, e
 | Crypto | Native **Web Crypto** — SHA-256 (pincode), PBKDF2 + AES-GCM (optionele versleuteling in rust) |
 | QR-codes | Gevendorde single-file-encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Lettertypen | Zelf gehoste WOFF2 (SIL OFL) — geen Google Fonts-verzoek, 5 thema's naar keuze |
-| Tests | **Ingebouwde testrunner van Node** (`node --test`) — 385 tests, geen testframework |
+| Tests | **Ingebouwde testrunner van Node** (`node --test`) — 470 tests, geen testframework |
 | CI | GitHub Actions — tests + build + versheidscontrole van de gecommitte bundle bij elke push/PR |
 
 **Nul runtime-afhankelijkheden is een ontwerpregel, geen toeval.** Alles wat een framework of SDK normaal levert — rendering, navigatie tussen weergaven, i18n, offline caching, auth via REST, versleuteling, QR-generatie — is rechtstreeks op de webplatform-API's gebouwd. De app die je installeert is exact de code in deze repository.
@@ -113,6 +117,37 @@ De code bestaat uit gerichte **ES-modules** achter één ingangspunt, `app.js`, 
 | Optionele cloud | `cloud.js`, `feedback.js`, `settings-sync.js` — alle via kale REST |
 
 Acties lopen via **één gedelegeerde listener** op `[data-action]` in plaats van inline handlers — wat ook de kijkersmodus mogelijk maakt, omdat één enkele `VIEWER_BLOCKED`-set elke schrijfactie tegenhoudt. Interfacetekst staat nooit in de code: die loopt via `t()` over woordenboeken die alle 7 talen dekken.
+
+### De vorm van het project
+
+Vier klassieke scripts publiceren `window.__*`-globals vóór de modules; al het andere is een ES-module achter één ingang.
+
+```mermaid
+flowchart TB
+  subgraph BOOT["Opstart"]
+    H["index.html"] --> C["translations.js<br/>card-descriptions.js<br/>data-embedded.js<br/>cloud-config.js"]
+    H --> B["app.bundle.js"]
+  end
+  B --> APP["app.js"]
+  APP --> UI
+  APP --> ST
+  APP --> PL
+  subgraph UI["Weergaven"]
+    R["render.js"]; S["stats.js"]; BG["badges.js"]; PN["pin.js"]; AC["account.js"]; TU["tutorial.js"]; PH["pagehead.js"]; IC["icons.js"]
+  end
+  subgraph ST["Status"]
+    STO["storage.js"]; DA["data.js"]; HI["history.js"]; SEC["secure-store.js"]; I18["i18n.js"]
+  end
+  subgraph PL["Platform"]
+    SW["sw.js"]; UP["update.js"]; IN["install.js"]; BK["backup.js"]
+  end
+  subgraph CL["Optionele cloud"]
+    CLO["cloud.js"]; FB["feedback.js"]; SS["settings-sync.js"]
+  end
+  ST --> CL
+  STO --> SEC
+```
+
 
 ---
 
@@ -141,9 +176,16 @@ Honderden hardgecodeerde spatiëringswaarden migreren naar tokens, met „het zi
 
 ### Een browserapp testen zonder browser
 De belofte van nul afhankelijkheden sluit Jest, Vitest en headless-browsertuigages uit.
-**Oplossing:** de logica is zo gefactoriseerd dat ze browservrij is en wordt gedekt door **385 tests op de ingebouwde runner van Node** — geen testafhankelijkheden, geen echt netwerk. De CI herbouwt bovendien de bundle en faalt als het gecommitte artefact verouderd is.
+**Oplossing:** de logica is zo gefactoriseerd dat ze browservrij is en wordt gedekt door **470 tests op de ingebouwde runner van Node** — geen testafhankelijkheden, geen echt netwerk. De CI herbouwt bovendien de bundle en faalt als het gecommitte artefact verouderd is.
 
 ---
+
+### Wat de tests dekken — en wat niet
+
+470 tests op Node's ingebouwde runner, zonder framework. Precies zijn over de grens telt zwaarder dan het aantal:
+
+- **Gedekt:** opslagmigraties en het sleutelschema per seizoen; de zeldzaamheidsladder van zeven niveaus inclusief promotie door een complete set; alle badgevoorwaarden en het moeilijkheidsmodel; de verzamelaarslijsten (ontbrekend, dubbel, ruil); de codeerrondes van back-upcodes; de cloudhulpjes tegen een nagebootste `fetch`, faalpaden inbegrepen; gelijkheid van i18n-sleutels over de 7 talen en detectie van dubbele sleutels; de precache van de service worker tegen de echte importgraaf; de markupcontracten van toetsenbordtoegang; de herkomst van elke van buitenaf gevoede `innerHTML`; WCAG AA-contrast in beide thema's.
+- **Niet gedekt:** het echte renderen (geen DOM-asserties voorbij markupstrings), het gedrag van de service worker tijdens uitvoering, echte netwerkoproepen, IndexedDB, installatieprompts, en alles wat een browserengine vereist — die worden met de hand en door de deterministische screenshotronde geverifieerd, niet door de suite. Het dekkingspercentage wordt bewust niet gepubliceerd: het zou de browservrije snede meten en lezen alsof het de app mat.
 
 ## 🚀 Aan de slag
 
@@ -159,7 +201,7 @@ npm install     # installeert esbuild, de enige devDependency
 npm run build   # app.js → app.bundle.js (geminificeerd + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 385 tests, node --test, zonder framework
+npm test        # 470 tests, node --test, zonder framework
 ```
 
 **Deployment.** De repository deployt as-is naar GitHub Pages: elke URL is relatief, dus de app draait identiek op een domeinroot, onder een subpad en op localhost. Releaseroutine: een changelog-vermelding toevoegen (dat *is* de versiebump) → `SW_VERSION` ophogen → builden → pushen.
@@ -176,7 +218,7 @@ npm test        # 385 tests, node --test, zonder framework
 
 ## 🔩 Engineering-notities
 
-Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); nul layoutverschuiving, per pixel gemeten tussen versies; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo; 385 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
+Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); nul layoutverschuiving, per pixel gemeten tussen versies; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo; 470 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
 
 ---
 

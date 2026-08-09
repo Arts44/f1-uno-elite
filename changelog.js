@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.47.2',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'Documentation and screenshots refreshed: every capture now shows the app as it actually is — the rebuilt tour, the calmer foils, the unified page headers, the grid without its old toolbar. The README gains an architecture diagram and an honest account of what the tests do and do not cover.',
+      ],
+      fr: [
+        'Documentation et captures rafraîchies : chaque image montre désormais l\'app telle qu\'elle est vraiment — la visite refaite, les foils apaisés, les en-têtes de page unifiés, la grille sans son ancienne barre. Le README gagne un schéma d\'architecture et un état honnête de ce que les tests couvrent et ne couvrent pas.',
+      ],
+      es: [
+        'Documentación y capturas actualizadas: cada imagen muestra ahora la app tal como es — la visita rehecha, los foils calmados, las cabeceras de página unificadas, la cuadrícula sin su antigua barra. El README gana un diagrama de arquitectura y un balance honesto de lo que las pruebas cubren y lo que no.',
+      ],
+      zh: [
+        '文档与截图已刷新:每一张图现在都如实呈现应用的样子——重做的导览、减弱后的闪卡、统一的页首、去掉旧工具栏的网格。README 新增架构示意图,以及关于测试覆盖与未覆盖范围的诚实说明。',
+      ],
+      it: [
+        'Documentazione e screenshot aggiornati: ogni immagine mostra ora l\'app com\'è davvero — la visita rifatta, i foil attenuati, le intestazioni di pagina unificate, la griglia senza la vecchia barra. Il README guadagna uno schema dell\'architettura e un resoconto onesto di ciò che i test coprono e non coprono.',
+      ],
+      nl: [
+        'Documentatie en schermafbeeldingen ververst: elke opname toont de app nu zoals die echt is — de herbouwde rondleiding, de rustiger foils, de eenvormige paginakoppen, het raster zonder de oude balk. De README krijgt een architectuurschema en een eerlijk overzicht van wat de tests wel en niet dekken.',
+      ],
+      de: [
+        'Dokumentation und Screenshots aufgefrischt: Jede Aufnahme zeigt die App jetzt so, wie sie wirklich ist — die neu gebaute Tour, die ruhigeren Foils, die einheitlichen Seitenköpfe, das Raster ohne die alte Leiste. Die README erhält ein Architekturdiagramm und eine ehrliche Aufstellung, was die Tests abdecken und was nicht.',
+      ],
+    },
+  },
+  {
     version: '1.47.1',
     date: '2026-08-09',
     changes: {

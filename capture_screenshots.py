@@ -180,6 +180,53 @@ def init_script(lang, theme, **over):
                     for k, v in seed.items()) + ';'
 
 
+# ── Bande de comparaison des 5 familles de foil (injectée par Playwright).
+# Le même visuel de carte est cloné cinq fois et reçoit tour à tour la
+# classe de chaque famille : ce qui diffère à l'écran ne peut donc venir
+# que du traitement foil, pas de la carte.
+FOIL_STRIP_JS = """() => {
+  const src = [...document.querySelectorAll('.card')]
+    .find(c => c.className.includes('tv-') && c.className.includes('_foil'));
+  if(!src) return false;
+  const FAM = [['Foil', 'tv-green_foil'], ['Dual', 'tv-blue_red_foil'],
+               ['Promo', 'tv-promo-red'], ['Nitro', 'tv-nitro_foil'],
+               ['Wild', 'tv-wild_foil']];
+  const box = document.createElement('div');
+  box.id = 'foilStrip';
+  box.style.cssText = 'position:fixed;inset:0;z-index:99999;background:var(--bg);'
+    + 'display:flex;align-items:center;justify-content:center;gap:22px;padding:24px;';
+  for(const [label, cls] of FAM){
+    const w = document.createElement('div');
+    w.style.cssText = 'width:210px;display:flex;flex-direction:column;gap:8px;';
+    const t = document.createElement('div');
+    t.textContent = label;
+    t.style.cssText = 'font:700 11px var(--font-d);letter-spacing:.12em;'
+      + 'text-transform:uppercase;color:var(--tx3);text-align:center;';
+    const card = src.cloneNode(true);
+    card.classList.remove('fx-idle');
+    [...card.classList].filter(x => x.startsWith('tv-')).forEach(x => card.classList.remove(x));
+    card.classList.add(cls);
+    const v = card.querySelector('.card-visual');
+    [...v.classList].filter(x => x.startsWith('tv-')).forEach(x => v.classList.remove(x));
+    v.classList.add(cls);
+    w.append(t, card);
+    box.appendChild(w);
+  }
+  document.body.appendChild(box);
+  return true;
+}"""
+
+# Fige toutes les bandes au même instant du cycle (passage centré sur la
+# tuile) et les faisceaux au même angle : deux gels successifs produisent
+# la même image.
+FOIL_FREEZE_JS = """() => {
+  document.getAnimations().forEach(a => {
+    const d = a.effect.getTiming().duration;
+    if(a.animationName === 'foil-pass'){ a.currentTime = d * 0.225; a.pause(); }
+    else if(a.animationName === 'wild-spin'){ a.currentTime = d * 0.30; a.pause(); }
+  });
+}"""
+
 # ══════════════════════════════════════════════════════════
 #   Helpers
 # ══════════════════════════════════════════════════════════
@@ -330,8 +377,18 @@ with sync_playwright() as p:
         go(pg, 'stats')
         pg.wait_for_selector('.sv-donut')
         pg.wait_for_timeout(400)
-    desktop('dark', 'stats-dark.jpg', open_stats)
-    desktop('light', 'stats-light.jpg', open_stats)
+    # 1.45.0 : Stats est passée en colonne principale + rail collant,
+    # et le rail n'apparaît qu'au-delà de 1000 px. À 800 px, la capture
+    # montrait une mise en page qui n'existe plus.
+    def desktop_wide(theme, name, fn=None, wait='.card'):
+        c = ctx_for('en', theme, 1280, 860, 2)
+        page = new_page(c, wait=wait)
+        if fn:
+            fn(page)
+        shot(page, name)
+        c.close()
+    desktop_wide('dark', 'stats-dark.jpg', open_stats)
+    desktop_wide('light', 'stats-light.jpg', open_stats)
 
     mobile('dark', 'grid-mobile-dark.jpg')
     mobile('light', 'grid-mobile-light.jpg')
@@ -427,9 +484,84 @@ with sync_playwright() as p:
         pg.wait_for_selector('.modal-visual')
         pg.wait_for_timeout(600)
     mobile('dark', 'circuit-gp.jpg', open_gp)
+
+    # ── Tutoriel refondu (1.47.0) — un chapitre en situation.
+    # On entre par le bouton « Rejouer » des Réglages : c'est le chemin
+    # réel, et il ne dépend pas de l'état « déjà vu ».
+    c = ctx_for('en', 'dark', 375, 812, 2)
+    page = new_page(c)
+    go(page, 'settings')
+    page.wait_for_selector('#replayTutBtn')
+    page.evaluate('document.getElementById("replayTutBtn").click()')
+    page.wait_for_selector('.tut-bubble')
+    page.wait_for_timeout(1800)          # défilement + placement stabilisés
+    # Avancer jusqu'à une étape d'observation : la bulle y montre la
+    # rangée d'actions complète (Quitter · Précédent · Passer · Suivant).
+    for _ in range(4):
+        if page.locator('#tutNext').count():
+            break
+        sp = page.locator('.tut-spot').bounding_box()
+        if sp:
+            page.mouse.click(sp['x'] + sp['width'] / 2, sp['y'] + sp['height'] / 2)
+        page.wait_for_timeout(1600)
+    page.wait_for_timeout(600)
+    if not page.locator('.tut-rail').count():
+        FAILS.append('tutoriel : le rail de chapitres est absent de la capture')
+    shot(page, 'tutorial-chapter.jpg')
+    c.close()
+
+    # ── Les cinq familles de foil au niveau « moyen » (1.46.x).
+    # Même carte, cinq traitements, bande figée au MÊME instant du cycle
+    # pour que la comparaison reste honnête d'un gel à l'autre.
+    c = ctx_for('en', 'dark', 1280, 560, 2)
+    page = new_page(c, hide_nav=True)
+    page.evaluate(FOIL_STRIP_JS)
+    page.wait_for_timeout(500)
+    page.evaluate(FOIL_FREEZE_JS)
+    page.wait_for_timeout(300)
+    shot(page, 'foil-family.jpg')
+    c.close()
     print('nouvelles surfaces OK')
 
     browser.close()
+
+# ══════════════════════════════════════════════════════════
+#   HONNÊTETÉ DU SEED — vérifiée, pas promise
+#
+#   Le seed PRÉ-DATE une liste de badges auto pour que les captures
+#   montrent une progression crédible. Rien n'empêcherait d'y glisser
+#   un badge que la collection ne justifie pas : la règle « une fois
+#   débloqué, toujours débloqué » l'afficherait quand même.
+#   On recharge donc l'app SANS cette liste et on laisse
+#   seedNewAutoBadges() dériver les badges réellement mérités depuis
+#   la seule collection. Tout badge pré-daté hors de cette dérivation
+#   est un mensonge : la capture échoue.
+# ══════════════════════════════════════════════════════════
+def check_seed_honesty(browser_factory):
+    pre_dated = set(json.loads(SEED['f1uno_auto_badges_2025']).keys())
+    with browser_factory() as pw:
+        b = pw.chromium.launch(headless=True)
+        c = b.new_context(viewport={'width': 420, 'height': 900})
+        c.add_init_script(init_script('en', 'dark', f1uno_auto_badges_2025='{}'))
+        pg = c.new_page()
+        pg.goto(URL)
+        pg.wait_for_selector('.card', timeout=20000)
+        pg.wait_for_timeout(1500)
+        derived = set(pg.evaluate("""() => {
+          const raw = localStorage.getItem('f1uno_auto_badges_2025');
+          return raw ? Object.keys(JSON.parse(raw)) : [];
+        }"""))
+        c.close()
+        b.close()
+    undeserved = sorted(pre_dated - derived)
+    if undeserved:
+        FAILS.append('badges pré-datés sans condition satisfaite : ' + ', '.join(undeserved))
+    else:
+        print(f'seed honnête : {len(pre_dated)} badges pré-datés, tous mérités '
+              f'({len(derived)} dérivés de la collection)')
+
+
+check_seed_honesty(sync_playwright)
 
 if FAILS:
     print('ÉCHECS :', *FAILS, sep='\n  ')
