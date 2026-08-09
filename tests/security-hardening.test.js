@@ -180,3 +180,41 @@ describe('tutoriel 1.47.0 — rien d’externe ne transite par la bulle', () => 
     assert.ok(!/localStorage|JSON\.parse/.test(tpl));
   });
 });
+
+/* ══════════════════════════════════════════════════════════
+   ALÉA — le bon générateur au bon endroit.
+
+   Codacy signale le Math.random() de badges.js (positionnement des
+   particules de célébration). L'alerte est désactivée côté service,
+   ce qui laisse une question ouverte : et si un Math.random()
+   apparaissait un jour LÀ où ça compte ? Ce test tient la frontière
+   à la place du pattern qu'on a fait taire.
+   ══════════════════════════════════════════════════════════ */
+describe('aléa — Math.random() ne doit jamais toucher la sécurité', () => {
+  const SENSIBLES = ['secure-store.js', 'pin.js', 'cloud.js', 'backup.js'];
+
+  test('aucun Math.random() dans les modules sensibles', () => {
+    for(const f of SENSIBLES){
+      const src = readFileSync(new URL(`../${f}`, import.meta.url), 'utf8');
+      assert.ok(!/Math\s*\.\s*random\s*\(/.test(src),
+        `${f} : le sel, l'IV et tout secret doivent venir de crypto.getRandomValues()`);
+    }
+  });
+
+  test('secure-store.js tire bien son sel et son IV d\'un CSPRNG', () => {
+    const src = readFileSync(new URL('../secure-store.js', import.meta.url), 'utf8');
+    const n = (src.match(/crypto\.getRandomValues\(/g) || []).length;
+    assert.ok(n >= 3, `attendu ≥3 appels (1 IV + 2 sels), trouvé ${n}`);
+  });
+
+  test('le seul Math.random() du dépôt est décoratif et documenté', () => {
+    const badges = readFileSync(new URL('../badges.js', import.meta.url), 'utf8');
+    // Le commentaire de justification cite lui-même Math.random() :
+    // on compte le CODE, pas la prose qui l'explique.
+    const code = badges.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    const n = (code.match(/Math\.random\(/g) || []).length;
+    assert.equal(n, 1, 'un seul usage attendu : les particules de célébration');
+    assert.ok(/\/\/\s*Math\.random\(\)\s*DÉCORATIF/.test(badges),
+      'l\'usage doit rester justifié sur place, en toutes lettres');
+  });
+});

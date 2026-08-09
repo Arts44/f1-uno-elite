@@ -104,6 +104,29 @@ exclude_paths:
 #         sauvegarde importée, d'un lien #backup= ni du réseau.
 #         Provenance détaillée au-dessus de cloudConfig().
 #
+#   · « Inaccurate / magic numeric literal » sur 86400000 (2×)
+#       → backup.js et badges.js. Le nombre a été REMPLACÉ par une
+#         constante nommée DAY_MS — le correctif que la règle appelle.
+#         Le pattern se déclenche malgré tout, sur la ligne de la
+#         constante elle-même : il vise la VALEUR, où qu'elle soit, et
+#         aucune écriture ne peut le satisfaire. 86400000 est
+#         exactement représentable en double (2^7 × 675000), il n'y a
+#         donc aucune perte de précision à corriger.
+#         Le refactor est CONSERVÉ : le nombre magique a disparu du
+#         code, ce qui était le vrai objectif. Seule l'alerte est
+#         désactivée, pas l'amélioration.
+#
+#   · « Insecure random / cryptographically weak RNG » sur badges.js
+#       → Un seul Math.random() dans tout le dépôt : la distance de
+#         projection (34→60 px) des 12 particules de célébration
+#         affichées quand un badge se débloque. Aucune valeur de
+#         sécurité n'en dépend.
+#         Le seul aléa qui compte, lui, utilise déjà un CSPRNG :
+#         crypto.getRandomValues() dans secure-store.js, pour le sel
+#         PBKDF2 et l'IV AES-GCM. Un test doit échouer si un
+#         Math.random() apparaît un jour dans secure-store.js — c'est
+#         là qu'il serait grave, pas dans des confettis.
+#
 # NON DÉSACTIVÉ, délibérément : tout ce qui touche eval, les fonctions
 # construites depuis une chaîne, les URL javascript:, et les
 # comparaisons d'empreintes. Ces alertes-là sont à corriger.

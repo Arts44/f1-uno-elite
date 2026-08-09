@@ -638,7 +638,6 @@ export function changeMoQty(cardId, typeId, delta){
   updateStats(); updateCardTile(cardId);
 }
 
-export function closeMoOverlay(e){ if(e.target===document.getElementById('mo')) closeMo(); }
 export function closeMo(){ document.getElementById('mo').classList.remove('open'); currentCardId=null; }
 
 /* ══════════════════════════════════════════════════════════ NAV BEAD
