@@ -172,7 +172,7 @@ Migrating hundreds of hard-coded spacing values to design tokens, with "it looks
 **Solution:** exact-match substitution only, then a proof — resolve every `var()` in both stylesheets down to pixels and byte-compare them. A later pass named the recurring half-steps rather than rounding 61 declarations for scale purity alone.
 
 ### Feedback with email notifications — without a server
-**Solution:** a Postgres trigger on the `feedback` table calls the Resend API through `pg_net`, entirely inside Supabase. The API key lives encrypted in the Vault, user content is HTML-escaped, and a failing email can never block the insert.
+**Solution:** a Postgres trigger on the `feedback` table calls the Resend API through `pg_net`, entirely inside Supabase. The API key lives encrypted in the Vault, user content is HTML-escaped in SQL, and the trigger swallows its own failures (`exception when others`) so a failing email can never block the insert. A **second trigger enforces the real rate limit in the database** — five entries per user per hour, raised as `rate_limited` — and the app maps that error to a typed code. The client-side cool-down is a courtesy; the protection is server-side.
 
 ### Testing a browser app without a browser
 Keeping a zero-dependency promise rules out Jest, Vitest and headless-browser harnesses.
@@ -223,8 +223,17 @@ npm test        # 511 tests, node --test, no framework
 ## ⚖️ Honest limits
 
 - **The PIN is an interface barrier, not strong security.** Without the optional encryption, the collection is readable in `localStorage` via DevTools. With encryption on, casual snooping is blocked — but a 4-digit PIN can be brute-forced offline by someone holding the device. A forgotten PIN makes an encrypted local collection unrecoverable.
-- **Cloud sign-in relies on the project's own Supabase email configuration.** Delivery, quotas and sender reputation are handled server-side and are not measured by this repository — treat sign-in emails as best-effort for a personal project, not as guaranteed delivery.
+- **Feedback notifications are sent from Resend's test domain** (`onboarding@resend.dev`). Resend only delivers from that domain to the account owner's own address, so the notification reaches the maintainer and nobody else. Sending from anywhere else would mean owning and verifying a domain. This is a deliberate limit, not a bug: feedback is stored in the database either way, and a failed send never blocks it.
+- **Sign-in codes travel over a custom SMTP provider configured in Supabase** — a chain entirely separate from the feedback notifications above. Delivery, quotas and sender reputation depend on that provider and are not measured by this repository; treat sign-in emails as best-effort for a personal project.
 - **Progression history has no back-fill** — the stats curve starts the day the feature was installed.
+
+---
+
+## ☕ Supporting the developer
+
+A single outbound link in **Settings → About** points to [Ko-fi](https://ko-fi.com/arts44). It supports **me, the developer** — not the app, and not its subject matter. There is no third-party script, no tracking pixel and no personal data leaving the device: it is an `<a target="_blank" rel="noopener noreferrer">` and nothing more. The URL lives in a single constant (`SUPPORT_URL` in `pin.js`); emptying it removes the row entirely. Offline, the row is visibly inert rather than leading to a dead page.
+
+**Nothing is unlocked by donating** — no feature, no badge, no name in a list. A donation that bought something would be a purchase, and this project stays a non-commercial fan project.
 
 ---
 

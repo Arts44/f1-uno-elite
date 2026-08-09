@@ -172,7 +172,7 @@ Honderden hardgecodeerde spatiëringswaarden migreren naar tokens, met „het zi
 **Oplossing:** uitsluitend exact passende substitutie, en daarna een bewijs — elke `var()` in beide stylesheets oplossen naar pixelwaarden en ze byte voor byte vergelijken. Een latere ronde gaf de terugkerende halve stappen een naam in plaats van 61 declaraties af te ronden puur voor schaalzuiverheid.
 
 ### Feedback met e-mailnotificatie — zonder server
-**Oplossing:** een Postgres-trigger op de `feedback`-tabel roept de Resend-API aan via `pg_net`, volledig binnen Supabase. De API-sleutel staat versleuteld in de Vault, gebruikersinhoud wordt HTML-geëscapet, en een mislukte e-mail kan de insert nooit blokkeren.
+**Oplossing:** een Postgres-trigger op de `feedback`-tabel roept de Resend-API aan via `pg_net`, volledig binnen Supabase. De API-sleutel staat versleuteld in de Vault, gebruikersinhoud wordt in SQL HTML-geëscapet, en de trigger slikt zijn eigen fouten (`exception when others`): een mislukte e-mail kan de insert nooit blokkeren. Een **tweede trigger legt de echte snelheidslimiet in de database op** — vijf inzendingen per gebruiker per uur, opgeworpen als `rate_limited` — en de app vertaalt die fout naar een getypeerde code. De wachttijd aan de clientkant is een beleefdheid; de bescherming zit op de server.
 
 ### Een browserapp testen zonder browser
 De belofte van nul afhankelijkheden sluit Jest, Vitest en headless-browsertuigages uit.
@@ -211,7 +211,8 @@ npm test        # 511 tests, node --test, zonder framework
 ## ⚖️ Eerlijke beperkingen
 
 - **De pincode is een interfacebarrière, geen sterke beveiliging.** Zonder de optionele versleuteling is de collectie leesbaar in `localStorage` via DevTools. Met versleuteling aan is terloops gluren geblokkeerd — maar een 4-cijferige pincode kan offline gebruteforcet worden door wie het toestel in handen heeft. Een vergeten pincode maakt een versleutelde lokale collectie onherstelbaar.
-- **Cloud-inloggen leunt op de eigen Supabase-e-mailconfiguratie van het project.** Bezorging, quota en afzenderreputatie worden serverzijdig geregeld en worden door deze repository niet gemeten — beschouw inlogmails als «naar beste vermogen» voor een persoonlijk project, niet als gegarandeerde bezorging.
+- **Feedbackmeldingen vertrekken vanaf het testdomein van Resend** (`onboarding@resend.dev`). Vanaf dat domein bezorgt Resend alleen op het adres van de accounteigenaar: de melding bereikt de beheerder en niemand anders. Elders vandaan versturen zou betekenen dat je een domein bezit en verifieert. Dit is een aanvaarde beperking, geen fout: de feedback wordt hoe dan ook in de database bewaard, en een mislukte verzending blokkeert dat nooit.
+- **Inlogcodes lopen via een eigen SMTP-provider die in Supabase is ingesteld** — een keten die volledig losstaat van de meldingen hierboven. Bezorging, quota en afzenderreputatie hangen van die provider af en worden door deze repository niet gemeten; beschouw inlogmails als «naar beste vermogen» voor een persoonlijk project.
 - **De voortgangshistorie kent geen back-fill** — de statistiekencurve begint op de dag dat de functie werd geïnstalleerd.
 
 ---
@@ -219,6 +220,14 @@ npm test        # 511 tests, node --test, zonder framework
 ## 🔩 Engineering-notities
 
 Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); nul layoutverschuiving, per pixel gemeten tussen versies; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo; 511 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
+
+---
+
+## ☕ De ontwikkelaar steunen
+
+Eén uitgaande link, in **Instellingen → Over**, wijst naar [Ko-fi](https://ko-fi.com/arts44). Die steunt **mij, de ontwikkelaar** — niet de app en niet het onderwerp. Geen script van derden, geen trackingpixel, geen persoonlijke gegevens die het apparaat verlaten: het is een `<a target="_blank" rel="noopener noreferrer">`, meer niet. De URL staat in één constante (`SUPPORT_URL` in `pin.js`); leegmaken laat de regel volledig verdwijnen. Offline wordt de regel zichtbaar inert in plaats van naar een dode pagina te leiden.
+
+**Doneren ontgrendelt niets** — geen functie, geen badge, geen naam in een lijst. Een donatie die iets zou kopen, is een aankoop, en dit blijft een niet-commercieel fanproject.
 
 ---
 

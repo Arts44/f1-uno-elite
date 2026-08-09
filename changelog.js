@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.47.5',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'A new “Support the developer” row in Settings → About opens a Ko-fi page in a new tab. It is a plain link — nothing is loaded from outside, nothing leaves your device, and donating unlocks nothing at all.',
+      ],
+      fr: [
+        'Une nouvelle ligne « Soutenir le créateur » dans Réglages → À propos ouvre une page Ko-fi dans un nouvel onglet. C\'est un simple lien : rien n\'est chargé de l\'extérieur, rien ne quitte votre appareil, et donner ne débloque strictement rien.',
+      ],
+      es: [
+        'Una nueva fila «Apoyar al creador» en Ajustes → Acerca de abre una página de Ko-fi en una pestaña nueva. Es un enlace simple: no se carga nada externo, nada sale de tu dispositivo y donar no desbloquea absolutamente nada.',
+      ],
+      zh: [
+        '设置 → 关于中新增「支持创作者」一行，会在新标签页打开一个 Ko-fi 页面。它只是一个普通链接：不加载任何外部内容，不会有数据离开你的设备，捐赠也不会解锁任何东西。',
+      ],
+      it: [
+        'Una nuova riga «Sostieni il creatore» in Impostazioni → Info apre una pagina Ko-fi in una nuova scheda. È un semplice link: non viene caricato nulla dall\'esterno, nulla lascia il tuo dispositivo e donare non sblocca proprio niente.',
+      ],
+      nl: [
+        'Een nieuwe regel «De maker steunen» in Instellingen → Over opent een Ko-fi-pagina in een nieuw tabblad. Het is gewoon een link: er wordt niets van buitenaf geladen, er verlaat niets je apparaat, en doneren ontgrendelt helemaal niets.',
+      ],
+      de: [
+        'Eine neue Zeile «Den Entwickler unterstützen» unter Einstellungen → Über öffnet eine Ko-fi-Seite in einem neuen Tab. Es ist ein schlichter Link: Es wird nichts von außen geladen, nichts verlässt Ihr Gerät, und eine Spende schaltet überhaupt nichts frei.',
+      ],
+    },
+  },
+  {
     version: '1.47.4',
     date: '2026-08-09',
     changes: {

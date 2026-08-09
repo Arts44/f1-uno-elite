@@ -37,10 +37,9 @@ export function isViewerModeAllowed(){ return localStorage.getItem('f1uno_viewer
    tiers, zéro pixel de suivi, aucune donnée qui quitte l'appareil.
    Laisser l'URL vide masque entièrement la ligne.
    ══════════════════════════════════════════════════════════ */
-// Vide = la ligne n'apparaît pas du tout. Elle le reste tant que
-// l'URL réelle n'est pas décidée : mieux vaut une fonction dormante
-// qu'un lien qui mène à une page d'inscription.
-export const SUPPORT_URL = '';
+// Source unique de l'URL : la changer ici la change partout. Vide =
+// la ligne disparaît entièrement de l'interface.
+export const SUPPORT_URL = 'https://ko-fi.com/arts44';
 
 export function getStoredPinHash(){ return localStorage.getItem('f1uno_pin_hash')||''; }
 

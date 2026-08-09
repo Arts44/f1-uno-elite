@@ -172,7 +172,7 @@ Hunderte hartkodierte Abstandswerte auf Tokens migrieren, mit „sieht für mich
 **Lösung:** Ausschließlich exakt passende Ersetzungen, danach ein Beweis — jedes `var()` in Vorher- und Nachher-Stylesheet zu Pixelwerten auflösen und beide Byte für Byte vergleichen. Ein späterer Durchgang benannte die wiederkehrenden Halbschritte, statt 61 Deklarationen allein der Skalenreinheit wegen zu runden.
 
 ### Feedback mit E-Mail-Benachrichtigung — ohne Server
-**Lösung:** Ein Postgres-Trigger auf der `feedback`-Tabelle ruft über `pg_net` die Resend-API auf — vollständig innerhalb von Supabase. Der API-Schlüssel liegt verschlüsselt im Vault, Nutzerinhalte werden HTML-escaped, und eine fehlschlagende E-Mail kann den Insert nie blockieren.
+**Lösung:** Ein Postgres-Trigger auf der `feedback`-Tabelle ruft über `pg_net` die Resend-API auf — vollständig innerhalb von Supabase. Der API-Schlüssel liegt verschlüsselt im Vault, Nutzerinhalte werden in SQL HTML-escaped, und der Trigger schluckt seine eigenen Fehler (`exception when others`): Eine fehlschlagende E-Mail kann den Insert nie blockieren. Ein **zweiter Trigger setzt die eigentliche Ratenbegrenzung in der Datenbank durch** — fünf Rückmeldungen pro Nutzer und Stunde, geworfen als `rate_limited` — und die App übersetzt diesen Fehler in einen typisierten Code. Die Wartezeit auf Client-Seite ist eine Höflichkeit; der Schutz liegt auf dem Server.
 
 ### Eine Browser-App ohne Browser testen
 Das Null-Abhängigkeiten-Versprechen schließt Jest, Vitest und Headless-Browser-Gespanne aus.
@@ -211,7 +211,8 @@ npm test        # 511 Tests, node --test, ohne Framework
 ## ⚖️ Ehrliche Grenzen
 
 - **Die PIN ist eine Oberflächenbarriere, keine starke Sicherheit.** Ohne die optionale Verschlüsselung ist die Sammlung per DevTools im `localStorage` lesbar. Mit aktiver Verschlüsselung ist beiläufiges Schnüffeln blockiert — aber eine 4-stellige PIN lässt sich offline brute-forcen, wenn jemand das Gerät in Händen hält. Eine vergessene PIN macht eine verschlüsselte lokale Sammlung unwiederbringlich.
-- **Die Cloud-Anmeldung stützt sich auf die eigene Supabase-E-Mail-Konfiguration des Projekts.** Zustellung, Kontingente und Absenderreputation werden serverseitig geregelt und von diesem Repository nicht gemessen — betrachte Anmelde-E-Mails als «nach bestem Bemühen» für ein persönliches Projekt, nicht als garantierte Zustellung.
+- **Feedback-Benachrichtigungen gehen von Resends Testdomain aus** (`onboarding@resend.dev`). Von dieser Domain aus stellt Resend nur an die Adresse des Kontoinhabers zu: Die Benachrichtigung erreicht den Betreuer und sonst niemanden. Von anderswo zu senden hieße, eine Domain zu besitzen und zu verifizieren. Das ist eine bewusst hingenommene Grenze, kein Fehler: Die Rückmeldung wird ohnehin in der Datenbank gespeichert, und ein fehlgeschlagener Versand blockiert das nie.
+- **Anmeldecodes laufen über einen in Supabase konfigurierten eigenen SMTP-Anbieter** — eine Kette, die von den obigen Benachrichtigungen völlig getrennt ist. Zustellung, Kontingente und Absenderreputation hängen von diesem Anbieter ab und werden von diesem Repository nicht gemessen; Anmelde-E-Mails sind für ein persönliches Projekt als «nach bestem Bemühen» zu verstehen.
 - **Die Fortschrittshistorie kennt kein Back-fill** — die Statistikkurve beginnt an dem Tag, an dem das Feature installiert wurde.
 
 ---
@@ -219,6 +220,14 @@ npm test        # 511 Tests, node --test, ohne Framework
 ## 🔩 Engineering-Notizen
 
 Null Laufzeitabhängigkeiten (nur esbuild, beim Build); null Layoutverschiebung, pixelgenau zwischen Versionen gemessen; das schnelle Hinzufügen profiliert und optimiert (~300 ms → ~45 ms auf einem Mittelklasse-Handy); optionale lokale Verschlüsselung am PIN (PBKDF2 + AES-GCM); Zuschauermodus in der Logik verriegelt, nicht im CSS; Screenshots von einem deterministischen Skript im Repo regeneriert; 511 Tests in Vanilla-JS mit Nodes eingebautem Runner. Alle Details im [englischen README](README.md).
+
+---
+
+## ☕ Den Entwickler unterstützen
+
+Ein einziger ausgehender Link unter **Einstellungen → Über** führt zu [Ko-fi](https://ko-fi.com/arts44). Er unterstützt **mich, den Entwickler** — nicht die App und nicht ihr Themenfeld. Kein Drittanbieter-Skript, kein Tracking-Pixel, keine persönlichen Daten verlassen das Gerät: Es ist ein `<a target="_blank" rel="noopener noreferrer">`, nicht mehr. Die URL lebt in einer einzigen Konstante (`SUPPORT_URL` in `pin.js`); leert man sie, verschwindet die Zeile ganz. Offline wird die Zeile sichtbar inaktiv, statt auf eine tote Seite zu führen.
+
+**Eine Spende schaltet nichts frei** — keine Funktion, kein Abzeichen, keinen Namen in einer Liste. Eine Spende, die etwas kaufte, wäre ein Kauf, und dies bleibt ein nicht-kommerzielles Fanprojekt.
 
 ---
 

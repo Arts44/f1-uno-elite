@@ -172,7 +172,7 @@ Migrar cientos de valores de espaciado escritos a mano hacia tokens, con «a mí
 **Solución:** sustitución solo por coincidencia exacta, y después una prueba — resolver cada `var()` de ambas hojas de estilo a píxeles y compararlas byte a byte. Una pasada posterior nombró los medios pasos recurrentes en vez de redondear 61 declaraciones solo por pureza de escala.
 
 ### Feedback con notificación por e-mail — sin servidor
-**Solución:** un trigger de Postgres sobre la tabla `feedback` llama a la API de Resend mediante `pg_net`, todo dentro de Supabase. La clave de API vive cifrada en el Vault, el contenido del usuario se escapa como HTML, y un e-mail fallido jamás puede bloquear la inserción.
+**Solución:** un trigger de Postgres sobre la tabla `feedback` llama a la API de Resend mediante `pg_net`, todo dentro de Supabase. La clave de API vive cifrada en el Vault, el contenido del usuario se escapa como HTML desde SQL, y el trigger se traga sus propios fallos (`exception when others`): un e-mail fallido jamás puede bloquear la inserción. Un **segundo trigger aplica el límite real de frecuencia en la base de datos** — cinco opiniones por usuario y hora, lanzadas como `rate_limited` — y la app traduce ese error a un código tipado. La espera del lado cliente es una cortesía; la protección está en el servidor.
 
 ### Probar una app de navegador sin navegador
 Mantener la promesa de cero dependencias descarta Jest, Vitest y los arneses de navegador headless.
@@ -211,7 +211,8 @@ npm test        # 511 tests, node --test, sin framework
 ## ⚖️ Límites asumidos
 
 - **El PIN es una barrera de interfaz, no seguridad fuerte.** Sin el cifrado opcional, la colección es legible en `localStorage` desde las DevTools. Con el cifrado activo, la curiosidad casual queda bloqueada — pero un PIN de 4 dígitos puede forzarse offline si alguien tiene el dispositivo. Un PIN olvidado hace irrecuperable una colección local cifrada.
-- **El inicio de sesión en la nube se apoya en la configuración de correo Supabase del proyecto.** La entrega, las cuotas y la reputación del remitente se gestionan en el servidor y este repositorio no las mide — considera los correos de acceso como «en la medida de lo posible» para un proyecto personal, no como entrega garantizada.
+- **Las notificaciones de opinión salen del dominio de pruebas de Resend** (`onboarding@resend.dev`). Desde ese dominio, Resend solo entrega a la dirección del propietario de la cuenta: la notificación llega al mantenedor y a nadie más. Enviar desde otro sitio exigiría poseer y verificar un dominio. Es un límite asumido, no un defecto: la opinión se guarda en la base de datos en cualquier caso, y un envío fallido nunca la bloquea.
+- **Los códigos de acceso viajan por un proveedor SMTP configurado en Supabase** — una cadena totalmente distinta de las notificaciones anteriores. La entrega, las cuotas y la reputación del remitente dependen de ese proveedor y este repositorio no las mide; considera los correos de acceso como «en la medida de lo posible» para un proyecto personal.
 - **El historial de progresión no tiene relleno retroactivo** — la curva de estadísticas empieza el día en que se instaló la función.
 
 ---
@@ -219,6 +220,14 @@ npm test        # 511 tests, node --test, sin framework
 ## 🔩 Notas de ingeniería
 
 Cero dependencias en ejecución (solo esbuild, al compilar); cero desplazamiento de diseño, medido al píxel entre versiones; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado; 511 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
+
+---
+
+## ☕ Apoyar al desarrollador
+
+Un único enlace saliente, en **Ajustes → Acerca de**, lleva a [Ko-fi](https://ko-fi.com/arts44). Apoya **a mí, el desarrollador** — no a la app ni a su universo. Ningún script de terceros, ningún píxel de seguimiento, ningún dato personal sale del dispositivo: es un `<a target="_blank" rel="noopener noreferrer">` y nada más. La URL vive en una constante única (`SUPPORT_URL` en `pin.js`); vaciarla hace desaparecer la fila. Sin conexión, la fila queda visiblemente inerte en vez de llevar a una página muerta.
+
+**Nada se desbloquea al donar** — ninguna función, ninguna insignia, ningún nombre en una lista. Una donación que comprara algo sería una compra, y este proyecto sigue siendo un proyecto de fan no comercial.
 
 ---
 

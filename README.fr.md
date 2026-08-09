@@ -172,7 +172,7 @@ Migrer des centaines de valeurs d'espacement en dur vers des tokens, avec pour s
 **Solution :** substitution en correspondance exacte uniquement, puis une preuve — résoudre chaque `var()` des deux feuilles de style en pixels et les comparer octet par octet. Une passe ultérieure a nommé les demi-pas récurrents plutôt que d'arrondir 61 déclarations pour la seule pureté de l'échelle.
 
 ### Du feedback avec notification e-mail — sans serveur
-**Solution :** un trigger Postgres sur la table `feedback` appelle l'API Resend via `pg_net`, entièrement dans Supabase. La clé d'API vit chiffrée dans le Vault, le contenu utilisateur est échappé en HTML, et un e-mail en échec ne peut jamais bloquer l'insertion.
+**Solution :** un trigger Postgres sur la table `feedback` appelle l'API Resend via `pg_net`, entièrement dans Supabase. La clé d'API vit chiffrée dans le Vault, le contenu utilisateur est échappé en HTML côté SQL, et le trigger avale ses propres échecs (`exception when others`) : un e-mail en échec ne peut jamais bloquer l'insertion. Un **second trigger applique la vraie limite de débit en base** — cinq avis par utilisateur et par heure, levés en `rate_limited` — et l'app traduit cette erreur en code typé. Le délai côté client est une politesse ; la protection est côté serveur.
 
 ### Tester une app navigateur sans navigateur
 Tenir la promesse zéro dépendance exclut Jest, Vitest et les harnais de navigateur headless.
@@ -211,7 +211,8 @@ npm test        # 511 tests, node --test, sans framework
 ## ⚖️ Limites assumées
 
 - **Le PIN est une barrière d'interface, pas une sécurité forte.** Sans le chiffrement optionnel, la collection est lisible dans `localStorage` via les DevTools. Chiffrement activé, la curiosité ordinaire est bloquée — mais un PIN à 4 chiffres se brute-force hors-ligne pour qui tient l'appareil. Un PIN oublié rend une collection locale chiffrée irrécupérable.
-- **La connexion cloud repose sur la configuration e-mail Supabase du projet.** Délivrabilité, quotas et réputation d'expéditeur se règlent côté serveur et ne sont pas mesurés par ce dépôt — les e-mails de connexion sont à considérer comme « au mieux » pour un projet perso, pas comme une livraison garantie.
+- **Les notifications d'avis partent du domaine de test de Resend** (`onboarding@resend.dev`). Depuis ce domaine, Resend ne délivre qu'à l'adresse du propriétaire du compte : la notification atteint le mainteneur et personne d'autre. Envoyer ailleurs supposerait de posséder et vérifier un domaine. C'est une limite assumée, pas un défaut : l'avis est enregistré en base dans tous les cas, et un envoi raté ne le bloque jamais.
+- **Les codes de connexion passent par un fournisseur SMTP configuré dans Supabase** — une chaîne entièrement distincte des notifications ci-dessus. Délivrabilité, quotas et réputation d'expéditeur dépendent de ce fournisseur et ne sont pas mesurés par ce dépôt ; les e-mails de connexion sont à considérer comme « au mieux » pour un projet perso.
 - **L'historique de progression n'a pas de rétro-remplissage** — la courbe des stats commence le jour où la fonctionnalité a été installée.
 
 ---
@@ -219,6 +220,14 @@ npm test        # 511 tests, node --test, sans framework
 ## 🔩 Notes d'ingénierie
 
 Zéro dépendance à l'exécution (esbuild seul, au build) ; zéro décalage de mise en page, mesuré au pixel entre les versions ; l'ajout rapide profilé et optimisé (~300 ms → ~45 ms sur mobile moyen) ; chiffrement local optionnel lié au PIN (PBKDF2 + AES-GCM) ; mode spectateur verrouillé dans la logique, pas en CSS ; captures régénérées par un script déterministe versionné ; 511 tests en JS vanilla avec le runner intégré de Node. Détails complets dans le [README anglais](README.md).
+
+---
+
+## ☕ Soutenir le développeur
+
+Un unique lien sortant, dans **Réglages → À propos**, mène à [Ko-fi](https://ko-fi.com/arts44). Il soutient **moi, le développeur** — pas l'app, ni son univers. Aucun script tiers, aucun pixel de suivi, aucune donnée personnelle ne quitte l'appareil : c'est un `<a target="_blank" rel="noopener noreferrer">`, rien de plus. L'URL vit dans une constante unique (`SUPPORT_URL` dans `pin.js`) ; la vider fait disparaître la ligne. Hors ligne, la ligne devient visiblement inerte plutôt que de mener à une page morte.
+
+**Aucune contrepartie** — pas de fonctionnalité débloquée, pas de badge donateur, pas de mention nominative. Un don qui achèterait quelque chose serait un achat, et ce projet reste un fan project non commercial.
 
 ---
 
