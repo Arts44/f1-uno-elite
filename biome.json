@@ -9,7 +9,7 @@
       "!app.bundle.js",
       "!app.bundle.js.map",
       "!package-lock.json",
-      "!_*.html",
+      "!_*",
       "!qrcodegen.js",
       "!data-embedded.js",
       "!screenshots/**",

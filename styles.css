@@ -69,6 +69,20 @@
   --st-owned:#00A94F;--st-wish:#EC4899;--st-doubles:#0EA5B5;
   --st-missing:#E4002B;--st-fav:#F43F5E;--st-copies:#7C4DFF;
   --pr-low:#E8002D;--pr-mid:#C77F00;
+  /* ── FOILS — intensité « moyen » (1.46.0) ───────────────────
+     Trois niveaux avaient été comparés sur la grille réelle ;
+     celui-ci est le retenu. Pour re-régler, ces six variables
+     suffisent — léger : .34/.15/10s, .40/.20/9s, .35/10s ;
+     actuel (avant 1.46.0) : .92/.50/3.8s, 1/.60/3s, .75/4s.
+     Le vrai levier de confort n'est pas l'opacité mais le CYCLE
+     DE SERVICE : la bande passe sur 45 % du cycle, puis attend. */
+  --f-peak:0.55;        /* crête de la bande */
+  --f-mid:0.26;         /* flancs de la bande */
+  --f-dur:6.5s;         /* période du balayage */
+  --f-promo-peak:0.62;--f-promo-mid:0.34;--f-promo-dur:6s;
+  --f-beam-a:0.50;      /* alpha des faisceaux coniques wild/nitro */
+  --f-beam-dur:7s;
+  --f-nitro-dur:10s;--f-nitro-a:0.62;
 }
 
 /* Thème sombre */
@@ -581,12 +595,34 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .card-visual.tv-blue_red_foil::after,.card-visual.tv-green_yellow_foil::after,
 .modal-visual.tv-blue_foil::after,.modal-visual.tv-green_foil::after,.modal-visual.tv-red_foil::after,.modal-visual.tv-yellow_foil::after,
 .modal-visual.tv-blue_red_foil::after,.modal-visual.tv-green_yellow_foil::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;
-  background:linear-gradient(105deg,transparent 40%,rgba(255,244,235,0.5) 47.5%,rgba(255,255,255,0.92) 50%,rgba(255,244,235,0.5) 52.5%,transparent 60%);
-  background-size:300% 100%;
-  animation:tv-sheen 3.8s linear infinite;
+  /* 1.46.0 — la bande est une COUCHE ÉTROITE TRANSLATÉE, plus un
+     background-position animé : le calque est composé au lieu d'être
+     repeint à chaque frame sur toute la tuile. */
+  content:'';position:absolute;top:0;bottom:0;left:0;width:55%;
+  pointer-events:none;z-index:2;mix-blend-mode:screen;
+  background:linear-gradient(105deg,
+    transparent 0%,
+    rgb(255 244 235 / var(--f-mid)) 38%,
+    rgb(255 255 255 / var(--f-peak)) 50%,
+    rgb(255 244 235 / var(--f-mid)) 62%,
+    transparent 100%);
+  animation:foil-pass var(--f-dur) ease-in-out infinite;
 }
-@keyframes tv-sheen{0%{background-position:0% 0;}100%{background-position:-300% 0;}}
+/* Le passage occupe 45 % du cycle ; les 55 % restants sont un temps
+   mort, pendant lequel la tuile ne bouge plus du tout. */
+/* Tuile hors cadre : les effets sont mis en PAUSE, pas supprimés —
+   l'état visuel est conservé et la reprise ne saute pas de phase.
+   La classe est posée par l'IntersectionObserver de render.js. */
+.card.fx-idle,
+.card.fx-idle::before,
+.card.fx-idle::after,
+.card.fx-idle .card-visual::after{animation-play-state:paused;}
+
+@keyframes foil-pass{
+  0%  {transform:translateX(-100%);}
+  45% {transform:translateX(300%);}
+  100%{transform:translateX(300%);}
+}
 
 /* ── FULL-CARD FOIL WASH (the wild treatment, generalized) ──
    Every foil card carries its tv- class on the WHOLE card: the base
@@ -675,9 +711,15 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .tv-promo-yellow{background:radial-gradient(120% 150% at 25% -15%,#ffe14d 0%,transparent 55%),radial-gradient(140% 130% at 85% 120%,#241a00 0%,transparent 60%),linear-gradient(135deg,#9a7a00,#453400);}
 .card-visual.tv-promo-blue::after,.card-visual.tv-promo-green::after,.card-visual.tv-promo-red::after,.card-visual.tv-promo-yellow::after,
 .modal-visual.tv-promo-blue::after,.modal-visual.tv-promo-green::after,.modal-visual.tv-promo-red::after,.modal-visual.tv-promo-yellow::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:screen;
-  background:linear-gradient(105deg,transparent 38%,rgba(255,209,102,0.6) 46%,#fff2cc 50%,rgba(255,209,102,0.6) 54%,transparent 62%);
-  background-size:300% 100%;animation:tv-sheen 3s linear infinite;
+  content:'';position:absolute;top:0;bottom:0;left:0;width:55%;
+  pointer-events:none;z-index:2;mix-blend-mode:screen;
+  background:linear-gradient(105deg,
+    transparent 0%,
+    rgb(255 209 102 / var(--f-promo-mid)) 38%,
+    rgb(255 242 204 / var(--f-promo-peak)) 50%,
+    rgb(255 209 102 / var(--f-promo-mid)) 62%,
+    transparent 100%);
+  animation:foil-pass var(--f-promo-dur) ease-in-out infinite;
 }
 
 /* ══ NITRO FOIL — like the real card: the DRIVER pops out in relief.
@@ -698,9 +740,12 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   position:relative;overflow:hidden;isolation:isolate;
 }
 /* nitro's edge: promo-style MAUVE border (the card's own border, hugs
-   the rounded corners) + wild's reflective halo, IDENTICAL (same
-   wild-glow animation, same timing). */
-.card.tv-nitro_foil{border-color:rgba(200,140,255,0.85);animation:wild-glow 4s linear infinite;}
+   the rounded corners) + wild's reflective halo, IDENTICAL. */
+/* 1.46.0 — wild-glow animait une box-shadow (repeint pur, toute la
+   tuile, en continu). Les faisceaux tournants portent déjà l'identité
+   colorée : le halo devient STATIQUE. */
+.card.tv-nitro_foil{border-color:rgba(200,140,255,0.85);
+  box-shadow:0 0 12px rgba(150,120,220,0.30),0 8px 32px rgba(0,0,0,0.7);}
 .card.tv-nitro_foil .dn-num,
 .modal-visual.tv-nitro_foil .dn-num{color:#FFFFFF !important;}
 .modal-visual.tv-nitro_foil{box-shadow:inset 0 0 0 2px rgba(200,140,255,0.85), inset 0 0 18px rgba(180,110,255,0.3);}
@@ -710,37 +755,36 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   background:conic-gradient(
     from 0deg,
     transparent            0deg,
-    rgba(30,80,220,0.75)  50deg,
+    rgb(30 80 220 / var(--f-beam-a))  50deg,
     transparent            90deg,
-    rgba(20,160,50,0.75)  140deg,
+    rgb(20 160 50 / var(--f-beam-a))  140deg,
     transparent            180deg,
-    rgba(220,0,0,0.75)    230deg,
+    rgb(220 0 0 / var(--f-beam-a))    230deg,
     transparent            270deg,
-    rgba(255,208,0,0.75)  320deg,
+    rgb(255 208 0 / var(--f-beam-a))  320deg,
     transparent            360deg
   );
-  animation:wild-spin 4s linear infinite;
+  animation:wild-spin var(--f-beam-dur) linear infinite;
 }
 /* the revealed grid: mauve glow + grid lines, clipped by the moving
    light band (mask) — nothing is visible outside the band's passage */
 .card.tv-nitro_foil::after,
 .modal-visual.tv-nitro_foil::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
+  /* 1.46.0 — même mécanique que la bande foil : une couche étroite
+     TRANSLATÉE, masque fixe. La grille est un motif périodique de
+     20 px : la translater est visuellement indiscernable d'une grille
+     fixe, et ça remplace un mask-position animé (repeint) par un
+     transform (composé). */
+  content:'';position:absolute;top:0;bottom:0;left:0;width:55%;
+  pointer-events:none;z-index:2;opacity:var(--f-nitro-a);
   background:
     linear-gradient(rgba(215,170,255,0.22),rgba(215,170,255,0.22)),
     linear-gradient(180deg,rgba(240,215,255,0.8) 0 1px,transparent 1px 20px),
     linear-gradient(90deg,rgba(240,215,255,0.8) 0 1px,transparent 1px 20px);
   background-size:100% 100%,20px 20px,20px 20px;
-  -webkit-mask-image:linear-gradient(105deg,transparent 40%,#000 47%,#000 53%,transparent 60%);
-  mask-image:linear-gradient(105deg,transparent 40%,#000 47%,#000 53%,transparent 60%);
-  -webkit-mask-size:300% 100%;mask-size:300% 100%;
-  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
-  animation:nitro-sweep 7s linear infinite;
-}
-@keyframes nitro-sweep{
-  0%{-webkit-mask-position:-50% 0;mask-position:-50% 0;}
-  22%{-webkit-mask-position:150% 0;mask-position:150% 0;}
-  100%{-webkit-mask-position:150% 0;mask-position:150% 0;}
+  -webkit-mask-image:linear-gradient(105deg,transparent 0%,#000 35%,#000 65%,transparent 100%);
+  mask-image:linear-gradient(105deg,transparent 0%,#000 35%,#000 65%,transparent 100%);
+  animation:foil-pass var(--f-nitro-dur) ease-in-out infinite;
 }
 .card.tv-wild_foil {
   background: var(--bg);
@@ -750,7 +794,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   /* isolate: keeps the composited rotating ::before clipped by the
      rounded corners (without it the layer can paint past the radius) */
   isolation: isolate;
-  animation: wild-glow 4s linear infinite;
+  box-shadow: 0 0 12px rgba(150,120,220,0.30), 0 8px 32px rgba(0,0,0,0.7);
 }
 
 /* Faisceaux lumineux rotatifs sur toute la carte */
@@ -761,16 +805,16 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   background: conic-gradient(
     from 0deg,
     transparent           0deg,
-    rgba(30,80,220,0.75)  50deg,
+    rgb(30 80 220 / var(--f-beam-a))  50deg,
     transparent           90deg,
-    rgba(20,160,50,0.75)  140deg,
+    rgb(20 160 50 / var(--f-beam-a))  140deg,
     transparent           180deg,
-    rgba(220,0,0,0.75)    230deg,
+    rgb(220 0 0 / var(--f-beam-a))    230deg,
     transparent           270deg,
-    rgba(255,208,0,0.75)  320deg,
+    rgb(255 208 0 / var(--f-beam-a))  320deg,
     transparent           360deg
   );
-  animation: wild-spin 4s linear infinite;
+  animation: wild-spin var(--f-beam-dur) linear infinite;
   pointer-events: none;
   z-index: 0;
 }
@@ -821,13 +865,6 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   background: rgba(255,255,255,0.15);
 }
 
-@keyframes wild-glow {
-  0%   { box-shadow: 0 0 18px rgba(30,80,220,0.6),  0 8px 32px rgba(0,0,0,0.7); }
-  25%  { box-shadow: 0 0 18px rgba(20,160,50,0.6),  0 8px 32px rgba(0,0,0,0.7); }
-  50%  { box-shadow: 0 0 18px rgba(220,0,0,0.6),    0 8px 32px rgba(0,0,0,0.7); }
-  75%  { box-shadow: 0 0 18px rgba(255,208,0,0.6),  0 8px 32px rgba(0,0,0,0.7); }
-  100% { box-shadow: 0 0 18px rgba(30,80,220,0.6),  0 8px 32px rgba(0,0,0,0.7); }
-}
 @keyframes wild-spin {
   /* scale(1.45): a rotating RECTANGLE only covers its container when its
      inscribed radius exceeds the container's half-diagonal — true for
@@ -958,16 +995,16 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   background:conic-gradient(
     from 0deg,
     transparent           0deg,
-    rgba(30,80,220,0.75)  50deg,
+    rgb(30 80 220 / var(--f-beam-a))  50deg,
     transparent           90deg,
-    rgba(20,160,50,0.75)  140deg,
+    rgb(20 160 50 / var(--f-beam-a))  140deg,
     transparent           180deg,
-    rgba(220,0,0,0.75)    230deg,
+    rgb(220 0 0 / var(--f-beam-a))    230deg,
     transparent           270deg,
-    rgba(255,208,0,0.75)  320deg,
+    rgb(255 208 0 / var(--f-beam-a))  320deg,
     transparent           360deg
   );
-  animation:wild-spin 4s linear infinite;
+  animation:wild-spin var(--f-beam-dur) linear infinite;
 }
 .modal-visual.tv-wild_foil::after{
   content:'';position:absolute;inset:0;pointer-events:none;z-index:2;
@@ -979,9 +1016,11 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   .card.tv-wild_foil::before,
   .card.tv-nitro_foil::before,
   .modal-visual.tv-nitro_foil::before{animation:none;transform:rotate(45deg) scale(1.45);}
-  .card.tv-nitro_foil::after,
-  .modal-visual.tv-nitro_foil::after{animation:none;-webkit-mask-position:50% 0;mask-position:50% 0;}
-  .card-visual[class*="tv-"]::after,.modal-visual[class*="tv-"]::after{animation:none;background-position:50% 0;}
+  /* Les bandes (foil, dual, promo, grille nitro) se figent EN TRAVERS
+     de la tuile — l'effet reste lisible à l'arrêt. */
+  .card-visual[class*="tv-"]::after,.modal-visual[class*="tv-"]::after,
+  .card.tv-nitro_foil::after,.modal-visual.tv-nitro_foil::after{
+    animation:none;transform:translateX(60%);}
 }
 .modal-visual.tv-green_yellow{background:linear-gradient(135deg,#0d4a1f,#8b8000,#2ecc71,#ffd700,#0d4a1f);}
 .modal-close{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:var(--ease);z-index:5;}
@@ -2016,11 +2055,15 @@ button:not(:disabled):not(.bn-tab):active,
 }
 
 /* Mode réduction des animations = mode performance de fait : TOUTES les
-   animations de foil s'arrêtent (la sheen l'était déjà ; wild-glow —
-   liseré wild/nitro — fuyait encore). */
+   animations de foil s'arrêtent. La bande reste POSÉE en travers de la
+   tuile plutôt que sortie du cadre : à l'arrêt, un foil se distingue
+   toujours d'un non-foil au premier regard. */
 @media (prefers-reduced-motion:reduce){
   .card.tv-wild_foil,.card.tv-nitro_foil,
   .modal-visual.tv-wild_foil,.modal-visual.tv-nitro_foil{animation:none !important;}
+  .card-visual[class*="tv-"]::after,.modal-visual[class*="tv-"]::after,
+  .card.tv-nitro_foil::after,.modal-visual.tv-nitro_foil::after{
+    animation:none !important;transform:translateX(60%) !important;}
 }
 
 /* Fiche à 320 px : libellés de types sur 2 lignes plutôt que tronqués */

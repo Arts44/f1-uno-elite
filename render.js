@@ -224,6 +224,38 @@ export function renderGrid(cards){
     grid.appendChild(buildCardEl(card));
   });
   log('Finished rendering', renderedCount, 'cards');
+  observeFoils();
+}
+
+/* ══════════════════════════════════════════════════════════
+   PAUSE DES EFFETS HORS ÉCRAN (1.46.0)
+
+   La grille compte 101 tuiles ; une quinzaine tient à l'écran.
+   Sans observateur, les ~85 autres animaient dans le vide :
+   du travail de composition permanent, invisible, qui empêchait
+   la page de se stabiliser (Speed Index) et vidait la batterie.
+
+   L'observateur ne fait qu'ajouter/retirer une classe ; le CSS
+   met les animations en `paused` — l'état visuel est conservé,
+   la reprise est instantanée et sans saut de phase.
+   ══════════════════════════════════════════════════════════ */
+let _foilObs = null;
+export function observeFoils(){
+  if(typeof IntersectionObserver === 'undefined') return;
+  const grid = document.getElementById('cardGrid');
+  if(!grid) return;
+  if(!_foilObs){
+    _foilObs = new IntersectionObserver(entries => {
+      entries.forEach(e => e.target.classList.toggle('fx-idle', !e.isIntersecting));
+    }, {
+      root: document.getElementById('collectionView'),
+      // Une tuile s'anime déjà avant d'entrer dans le cadre : pas de
+      // démarrage visible pendant un défilement rapide.
+      rootMargin: '250px 0px'
+    });
+  }
+  _foilObs.disconnect();
+  grid.querySelectorAll('.card').forEach(c => _foilObs.observe(c));
 }
 
 /* Construit LA tuile d'une carte — extrait de renderGrid pour que
@@ -346,6 +378,8 @@ export function updateCardTile(cardId){
   }
   const fresh = buildCardEl(card);
   old.replaceWith(fresh);
+  // La tuile est un NOUVEAU nœud : l'ancien était observé, pas celui-ci.
+  if(_foilObs) _foilObs.observe(fresh);
   if(restore !== null){
     const target = restore === '' ? fresh : fresh.querySelector(restore);
     try { target?.focus({ preventScroll: true }); } catch(e){}

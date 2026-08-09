@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.46.0',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'Foil cards are calmer. The shine is softer and, above all, it now passes and then rests instead of sweeping non-stop — on a screen full of cards, your eye gets a break. Every foil stays recognisable at a glance, and the five kinds still tell each other apart.',
+        'Under the hood the effects were rebuilt to cost far less: nothing repaints continuously any more, and cards scrolled out of view stop animating altogether. Better for your battery. If your device asks for reduced motion, everything freezes with the shine left across the card, so foils are still obvious.',
+      ],
+      fr: [
+        'Les cartes foil sont plus calmes. Le reflet est plus doux et surtout il passe puis se repose, au lieu de balayer sans arrêt — sur un écran plein de cartes, l\'œil souffle. Chaque foil reste reconnaissable au premier regard, et les cinq sortes se distinguent toujours entre elles.',
+        'Sous le capot, les effets ont été refaits pour coûter bien moins cher : plus rien ne se repeint en continu, et les cartes sorties de l\'écran cessent complètement de s\'animer. Ta batterie te remercie. Si ton appareil demande à réduire les animations, tout se fige avec le reflet posé en travers de la carte : les foils restent évidents.',
+      ],
+      es: [
+        'Las cartas foil son más tranquilas. El brillo es más suave y, sobre todo, pasa y luego descansa en vez de barrer sin parar — con la pantalla llena de cartas, la vista respira. Cada foil sigue siendo reconocible de un vistazo y los cinco tipos se distinguen entre sí.',
+        'Por dentro, los efectos se rehicieron para costar mucho menos: ya nada se repinta continuamente y las cartas fuera de pantalla dejan de animarse. Tu batería lo agradece. Si tu dispositivo pide reducir el movimiento, todo se congela con el brillo cruzado sobre la carta: los foils siguen siendo evidentes.',
+      ],
+      zh: [
+        '闪卡变得更安静了。反光更柔和,更重要的是它掠过之后会停下来休息,不再持续扫动——满屏卡牌时,眼睛终于能喘口气。每张闪卡依然一眼可辨,五种闪卡也仍然彼此区分得清。',
+        '底层重写了这些效果,开销大幅下降:不再有任何元素持续重绘,滚出屏幕的卡牌会完全停止动画,更省电。若你的设备要求减少动态效果,一切会静止,反光则停留在卡面上——闪卡依旧一目了然。',
+      ],
+      it: [
+        'Le carte foil sono più tranquille. Il riflesso è più morbido e soprattutto passa e poi riposa, invece di scorrere senza sosta — con lo schermo pieno di carte, l\'occhio respira. Ogni foil resta riconoscibile al primo sguardo e i cinque tipi si distinguono ancora tra loro.',
+        'Sotto il cofano gli effetti sono stati rifatti per costare molto meno: nulla viene più ridipinto di continuo e le carte uscite dallo schermo smettono del tutto di animarsi. La batteria ringrazia. Se il dispositivo chiede di ridurre le animazioni, tutto si congela con il riflesso posato sulla carta: i foil restano evidenti.',
+      ],
+      nl: [
+        'Foilkaarten zijn rustiger. De glans is zachter en gaat vooral voorbij en rust dan, in plaats van onophoudelijk te vegen — bij een scherm vol kaarten krijgt je oog even lucht. Elke foil blijft in één oogopslag herkenbaar en de vijf soorten zijn nog steeds uit elkaar te houden.',
+        'Onder de motorkap zijn de effecten herbouwd zodat ze veel minder kosten: niets wordt nog doorlopend hertekend, en kaarten buiten beeld stoppen volledig met animeren. Fijn voor je batterij. Vraagt je toestel om minder beweging, dan bevriest alles met de glans dwars over de kaart: foils blijven duidelijk.',
+      ],
+      de: [
+        'Foil-Karten sind ruhiger. Der Glanz ist weicher und zieht vor allem vorbei und ruht dann, statt ununterbrochen zu wandern — bei einem Bildschirm voller Karten kommt das Auge zur Ruhe. Jede Foil bleibt auf den ersten Blick erkennbar, und die fünf Arten sind weiterhin voneinander zu unterscheiden.',
+        'Unter der Haube wurden die Effekte neu gebaut und kosten deutlich weniger: nichts wird mehr dauerhaft neu gezeichnet, und Karten außerhalb des Bildschirms hören ganz auf zu animieren. Gut für den Akku. Verlangt dein Gerät weniger Bewegung, friert alles ein — mit dem Glanz quer über der Karte, damit Foils klar erkennbar bleiben.',
+      ],
+    },
+  },
+  {
     version: '1.45.0',
     date: '2026-08-09',
     changes: {
