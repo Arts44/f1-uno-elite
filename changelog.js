@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.46.1',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'Nitro cards look right again: the light that reveals their grid is a beam with soft edges instead of a hard panel, the grid is finer, and its violet is back — nitro no longer gets mistaken for wild.',
+      ],
+      fr: [
+        'Les cartes nitro retrouvent leur allure : la lumière qui révèle leur grille est un rai aux bords fondus et non plus un panneau à bords francs, la trame est plus fine, et son violet est revenu — on ne confond plus nitro et wild.',
+      ],
+      es: [
+        'Las cartas nitro recuperan su aspecto: la luz que revela su rejilla es un haz de bordes suaves en vez de un panel de bordes duros, la trama es más fina y su violeta ha vuelto — ya no se confunde nitro con wild.',
+      ],
+      zh: [
+        '硝速卡恢复了应有的样子:揭示网格的那道光变成边缘柔和的光束,不再是硬边色块;网格更细,紫色也回来了——不会再把硝速卡认成万能卡。',
+      ],
+      it: [
+        'Le carte nitro ritrovano il loro aspetto: la luce che rivela la griglia è un raggio dai bordi sfumati invece di un pannello dai bordi netti, la trama è più fine e il suo viola è tornato — nitro non si confonde più con wild.',
+      ],
+      nl: [
+        'Nitrokaarten zien er weer uit zoals het hoort: het licht dat hun raster onthult is een straal met zachte randen in plaats van een hard vlak, het raster is fijner en het paars is terug — nitro wordt niet meer voor wild aangezien.',
+      ],
+      de: [
+        'Nitro-Karten sehen wieder richtig aus: Das Licht, das ihr Gitter enthüllt, ist ein Strahl mit weichen Rändern statt einer hartkantigen Fläche, das Gitter ist feiner, und sein Violett ist zurück — Nitro wird nicht mehr mit Wild verwechselt.',
+      ],
+    },
+  },
+  {
     version: '1.46.0',
     date: '2026-08-09',
     changes: {
