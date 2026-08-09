@@ -21,6 +21,11 @@ const read = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
 const ALLOWED = [
   'www.w3.org', 'schemas.', 'github.com/Arts44', 'arts44.github.io',
   'supabase.co', 'www.nayuki.io',
+  // Lien de soutien (1.48.0) : une ancre que l'utilisateur DÉCIDE
+  // d'ouvrir, jamais une ressource chargée par la page. La règle
+  // « zéro ressource externe » n'est pas assouplie — elle est
+  // vérifiée plus finement par la suite « lien de soutien » ci-dessous.
+  'ko-fi.com',
 ];
 const isAllowed = url => ALLOWED.some(a => url.includes(a));
 
@@ -92,5 +97,57 @@ describe('le rendu ne fabrique plus de balise <img> distante', () => {
     assert.equal(/\.login-duo|\.logo-duo|\.driver-img|\.team-logo/.test(css), false);
     assert.match(css, /\.lockup\{/);
     assert.match(css, /\.team-mono\{/);
+  });
+});
+
+describe('lien de soutien — une ancre, jamais une ressource', () => {
+  // La promesse du projet n'est pas « aucune URL externe n'est écrite
+  // nulle part », c'est « la page ne CHARGE rien de distant ». Un lien
+  // sortant respecte cette promesse tant qu'il reste un lien : ces
+  // tests l'imposent, pour que personne ne le transforme un jour en
+  // <img>, en fetch() ou en import.
+  const pin = read('pin.js');
+  const url = (pin.match(/SUPPORT_URL = '([^']*)'/) || [])[1];
+
+  test('l’URL vit dans UNE constante, pas éparpillée', () => {
+    assert.ok(url !== undefined, 'SUPPORT_URL introuvable');
+    // Chaîne vide = fonction dormante, en attente de l'URL réelle.
+    if (!url) return;                       // vide = fonction désactivée
+    const hits = (pin.match(new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+    assert.equal(hits, 1, 'l’URL est écrite plus d’une fois — une seule source');
+  });
+
+  test('elle n’est jamais chargée : ni fetch, ni src, ni import, ni url()', () => {
+    for (const f of ['pin.js', 'app.js', 'render.js', 'sw.js', 'styles.css',
+                     'index.html', 'index-dev.html', 'manifest.webmanifest']) {
+      const src = read(f);
+      assert.ok(!/fetch\([^)]*ko-fi/i.test(src), `${f} : fetch vers l’hôte de soutien`);
+      assert.ok(!/src\s*=\s*["'`][^"'`]*ko-fi/i.test(src), `${f} : chargé via src=`);
+      assert.ok(!/import\s*\(?["'`][^"'`]*ko-fi/i.test(src), `${f} : importé`);
+      assert.ok(!/url\(\s*["']?[^)]*ko-fi/i.test(src), `${f} : chargé via url() CSS`);
+    }
+  });
+
+  test('l’ancre s’ouvre sans donner la main à la page ouverte', () => {
+    const row = pin.slice(pin.indexOf('id="supportBtn"'));
+    const tag = row.slice(0, row.indexOf('>') + 1) + row.slice(0, 220);
+    assert.match(tag, /target="_blank"/, 'doit s’ouvrir dans un nouvel onglet');
+    assert.match(tag, /rel="noopener noreferrer"/,
+      'noopener ET noreferrer : pas d’accès à window.opener, pas de referrer transmis');
+  });
+
+  test('le service worker ne précache pas l’hôte de soutien', () => {
+    assert.ok(!read('sw.js').includes('ko-fi'), 'rien d’externe dans le precache');
+  });
+
+  test('aucune contrepartie : le don ne débloque rien', () => {
+    // Le cadrage du projet : le soutien va au développeur, pas à l'app.
+    // Aucun état persistant ne doit dépendre du fait d'avoir donné.
+    assert.ok(!/f1uno_(donor|supporter|donated)/.test(pin),
+      'une clé de stockage « donateur » créerait une contrepartie');
+    for (const f of ['badges.js', 'storage.js', 'settings-sync.js']) {
+      assert.ok(!/donor|supporter|donat/i.test(read(f)),
+        `${f} : trace d’un statut donateur`);
+    }
   });
 });

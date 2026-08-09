@@ -5,7 +5,7 @@
 import { log } from './logger.js';
 import { isViewer, setViewer } from './session.js';
 import { t, LANGS, getLang, setLang } from './i18n.js';
-import { switchView, showToast, toggleTheme, currentView, setCurrentView, closeMo, setSettingsTabLocked, confirmDialog } from './render.js';
+import { switchView, showToast, currentView, setCurrentView, closeMo, setSettingsTabLocked, confirmDialog } from './render.js';
 import { initApp } from './app.js';
 import { maybeStartTutorial, startTutorial } from './tutorial.js';
 import { installRowHTML, bindInstallRow } from './install.js';
@@ -23,6 +23,25 @@ import {
 export function isPinEnabled(){ return localStorage.getItem('f1uno_pin_enabled')==='true'; }
 export function isSetupDone(){ return localStorage.getItem('f1uno_setup_done')==='true'; }
 export function isViewerModeAllowed(){ return localStorage.getItem('f1uno_viewer_enabled')==='true'; }
+/* ══════════════════════════════════════════════════════════
+   SOUTENIR LE CRÉATEUR — un lien, rien d'autre.
+
+   Le don soutient le DÉVELOPPEUR, pas l'application : le projet
+   reste un fan project non commercial, et le disclaimer F1/Mattel
+   ne bouge pas. Aucune contrepartie — pas de fonctionnalité
+   débloquée, pas de badge donateur, pas de mention nominative :
+   à la seconde où le don ouvre quelque chose, ce n'est plus un
+   don, c'est un achat.
+
+   Un lien externe et c'est tout : zéro dépendance, zéro script
+   tiers, zéro pixel de suivi, aucune donnée qui quitte l'appareil.
+   Laisser l'URL vide masque entièrement la ligne.
+   ══════════════════════════════════════════════════════════ */
+// Vide = la ligne n'apparaît pas du tout. Elle le reste tant que
+// l'URL réelle n'est pas décidée : mieux vaut une fonction dormante
+// qu'un lien qui mène à une page d'inscription.
+export const SUPPORT_URL = '';
+
 export function getStoredPinHash(){ return localStorage.getItem('f1uno_pin_hash')||''; }
 
 /* Comparaison à TEMPS CONSTANT de deux empreintes hexadécimales.
@@ -758,6 +777,15 @@ export function renderSettings(){
         </div>
         <button class="setv-btn" id="checkUpdBtn">${t('upd.check_btn')}</button>
       </div>` : ''}
+      ${SUPPORT_URL ? `
+      <div class="setv-row" id="supportRow">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${icon('heart')} ${t('s.support')}</div>
+          <div class="setv-row-sub">${t('s.support_sub')}</div>
+        </div>
+        <a class="setv-btn" id="supportBtn" href="${SUPPORT_URL}"
+           target="_blank" rel="noopener noreferrer">${t('s.support_btn')}</a>
+      </div>` : ''}
     </div>
 
     ${pinOn ? `
@@ -862,6 +890,28 @@ export function renderSettings(){
 
   el.querySelector('#settingsLockBtn')?.addEventListener('click', lockApp);
   el.querySelector('#changelogBtn')?.addEventListener('click', () => openChangelog());
+
+  /* Hors ligne : un lien externe qui ne mène nulle part vaut moins
+     qu'un lien qui le dit. On le désactive et on l'explique, plutôt
+     que de laisser l'utilisateur tomber sur la page d'erreur du
+     navigateur. L'état se remet à jour dès le retour du réseau —
+     l'app est hors-ligne d'abord, ce cas est la norme, pas l'exception. */
+  const support = el.querySelector('#supportBtn');
+  if(support){
+    const sub = el.querySelector('#supportRow .setv-row-sub');
+    const online = () => {
+      const up = navigator.onLine !== false;
+      support.classList.toggle('is-off', !up);
+      support.setAttribute('aria-disabled', up ? 'false' : 'true');
+      if(sub) sub.textContent = up ? t('s.support_sub') : t('s.support_offline');
+    };
+    online();
+    support.addEventListener('click', e => {
+      if(navigator.onLine === false) e.preventDefault();
+    });
+    window.addEventListener('online', online);
+    window.addEventListener('offline', online);
+  }
 
   // — Manual update check: reuses the automatic mechanism; if a new
   //   version is found, the existing "reload" banner takes over —

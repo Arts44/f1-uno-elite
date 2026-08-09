@@ -316,7 +316,6 @@ function buildCardEl(card){
       return d.owned && (!isSet || (d.qty||0)>1);
     });
     const ownedSummary=sortTypesCanonical(ownedTypes).map(t=>{
-      const ctt=CARD_TYPES[t];
       let cls='';
       if(t==='blue'||t==='blue_foil') cls='blue';
       else if(t==='green'||t==='green_foil') cls='green';
@@ -426,9 +425,14 @@ export function openModal(id){
   currentCardId=id;
 
   updateModalVisual(card);
-  const rarity=RARITIES[cardRarity(card)];
 
   const _img = safeImagePath(card.image);
+  // Exclusion ciblée, une ligne, justifiée : le correctif est DANS la
+  // ligne signalée. La source passe par safeImagePath() (chemins
+  // relatifs uniquement — tout schéma, tout hôte, toute remontée de
+  // répertoire refusés) et le nom par escapeHtml(). Les deux sont
+  // couverts par 17 cas dans tests/security-hardening.test.js.
+  // eslint-disable-next-line no-unsanitized/property
   document.getElementById('moEmoji').innerHTML = _img ? `<img src="${_img}" alt="${escapeHtml(card.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-xl) var(--r-xl) 0 0;">` : (card.category==='gp' && circuitSVG(card.id,'modal') ? circuitSVG(card.id,'modal') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : catEmoji(card.category));
   document.getElementById('moNum').textContent=`#${card.id} · ${CATS[card.category]?.label||card.category}`;
   document.getElementById('moName').textContent=card.name + (card.category==='pilote'?` ${card.nationality||''}`:'');
@@ -464,7 +468,6 @@ export function renderModalTypes(card){
 
   function makeCell(typeId){
     const ct=CARD_TYPES[typeId];
-    const r=RARITIES[variantRarity(card,typeId)];
     const d=getTypeData(card.id, typeId);
     const qty=d.qty||0;
     const cell=document.createElement('div');

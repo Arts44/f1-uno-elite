@@ -223,7 +223,7 @@ npm test        # 470 tests, node --test, no framework
 ## ⚖️ Honest limits
 
 - **The PIN is an interface barrier, not strong security.** Without the optional encryption, the collection is readable in `localStorage` via DevTools. With encryption on, casual snooping is blocked — but a 4-digit PIN can be brute-forced offline by someone holding the device. A forgotten PIN makes an encrypted local collection unrecoverable.
-- **Cloud sign-in runs on a test email domain**, with tight rate limits — fine for a personal project, not production-grade delivery.
+- **Cloud sign-in relies on the project's own Supabase email configuration.** Delivery, quotas and sender reputation are handled server-side and are not measured by this repository — treat sign-in emails as best-effort for a personal project, not as guaranteed delivery.
 - **Progression history has no back-fill** — the stats curve starts the day the feature was installed.
 
 ---

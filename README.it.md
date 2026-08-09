@@ -211,7 +211,7 @@ npm test        # 470 test, node --test, senza framework
 ## ⚖️ Limiti dichiarati
 
 - **Il PIN è una barriera d'interfaccia, non sicurezza forte.** Senza la crittografia opzionale, la collezione è leggibile in `localStorage` dai DevTools. Con la crittografia attiva, la curiosità casuale è bloccata — ma un PIN a 4 cifre può essere forzato offline da chi ha in mano il dispositivo. Un PIN dimenticato rende irrecuperabile una collezione locale cifrata.
-- **L'accesso cloud gira su un dominio e-mail di test**, con limiti stretti — perfetto per un progetto personale, non una consegna e-mail di produzione.
+- **L'accesso cloud si appoggia alla configurazione e-mail Supabase del progetto.** Recapito, quote e reputazione del mittente si gestiscono lato server e questo repository non li misura — considera le e-mail di accesso come «al meglio» per un progetto personale, non come consegna garantita.
 - **La cronologia di progressione non ha back-fill** — la curva delle statistiche parte dal giorno in cui la funzione è stata installata.
 
 ---

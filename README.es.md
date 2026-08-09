@@ -211,7 +211,7 @@ npm test        # 470 tests, node --test, sin framework
 ## ⚖️ Límites asumidos
 
 - **El PIN es una barrera de interfaz, no seguridad fuerte.** Sin el cifrado opcional, la colección es legible en `localStorage` desde las DevTools. Con el cifrado activo, la curiosidad casual queda bloqueada — pero un PIN de 4 dígitos puede forzarse offline si alguien tiene el dispositivo. Un PIN olvidado hace irrecuperable una colección local cifrada.
-- **El inicio de sesión en la nube corre sobre un dominio de e-mail de prueba**, con límites estrictos — perfecto para un proyecto personal, no entrega de correo de producción.
+- **El inicio de sesión en la nube se apoya en la configuración de correo Supabase del proyecto.** La entrega, las cuotas y la reputación del remitente se gestionan en el servidor y este repositorio no las mide — considera los correos de acceso como «en la medida de lo posible» para un proyecto personal, no como entrega garantizada.
 - **El historial de progresión no tiene relleno retroactivo** — la curva de estadísticas empieza el día en que se instaló la función.
 
 ---

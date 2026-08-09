@@ -66,8 +66,13 @@ rules:
   #
   # Ce qui remplace la règle : le test de provenance ci-dessus, qui
   # échoue si un site à donnée externe perd son échappement.
-  no-unsanitized/property: 'off'
-  no-unsanitized/method: 'off'
+  #
+  # ELLE N'EST PAS DÉSACTIVÉE GLOBALEMENT. Le détecteur XSS de Codacy
+  # ne crie en fait que sur DEUX lignes — celles où une VARIABLE part
+  # dans innerHTML — et ces deux-là portent leur exclusion sur place,
+  # avec la raison écrite juste au-dessus (i18n.js, render.js).
+  # La règle doit continuer de crier partout ailleurs : c'est sa
+  # raison d'être.
 
   # ── Règles de style sans portée ici ──────────────────────────────
   # Le dépôt a son propre style (2 espaces, points-virgules, quotes
@@ -84,15 +89,36 @@ rules:
   # Ces règles couvrent des risques réels sur cette architecture :
   # une alerte de leur part est à corriger, pas à faire taire.
   # ══════════════════════════════════════════════════════════════
+  # Règles NATIVES d'ESLint : aucun plugin à charger, donc elles
+  # fonctionnent réellement chez Codacy.
   no-eval: 'error'
   no-implied-eval: 'error'
   no-new-func: 'error'
   no-script-url: 'error'
   no-prototype-builtins: 'error'
-  security/detect-eval-with-expression: 'error'
-  security/detect-non-literal-require: 'error'
-  security/detect-unsafe-regex: 'error'
-  security/detect-possible-timing-attacks: 'error'   # a trouvé pin.js — gardée
+
+  # ── Pourquoi il n'y a PAS de règles security/* ici ────────────
+  # La version précédente de ce fichier en déclarait quatre
+  # (detect-eval-with-expression, detect-non-literal-require,
+  # detect-unsafe-regex, detect-possible-timing-attacks) SANS
+  # déclarer le plugin eslint-plugin-security qui les fournit.
+  # Codacy ne pouvait pas les résoudre et remontait « Definition for
+  # rule … was not found » sur la ligne 1 de CHAQUE fichier : 112
+  # fausses alertes, et surtout quatre règles qui ne protégeaient
+  # plus rien tout en donnant l'illusion du contraire.
+  #
+  # Les déclarer correctement demanderait d'ajouter eslint +
+  # eslint-plugin-security aux dépendances de développement, pour
+  # un dépôt dont la sobriété de dépendances est une règle affichée.
+  # Ce qu'elles couvraient est repris ailleurs, plus solidement :
+  #   - eval / require dynamique : couverts par les règles natives
+  #     ci-dessus (no-eval, no-implied-eval, no-new-func) ;
+  #   - comparaison à temps constant : la faille qu'elle avait
+  #     trouvée dans pin.js est CORRIGÉE, et verrouillée par
+  #     tests/security-hardening.test.js, qui échoue si une
+  #     comparaison naïve d'empreinte réapparaît ou si
+  #     timingSafeEqual reprend une sortie anticipée. Un test qui
+  #     échoue vaut mieux qu'une règle qui ne se charge pas.
   no-unused-vars:
     - 'warn'
     - args: 'none'

@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.47.3',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'Housekeeping: five leftovers from earlier refactors removed, and the analyser configuration fixed so it stops reporting rules it could not load. Nothing changes on screen.',
+      ],
+      fr: [
+        'Ménage : cinq reliquats d\'anciens remaniements supprimés, et la configuration de l\'analyseur corrigée pour qu\'il cesse de signaler des règles qu\'il n\'arrivait pas à charger. Rien ne change à l\'écran.',
+      ],
+      es: [
+        'Limpieza: eliminados cinco restos de refactorizaciones anteriores y corregida la configuración del analizador para que deje de informar reglas que no podía cargar. Nada cambia en pantalla.',
+      ],
+      zh: [
+        '清理:移除了此前重构留下的五处残余,并修正了分析器配置,使其不再报告自己无法加载的规则。界面没有任何变化。',
+      ],
+      it: [
+        'Pulizia: rimossi cinque residui di rifacimenti precedenti e corretta la configurazione dell\'analizzatore perché smetta di segnalare regole che non riusciva a caricare. Sullo schermo non cambia nulla.',
+      ],
+      nl: [
+        'Opruiming: vijf overblijfselen van eerdere herzieningen verwijderd, en de configuratie van de analyser gecorrigeerd zodat die stopt met het melden van regels die hij niet kon laden. Op het scherm verandert er niets.',
+      ],
+      de: [
+        'Aufräumen: fünf Überbleibsel früherer Umbauten entfernt und die Analyser-Konfiguration korrigiert, damit sie keine Regeln mehr meldet, die sie nicht laden konnte. Auf dem Bildschirm ändert sich nichts.',
+      ],
+    },
+  },
+  {
     version: '1.47.2',
     date: '2026-08-09',
     changes: {

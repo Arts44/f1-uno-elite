@@ -105,6 +105,13 @@ export function applyLanguage(){
    qui rend le mélange visible.
    ══════════════════════════════════════════════════════════ */
 export function setSafeHTML(el, html){
+  // Exclusion ciblée, une ligne, justifiée : CETTE ligne EST le point
+  // d'assignation que la règle cherche. C'est précisément pour la
+  // rendre unique et nommée qu'elle existe — un analyseur qui crie ici
+  // crie sur la déclaration d'intention, pas sur un risque. Toute
+  // donnée externe passe par escapeHtml/tEsc AVANT d'arriver ici, ce
+  // que verrouille tests/security-hardening.test.js.
+  // eslint-disable-next-line no-unsanitized/property
   if(el) el.innerHTML = html;
   return el;
 }

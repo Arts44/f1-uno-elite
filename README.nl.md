@@ -211,7 +211,7 @@ npm test        # 470 tests, node --test, zonder framework
 ## ⚖️ Eerlijke beperkingen
 
 - **De pincode is een interfacebarrière, geen sterke beveiliging.** Zonder de optionele versleuteling is de collectie leesbaar in `localStorage` via DevTools. Met versleuteling aan is terloops gluren geblokkeerd — maar een 4-cijferige pincode kan offline gebruteforcet worden door wie het toestel in handen heeft. Een vergeten pincode maakt een versleutelde lokale collectie onherstelbaar.
-- **Cloud-inloggen draait op een test-e-maildomein**, met strakke limieten — prima voor een persoonlijk project, geen productiewaardige bezorging.
+- **Cloud-inloggen leunt op de eigen Supabase-e-mailconfiguratie van het project.** Bezorging, quota en afzenderreputatie worden serverzijdig geregeld en worden door deze repository niet gemeten — beschouw inlogmails als «naar beste vermogen» voor een persoonlijk project, niet als gegarandeerde bezorging.
 - **De voortgangshistorie kent geen back-fill** — de statistiekencurve begint op de dag dat de functie werd geïnstalleerd.
 
 ---

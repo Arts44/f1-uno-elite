@@ -14,7 +14,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
-import { t, getLang, escapeHtml, setSafeHTML } from './i18n.js';
+import { t, escapeHtml, setSafeHTML } from './i18n.js';
 import { APP_VERSION } from './changelog.js';
 import {
   cloudConfig, isCloudConfigured, authHeaders, getValidSession,

@@ -211,7 +211,7 @@ npm test        # 470 Tests, node --test, ohne Framework
 ## ⚖️ Ehrliche Grenzen
 
 - **Die PIN ist eine Oberflächenbarriere, keine starke Sicherheit.** Ohne die optionale Verschlüsselung ist die Sammlung per DevTools im `localStorage` lesbar. Mit aktiver Verschlüsselung ist beiläufiges Schnüffeln blockiert — aber eine 4-stellige PIN lässt sich offline brute-forcen, wenn jemand das Gerät in Händen hält. Eine vergessene PIN macht eine verschlüsselte lokale Sammlung unwiederbringlich.
-- **Die Cloud-Anmeldung läuft über eine Test-E-Mail-Domain**, mit engen Limits — für ein persönliches Projekt in Ordnung, keine produktionsreife Zustellung.
+- **Die Cloud-Anmeldung stützt sich auf die eigene Supabase-E-Mail-Konfiguration des Projekts.** Zustellung, Kontingente und Absenderreputation werden serverseitig geregelt und von diesem Repository nicht gemessen — betrachte Anmelde-E-Mails als «nach bestem Bemühen» für ein persönliches Projekt, nicht als garantierte Zustellung.
 - **Die Fortschrittshistorie kennt kein Back-fill** — die Statistikkurve beginnt an dem Tag, an dem das Feature installiert wurde.
 
 ---

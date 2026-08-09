@@ -334,6 +334,15 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
    The update/what's-new pills reuse the install-banner look; when an
    install banner is also present they stack above it. */
 .update-banner{bottom:150px;z-index:401;}
+/* Soutien — un lien, dans la grammaire des boutons existants. Aucun
+   traitement racoleur : ni couleur d'accent, ni pastille, ni animation.
+   Le cœur suffit à dire ce que c'est. */
+#supportBtn{display:inline-flex;align-items:center;justify-content:center;
+  text-decoration:none;min-height:36px;}
+#supportRow .setv-row-label .ic{color:var(--red);margin-right:2px;}
+/* Hors ligne : visiblement inerte, et le sous-titre l'explique. */
+#supportBtn.is-off{opacity:0.45;pointer-events:none;cursor:default;}
+
 .setv-version{font-family:var(--font-b);font-size:13px;font-weight:700;color:var(--tx2);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-pill);padding:var(--space-1) var(--space-14px);white-space:nowrap;}
 .changelog-dialog{max-width:460px;text-align:left;}
 .changelog-dialog .import-dialog-title{text-align:center;}
