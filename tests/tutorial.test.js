@@ -7,7 +7,7 @@ import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
 import { loadData, coll, saveData, setTypeData } from '../storage.js';
 import {
   tutorialKeys, captureLocalStorage, applyLocalStorage, TUTORIAL_STEPS,
-  isTutorialSeen, markTutorialSeen,
+  TUTORIAL_CHAPTERS, isTutorialSeen, markTutorialSeen,
 } from '../tutorial.js';
 
 describe('tutorial — state snapshot / restore (data safety)', () => {
@@ -68,60 +68,161 @@ describe('tutorial — state snapshot / restore (data safety)', () => {
   });
 });
 
-describe('tutorial — step sequence', () => {
+describe('tutorial — parcours en 5 chapitres (1.47.0)', () => {
   const VALID_ACTIONS = new Set(['click', 'dataAction', 'view', 'input', 'condition']);
+  const ids = TUTORIAL_STEPS.map(s => s.id);
+  const idx = id => ids.indexOf(id);
+  const chapterOf = id => TUTORIAL_STEPS[idx(id)].chapter;
 
-  test('steps are well-formed: unique ids, each is observe or a valid action', () => {
-    const ids = TUTORIAL_STEPS.map(s => s.id);
-    assert.equal(new Set(ids).size, ids.length, 'ids unique');
+  test('étapes bien formées : ids uniques, chapitre connu, observe ou action valide', () => {
+    assert.equal(new Set(ids).size, ids.length, 'ids uniques');
+    const known = new Set(TUTORIAL_CHAPTERS.map(c => c.id));
     for (const s of TUTORIAL_STEPS) {
       assert.ok(typeof s.id === 'string' && s.id.length > 0);
-      assert.ok(s.observe === true || !!s.action,
-        `${s.id} must be observe or have an action`);
-      if (s.action) assert.ok(VALID_ACTIONS.has(s.action.type), `${s.id}: bad action type`);
+      assert.ok(known.has(s.chapter), `${s.id} : chapitre inconnu « ${s.chapter} »`);
+      assert.ok(s.observe === true || !!s.action, `${s.id} doit être observe ou porter une action`);
+      if (s.action) assert.ok(VALID_ACTIONS.has(s.action.type), `${s.id} : type d'action invalide`);
     }
   });
 
-  test('covers the required areas (modal, quick statuses, badges, stats, settings)', () => {
-    const ids = new Set(TUTORIAL_STEPS.map(s => s.id));
-    ['open_card', 'mark_owned', 'mark_double', 'close_modal', 'favorite', 'wishlist',
-     'go_badges', 'badge_next', 'badge_families',
-     'go_stats', 'stats_progress', 'stats_highlights', 'stats_donut',
-     'go_settings', 'set_theme', 'set_font', 'set_backup', 'set_data', 'replay',
-    ].forEach(id => assert.ok(ids.has(id), `missing step ${id}`));
+  test('les 5 chapitres suivent l’ordre de la nav', () => {
+    assert.deepEqual(TUTORIAL_CHAPTERS.map(c => c.id),
+      ['collection', 'badges', 'stats', 'account', 'settings']);
+    // Compte AVANT Réglages : la nav fait foi (avant 1.47.0 c'était l'inverse).
+    assert.ok(idx('go_account') < idx('go_settings'));
   });
 
-  test('the search/filter steps are gone (feature removed)', () => {
-    const ids = new Set(TUTORIAL_STEPS.map(s => s.id));
-    ['sidebar_open', 'filter_apply', 'filter_reset', 'sidebar_close', 'search']
-      .forEach(id => assert.ok(!ids.has(id), `obsolete step ${id} still present`));
+  test('les étapes d’un chapitre sont CONTIGUËS — on n’en sort pas puis on y revient', () => {
+    const seen = [];
+    for (const s of TUTORIAL_STEPS) {
+      if (seen[seen.length - 1] !== s.chapter) {
+        assert.ok(!seen.includes(s.chapter), `le chapitre ${s.chapter} est repris après en être sorti`);
+        seen.push(s.chapter);
+      }
+    }
+    assert.deepEqual(seen, TUTORIAL_CHAPTERS.map(c => c.id));
   });
 
-  test('pedagogical order: adding a card comes first, before the other views', () => {
-    const idx = id => TUTORIAL_STEPS.findIndex(s => s.id === id);
-    assert.equal(TUTORIAL_STEPS[0].id, 'welcome');
-    assert.equal(TUTORIAL_STEPS[1].id, 'open_card', 'first taught action is opening a card');
-    assert.equal(TUTORIAL_STEPS[2].id, 'mark_owned', 'then marking a variant owned');
-    assert.ok(idx('mark_double') < idx('favorite'), 'quantity before quick statuses');
-    assert.ok(idx('wishlist') < idx('go_badges'), 'collection basics before other views');
-    assert.ok(idx('go_badges') < idx('go_stats') && idx('go_stats') < idx('go_settings'));
-    assert.equal(TUTORIAL_STEPS[TUTORIAL_STEPS.length - 1].id, 'replay');
+  test('chaque chapitre s’ouvre par sa navigation, sauf Collection (on y est déjà)', () => {
+    for (const c of TUTORIAL_CHAPTERS) {
+      const first = TUTORIAL_STEPS.find(s => s.chapter === c.id);
+      if (c.id === 'collection') { assert.equal(first.id, 'coll_intro'); continue; }
+      assert.equal(first.action && first.action.type, 'view', `${c.id} ne s'ouvre pas par une navigation`);
+      assert.equal(first.action.view, c.view);
+    }
   });
 
-  test('close steps validate on the actual state change (condition), not one button', () => {
+  test('chaque chapitre présente sa page avant de la détailler', () => {
+    for (const c of TUTORIAL_CHAPTERS) {
+      const inCh = TUTORIAL_STEPS.filter(s => s.chapter === c.id);
+      const introAt = inCh.findIndex(s => /_intro$/.test(s.id));
+      assert.ok(introAt !== -1, `${c.id} n'a pas d'introduction`);
+      assert.ok(introAt <= 1, `${c.id} : l'introduction arrive trop tard`);
+      assert.ok(inCh[introAt].observe, 'une introduction est passive');
+    }
+  });
+
+  test('couverture : tout ce que l’app sait faire est montré', () => {
+    const S = new Set(ids);
+    ['coll_intro', 'open_card', 'mark_owned', 'mark_double', 'set_complete',
+     'close_modal', 'quick_status', 'quick_add',
+     'go_badges', 'badges_intro', 'badge_next', 'badge_families',
+     'go_stats', 'stats_intro', 'stats_progress', 'stats_rail', 'stats_goals', 'set_tools',
+     'go_account', 'account_intro', 'acc_cloud', 'set_backup', 'set_data',
+     'go_settings', 'settings_intro', 'set_theme', 'set_security', 'replay',
+    ].forEach(id => assert.ok(S.has(id), `étape manquante : ${id}`));
+    assert.equal(TUTORIAL_STEPS.length, 28);
+  });
+
+  test('les étapes de fonctionnalités supprimées ne sont pas revenues', () => {
+    const S = new Set(ids);
+    // tri, pochette, recherche/filtres : retirés de l'app en 1.44.0 et avant.
+    ['sidebar_open', 'filter_apply', 'filter_reset', 'sidebar_close', 'search',
+     'sort_by', 'open_pack', 'pack_mode',
+     // fusionnées ou coupées en 1.47.0
+     'welcome', 'favorite', 'wishlist', 'stats_highlights', 'stats_donut', 'set_font',
+    ].forEach(id => assert.ok(!S.has(id), `étape obsolète encore présente : ${id}`));
+  });
+
+  test('ordre pédagogique : ajouter une carte s’apprend avant tout le reste', () => {
+    assert.equal(ids[0], 'coll_intro');
+    assert.equal(ids[1], 'open_card', 'le premier geste enseigné est d’ouvrir une carte');
+    assert.equal(ids[2], 'mark_owned', 'puis de marquer une variante possédée');
+    assert.ok(idx('mark_double') < idx('quick_status'), 'quantités avant statuts rapides');
+    assert.ok(idx('quick_add') < idx('go_badges'), 'les bases de la collection avant les autres pages');
+    assert.equal(ids[ids.length - 1], 'replay');
+  });
+
+  test('fermer valide sur le CHANGEMENT D’ÉTAT, pas sur un bouton précis', () => {
     const step = TUTORIAL_STEPS.find(s => s.id === 'close_modal');
-    assert.equal(step.action.type, 'condition', 'close_modal must be condition-based');
+    assert.equal(step.action.type, 'condition');
     assert.equal(typeof step.action.check, 'function');
   });
 
-  test('the badge steps are observe-only on the v2.2 page (next + families)', () => {
-    // v2.2 : plus de mode « retirer » global ni de bouton valider en
-    // grille — le tutoriel montre la carte Prochain badge et les
-    // familles sans déclencher d'écriture.
-    const nx = TUTORIAL_STEPS.find(s => s.id === 'badge_next');
-    const fam = TUTORIAL_STEPS.find(s => s.id === 'badge_families');
-    assert.ok(nx.observe && fam.observe);
-    assert.ok(!nx.action && !fam.action);
+  test('les étapes des pages Badges, Stats, Compte et Réglages n’écrivent RIEN', () => {
+    // Elles montrent ; elles ne déclenchent aucune modification de la
+    // collection. Seul le chapitre Collection fait agir l'utilisateur.
+    for (const s of TUTORIAL_STEPS) {
+      if (s.chapter === 'collection') continue;
+      const isNav = s.action && s.action.type === 'view';
+      assert.ok(s.observe === true || isNav,
+        `${s.id} : une étape hors Collection doit être passive ou une navigation`);
+    }
+  });
+});
+
+describe('tutorial — textes ×7 (1.47.0)', () => {
+  const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
+  const src = readFileSync(new URL('../translations.js', import.meta.url), 'utf8');
+  const head = src.slice(0, src.indexOf('window.__BADGE_T'));
+  const marks = LANGS.map(l => [head.indexOf(l + ':{'), l]).sort((a, b) => a[0] - b[0]);
+  const block = {};
+  marks.forEach(([start, lang], i) => {
+    block[lang] = head.slice(start, i + 1 < marks.length ? marks[i + 1][0] : head.length);
+  });
+  const val = (lang, key) => {
+    const m = block[lang].match(new RegExp("'" + key.replace('.', '\\.') + "':'((?:[^'\\\\]|\\\\.)*)'"));
+    return m ? m[1] : null;
+  };
+
+  test('chaque étape a son titre et son texte dans les 7 langues', () => {
+    for (const s of TUTORIAL_STEPS) {
+      for (const lang of LANGS) {
+        assert.ok(val(lang, 'tut.' + s.id + '_t'), `${lang} : tut.${s.id}_t manquant`);
+        assert.ok(val(lang, 'tut.' + s.id + '_d'), `${lang} : tut.${s.id}_d manquant`);
+      }
+    }
+  });
+
+  test('chaque chapitre a son nom dans les 7 langues', () => {
+    for (const c of TUTORIAL_CHAPTERS) {
+      for (const lang of LANGS) {
+        assert.ok(val(lang, 'tut.ch_' + c.id), `${lang} : tut.ch_${c.id} manquant`);
+      }
+    }
+  });
+
+  test('les commandes de l’infobulle existent partout', () => {
+    for (const k of ['quit', 'prev', 'next', 'done', 'skip_chapter', 'skip_chapter_short',
+                     'skip_step', 'do_it', 'missing', 'away_down', 'away_up']) {
+      for (const lang of LANGS) {
+        assert.ok(val(lang, 'tut.' + k), `${lang} : tut.${k} manquant`);
+      }
+    }
+  });
+
+  test('les textes tiennent dans la bulle — 2 lignes à 375 px', () => {
+    // Mesuré : au-delà de ~130 caractères la bulle passe à 3 lignes et
+    // dépasse 40 % de la hauteur d'un écran de 320×568.
+    const LIMIT = 130;
+    const tooLong = [];
+    for (const s of TUTORIAL_STEPS) {
+      for (const lang of LANGS) {
+        const v = val(lang, 'tut.' + s.id + '_d') || '';
+        if (v.length > LIMIT) tooLong.push(`${lang}/${s.id} (${v.length})`);
+      }
+    }
+    assert.deepEqual(tooLong, [], `textes trop longs : ${tooLong.join(', ')}`);
   });
 });
 

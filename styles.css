@@ -1675,24 +1675,100 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    via a huge box-shadow, and the bubble is interactive.
    ══════════════════════════════════════════════════════════ */
 .tut-overlay{position:fixed;inset:0;z-index:900;pointer-events:none;}
-.tut-spot{position:fixed;border-radius:var(--r-sm);box-shadow:0 0 0 9999px rgba(0,0,0,0.55),0 0 0 2px var(--red);transition:top 0.25s ease,left 0.25s ease,width 0.25s ease,height 0.25s ease;pointer-events:none;}
+/* Le halo grise l'écran par une ombre géante. pointer-events:none est
+   ESSENTIEL : sans lui le voile intercepte le défilement automatique
+   qui amène la cible dans le cadre. */
+.tut-spot{position:fixed;border-radius:var(--r-sm);pointer-events:none;
+  box-shadow:0 0 0 9999px rgba(0,0,0,0.55),0 0 0 2px var(--red);
+  transition:top 0.25s ease,left 0.25s ease,width 0.25s ease,height 0.25s ease;}
 [data-theme="dark"] .tut-spot{box-shadow:0 0 0 9999px rgba(0,0,0,0.68),0 0 0 2px var(--red);}
-.tut-bubble{position:fixed;pointer-events:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--sh-lg);padding:var(--space-4) var(--space-5) var(--space-14px);box-sizing:border-box;animation:tutIn 0.2s ease;}
+
+.tut-bubble{position:fixed;pointer-events:auto;box-sizing:border-box;
+  background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-md);
+  box-shadow:var(--sh-lg);padding:var(--space-4);animation:tutIn 0.2s ease;}
+.tut-bubble:focus{outline:none;}
+.tut-bubble:focus-visible{outline:2px solid var(--red);outline-offset:3px;}
 @keyframes tutIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-.tut-progress{font-family:var(--font-d);font-weight:700;font-size:10px;letter-spacing:1px;color:var(--tx3);text-transform:uppercase;margin-bottom:var(--space-6px);}
-.tut-title{font-family:var(--font-d);font-weight:800;font-size:17px;color:var(--tx1);margin-bottom:var(--space-1);}
-.tut-text{font-size:13px;line-height:1.5;color:var(--tx2);margin-bottom:var(--space-3);}
-.tut-btns{display:flex;justify-content:flex-end;align-items:center;gap:var(--space-2);flex-wrap:wrap;}
-/* Two clearly distinct escape hatches on every step:
-   quit = plain text link (leaves + restores), skip-step = outlined chip. */
-.tut-quit{background:none;border:none;color:var(--tx3);font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer;padding:var(--space-2) var(--space-6px);border-radius:var(--r-pill);transition:var(--ease);margin-right:auto;}
+
+/* Rail : un segment par chapitre, celui en cours se remplit. La
+   position dans TOUT le parcours se lit d'un coup d'œil. */
+.tut-rail{display:flex;gap:4px;margin-bottom:var(--space-3);}
+.tut-rail i{flex:1;height:3px;border-radius:var(--r-pill);background:var(--surface3);overflow:hidden;}
+.tut-rail i.done{background:var(--red);}
+.tut-rail i.now span{display:block;height:100%;background:var(--red);border-radius:var(--r-pill);}
+
+.tut-kicker{display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);}
+.tut-chapter{font-family:var(--font-d);font-weight:700;font-size:10px;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--red);}
+.tut-count{font-family:var(--font-d);font-weight:600;font-size:10px;color:var(--tx3);
+  font-variant-numeric:tabular-nums;margin-left:auto;}
+.tut-title{font-family:var(--font-d);font-weight:800;font-size:17px;line-height:1.2;
+  color:var(--tx1);margin:0 0 var(--space-1);}
+.tut-text{font-size:13px;line-height:1.5;color:var(--tx2);margin:0;}
+
+.tut-btns{display:flex;align-items:center;gap:var(--space-2);margin-top:var(--space-4);}
+.tut-quit{background:none;border:none;color:var(--tx3);font:600 12px var(--font-b);cursor:pointer;
+  padding:0 var(--space-6px);min-height:36px;border-radius:var(--r-pill);transition:var(--ease);}
 .tut-quit:hover{color:var(--red);}
-.tut-skip-step{background:none;border:1px solid var(--border);color:var(--tx2);font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer;padding:var(--space-2) var(--space-14px);border-radius:var(--r-pill);transition:var(--ease);}
-.tut-skip-step:hover{border-color:var(--tx3);color:var(--tx1);}
-.tut-next{background:var(--red);border:none;color:#fff;font-family:var(--font-b);font-size:13px;font-weight:700;border-radius:var(--r-pill);padding:var(--space-2) var(--space-6);cursor:pointer;transition:var(--ease);box-shadow:var(--sh-sm);}
-.tut-next:hover{filter:brightness(1.08);transform:translateY(-1px);}
-.tut-hint{font-size:12px;font-weight:600;color:var(--red);display:inline-flex;align-items:center;gap:var(--space-1);}
-.tut-hint::before{content:'👆';}
+.tut-prev{background:none;border:1px solid var(--border);color:var(--tx2);font:600 12px var(--font-b);
+  cursor:pointer;padding:0 var(--space-3);min-height:36px;border-radius:var(--r-pill);
+  transition:var(--ease);margin-left:auto;}
+.tut-prev:hover:not(:disabled){border-color:var(--tx3);color:var(--tx1);}
+.tut-prev:disabled{opacity:0.35;cursor:default;}
+.tut-skip{background:none;border:1px solid var(--border);color:var(--tx2);font:600 12px var(--font-b);
+  cursor:pointer;padding:0 var(--space-3);min-height:36px;border-radius:var(--r-pill);transition:var(--ease);}
+.tut-skip:hover{border-color:var(--tx3);color:var(--tx1);}
+/* Le geste résiste depuis quelques secondes : la sortie de secours
+   s'affirme, sans jamais avoir été absente. */
+.tut-skip.urge{border-color:var(--red-m);color:var(--red);}
+.tut-next{background:var(--red);border:none;color:var(--on-red,#fff);font:700 13px var(--font-b);
+  border-radius:var(--r-pill);padding:0 var(--space-5);min-height:36px;cursor:pointer;
+  box-shadow:var(--sh-sm);transition:var(--ease);}
+.tut-next:hover{filter:brightness(1.08);}
+.tut-do{margin-left:auto;font:700 12px var(--font-b);color:var(--red);white-space:nowrap;}
+.tut-do::before{content:'↑ ';}
+/* Quitter et Précédent sont des icônes à toutes les largeurs : à 320 px
+   de bulle, les deux mots poussaient « Passer l'étape » sur deux lignes.
+   Le nom accessible reste porté par aria-label. */
+.tut-quit .tut-lg,.tut-prev .tut-lg{display:none;}
+.tut-quit .tut-sm,.tut-prev .tut-sm{display:inline;font-size:16px;line-height:1;}
+.tut-skip .tut-sm{display:none;}
+.tut-btns button:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
+
+/* La flèche DÉSIGNE la cible : elle change de côté avec la bulle et
+   se place à --tut-arrow, calculé sur le centre du halo. */
+.tut-bubble::after{content:'';position:absolute;width:12px;height:12px;
+  background:var(--surface);border:1px solid var(--border-s);transform:rotate(45deg);}
+.tut-bubble[data-side="bottom"]::after{top:-7px;left:calc(var(--tut-arrow,50%) - 6px);border-bottom:none;border-right:none;}
+.tut-bubble[data-side="top"]::after{bottom:-7px;left:calc(var(--tut-arrow,50%) - 6px);border-top:none;border-left:none;}
+.tut-bubble[data-side="right"]::after{left:-7px;top:calc(var(--tut-arrow,50%) - 6px);border-top:none;border-right:none;}
+.tut-bubble[data-side="left"]::after{right:-7px;top:calc(var(--tut-arrow,50%) - 6px);border-bottom:none;border-left:none;}
+.tut-bubble[data-side="none"]::after{display:none;}
+
+/* Cible hors cadre malgré le défilement : on dit OÙ regarder, on ne
+   laisse jamais un écran grisé inerte. */
+.tut-away{position:fixed;left:50%;transform:translateX(-50%);z-index:901;pointer-events:none;
+  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 var(--space-4);
+  border-radius:var(--r-pill);background:var(--red);color:var(--on-red,#fff);
+  font:700 12px var(--font-b);box-shadow:var(--sh-md);}
+.tut-away.down{bottom:calc(var(--nav-clear) + 8px);}
+.tut-away.up{top:calc(56px + 12px);}
+
+/* Mobile étroit : la bulle doit rester bien sous 40 % de la hauteur
+   d'écran, sinon elle recouvre ce qu'elle explique. Une seule rangée
+   d'actions (au lieu de deux), libellés courts, icônes pour les deux
+   commandes secondaires — cibles toujours ≥ 36 px de haut. */
+.tut-quit,.tut-prev{min-width:36px;padding:0 var(--space-3);}
+@media (max-width:430px){
+  .tut-bubble{padding:var(--space-14px);}
+  .tut-title{font-size:16px;}
+  .tut-skip .tut-lg{display:none;}
+  .tut-skip .tut-sm{display:inline;}
+  .tut-quit,.tut-prev{padding:0 var(--space-2);}
+  .tut-skip{padding:0 var(--space-2);font-size:11px;}
+  .tut-next{padding:0 var(--space-3);font-size:12px;}
+  .tut-do{font-size:11px;}
+}
 @media (prefers-reduced-motion:reduce){.tut-spot{transition:none;}.tut-bubble{animation:none;}}
 
 /* ══════════════════════════════════════════════════════════
@@ -2097,8 +2173,8 @@ button:not(:disabled):not(.bn-tab):active,
    :root = clair (défaut), [data-theme=dark] = surcharge. Les encres
    colorées inline passent par --ink-mix : pleines en sombre, assombries
    à 74 % en clair pour tenir AA sur fonds clairs. */
-:root{--ink-mix:74%;--red-ink:#C50026;}
-[data-theme="dark"]{--ink-mix:100%;--red-ink:var(--red);}
+:root{--ink-mix:74%;--red-ink:#C50026;--on-red:#FFFFFF;}
+[data-theme="dark"]{--ink-mix:100%;--red-ink:var(--red);--on-red:#2A0509;}
 /* pilule saison active : rouge d'encre plus profond en clair */
 .season-pill.active{color:var(--red-ink);}
 /* libellé actif de la nav : même encre */

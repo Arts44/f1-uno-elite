@@ -13,6 +13,7 @@ import './_setup.js';
 import '../translations.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { pageHeadHTML, pageHeadBtn } from '../pagehead.js';
 
 const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
@@ -77,5 +78,34 @@ describe('clés du bandeau — les 7 langues', () => {
       assert.equal(window.__T[lang]['header.total'], undefined, `header.total encore là en ${lang}`);
       assert.equal(window.__T[lang]['header.total_aria'], undefined, `header.total_aria encore là en ${lang}`);
     }
+  });
+});
+
+describe('infobulle du tutoriel — contraste des aplats', () => {
+  const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+  const rule = name => {
+    const i = css.indexOf(name + '{');
+    return i === -1 ? '' : css.slice(i, css.indexOf('}', i));
+  };
+
+  test('le bouton Suivant et la pastille directionnelle sont en blanc, pas en --red-ink', () => {
+    // --red-ink est l'encre ROUGE FONCÉE pour du texte sur fond CLAIR
+    // (#C50026 en clair, var(--red) en sombre). Posée sur un aplat
+    // var(--red), elle donne du rouge sur rouge — invisible en sombre.
+    for (const sel of ['.tut-next', '.tut-away']) {
+      const r = rule(sel);
+      assert.ok(r.includes('background:var(--red)'), `${sel} : aplat rouge attendu`);
+      assert.ok(r.includes('color:var(--on-red'), `${sel} : le texte doit utiliser --on-red`);
+      assert.ok(!r.includes('--red-ink'), `${sel} : --red-ink sur un aplat rouge`);
+    }
+  });
+
+  test('--on-red change avec le thème — le rouge sombre est trop clair pour du blanc', () => {
+    // #FFF sur #FF4757 ne fait que 3,1:1 (sous AA pour du texte de 13 px).
+    // Le thème sombre veut donc une encre presque noire, pas du blanc.
+    assert.match(css, /:root\{[^}]*--on-red:#FFFFFF/);
+    assert.match(css, /\[data-theme="dark"\]\{[^}]*--on-red:#[0-9A-F]{6}/i);
+    const dark = css.match(/\[data-theme="dark"\]\{[^}]*--on-red:(#[0-9A-F]{6})/i)[1];
+    assert.notEqual(dark.toUpperCase(), '#FFFFFF', 'le thème sombre ne peut pas garder du blanc');
   });
 });

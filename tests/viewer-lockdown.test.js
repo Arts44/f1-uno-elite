@@ -109,9 +109,17 @@ describe('surface exposée', () => {
       'un état bloqué doit dire comment se débloquer');
   });
 
-  test('le tutoriel saute les étapes Compte en spectateur', () => {
+  test('le tutoriel saute TOUT le chapitre Compte en spectateur', () => {
+    // Depuis 1.47.0 le parcours est chapitré : on ne retire plus deux
+    // étapes à la main, on retire le chapitre entier — et le compteur
+    // de chapitres tombe de 5 à 4.
     const src = read('tutorial.js');
-    assert.match(src, /VIEWER_SKIPPED[\s\S]{0,120}go_account[\s\S]{0,40}set_backup/);
+    assert.match(src, /VIEWER_SKIPPED_CHAPTER\s*=\s*'account'/);
     assert.match(src, /export function activeTutorialSteps/);
+    assert.match(src, /export function activeTutorialChapters/);
+    assert.match(src, /filter\(c => c\.id !== VIEWER_SKIPPED_CHAPTER\)/,
+      'les chapitres doivent être filtrés, sinon le compteur reste à 5');
+    assert.match(src, /filter\(s => s\.chapter !== VIEWER_SKIPPED_CHAPTER\)/,
+      'les étapes du chapitre doivent être filtrées');
   });
 });

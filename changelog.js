@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.47.0',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'The guided tour is rebuilt as five chapters, one per page, in the order of the tabs. You always know which chapter you are in, how many steps are left, and you can skip a whole chapter or leave at any time.',
+        'No more staring at a greyed-out screen wondering where to look: each step now brings its target into view by itself and checks it really is visible before showing you anything. The bubble picks its own side, never runs off screen and never sits on top of what it is pointing at.',
+        'New in the tour: complete sets and the Eternal rarity, the Account page, and quick add. Every step where you have to do something also offers a way past it — nobody gets stuck.',
+      ],
+      fr: [
+        'La visite guidée est refaite en cinq chapitres, un par page, dans l\'ordre des onglets. Tu sais toujours dans quel chapitre tu es, combien d\'étapes il reste, et tu peux passer un chapitre entier ou partir quand tu veux.',
+        'Fini l\'écran grisé où l\'on cherche où regarder : chaque étape amène sa cible à l\'écran toute seule et vérifie qu\'elle est vraiment visible avant de t\'afficher quoi que ce soit. L\'infobulle choisit son côté, ne sort jamais de l\'écran et ne se pose jamais sur ce qu\'elle désigne.',
+        'Nouveau dans la visite : les sets complets et la rareté Éternel, la page Compte, et l\'ajout rapide. Chaque étape qui demande un geste offre aussi une porte de sortie — personne ne reste coincé.',
+      ],
+      es: [
+        'La visita guiada se rehace en cinco capítulos, uno por página, en el orden de las pestañas. Siempre sabes en qué capítulo estás, cuántos pasos quedan, y puedes saltarte un capítulo entero o salir cuando quieras.',
+        'Se acabó la pantalla gris en la que no sabes dónde mirar: cada paso trae su objetivo a la vista por sí solo y comprueba que de verdad se ve antes de mostrarte nada. El globo elige su lado, nunca se sale de la pantalla y nunca se pone encima de lo que señala.',
+        'Nuevo en la visita: los sets completos y la rareza Eterno, la página Cuenta y el añadido rápido. Cada paso que pide un gesto ofrece también una salida — nadie se queda atascado.',
+      ],
+      zh: [
+        '导览重做为五个章节,每页一章,顺序与底部标签一致。你随时知道自己在第几章、还剩几步,也可以跳过整章或随时退出。',
+        '不会再对着灰屏找不到重点:每一步都会自动把目标滚入视野,并在显示之前确认它真的可见。提示气泡自己选择方位,绝不跑出屏幕,也绝不压在它所指的东西上面。',
+        '导览新增内容:整套收齐与「永恒」稀有度、账户页,以及快速添加。每个需要你动手的步骤都留了出口——没有人会被卡住。',
+      ],
+      it: [
+        'La visita guidata è rifatta in cinque capitoli, uno per pagina, nell\'ordine delle schede. Sai sempre in quale capitolo sei, quanti passi restano, e puoi saltare un capitolo intero o uscire quando vuoi.',
+        'Basta schermate grigie in cui non sai dove guardare: ogni passo porta da solo il bersaglio in vista e verifica che sia davvero visibile prima di mostrarti qualcosa. Il fumetto sceglie il suo lato, non esce mai dallo schermo e non si posa mai su ciò che indica.',
+        'Novità nella visita: i set completi e la rarità Eterno, la pagina Account e l\'aggiunta rapida. Ogni passo che chiede un gesto offre anche una via d\'uscita — nessuno resta bloccato.',
+      ],
+      nl: [
+        'De rondleiding is herbouwd als vijf hoofdstukken, één per pagina, in de volgorde van de tabbladen. Je weet altijd in welk hoofdstuk je zit, hoeveel stappen er nog komen, en je kunt een heel hoofdstuk overslaan of op elk moment stoppen.',
+        'Geen grijs scherm meer waarop je zoekt waar je moet kijken: elke stap haalt zijn doel zelf in beeld en controleert of het echt zichtbaar is voordat er iets verschijnt. De ballon kiest zijn eigen kant, loopt nooit van het scherm en gaat nooit bovenop wat hij aanwijst.',
+        'Nieuw in de rondleiding: complete sets en de zeldzaamheid Eeuwig, de pagina Account, en snel toevoegen. Elke stap die om een handeling vraagt biedt ook een uitweg — niemand komt vast te zitten.',
+      ],
+      de: [
+        'Die Tour ist als fünf Kapitel neu gebaut, eins pro Seite, in der Reihenfolge der Tabs. Du weißt immer, in welchem Kapitel du bist, wie viele Schritte bleiben, und kannst ein ganzes Kapitel überspringen oder jederzeit aussteigen.',
+        'Kein abgedunkelter Bildschirm mehr, auf dem man sucht, wo man hinschauen soll: Jeder Schritt holt sein Ziel selbst ins Bild und prüft, ob es wirklich sichtbar ist, bevor überhaupt etwas erscheint. Die Sprechblase wählt ihre Seite, verlässt nie den Bildschirm und legt sich nie auf das, worauf sie zeigt.',
+        'Neu in der Tour: vollständige Sets und die Seltenheit Ewig, die Kontoseite und das schnelle Hinzufügen. Jeder Schritt, der eine Handlung verlangt, bietet auch einen Ausweg — niemand bleibt stecken.',
+      ],
+    },
+  },
+  {
     version: '1.46.1',
     date: '2026-08-09',
     changes: {

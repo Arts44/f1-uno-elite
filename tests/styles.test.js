@@ -14,7 +14,9 @@ describe('styles.css custom properties', () => {
   // Tokens supplied at runtime by JS (element.style.setProperty) rather
   // than declared in the sheet — legitimately "used but not defined".
   // --c1/--c2 : couleurs de livrée posées inline par liveryHTML() (render.js).
-  const RUNTIME_SET = new Set(['--tc', '--rarc', '--px', '--py', '--dur', '--delay', '--logo-bg', '--c1', '--c2']);
+  // --tut-arrow : décalage de la flèche de l'infobulle, calculé sur le
+  //   centre du halo à chaque étape (tutorial.js, _positionBubble).
+  const RUNTIME_SET = new Set(['--tc', '--rarc', '--px', '--py', '--dur', '--delay', '--logo-bg', '--c1', '--c2', '--tut-arrow']);
 
   test('every var(--token) used is defined somewhere (or set at runtime)', () => {
     const defined = new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map(m => m[1]));
