@@ -792,7 +792,12 @@ let selectedTitleId = null;
 function loadSelectedTitle(){
   selectedTitleId = null;
   try {
-    const raw = localStorage.getItem('f1uno_title');
+    // Clé scoppée par saison depuis 1.47.4 (un titre se gagne AVEC les
+    // badges d'une saison). La migration v3 déplace l'ancienne clé nue ;
+    // la relecture de secours ci-dessous couvre le cas où le titre est
+    // lu avant que loadData() n'ait migré.
+    const raw = localStorage.getItem(_storageKey('title'))
+      ?? localStorage.getItem('f1uno_title');
     if(!raw) return;
     const v = JSON.parse(raw);
     // Ancien format (objet complet) ET nouveau (id nu) : on ne retient
@@ -802,8 +807,8 @@ function loadSelectedTitle(){
   } catch(e){}
 }
 function saveSelectedTitle(){
-  if(selectedTitleId) localStorage.setItem('f1uno_title', JSON.stringify(selectedTitleId));
-  else localStorage.removeItem('f1uno_title');
+  if(selectedTitleId) localStorage.setItem(_storageKey('title'), JSON.stringify(selectedTitleId));
+  else localStorage.removeItem(_storageKey('title'));
 }
 
 export function getUnlockedTitles(){

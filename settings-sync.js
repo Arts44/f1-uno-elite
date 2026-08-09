@@ -25,13 +25,23 @@ import { log } from './logger.js';
 import { applyLanguage } from './i18n.js';
 import { applySavedFont } from './pin.js';
 import { updateUserTitle } from './badges.js';
+import { _storageKey } from './storage.js';
 
+/* Réglages d'APPAREIL : une seule valeur, toutes saisons confondues.
+   Leur clé de stockage est littérale. */
 export const PREF_KEYS = {
   lang: 'f1uno_lang',
   theme: 'f1uno_theme',
   font: 'f1uno_font',
-  title: 'f1uno_title',
 };
+
+/* Le titre porté voyage AUSSI dans la catégorie « prefs » du format de
+   sauvegarde (champ `prefs.title`, inchangé pour rester compatible avec
+   les sauvegardes existantes), mais sa clé de stockage dépend de la
+   saison depuis 1.47.4 — il est donc résolu à l'exécution, pas listé
+   ci-dessus. Un titre exporté depuis 2025 se restaure dans la saison
+   active au moment de l'import. */
+export const titleStorageKey = () => _storageKey('title');
 export const SECURITY_KEYS = {
   pinEnabled: 'f1uno_pin_enabled',
   pinHash: 'f1uno_pin_hash',
@@ -66,6 +76,8 @@ export function gatherSettings(include = {}){
       const v = localStorage.getItem(key);
       if(v !== null) prefs[name] = v;
     });
+    const ti = localStorage.getItem(titleStorageKey());
+    if(ti !== null) prefs.title = ti;
     if(Object.keys(prefs).length) settings.prefs = prefs;
   }
   if(include.security){
@@ -91,6 +103,8 @@ export function applySettings(settings, choose = {}){
     Object.entries(PREF_KEYS).forEach(([name, key]) => {
       if(typeof settings.prefs[name] === 'string') localStorage.setItem(key, settings.prefs[name]);
     });
+    if(typeof settings.prefs.title === 'string')
+      localStorage.setItem(titleStorageKey(), settings.prefs.title);
     applied.prefs = true;
   }
   if(choose.security && settings.security && typeof settings.security === 'object'){

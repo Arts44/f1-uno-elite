@@ -193,10 +193,15 @@ export async function loadAppData(){
   }
 }
 
+// Renvoie une promesse résolue quand la saison est ENTIÈREMENT en
+// place (catalogue rechargé, collection de la saison relue). Les
+// appelants qui écrivent ensuite — l'import de sauvegarde — doivent
+// l'attendre, sinon ils écrivent la collection de l'ancienne saison
+// sous la clé de la nouvelle.
 export function switchSeason(season){
-  if(season === _currentSeason) return;
+  if(season === _currentSeason) return Promise.resolve();
   _currentSeason = season;
-  loadAppData().then(() => {
+  return loadAppData().then(() => {
     loadData();
     loadManualBadges();
     renderCollection();

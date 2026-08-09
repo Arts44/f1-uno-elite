@@ -98,7 +98,7 @@ Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas, cada 
 | Cripto | **Web Crypto** nativo — SHA-256 (PIN), PBKDF2 + AES-GCM (cifrado en reposo opcional) |
 | Códigos QR | Codificador de un solo archivo vendorizado ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Fuentes | WOFF2 autoalojadas (SIL OFL) — ninguna petición a Google Fonts, 5 temas a elegir |
-| Tests | **Runner de tests integrado en Node** (`node --test`) — 470 tests, sin framework de test |
+| Tests | **Runner de tests integrado en Node** (`node --test`) — 511 tests, sin framework de test |
 | CI | GitHub Actions — tests + build + verificación de frescura del bundle commiteado en cada push/PR |
 
 **Cero dependencias en runtime es una regla de diseño, no una casualidad.** Todo lo que un framework o SDK proporcionaría — renderizado, navegación entre vistas, i18n, caché offline, auth por REST, cifrado, generación de QR — está construido directamente sobre las API de la plataforma web. La app que instalas es exactamente el código de este repositorio.
@@ -176,13 +176,13 @@ Migrar cientos de valores de espaciado escritos a mano hacia tokens, con «a mí
 
 ### Probar una app de navegador sin navegador
 Mantener la promesa de cero dependencias descarta Jest, Vitest y los arneses de navegador headless.
-**Solución:** la lógica se factorizó para ser independiente del navegador y está cubierta por **470 tests en el runner integrado de Node** — sin dependencias de test, sin red real. La CI también reconstruye el bundle y falla si el artefacto commiteado está obsoleto.
+**Solución:** la lógica se factorizó para ser independiente del navegador y está cubierta por **511 tests en el runner integrado de Node** — sin dependencias de test, sin red real. La CI también reconstruye el bundle y falla si el artefacto commiteado está obsoleto.
 
 ---
 
 ### Qué cubren las pruebas — y qué no
 
-470 pruebas sobre el ejecutor integrado de Node, sin framework. Ser preciso sobre el límite importa más que el número:
+511 pruebas sobre el ejecutor integrado de Node, sin framework. Ser preciso sobre el límite importa más que el número:
 
 - **Cubierto:** migraciones de almacenamiento y esquema de claves por temporada; la escala de rareza de siete niveles, incluido el ascenso por set completo; todas las condiciones de insignia y el modelo de dificultad; las listas del coleccionista (que faltan, repetidas, intercambio); los ciclos de codificación de los códigos de copia; los ayudantes de nube contra un `fetch` simulado, incluidos los caminos de fallo; la paridad de claves i18n en los 7 idiomas y la detección de duplicados; la precaché del service worker frente al grafo real de importaciones; los contratos de marcado del acceso por teclado; la procedencia de cada `innerHTML` alimentado desde fuera; el contraste WCAG AA en ambos temas.
 - **No cubierto:** el renderizado real (ninguna aserción DOM más allá de cadenas de marcado), el comportamiento del service worker en ejecución, llamadas de red reales, IndexedDB, los avisos de instalación, y todo lo que exija un motor de navegador — eso se verifica a mano y con la pasada determinista de capturas, no con la suite. El porcentaje de cobertura no se publica a propósito: mediría la parte sin navegador y se leería como si midiera la aplicación.
@@ -201,7 +201,7 @@ npm install     # instala esbuild, la única devDependency
 npm run build   # app.js → app.bundle.js (minificado + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 470 tests, node --test, sin framework
+npm test        # 511 tests, node --test, sin framework
 ```
 
 **Despliegue.** El repositorio se despliega tal cual en GitHub Pages: todas las URL son relativas, así que la app funciona igual en la raíz de un dominio, bajo un subdirectorio y en localhost. Rutina de release: añadir una entrada al changelog (eso *es* el bump de versión) → subir `SW_VERSION` → build → push.
@@ -218,7 +218,7 @@ npm test        # 470 tests, node --test, sin framework
 
 ## 🔩 Notas de ingeniería
 
-Cero dependencias en ejecución (solo esbuild, al compilar); cero desplazamiento de diseño, medido al píxel entre versiones; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado; 470 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
+Cero dependencias en ejecución (solo esbuild, al compilar); cero desplazamiento de diseño, medido al píxel entre versiones; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado; 511 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
 
 ---
 

@@ -17,8 +17,18 @@ describe('tutorial — state snapshot / restore (data safety)', () => {
     const keys = tutorialKeys(2025);
     ['f1uno_owned_2025', 'f1uno_badges_2025', 'f1uno_auto_badges_2025',
      'f1uno_history_2025', 'f1uno_changes_since_backup', 'f1uno_last_backup',
-     'f1uno_theme', 'f1uno_lang', 'f1uno_font', 'f1uno_title',
+     'f1uno_theme', 'f1uno_lang', 'f1uno_font',
+     // Scoppés par saison depuis 1.47.4 — le tutoriel peut épingler un
+     // badge et changer le titre porté : les deux doivent revenir.
+     'f1uno_title_2025', 'f1uno_pinned_badge_2025',
     ].forEach(k => assert.ok(keys.includes(k), k));
+  });
+
+  test('tutorialKeys suit la saison qu\'on lui passe', () => {
+    const keys = tutorialKeys(2026);
+    ['f1uno_owned_2026', 'f1uno_title_2026', 'f1uno_pinned_badge_2026']
+      .forEach(k => assert.ok(keys.includes(k), k));
+    assert.ok(!keys.some(k => k.endsWith('_2025')));
   });
 
   test('captureLocalStorage records values and null for absent keys', () => {

@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.47.4',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'Importing a backup from a different season no longer mixes the two collections together: the season is switched properly first, so what you import lands where it belongs and the other season stays untouched.',
+        'The title you wear now belongs to its season. A title earned in one season is no longer worn in another — your current title is kept as you migrate.',
+        'Deleting your local data now also clears the worn title and the pinned badge, instead of leaving them behind.',
+      ],
+      fr: [
+        'Importer une sauvegarde d\'une autre saison ne mélange plus les deux collections : la saison est réellement changée avant l\'import, ce que vous importez se range au bon endroit, et l\'autre saison reste intacte.',
+        'Le titre que vous portez appartient désormais à sa saison. Un titre gagné dans une saison ne se porte plus dans une autre — votre titre actuel est conservé lors de la mise à jour.',
+        'La suppression des données locales efface aussi le titre porté et le badge épinglé, au lieu de les laisser derrière elle.',
+      ],
+      es: [
+        'Importar una copia de seguridad de otra temporada ya no mezcla ambas colecciones: la temporada se cambia de verdad antes de importar, lo que importas va donde corresponde y la otra temporada queda intacta.',
+        'El título que llevas ahora pertenece a su temporada. Un título ganado en una temporada ya no se lleva en otra — tu título actual se conserva al actualizar.',
+        'Borrar los datos locales elimina también el título llevado y la insignia fijada, en vez de dejarlos atrás.',
+      ],
+      zh: [
+        '导入其他赛季的备份不再把两份收藏混在一起:导入前会真正切换赛季,导入的内容归入正确位置,另一个赛季保持原样。',
+        '你佩戴的称号现在归属于所在赛季。某个赛季获得的称号不再出现在另一个赛季——升级时会保留你当前的称号。',
+        '删除本地数据现在也会清除佩戴的称号和置顶徽章,而不是把它们留下。',
+      ],
+      it: [
+        'Importare un backup di un\'altra stagione non mescola più le due collezioni: la stagione viene cambiata davvero prima dell\'importazione, ciò che importi finisce al posto giusto e l\'altra stagione resta intatta.',
+        'Il titolo che porti appartiene ora alla sua stagione. Un titolo ottenuto in una stagione non si porta più in un\'altra — il tuo titolo attuale viene conservato durante l\'aggiornamento.',
+        'L\'eliminazione dei dati locali cancella anche il titolo portato e il badge fissato, invece di lasciarli indietro.',
+      ],
+      nl: [
+        'Een back-up van een ander seizoen importeren gooit de twee collecties niet meer door elkaar: het seizoen wordt eerst echt gewisseld, wat je importeert komt op de juiste plek terecht en het andere seizoen blijft ongemoeid.',
+        'De titel die je draagt hoort nu bij zijn seizoen. Een titel die je in één seizoen verdient, draag je niet meer in een ander — je huidige titel blijft bij het bijwerken behouden.',
+        'Het wissen van je lokale gegevens verwijdert nu ook de gedragen titel en de vastgezette badge, in plaats van ze achter te laten.',
+      ],
+      de: [
+        'Der Import einer Sicherung aus einer anderen Saison vermischt die beiden Sammlungen nicht mehr: Die Saison wird zuerst wirklich gewechselt, das Importierte landet am richtigen Ort, und die andere Saison bleibt unberührt.',
+        'Der getragene Titel gehört jetzt zu seiner Saison. Ein in einer Saison erworbener Titel wird in einer anderen nicht mehr getragen — Ihr aktueller Titel bleibt beim Aktualisieren erhalten.',
+        'Das Löschen der lokalen Daten entfernt nun auch den getragenen Titel und das angeheftete Abzeichen, statt sie zurückzulassen.',
+      ],
+    },
+  },
+  {
     version: '1.47.3',
     date: '2026-08-09',
     changes: {

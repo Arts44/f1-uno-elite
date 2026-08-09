@@ -5,7 +5,7 @@ import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
 import {
   gatherSettings, applySettings, backupIncludes, setBackupIncludes,
-  PREF_KEYS, SECURITY_KEYS,
+  PREF_KEYS, SECURITY_KEYS, titleStorageKey,
 } from '../settings-sync.js';
 import { collectionSnapshot, loadData, _showImportDialog } from '../storage.js';
 
@@ -13,7 +13,7 @@ function seedDeviceSettings(){
   localStorage.setItem('f1uno_lang', 'fr');
   localStorage.setItem('f1uno_theme', 'dark');
   localStorage.setItem('f1uno_font', 'prestige');
-  localStorage.setItem('f1uno_title', 'legend');
+  localStorage.setItem('f1uno_title_2025', 'legend'); // scoppé saison (1.47.4)
   localStorage.setItem('f1uno_pin_enabled', 'true');
   localStorage.setItem('f1uno_pin_hash', 'abc123hash');
   localStorage.setItem('f1uno_viewer_enabled', 'true');
@@ -115,8 +115,11 @@ describe('settings-sync — remembered export choice', () => {
 
 describe('settings-sync — key coverage', () => {
   test('categories cover exactly the intended localStorage keys', () => {
+    // Le titre n'est plus une clé littérale : il dépend de la saison
+    // (titleStorageKey()). PREF_KEYS ne garde que l'appareil.
     assert.deepEqual(Object.values(PREF_KEYS).sort(),
-      ['f1uno_font', 'f1uno_lang', 'f1uno_theme', 'f1uno_title']);
+      ['f1uno_font', 'f1uno_lang', 'f1uno_theme']);
+    assert.equal(titleStorageKey(), 'f1uno_title_2025');
     assert.deepEqual(Object.values(SECURITY_KEYS).sort(),
       ['f1uno_pin_enabled', 'f1uno_pin_hash', 'f1uno_viewer_enabled']);
     // the cloud session token must NEVER be part of any category

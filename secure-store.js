@@ -42,7 +42,19 @@ const SALT_KEY = 'f1uno_enc_salt';
 const CHECK_KEY = 'f1uno_enc_check';
 const CHECK_PLAINTEXT = 'f1uno-enc-check-v1';
 const ITERATIONS = 310000;
-const DATA_KEY_RE = /^f1uno_(owned|badges|auto_badges|history)_/;
+/* ── REGISTRE : ce qui passe par secureGet/secureSet ──────────
+   Exactement les quatre familles de clés que le chiffrement au repos
+   couvre. Ce registre doit rester en phase avec les appels réels :
+   tests/key-registry.test.js échoue si une clé lue/écrite par
+   secure* n'est pas décrite ici, ou l'inverse.
+
+   Volontairement ABSENTS : f1uno_title_* et f1uno_pinned_badge_*.
+   Ils ne contiennent qu'un identifiant de badge ou de titre, tous
+   deux présents en clair dans le dépôt, et se déduisent des badges
+   qu'ils accompagnent — les chiffrer ne cacherait rien de plus.
+   Ils appartiennent en revanche à une saison : c'est SEASON_KEY_RE
+   (storage.js) qui les couvre pour l'effacement et l'export. */
+export const DATA_KEY_RE = /^f1uno_(owned|badges|auto_badges|history)_/;
 
 let _key = null;            // CryptoKey for this unlocked session
 let _cache = new Map();     // key -> plaintext string (enc mode only)

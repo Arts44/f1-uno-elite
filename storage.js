@@ -7,7 +7,7 @@ import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
 import { t, tEsc, setSafeHTML } from './i18n.js';
 import {
-  _currentSeason, setCurrentSeason,
+  _currentSeason, switchSeason,
   CARDS_DB, CARD_TYPES, RARITY_ORDER, RARITY_KEYS, ROLE_BASE_RARITY
 } from './data.js';
 import { updateStats } from './stats.js';
@@ -23,10 +23,16 @@ import { secureGet, secureSet } from './secure-store.js';
 import { icon } from './icons.js';
 
 /* ── Versioning & season-scoped keys ── */
-const STORAGE_VERSION = 2;
+const STORAGE_VERSION = 3;
 
+/* Seuls le thème et le numéro de version sont des réglages d'APPAREIL :
+   ils valent pour toutes les saisons. Tout le reste — collection,
+   badges, historique, TITRE — appartient à une saison et porte son
+   année. Le titre a été rescoppé en v3 (voir _migrateStorage) : il se
+   gagne avec les badges d'une saison, il ne se porte donc pas dans une
+   autre. */
 export function _storageKey(name){
-  return (name==='theme'||name==='title'||name==='version')
+  return (name==='theme'||name==='version')
     ? `f1uno_${name}`
     : `f1uno_${name}_${_currentSeason}`;
 }
@@ -44,6 +50,17 @@ function _migrateStorage(){
     const oa = localStorage.getItem('f1uno_auto_badges');
     if(oa && !localStorage.getItem('f1uno_auto_badges_2025'))
       localStorage.setItem('f1uno_auto_badges_2025', oa);
+  }
+  if(ver < 3){
+    // v3 : f1uno_title devient f1uno_title_<année>. La seule saison
+    // ayant existé jusqu'ici est 2025 : le titre porté aujourd'hui lui
+    // appartient. On le déplace — sans écraser une valeur déjà scoppée.
+    const ot = localStorage.getItem('f1uno_title');
+    if(ot !== null){
+      if(!localStorage.getItem('f1uno_title_2025'))
+        localStorage.setItem('f1uno_title_2025', ot);
+      localStorage.removeItem('f1uno_title');
+    }
   }
   localStorage.setItem('f1uno_version', String(STORAGE_VERSION));
 }
@@ -116,17 +133,25 @@ export function setTypeData(cardId, typeId, key, value){
   if(_txDepth === 0){ saveData(); updateStats(); }
 }
 
+/* ── REGISTRE : tout ce qui appartient à UNE saison ────────────
+   Surensemble de DATA_KEY_RE (secure-store.js) : les quatre familles
+   chiffrables, plus le titre porté et le badge épinglé, qui se
+   gagnent avec les badges d'une saison donnée. C'est la liste de
+   référence pour l'effacement des données locales et pour l'instantané
+   du tutoriel (tutorial.js : tutorialKeys). */
+export const SEASON_KEY_RE = /^f1uno_(owned|badges|auto_badges|history|title|pinned_badge)_\d+$/;
+
 // ── Suppression des données locales de collection (zone danger) ──
-// Efface les clés de collection de TOUTES les saisons (possédées,
-// badges, badges auto, historique) + les compteurs de rappel de
-// sauvegarde. Les préférences (thème, langue, police) et le PIN sont
-// volontairement conservés. Recharge l'état mémoire (vide) ensuite.
+// Efface les clés de saison de TOUTES les saisons (possédées, badges,
+// badges auto, historique, titre porté, badge épinglé) + les compteurs
+// de rappel de sauvegarde. Les préférences (thème, langue, police) et
+// le PIN sont volontairement conservés. Recharge l'état mémoire ensuite.
 export function deleteLocalCollectionData(){
   if(deniedForViewer()) return 0;   // lecture seule : refus même en appel direct
   const kill = [];
   for(let i = 0; i < localStorage.length; i++){
     const k = localStorage.key(i);
-    if(/^f1uno_(owned|badges|auto_badges|history)_/.test(k)) kill.push(k);
+    if(SEASON_KEY_RE.test(k)) kill.push(k);
   }
   kill.forEach(k => localStorage.removeItem(k));
   localStorage.removeItem('f1uno_changes_since_backup');
@@ -313,8 +338,8 @@ export function _showImportDialog(data){
     prefs: !!overlay.querySelector('#impSetPrefs')?.checked,
     security: !!secBox?.checked,
   });
-  const _finish = mode => {
-    _applyImport(data, mode);
+  const _finish = async mode => {
+    await _applyImport(data, mode);
     if(data.settings) applySettings(data.settings, _choices());
     overlay.remove();
   };
@@ -323,8 +348,16 @@ export function _showImportDialog(data){
   overlay.querySelector('#importMergeBtn').addEventListener('click',()=>_finish('merge'));
 }
 
-function _applyImport(data, mode){
-  if(data.season) setCurrentSeason(data.season);
+export async function _applyImport(data, mode){
+  // Une sauvegarde d'une AUTRE saison doit passer par switchSeason() :
+  // setCurrentSeason() seul ne déplaçait que la variable, laissant en
+  // mémoire le catalogue et la collection de la saison précédente. La
+  // fusion se faisait alors sur les données de l'ancienne saison, puis
+  // saveData() les réécrivait sous la clé de la nouvelle — écrasant la
+  // collection réellement stockée pour celle-ci.
+  if(data.season && data.season !== _currentSeason){
+    await switchSeason(data.season);
+  }
   if(mode==='replace'){
     coll = data.owned || {};
     if(data.manualBadges) setManualBadges(data.manualBadges);
