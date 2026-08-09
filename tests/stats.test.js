@@ -97,3 +97,34 @@ describe('rarity chip painting', () => {
     assert.ok(!/text-shadow/.test(divine[0]), 'divine chip must not gain a text-shadow either');
   });
 });
+
+/* ══════════════════════════════════════════════════════════
+   CODE GARDÉ VOLONTAIREMENT — fmtMissing / fmtDoubles / fmtTrade.
+
+   Ces trois exports n'ont aucun appelant. Tout analyseur les
+   signalera, et toute passe de nettoyage automatique les retirera.
+   Le mainteneur a décidé de les garder : elles sont la base de
+   l'export de liste d'échange (partage texte ou image), une
+   évolution voulue mais pas encore datée.
+
+   Un commentaire ne protège que ceux qui le lisent. Ce test-ci
+   échoue si elles disparaissent — et son message dit pourquoi elles
+   sont là, à l'endroit où quelqu'un le verra : la sortie rouge.
+   ══════════════════════════════════════════════════════════ */
+describe('exports gardés pour l’export de liste d’échange', () => {
+  const src = readFileSync(new URL('../stats.js', import.meta.url), 'utf8');
+
+  for (const nom of ['fmtMissing', 'fmtDoubles', 'fmtTrade']) {
+    test(`${nom} existe toujours et reste exportée`, () => {
+      assert.match(src, new RegExp(`export\\s+function\\s+${nom}\\s*\\(`),
+        `${nom} a été retirée. Ce n'est PAS du code mort : décision du `
+        + `mainteneur de la garder comme base de l'export de liste `
+        + `d'échange. Si la décision a changé, retire ce test avec elle.`);
+    });
+  }
+
+  test('la raison de les garder est écrite au-dessus', () => {
+    assert.match(src, /NE PAS SUPPRIMER comme code mort/,
+      'le commentaire qui explique la décision doit rester');
+  });
+});

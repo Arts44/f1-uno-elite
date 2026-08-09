@@ -542,7 +542,15 @@ function _toolPanelHTML(tool){
 /* ── Collector-tools text formatting (shareable lists) — moved from
    pin.js with the tools UI. Not wired to a button yet: kept exported
    as the ready-made v2.x text export. Card names are data (never
-   translated); category/rarity/type labels use i18n. ── */
+   translated); category/rarity/type labels use i18n.
+
+   NE PAS SUPPRIMER comme code mort. fmtMissing / fmtDoubles /
+   fmtTrade n'ont aucun appelant, et tout analyseur — comme tout
+   nettoyage automatique — les signalera. C'est délibéré : elles sont
+   la base de l'export de liste d'échange (partage en texte ou en
+   image), une évolution décidée mais pas encore datée. Elles restent
+   exportées pour que ce jour-là il n'y ait qu'une UI à brancher.
+   Décision du mainteneur, 1.48.x. ── */
 function _catLabel(cat){ const k='cat.'+cat, l=t(k); return l===k ? (CATS[cat]?.label||cat) : l; }
 function _typeLabel(id){ const k='type.'+id, l=t(k); return l===k ? (CARD_TYPES[id]?.label||id) : l; }
 

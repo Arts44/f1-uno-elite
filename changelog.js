@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.49.0',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'Settings → About now has two links: a Ko-fi page where you can follow me or chip in, and the project\'s source code on GitHub. The app is free and stays free — nothing here is locked behind anything.',
+      ],
+      fr: [
+        'Réglages → À propos porte maintenant deux liens : une page Ko-fi où vous pouvez me suivre ou soutenir le travail, et le code source du projet sur GitHub. L\'app est gratuite et le reste — rien n\'y est verrouillé derrière quoi que ce soit.',
+      ],
+      es: [
+        'Ajustes → Acerca de tiene ahora dos enlaces: una página de Ko-fi donde puedes seguirme o aportar, y el código fuente del proyecto en GitHub. La app es gratuita y lo seguirá siendo — aquí no hay nada bloqueado tras nada.',
+      ],
+      zh: [
+        '设置 → 关于现在有两个链接：一个 Ko-fi 页面，你可以在那里关注我或支持一下；以及项目在 GitHub 上的源代码。这个应用是免费的，而且会一直免费——这里没有任何东西被锁在门后。',
+      ],
+      it: [
+        'Impostazioni → Info ora contiene due link: una pagina Ko-fi dove puoi seguirmi o dare una mano, e il codice sorgente del progetto su GitHub. L\'app è gratuita e resta gratuita — qui non c\'è nulla chiuso dietro a niente.',
+      ],
+      nl: [
+        'Instellingen → Over heeft nu twee links: een Ko-fi-pagina waar je me kunt volgen of kunt bijdragen, en de broncode van het project op GitHub. De app is gratis en blijft gratis — er zit hier niets achter slot en grendel.',
+      ],
+      de: [
+        'Einstellungen → Über enthält jetzt zwei Links: eine Ko-fi-Seite, wo Sie mir folgen oder etwas beitragen können, und den Quellcode des Projekts auf GitHub. Die App ist kostenlos und bleibt es — hier ist nichts hinter irgendetwas weggesperrt.',
+      ],
+    },
+  },
+  {
     version: '1.48.0',
     date: '2026-08-09',
     changes: {

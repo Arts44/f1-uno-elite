@@ -100,44 +100,64 @@ describe('le rendu ne fabrique plus de balise <img> distante', () => {
   });
 });
 
-describe('lien de soutien — une ancre, jamais une ressource', () => {
+describe('liens externes de « À propos » — des ancres, jamais des ressources', () => {
   // La promesse du projet n'est pas « aucune URL externe n'est écrite
   // nulle part », c'est « la page ne CHARGE rien de distant ». Un lien
   // sortant respecte cette promesse tant qu'il reste un lien : ces
   // tests l'imposent, pour que personne ne le transforme un jour en
   // <img>, en fetch() ou en import.
   const pin = read('pin.js');
-  const url = (pin.match(/SUPPORT_URL = '([^']*)'/) || [])[1];
+  const LIENS = [
+    { nom: 'SUPPORT_URL', hote: 'ko-fi', url: (pin.match(/SUPPORT_URL = '([^']*)'/) || [])[1], btn: 'supportBtn' },
+    { nom: 'SOURCE_URL',  hote: 'github', url: (pin.match(/SOURCE_URL = '([^']*)'/) || [])[1],  btn: 'sourceBtn' },
+  ];
 
-  test('l’URL vit dans UNE constante, pas éparpillée', () => {
-    assert.ok(url !== undefined, 'SUPPORT_URL introuvable');
-    // Chaîne vide = fonction dormante, en attente de l'URL réelle.
-    if (!url) return;                       // vide = fonction désactivée
-    const hits = (pin.match(new RegExp(url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
-    assert.equal(hits, 1, 'l’URL est écrite plus d’une fois — une seule source');
-  });
-
-  test('elle n’est jamais chargée : ni fetch, ni src, ni import, ni url()', () => {
-    for (const f of ['pin.js', 'app.js', 'render.js', 'sw.js', 'styles.css',
-                     'index.html', 'index-dev.html', 'manifest.webmanifest']) {
-      const src = read(f);
-      assert.ok(!/fetch\([^)]*ko-fi/i.test(src), `${f} : fetch vers l’hôte de soutien`);
-      assert.ok(!/src\s*=\s*["'`][^"'`]*ko-fi/i.test(src), `${f} : chargé via src=`);
-      assert.ok(!/import\s*\(?["'`][^"'`]*ko-fi/i.test(src), `${f} : importé`);
-      assert.ok(!/url\(\s*["']?[^)]*ko-fi/i.test(src), `${f} : chargé via url() CSS`);
+  test('chaque URL vit dans UNE constante, pas éparpillée', () => {
+    for (const l of LIENS) {
+      assert.ok(l.url !== undefined, `${l.nom} introuvable`);
+      // Chaîne vide = destination dormante, en attente de l'URL réelle.
+      if (!l.url) continue;
+      const hits = (pin.match(new RegExp(l.url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length;
+      assert.equal(hits, 1, `${l.nom} : l’URL est écrite plus d’une fois`);
     }
   });
 
-  test('l’ancre s’ouvre sans donner la main à la page ouverte', () => {
-    const row = pin.slice(pin.indexOf('id="supportBtn"'));
-    const tag = row.slice(0, row.indexOf('>') + 1) + row.slice(0, 220);
-    assert.match(tag, /target="_blank"/, 'doit s’ouvrir dans un nouvel onglet');
-    assert.match(tag, /rel="noopener noreferrer"/,
-      'noopener ET noreferrer : pas d’accès à window.opener, pas de referrer transmis');
+  test('le dépôt visé est bien celui de CETTE app', () => {
+    const src = LIENS.find(l => l.nom === 'SOURCE_URL').url;
+    if (!src) return;
+    assert.match(src, /^https:\/\/github\.com\/[^/]+\/f1-uno-elite$/,
+      'le lien doit mener au dépôt du projet, pas au profil');
   });
 
-  test('le service worker ne précache pas l’hôte de soutien', () => {
-    assert.ok(!read('sw.js').includes('ko-fi'), 'rien d’externe dans le precache');
+  test('aucune n’est jamais chargée : ni fetch, ni src, ni import, ni url()', () => {
+    for (const f of ['pin.js', 'app.js', 'render.js', 'sw.js', 'styles.css',
+                     'index.html', 'index-dev.html', 'manifest.webmanifest']) {
+      const src = read(f);
+      for (const { hote } of LIENS) {
+        assert.ok(!new RegExp(`fetch\\([^)]*${hote}`, 'i').test(src), `${f} : fetch vers ${hote}`);
+        assert.ok(!new RegExp(`src\\s*=\\s*["'\`][^"'\`]*${hote}`, 'i').test(src), `${f} : ${hote} chargé via src=`);
+        assert.ok(!new RegExp(`import\\s*\\(?["'\`][^"'\`]*${hote}`, 'i').test(src), `${f} : ${hote} importé`);
+        assert.ok(!new RegExp(`url\\(\\s*["']?[^)]*${hote}`, 'i').test(src), `${f} : ${hote} chargé via url() CSS`);
+      }
+    }
+  });
+
+  test('chaque ancre s’ouvre sans donner la main à la page ouverte', () => {
+    for (const { btn } of LIENS) {
+      const i = pin.indexOf(`id="${btn}"`);
+      assert.ok(i > 0, `${btn} absent du markup`);
+      const tag = pin.slice(i, i + 220);
+      assert.match(tag, /target="_blank"/, `${btn} : doit s’ouvrir dans un nouvel onglet`);
+      assert.match(tag, /rel="noopener noreferrer"/,
+        `${btn} : noopener ET noreferrer — pas d’accès à window.opener, pas de referrer transmis`);
+    }
+  });
+
+  test('le service worker ne précache aucun des deux hôtes', () => {
+    const sw = read('sw.js');
+    for (const { hote } of LIENS) {
+      assert.ok(!sw.includes(hote), `${hote} : rien d’externe dans le precache`);
+    }
   });
 
   test('aucune contrepartie : le don ne débloque rien', () => {

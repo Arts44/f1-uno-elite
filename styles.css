@@ -307,11 +307,23 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 /* Soutien — un lien, dans la grammaire des boutons existants. Aucun
    traitement racoleur : ni couleur d'accent, ni pastille, ni animation.
    Le cœur suffit à dire ce que c'est. */
-#supportBtn{display:inline-flex;align-items:center;justify-content:center;
+/* Deux destinations pour une seule entrée : la ligne s'empile —
+   texte au-dessus, boutons dessous — plutôt que de serrer deux
+   pilules à droite d'un paragraphe de trois lignes à 375 px. Le reste
+   du bloc « À propos » garde sa grammaire (une ligne, un contrôle). */
+/* Double sélecteur VOLONTAIRE : .setv-row est déclarée plus bas dans
+   le fichier ; à spécificité égale elle gagnerait et la ligne
+   resterait centrée. */
+.setv-row.setv-row-stack{flex-direction:column;align-items:stretch;gap:var(--space-3);}
+/* Boutons à leur largeur naturelle, alignés sur le bord gauche du
+   texte — pas étirés : deux pilules pleine largeur pèseraient plus
+   lourd que la ligne qu'elles accompagnent. */
+.setv-row-links{display:flex;gap:var(--space-2);flex-wrap:wrap;}
+.setv-row-links .setv-btn{display:inline-flex;align-items:center;justify-content:center;
   text-decoration:none;min-height:36px;}
 #supportRow .setv-row-label .ic{color:var(--red);margin-right:2px;}
 /* Hors ligne : visiblement inerte, et le sous-titre l'explique. */
-#supportBtn.is-off{opacity:0.45;pointer-events:none;cursor:default;}
+.setv-row-links .setv-btn.is-off{opacity:0.45;pointer-events:none;cursor:default;}
 
 .setv-version{font-family:var(--font-b);font-size:13px;font-weight:700;color:var(--tx2);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-pill);padding:var(--space-1) var(--space-14px);white-space:nowrap;}
 .changelog-dialog{max-width:460px;text-align:left;}

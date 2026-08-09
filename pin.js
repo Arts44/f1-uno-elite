@@ -24,22 +24,33 @@ export function isPinEnabled(){ return localStorage.getItem('f1uno_pin_enabled')
 export function isSetupDone(){ return localStorage.getItem('f1uno_setup_done')==='true'; }
 export function isViewerModeAllowed(){ return localStorage.getItem('f1uno_viewer_enabled')==='true'; }
 /* ══════════════════════════════════════════════════════════
-   SOUTENIR LE CRÉATEUR — un lien, rien d'autre.
+   LE PROJET ET SON AUTEUR — deux liens, rien d'autre.
 
-   Le don soutient le DÉVELOPPEUR, pas l'application : le projet
-   reste un fan project non commercial, et le disclaimer F1/Mattel
-   ne bouge pas. Aucune contrepartie — pas de fonctionnalité
-   débloquée, pas de badge donateur, pas de mention nominative :
-   à la seconde où le don ouvre quelque chose, ce n'est plus un
-   don, c'est un achat.
+   Deux destinations, une même intention : donner accès à ce qu'il
+   y a autour de l'app, sans rien demander. Ko-fi rassemble les
+   réseaux de l'auteur, le suivi et — parmi d'autres options — le
+   don ; GitHub donne le code.
 
-   Un lien externe et c'est tout : zéro dépendance, zéro script
+   Ce qui ne change pas : le don soutient le DÉVELOPPEUR, pas
+   l'application. Le projet reste un fan project non commercial, le
+   disclaimer F1/Mattel ne bouge pas, et il n'y a AUCUNE
+   contrepartie — pas de fonctionnalité débloquée, pas de badge
+   donateur, pas de mention nominative. À la seconde où le don
+   ouvre quelque chose, ce n'est plus un don, c'est un achat.
+
+   Des liens externes et c'est tout : zéro dépendance, zéro script
    tiers, zéro pixel de suivi, aucune donnée qui quitte l'appareil.
-   Laisser l'URL vide masque entièrement la ligne.
+   Vider les DEUX URL masque entièrement la ligne ; n'en vider
+   qu'une retire seulement son bouton.
+
+   GitHub pointe le DÉPÔT, pas le profil : la ligne vit dans « À
+   propos » de cette app, donc ce qu'on y cherche est le code de
+   CETTE app. Le profil est à un clic depuis l'en-tête du dépôt ;
+   l'inverse n'est pas vrai.
    ══════════════════════════════════════════════════════════ */
-// Source unique de l'URL : la changer ici la change partout. Vide =
-// la ligne disparaît entièrement de l'interface.
+// Source unique de chaque URL : les changer ici les change partout.
 export const SUPPORT_URL = 'https://ko-fi.com/arts44';
+export const SOURCE_URL = 'https://github.com/Arts44/f1-uno-elite';
 
 export function getStoredPinHash(){ return localStorage.getItem('f1uno_pin_hash')||''; }
 
@@ -773,14 +784,18 @@ export function renderSettings(){
         </div>
         <button class="setv-btn" id="checkUpdBtn">${t('upd.check_btn')}</button>
       </div>` : ''}
-      ${SUPPORT_URL ? `
-      <div class="setv-row" id="supportRow">
+      ${(SUPPORT_URL || SOURCE_URL) ? `
+      <div class="setv-row setv-row-stack" id="supportRow">
         <div class="setv-row-left">
-          <div class="setv-row-label">${icon('heart')} ${t('s.support')}</div>
+          <div class="setv-row-label">${icon('handshake')} ${t('s.support')}</div>
           <div class="setv-row-sub">${t('s.support_sub')}</div>
         </div>
-        <a class="setv-btn" id="supportBtn" href="${SUPPORT_URL}"
-           target="_blank" rel="noopener noreferrer">${t('s.support_btn')}</a>
+        <div class="setv-row-links">
+          ${SUPPORT_URL ? `<a class="setv-btn" id="supportBtn" href="${SUPPORT_URL}"
+             target="_blank" rel="noopener noreferrer">${t('s.support_btn')}</a>` : ''}
+          ${SOURCE_URL ? `<a class="setv-btn" id="sourceBtn" href="${SOURCE_URL}"
+             target="_blank" rel="noopener noreferrer">${t('s.source_btn')}</a>` : ''}
+        </div>
       </div>` : ''}
     </div>
 
@@ -892,19 +907,21 @@ export function renderSettings(){
      que de laisser l'utilisateur tomber sur la page d'erreur du
      navigateur. L'état se remet à jour dès le retour du réseau —
      l'app est hors-ligne d'abord, ce cas est la norme, pas l'exception. */
-  const support = el.querySelector('#supportBtn');
-  if(support){
+  const liens = [...el.querySelectorAll('#supportRow .setv-btn')];
+  if(liens.length){
     const sub = el.querySelector('#supportRow .setv-row-sub');
     const online = () => {
       const up = navigator.onLine !== false;
-      support.classList.toggle('is-off', !up);
-      support.setAttribute('aria-disabled', up ? 'false' : 'true');
+      liens.forEach(a => {
+        a.classList.toggle('is-off', !up);
+        a.setAttribute('aria-disabled', up ? 'false' : 'true');
+      });
       if(sub) sub.textContent = up ? t('s.support_sub') : t('s.support_offline');
     };
     online();
-    support.addEventListener('click', e => {
+    liens.forEach(a => a.addEventListener('click', e => {
       if(navigator.onLine === false) e.preventDefault();
-    });
+    }));
     window.addEventListener('online', online);
     window.addEventListener('offline', online);
   }
