@@ -12,6 +12,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # Au niveau du JOB : un `if:` d'étape ne voit PAS le `env:` de sa
+    # propre étape (il est évalué avant). C'est la seule portée qui
+    # permet de sauter proprement l'envoi quand le secret est absent.
+    env:
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -36,6 +41,33 @@ jobs:
       # ignore CI. Flip continue-on-error to false once the count reaches 0.
       - name: Lint (Biome — non-blocking for now)
         run: npm run lint
+        continue-on-error: true
+
+      # ── Couverture → Codacy ─────────────────────────────────────
+      # Reporter LCOV NATIF de Node : aucune dépendance ajoutée, ce qui
+      # est la règle du dépôt. Exclut les tests eux-mêmes, l'artefact de
+      # build, les outils de dev et les fichiers de DONNÉES (traductions,
+      # données embarquées, descriptions de cartes, config cloud) : leur
+      # inclure gonflerait le dénominateur avec des littéraux.
+      #
+      # AUCUN SEUIL n'est imposé. Le chiffre mesure la tranche
+      # « sans navigateur » de l'app — pas l'app. Le publier comme une
+      # note serait trompeur ; le remonter comme SIGNAL de tendance ne
+      # l'est pas. C'est pour ça qu'il monte ici sans bloquer la CI.
+      - name: Couverture (reporter LCOV natif)
+        run: npm run test:cov
+
+      # Le secret CODACY_PROJECT_TOKEN se crée dans Codacy :
+      # Repository > Settings > Coverage > Project API token, puis se
+      # colle dans GitHub : Settings > Secrets and variables > Actions.
+      # Sans le secret, l'étape est SAUTÉE — un fork ou une PR externe
+      # ne fait pas échouer la CI pour une variable qu'il ne peut pas
+      # avoir.
+      - name: Envoi de la couverture à Codacy
+        if: env.CODACY_PROJECT_TOKEN != ''
+        run: |
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
+            --force-coverage-parser lcov -r coverage/lcov.info
         continue-on-error: true
 
       - name: Production build (esbuild)
