@@ -65,71 +65,128 @@ exclude_paths:
   - 'node_modules/**'
 
 # ══════════════════════════════════════════════════════════════════
-# PATTERNS NATIFS CODACY — ce fichier ne peut PAS les désactiver.
+# CE QUI EST FAIT CÔTÉ SERVICE — et pourquoi ce fichier ne suffit pas
 #
-# Codacy applique, en plus d'ESLint, ses propres patterns. Ils ne
-# lisent ni .eslintrc.yml ni les directives eslint-disable en ligne :
-# ces directives ont même produit leur propre alerte ici, le plugin
-# no-unsanitized n'étant pas installé côté service. Elles ont donc été
-# retirées du code (i18n.js, render.js), leur justification conservée
-# en commentaire simple.
+# Codacy applique, EN PLUS d'ESLint, ses propres analyseurs (Opengrep,
+# Trivy, PMD…). Ils ne lisent ni .eslintrc.yml ni les directives
+# eslint-disable en ligne — ces directives ont même produit leur propre
+# alerte ici, le plugin no-unsanitized n'étant pas installé côté
+# service. Elles ont donc été retirées du code (i18n.js, render.js),
+# leur justification conservée en commentaire simple.
 #
-# Les quatre patterns ci-dessous se désactivent UNIQUEMENT dans
-# l'interface : Repository → Settings → Code patterns. La raison est
-# consignée ici pour que la décision reste défendable sans accès au
-# service :
+# Ce fichier ne pilote PAS ces analyseurs. Les décisions ci-dessous
+# sont appliquées dans Codacy même ; elles sont consignées ici pour
+# rester défendables sans accès au service.
 #
-#   · « Avoid assigning user-controlled data to innerHTML » (55×)
-#   · « Avoid Using Insecure Document Methods » (55×)
-#       → Un audit de provenance des 78 affectations innerHTML des
-#         modules livrés donne : 40 markup CONSTANT du dépôt,
-#         35 données INTERNES versionnées, 3 données EXTERNES, toutes
-#         les trois déjà échappées (import JSON → tEsc, session cloud
-#         et retours de feedback → escapeHtml). Le pattern ne sait pas
+# État vérifié après application : 117 → 0 issues, sans qu'une seule
+# ligne de code ait été tordue pour y arriver.
+#
+# ┌────────────────────────────────────────────────────────────────┐
+# │ DEUX MÉCANIQUES, À NE PAS CONFONDRE                            │
+# │                                                                │
+# │ PATTERN DÉSACTIVÉ = décision STRUCTURELLE. La règle ne peut    │
+# │   pas être satisfaite sans dénaturer le code, et elle vaut     │
+# │   pour tout le dépôt, aujourd'hui et demain. On éteint la      │
+# │   règle, et on met un TEST à sa place.                         │
+# │                                                                │
+# │ ISSUE MARQUÉE FAUX POSITIF = exception PONCTUELLE. La règle    │
+# │   est bonne et doit rester armée ; c'est CETTE ligne-là qui    │
+# │   est un cas particulier. On éteint l'occurrence, pas la       │
+# │   règle.                                                       │
+# │                                                                │
+# │ Par défaut, préférer la seconde. Éteindre un détecteur de      │
+# │ secrets parce qu'une clé publique le déclenche, c'est se       │
+# │ priver de lui le jour où un VRAI secret sera commité.          │
+# └────────────────────────────────────────────────────────────────┘
+#
+# ── A. PATTERNS DÉSACTIVÉS (structurel) ─────────────────────────
+# Décochés dans le coding standard de l'organisation
+# (« Default coding standard » #164497), puis appliqué au dépôt.
+# Un pattern imposé par un standard NE PEUT PAS être décoché au
+# niveau du dépôt : ni par l'interface du dépôt, ni par la CLI.
+#
+#   · « Avoid assigning user-controlled data to innerHTML »   (54)
+#     Semgrep_javascript.browser.security.insecure-innerhtml…
+#   · « Avoid Using Insecure Document Methods »               (54)
+#     Semgrep_javascript.browser.security.insecure-document-method…
+#       → Audit de provenance des 78 affectations innerHTML des
+#         modules livrés : 40 markup CONSTANT du dépôt, 35 données
+#         INTERNES versionnées, 3 données EXTERNES — ces trois-là
+#         déjà échappées (import JSON → tEsc ; session cloud et
+#         retours de feedback → escapeHtml). Le pattern ne sait pas
 #         distinguer les trois cas et signale les 78.
-#         CE QUI REMPLACE LE PATTERN : le test de provenance de
+#         Le satisfaire exigerait de reconstruire 78 fragments de
+#         markup en createElement/textContent : des centaines de
+#         lignes en remplacement de gabarits lisibles, pour zéro
+#         gain réel. C'est la définition de « tordre le code ».
+#       CE QUI REMPLACE LA RÈGLE : le test de provenance de
 #         tests/security-hardening.test.js, qui ÉCHOUE si un site à
-#         donnée externe perd son échappement. Un test qui casse le
-#         build vaut mieux qu'une alerte qu'on apprend à ignorer.
+#         donnée externe perd son échappement.
 #
-#   · « Hardcoded JWT » sur cloud-config.js:23
-#       → C'est la clé « anon public » de Supabase, publique par
-#         conception et protégée par Row Level Security côté serveur.
-#         Décodage du token : {"role":"anon"} — vérifié, ce n'est PAS
-#         service_role. Une app 100 % cliente ne peut pas la cacher.
-#
-#   · « Server-Side Request Forgery » sur cloud.js (fetch vers cfg.url)
-#       → cfg.url provient d'un littéral de cloud-config.js, fichier
-#         versionné et servi avec l'app. Jamais d'une saisie, d'une
+#   · « SSRF by Validating User-Controlled URLs »              (2)
+#     Semgrep_rules_lgpl_javascript_ssrf_rule-node-ssrf
+#       → cfg.url vient d'un littéral de cloud-config.js, fichier
+#         versionné servi avec l'app. Jamais d'une saisie, d'une
 #         sauvegarde importée, d'un lien #backup= ni du réseau.
 #         Provenance détaillée au-dessus de cloudConfig().
 #
-#   · « Inaccurate / magic numeric literal » sur 86400000 (2×)
-#       → backup.js et badges.js. Le nombre a été REMPLACÉ par une
-#         constante nommée DAY_MS — le correctif que la règle appelle.
-#         Le pattern se déclenche malgré tout, sur la ligne de la
-#         constante elle-même : il vise la VALEUR, où qu'elle soit, et
-#         aucune écriture ne peut le satisfaire. 86400000 est
-#         exactement représentable en double (2^7 × 675000), il n'y a
-#         donc aucune perte de précision à corriger.
-#         Le refactor est CONSERVÉ : le nombre magique a disparu du
-#         code, ce qui était le vrai objectif. Seule l'alerte est
-#         désactivée, pas l'amélioration.
+#   · « Avoid Innaccurate Numeric Literals »                   (2)
+#     PMD_category_ecmascript_errorprone_InnaccurateNumericLiteral
+#       → 86400000 a été REMPLACÉ par la constante DAY_MS — le
+#         correctif que la règle appelle. Le pattern se déclenche
+#         malgré tout, sur la ligne de la constante : il vise la
+#         VALEUR, où qu'elle soit. Et 86400000 est exactement
+#         représentable en double (2^7 × 675000) : il n'y a aucune
+#         imprécision à corriger. Le refactor est CONSERVÉ, seule
+#         l'alerte est éteinte.
 #
-#   · « Insecure random / cryptographically weak RNG » sur badges.js
+#   · « Cryptographically Weak Random Number Generators »      (1)
+#     Semgrep_rules_lgpl_javascript_crypto_rule-node-insecure-random…
 #       → Un seul Math.random() dans tout le dépôt : la distance de
 #         projection (34→60 px) des 12 particules de célébration
-#         affichées quand un badge se débloque. Aucune valeur de
-#         sécurité n'en dépend.
-#         Le seul aléa qui compte, lui, utilise déjà un CSPRNG :
-#         crypto.getRandomValues() dans secure-store.js, pour le sel
-#         PBKDF2 et l'IV AES-GCM. Un test doit échouer si un
-#         Math.random() apparaît un jour dans secure-store.js — c'est
-#         là qu'il serait grave, pas dans des confettis.
+#         d'un badge. Le seul aléa qui compte utilise déjà un
+#         CSPRNG — crypto.getRandomValues() dans secure-store.js,
+#         pour le sel PBKDF2 et l'IV AES-GCM.
+#       CE QUI REMPLACE LA RÈGLE : trois tests dans
+#         tests/security-hardening.test.js — aucun Math.random()
+#         dans secure-store.js / pin.js / cloud.js / backup.js,
+#         ≥3 crypto.getRandomValues() dans secure-store.js, et un
+#         seul Math.random() dans badges.js, justifié sur place.
 #
-# NON DÉSACTIVÉ, délibérément : tout ce qui touche eval, les fonctions
-# construites depuis une chaîne, les URL javascript:, et les
-# comparaisons d'empreintes. Ces alertes-là sont à corriger.
+# ── B. ISSUES MARQUÉES FAUX POSITIF (ponctuel) ──────────────────
+# Les patterns ci-dessous restent ACTIFS. Seules ces occasions
+# précises sont écartées, avec la raison écrite dans Codacy.
+#
+#   · cloud-config.js:23 — la clé « anon public » de Supabase
+#     déclenche TROIS détecteurs de secret :
+#       Semgrep_generic.secrets.gitleaks.jwt.jwt
+#       Semgrep_generic.secrets.security.detected-jwt-token…
+#       Trivy_secret
+#     Cette clé est PUBLIQUE PAR CONCEPTION : servie à chaque
+#     visiteur avec l'app (100 % cliente, aucun backend où la
+#     cacher), elle n'autorise que ce que la Row Level Security
+#     laisse passer côté serveur. Le token décodé porte
+#     {"role":"anon"} — ce n'est PAS service_role, qui contournerait
+#     RLS et n'a rien à faire dans un dépôt.
+#     Les trois détecteurs restent ARMÉS : ils doivent continuer de
+#     crier si un vrai secret est commité un jour.
+#
+#   · cloud.js:25 — « Avoid Hardcoded Passwords » sur
+#     export const SESSION_KEY = 'f1uno_cloud_session';
+#     C'est le NOM d'une clé localStorage, pas un mot de passe.
+#     Le pattern reste ACTIF, pour la même raison.
+#
+# ── C. CE QU'ON NE DÉSACTIVE JAMAIS ─────────────────────────────
+# eval, les fonctions construites depuis une chaîne, les URL
+# javascript:, et les comparaisons d'empreintes. Une alerte de leur
+# part est à CORRIGER, jamais à faire taire.
+# Elles sont hors d'atteinte du coding standard par construction :
+# Codacy affiche « ESLint · Config File: Applied · Overwritten by
+# file », donc c'est .eslintrc.yml (no-eval, no-implied-eval,
+# no-new-func, no-script-url) qui fait foi. La comparaison
+# d'empreintes, elle, est tenue par tests/security-hardening.test.js
+# — un test qui casse le build vaut mieux qu'une règle qu'un
+# changement de configuration peut éteindre.
 
 engines:
   eslint:
