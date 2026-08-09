@@ -11,6 +11,7 @@ import { maybeStartTutorial, startTutorial } from './tutorial.js';
 import { installRowHTML, bindInstallRow } from './install.js';
 import { openChangelog, checkForUpdatesNow, isUpdateCheckSupported } from './update.js';
 import { APP_VERSION } from './changelog.js';
+import { pageHeadHTML } from './pagehead.js';
 import { segDisplay, segActiveIndex } from './otp-input.js';
 import { icon } from './icons.js';
 import {
@@ -630,8 +631,11 @@ export function renderSettings(){
     `<option value="${code}"${getLang()===code?' selected':''}>${label}</option>`
   ).join('');
 
-  el.innerHTML = `
-    <div class="setv-title">${icon('settings')} <span>${t('nav.settings').replace('⚙️ ','')}</span></div>
+  el.innerHTML = pageHeadHTML({
+    icon: 'settings',
+    title: t('nav.settings'),
+    sub: t('ph.set_sub', { v: APP_VERSION })
+  }) + `
 
     <div class="setv-section set-appearance">
       <div class="setv-section-title">${icon('palette')} ${t('s.appearance')}</div>

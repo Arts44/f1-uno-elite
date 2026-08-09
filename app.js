@@ -13,7 +13,7 @@ import { maybeShowQuickAddHint, dismissQuickAddHint,
   toggleTheme, quickToggle, changeMoQty, showToast,
   toggleQuickAdd, quickAddType, closeQuickAdd, initNavBead
 } from './render.js';
-import { updateStats } from './stats.js';
+import { updateStats, renderCollectionHead } from './stats.js';
 import { seedNewAutoBadges,
   loadManualBadges, updateUserTitle, toggleManualBadge, removeAutoBadge,
   toggleBadgeDetail, pinBadge, unpinBadge, shareProfileCard,
@@ -49,6 +49,11 @@ initInstall();
 
 export function initApp() {
   log('Initialisation de l\'app...');
+  // Le bandeau de page est posé AVANT les données : sa hauteur est la
+  // même à vide qu'une fois remplie (seuls les nombres changent), donc
+  // le squelette et la grille réelle démarrent au même y — zéro
+  // décalage de mise en page au chargement.
+  renderCollectionHead({ total: 0, owned: 0, doubles: 0, missing: 0, pct: 0 });
   showGridSkeleton();          // no-op if the data lands within 150ms
   loadAppData().then(() => {
     hideGridSkeleton();

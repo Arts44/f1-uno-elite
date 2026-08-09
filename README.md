@@ -67,7 +67,7 @@ It's a **PWA**: install it from your browser and it runs like a native app, full
 Track a complete **F1 UNO Élite** trading-card collection — 101 cards, each existing in up to 16 variants (base colours, foils, duals, Wild, Nitro, promos):
 
 - 📇 **Full collection management** — owned / doubles / wishlist / favourites, per-variant quantities, the whole collection always in view.
-- ➕ **One-gesture quick add** — a + button on every tile opens a variant picker: one tap adds a copy, with an Undo toast. The header shows your live progress (owned/total) over a thin progress line.
+- ➕ **One-gesture quick add** — a + button on every tile opens a variant picker: one tap adds a copy, with an Undo toast. The Collection page header shows your live progress: a bar plus owned / missing / doubles.
 - ✨ **Animated 7-level rarity system** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, computed from the best owned variant, +1 level when the set is complete (every variant owned) — `eternal` is only reachable that way. Foil cards carry live light-sweep visuals and the top tier renders as a shifting iridescent gradient (all respecting `prefers-reduced-motion`).
 - 📴 **Works fully offline** — the whole app is precached by a service worker; after the first visit, airplane mode changes nothing.
 - 🔄 **Transparent auto-updates** — new versions are detected in the background and applied with one tap, plus an in-app changelog showing what changed since *your* last version.

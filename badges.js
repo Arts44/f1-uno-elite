@@ -3,6 +3,7 @@
    ══════════════════════════════════════════════════════════ */
 import { t, getLang } from './i18n.js';
 import { icon } from './icons.js';
+import { pageHeadHTML, pageHeadBtn } from './pagehead.js';
 import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES } from './data.js';
 import {
   _storageKey, getTypeData,
@@ -472,7 +473,7 @@ function _tileHTML(b, fam){
 let _heroWasAnimated = false;
 export function renderBadges(opts = {}){
   loadManualBadges();
-  const hero = document.getElementById('badgesHero');
+  const hero = document.getElementById('badgesHead');
   const next = document.getElementById('badgesNext');
   const fams = document.getElementById('badgesFams');
   if(!hero || !next || !fams) return;
@@ -483,26 +484,31 @@ export function renderBadges(opts = {}){
   const total = autoUnlocked + manualUnlocked;
   const TOTAL = AUTO_BADGES.length + MANUAL_BADGES.length;
 
-  // ── Hero : anneau + compteur + titre + plus difficile + partage ──
+  // ── Bandeau de page (1.45.0) : le hero d'avant, rangé dans le
+  //    pattern commun. L'anneau, le titre porté et « le plus difficile »
+  //    occupent le slot mesure ; le partage passe dans le slot d'actions.
   const C = 2 * Math.PI * 38;
   const hardest = hardestUnlockedBadge([...AUTO_BADGES, ...MANUAL_BADGES], evaluateBadgeCondition, b => !!(autoBadgeUnlocked[b.id] || manualBadges[b.id]));
-  hero.innerHTML = `
-    <div class="bh-ring">
-      <svg width="86" height="86" viewBox="0 0 86 86" aria-hidden="true">
-        <circle class="bh-bg" cx="43" cy="43" r="38" fill="none" stroke-width="7"/>
-        <circle class="bh-fg" id="bhFg" cx="43" cy="43" r="38" fill="none" stroke-width="7"
-          stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - total / TOTAL)}"/>
-      </svg>
-      <div class="bh-num"><b id="bhCount">${total}</b><span>/ ${TOTAL}</span></div>
-    </div>
-    <div class="bh-right">
-      <div class="bh-kicker">${t('b.title').replace('🏅 ','')}</div>
-      <div class="user-title-wrap" id="userTitleCard"></div>
-      ${hardest ? `<div class="bh-hardest">${t('b.hardest')} <b>${hardest.emoji} ${_bt(hardest).name || hardest.name}</b></div>` : ''}
-    </div>
-    <button class="bh-share" data-action="shareBadges" type="button" aria-label="${t('b.share')}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" x2="12" y1="2" y2="15"/></svg>
-    </button>`;
+  hero.innerHTML = pageHeadHTML({
+    icon: 'award',
+    title: t('nav.badges'),
+    sub: t('ph.badges_sub', { n: total, total: TOTAL }),
+    actions: pageHeadBtn('upload', t('b.share'), 'data-action="shareBadges"'),
+    metric: `<div class="bh-row">
+      <div class="bh-ring">
+        <svg width="86" height="86" viewBox="0 0 86 86" aria-hidden="true">
+          <circle class="bh-bg" cx="43" cy="43" r="38" fill="none" stroke-width="7"/>
+          <circle class="bh-fg" id="bhFg" cx="43" cy="43" r="38" fill="none" stroke-width="7"
+            stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - total / TOTAL)}"/>
+        </svg>
+        <div class="bh-num"><b id="bhCount">${total}</b><span>/ ${TOTAL}</span></div>
+      </div>
+      <div class="bh-right">
+        <div class="user-title-wrap" id="userTitleCard"></div>
+        ${hardest ? `<div class="bh-hardest">${t('b.hardest')} <b>${hardest.emoji} ${_bt(hardest).name || hardest.name}</b></div>` : ''}
+      </div>
+    </div>`
+  });
 
   // ── Prochain badge / Objectif épinglé ──
   const nx = pickNextBadge(getPinnedBadge(), AUTO_BADGES, evaluateBadgeCondition, isAutoBadgeUnlocked);

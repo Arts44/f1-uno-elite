@@ -153,6 +153,7 @@ Collections/F1/                 ← git root · all commands run here
 ├── badges.js                   # Badge evaluation/rendering + titles
 ├── stats.js                    # computeStats(), renderStats() (progression, highlights, donut)
 ├── render.js                   # Grid, modal, views, toast
+├── pagehead.js                 # Bandeau d'en-tête commun aux 5 pages (icône, titre, sous-titre, actions, mesure)
 ├── pin.js                      # Auth/PIN, viewer & admin modes, settings UI
 ├── cloud.js                    # Optional Supabase push/pull via raw REST fetch (magic-link auth)
 ├── settings-sync.js            # Optional settings in backups (prefs / security categories)

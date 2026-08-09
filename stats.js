@@ -1,7 +1,8 @@
 /* ══════════════════════════════════════════════════════════
    STATS — live header/counter updates + stats view rendering
    ══════════════════════════════════════════════════════════ */
-import { t, tEsc } from './i18n.js';
+import { t, tEsc, getLang } from './i18n.js';
+import { pageHeadHTML } from './pagehead.js';
 import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, MANUAL_BADGES, rarityChipClass, rarityChipStyle, _currentSeason } from './data.js';
 import { missingCards, doublesList, tradeList, nearGoals } from './collector.js';
 import {
@@ -38,17 +39,51 @@ export function computeStats(){
   return { total, owned, wish, doubles, missing, fav, totalExemplaires, pct };
 }
 
+/* ── Bandeau de la page Collection ─────────────────────────
+   Reconstruit une fois, puis mis à jour par valeur : updateStats()
+   est appelé à chaque écriture dans la collection, et réécrire
+   l'innerHTML à chaque coche ferait clignoter la barre au lieu de
+   l'animer. ── */
+export function renderCollectionHead(s){
+  const el = document.getElementById('collHead');
+  if(!el) return;
+  // La coquille ne se reconstruit qu'au changement de langue, de
+  // saison ou de taille de jeu — pas à chaque coche.
+  const key = `${getLang()}|${_currentSeason}|${s.total}`;
+  if(el.dataset.k !== key){
+    el.dataset.k = key;
+    el.innerHTML = pageHeadHTML({
+      icon: 'layers',
+      title: t('nav.collection'),
+      sub: t('ph.coll_sub', { n: s.total, y: _currentSeason }),
+      metric: `<div class="phm-coll">
+        <div class="phm-bar"><i id="phCollBar" style="width:0%"></i></div>
+        <div class="phm-nums">
+          <div class="phm-k k-own"><b id="phCollOwned">0</b><span>${t('st.owned')}</span></div>
+          <div class="phm-k k-mis"><b id="phCollMissing">0</b><span>${t('st.missing')}</span></div>
+          <div class="phm-k k-dbl"><b id="phCollDoubles">0</b><span>${t('st.doubles')}</span></div>
+        </div>
+      </div>`
+    });
+  }
+  const set = (id, v) => { const n = document.getElementById(id); if(n) n.textContent = v; };
+  const bar = document.getElementById('phCollBar');
+  if(bar) bar.style.width = s.pct + '%';
+  set('phCollOwned', `${s.owned}/${s.total}`);
+  set('phCollMissing', s.missing);
+  set('phCollDoubles', s.doubles);
+}
+
 export function updateStats(){
   // Un badge auto vient-il de tomber ? (toast + persistance — ajout v2.2,
   // la règle « une fois débloqué, toujours débloqué » ne change pas)
   try { checkNewAutoBadges(); } catch(e){ console.error('badge check failed', e); }
   const { total, owned, wish, doubles, missing, fav, totalExemplaires, pct } = computeStats();
 
-  // Header : compteur de progression (37/101 cartes) + hairline
-  const totalCount = document.getElementById('totalCount');
-  if (totalCount) totalCount.textContent = t('header.total',{o:owned,n:total});
-  const headerProgressBar = document.getElementById('headerProgressBar');
-  if (headerProgressBar) headerProgressBar.style.width = pct + '%';
+  // Bandeau de la page Collection — depuis 1.45.0, le compteur et la
+  // barre de progression vivent ici et non plus dans le header global
+  // (ils y faisaient doublon sur Collection et hors-sujet ailleurs).
+  renderCollectionHead({ total, owned, doubles, missing, pct });
 
   // Vérifications de sécurité avant de modifier le DOM
   const statOwned = document.getElementById('statOwned');
@@ -356,6 +391,7 @@ export function renderStats(){
 
   // — Outils de collectionneur : onglets Manquantes / Doubles / Échange —
   const toolsHtml = `
+    <section class="sv-block">
     <div class="sv-section-title">${icon('wrench')} ${t('st.tools')}</div>
     <div class="sv-tools">
       <div class="sv-tools-tabs" role="tablist" aria-label="${t('st.tools')}">
@@ -364,7 +400,7 @@ export function renderStats(){
         <button class="sv-tool-tab" data-tool="trade" role="tab" aria-selected="false" type="button">${t('tools.trade')}</button>
       </div>
       <div class="sv-tools-body" id="svToolsBody">${_toolPanelHTML('missing')}</div>
-    </div>`;
+    </div></section>`;
 
   // — Objectifs proches (phase H) : les buts « à N cartes près »,
   //   cliquables → les manquantes concernées (chips), même grammaire de
@@ -375,6 +411,7 @@ export function renderStats(){
     : g.kind === 'champion' ? t('st.goal_finish', { x: t('st.champions') })
     : t('st.goal_finish', { x: t('cat.' + g.key) });
   const goalsHtml = goals.length ? `
+    <section class="sv-block">
     <div class="sv-section-title">${t('st.goals')}</div>
     <div class="sv-goals">${goals.map((g, i) => `
       <div class="sv-goal" data-goal="${i}" role="button" tabindex="0">
@@ -386,12 +423,20 @@ export function renderStats(){
         <div class="sv-goal-miss" id="goalMiss${i}" style="display:none">${g.missing.map(m =>
           `<span class="bd-chip miss">#${m.id} ${m.name}</span>`).join('')}</div>
       </div>`).join('')}
-    </div>` : '';
+    </div></section>` : '';
 
-  el.innerHTML = `
-    <div class="sv-title">${t('st.title')}</div>
+  // ── Mise en page (1.45.0) — disposition « colonne principale +
+  //    rail collant ». Le récit (général → répartitions → outils →
+  //    historique) tient la colonne large ; le rail garde donut,
+  //    à la une et objectifs sous les yeux pendant le défilement.
+  //    Aucun calcul n'a changé : seuls les conteneurs bougent.
+  const block = (title, body) => `<section class="sv-block"><div class="sv-section-title">${title}</div>${body}</section>`;
 
-    <div class="sv-progress${pct===100?' sv-progress-full':''}">
+  el.innerHTML = pageHeadHTML({
+    icon: 'chart',
+    title: t('st.title'),
+    sub: t('ph.stats_sub', { n: total, y: _currentSeason }),
+    metric: `<div class="sv-progress${pct===100?' sv-progress-full':''}">
       <div class="sv-prog-hero">
         <div class="sv-prog-pct-big">${pct}%</div>
         <div class="sv-prog-text">
@@ -400,40 +445,36 @@ export function renderStats(){
         </div>
       </div>
       <div class="sv-prog-bar"><div class="sv-prog-fill${pct===100?' sv-prog-fill-full':''}" style="width:${pct}%"></div></div>
-    </div>
+    </div>`
+  }) + `
+    <div class="sv-layout">
+      <div class="sv-col">
+        ${block(t('st.general'), `<div class="sv-cards">
+          <div class="sv-card owned"><div class="sv-card-value">${owned}<span class="sv-card-total">/${total}</span></div><div class="sv-card-label">${t('st.owned')}</div></div>
+          <div class="sv-card wish"><div class="sv-card-value">${wish}</div><div class="sv-card-label">${t('st.wish')}</div></div>
+          <div class="sv-card doubles"><div class="sv-card-value">${doubles}</div><div class="sv-card-label">${t('st.doubles')}</div></div>
+          <div class="sv-card missing"><div class="sv-card-value">${missing}</div><div class="sv-card-label">${t('st.missing')}</div></div>
+          <div class="sv-card fav"><div class="sv-card-value">${fav}</div><div class="sv-card-label">${t('st.fav')}</div></div>
+          <div class="sv-card exemplaires"><div class="sv-card-value">${totalExemplaires}</div><div class="sv-card-label">${t('st.copies')}</div></div>
+        </div>`)}
 
-    <div class="sv-section-title">${t('st.general')}</div>
-    <div class="sv-cards">
-      <div class="sv-card owned"><div class="sv-card-value">${owned}<span class="sv-card-total">/${total}</span></div><div class="sv-card-label">${t('st.owned')}</div></div>
-      <div class="sv-card wish"><div class="sv-card-value">${wish}</div><div class="sv-card-label">${t('st.wish')}</div></div>
-      <div class="sv-card doubles"><div class="sv-card-value">${doubles}</div><div class="sv-card-label">${t('st.doubles')}</div></div>
-      <div class="sv-card missing"><div class="sv-card-value">${missing}</div><div class="sv-card-label">${t('st.missing')}</div></div>
-      <div class="sv-card fav"><div class="sv-card-value">${fav}</div><div class="sv-card-label">${t('st.fav')}</div></div>
-      <div class="sv-card exemplaires"><div class="sv-card-value">${totalExemplaires}</div><div class="sv-card-label">${t('st.copies')}</div></div>
-    </div>
+        <div class="sv-breakcols">
+          ${catRows    ? block(t('st.by_cat'),    `<div class="sv-rows-block">${catRows}</div>`)    : ''}
+          ${typeRows   ? block(t('st.by_type'),   `<div class="sv-rows-block">${typeRows}</div>`)   : ''}
+          ${teamRows   ? block(t('st.by_team'),   `<div class="sv-rows-block">${teamRows}</div>`)   : ''}
+          ${rarityRows ? block(t('st.by_rarity'), `<div class="sv-rows-block">${rarityRows}</div>`) : ''}
+        </div>
 
-    <div class="sv-summary">
-      <div class="sv-summary-panel">
-        <div class="sv-section-title sv-sub">${t('st.featured')}</div>
-        ${featuredHtml}
+        ${toolsHtml}
+        ${block(t('st.history'), histHtml)}
       </div>
-      ${donutHtml ? `<div class="sv-summary-panel">
-        <div class="sv-section-title sv-sub">${t('st.chart_rarity')}</div>
-        ${donutHtml}
-      </div>`:''}
+
+      <aside class="sv-rail">
+        ${donutHtml ? block(t('st.chart_rarity'), donutHtml) : ''}
+        ${block(t('st.featured'), featuredHtml)}
+        ${goalsHtml}
+      </aside>
     </div>
-
-    ${goalsHtml}
-
-    ${catRows   ? `<div class="sv-section-title">${t('st.by_cat')}</div><div class="sv-rows-block">${catRows}</div>`:''}
-    ${typeRows  ? `<div class="sv-section-title">${t('st.by_type')}</div><div class="sv-rows-block">${typeRows}</div>`:''}
-    ${teamRows  ? `<div class="sv-section-title">${t('st.by_team')}</div><div class="sv-rows-block">${teamRows}</div>`:''}
-    ${rarityRows? `<div class="sv-section-title">${t('st.by_rarity')}</div><div class="sv-rows-block">${rarityRows}</div>`:''}
-
-    ${toolsHtml}
-
-    <div class="sv-section-title">${t('st.history')}</div>
-    ${histHtml}
   `;
 
   // Objectifs proches : clic/Entrée = déplier les manquantes concernées

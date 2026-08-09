@@ -16,6 +16,7 @@ import { cloudSectionHTML, bindCloudSection, isCloudSignedIn, cloudDeleteAll } f
 import { feedbackSectionHTML, bindFeedbackSection } from './feedback.js';
 import { showAdminPinScreen } from './pin.js';
 import { icon } from './icons.js';
+import { pageHeadHTML } from './pagehead.js';
 
 /* ── Deletion logic (pure, unit-tested) ── */
 export const DELETE_SCOPES = ['local', 'cloud', 'both'];
@@ -43,8 +44,11 @@ export function deletionPlan(scope, cloudConnected){
    L'écran explique le refus ET donne la sortie (passer en admin) —
    un état bloqué sans issue est un cul-de-sac. */
 function _lockedAccountHTML(){
-  return `
-    <h2 class="setv-title">${t('acc.title')}</h2>
+  return pageHeadHTML({
+    icon: 'user',
+    title: t('acc.title'),
+    sub: t('acc.locked_title')
+  }) + `
     <div class="setv-section acc-locked">
       <svg class="acc-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -65,8 +69,11 @@ export function renderAccount(){
     el.querySelector('#accAdminBtn')?.addEventListener('click', showAdminPinScreen);
     return;
   }
-  el.innerHTML = `
-    <h2 class="setv-title">${icon('user')} ${t('acc.title')}</h2>
+  el.innerHTML = pageHeadHTML({
+    icon: 'user',
+    title: t('acc.title'),
+    sub: t('ph.acc_sub')
+  }) + `
 
     <div class="acc-accent acc-cloud">${cloudSectionHTML()}</div>
 

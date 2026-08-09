@@ -67,7 +67,7 @@ C'est une **PWA** : installez-la depuis votre navigateur et elle fonctionne comm
 Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chacune existant en jusqu'à 16 variantes (couleurs de base, foils, duals, Wild, Nitro, promos) :
 
 - 📇 **Gestion complète de la collection** — possédées / doubles / wishlist / favoris, quantités par variante, l’ensemble de la collection toujours visible.
-- ➕ **Ajout rapide en un geste** — un bouton + sur chaque tuile ouvre un sélecteur de variantes : un appui ajoute un exemplaire, avec un toast « Annuler ». Le header affiche la progression en direct (possédées/total) au-dessus d’un fin liseré de progression.
+- ➕ **Ajout rapide en un geste** — un bouton + sur chaque tuile ouvre un sélecteur de variantes : un appui ajoute un exemplaire, avec un toast « Annuler ». Le bandeau de la page Collection affiche la progression en direct : une barre, puis possédées / manquantes / doubles.
 - ✨ **Système de rareté animé à 7 niveaux** — `epic → legendary → mythic → ultra → cosmic → divine → eternal`, calculé depuis la meilleure variante possédée, +1 niveau quand le set est complet (toutes les variantes possédées) — `eternal` n'est atteignable que comme ça. Les cartes foil portent des reflets de lumière animés, `divine` s'affiche en dégradé irisé mouvant et `eternal` en noir & or scintillant (le tout respectant `prefers-reduced-motion`).
 - 📴 **Fonctionne entièrement hors-ligne** — toute l'app est précachée par un service worker ; après la première visite, le mode avion ne change rien.
 - 🔄 **Mises à jour transparentes** — les nouvelles versions sont détectées en arrière-plan et appliquées d'un tap, avec un changelog intégré qui montre ce qui a changé depuis *votre* dernière version.

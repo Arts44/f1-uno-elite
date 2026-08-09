@@ -405,9 +405,69 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .theme-switch:hover{background:var(--surface3);transform:scale(1.05);}
 .theme-icon{font-size:16px;transition:var(--ease);}
 
+/* ══════════════════════════════════════════════════════════
+   BANDEAU DE PAGE (.ph) — le pattern commun aux 5 pages (1.45.0).
+   Voir pagehead.js pour le pourquoi. Il DÉFILE : seul le header
+   global reste collant, donc la hauteur se paie une fois.
+   ══════════════════════════════════════════════════════════ */
+.ph{padding:var(--space-5) var(--space-4) 0;display:flex;flex-direction:column;gap:var(--space-14px);}
+.ph-top{display:flex;align-items:center;gap:var(--space-3);min-height:var(--tap-min);}
+.ph-id{display:flex;align-items:center;gap:var(--space-3);min-width:0;flex:1;}
+.ph-icon{width:38px;height:38px;flex:0 0 38px;border-radius:12px;background:var(--surface2);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  color:var(--red);font-size:19px;}
+.ph-txt{min-width:0;}
+.ph-title{font-family:var(--font-d);font-weight:800;font-size:22px;letter-spacing:-0.5px;line-height:1.08;
+  color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ph-sub{font-size:12px;color:var(--tx2);margin-top:3px;font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ph-act{display:flex;gap:var(--space-2);flex:0 0 auto;}
+.ph-btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--border);background:var(--surface);
+  color:var(--tx2);display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:17px;transition:var(--ease);}
+.ph-btn:hover{color:var(--red);border-color:var(--red);}
+.ph-metric{border-top:1px solid var(--border);padding-top:var(--space-14px);}
+/* Sur Collection le bandeau porte sa propre gouttière (16 px, celle de
+   .card-grid, pour que titre et tuiles s'alignent). Dans les vues déjà
+   rembourrées, il laisse la vue la porter. */
+.badges-view > .ph,.stats-view > .ph,.settings-view > .ph{padding-left:0;padding-right:0;}
+/* Vues en display:block : pas de gap de conteneur pour séparer le
+   bandeau du premier bloc — il le porte lui-même. */
+.stats-view > .ph,.settings-view > .ph{margin-bottom:var(--space-5);}
+@media(min-width:700px){.ph{padding-top:var(--space-6);}.ph-title{font-size:26px;}}
+@media(max-width:360px){
+  .ph{padding:var(--space-4) var(--space-14px) 0;}
+  .ph-title{font-size:19px;}
+  .ph-icon{width:32px;height:32px;flex-basis:32px;border-radius:10px;font-size:16px;}
+}
+
+/* Mesure de Collection — compacte sur mobile (une ligne), déployée
+   sur desktop (barre à gauche, chiffres empilés à droite). */
+.phm-coll{display:flex;flex-direction:column;gap:var(--space-10px);}
+.phm-bar{height:6px;border-radius:var(--r-pill);background:var(--surface3);overflow:hidden;}
+.phm-bar i{display:block;height:100%;border-radius:var(--r-pill);background:var(--green);
+  transition:width 0.35s ease;}
+.phm-nums{display:flex;gap:var(--space-4);flex-wrap:wrap;font-size:11px;color:var(--tx2);
+  font-variant-numeric:tabular-nums;}
+.phm-k{display:flex;align-items:baseline;gap:5px;}
+.phm-k b{font-family:var(--font-d);font-size:13px;line-height:1.1;}
+.phm-k.k-own b{color:var(--st-owned);}
+.phm-k.k-mis b{color:var(--st-missing);}
+.phm-k.k-dbl b{color:var(--st-doubles);}
+@media(min-width:700px){
+  .phm-coll{flex-direction:row-reverse;align-items:center;gap:var(--space-6);}
+  .phm-coll .phm-bar{flex:1;}
+  .phm-nums{flex:0 0 auto;gap:var(--space-6);}
+  .phm-k{flex-direction:column;align-items:flex-start;gap:2px;}
+  .phm-k b{font-size:15px;}
+}
+
 /* LAYOUT */
-.app{height:calc(100vh - 56px);width:100%;max-width:none;}
-.main{display:flex;flex-direction:column;gap:var(--space-5);overflow-y:auto;padding:0 0 var(--nav-clear);height:100%;width:100%;max-width:none;}
+.app{height:calc(100vh - 56px);width:100%;max-width:none;min-width:0;overflow-x:hidden;}
+/* overflow-x:hidden était posé sur body, mais l'élément qui défile est
+   <html> : la page pouvait donc bien glisser de 14 px de côté sur les
+   vues qui ont leur propre barre de défilement. */
+.main{display:flex;flex-direction:column;gap:0;overflow-y:auto;padding:0 0 var(--nav-clear);height:100%;width:100%;max-width:none;}
 .main::-webkit-scrollbar{width:8px;}
 .main::-webkit-scrollbar-track{background:var(--surface2);border-radius:4px;}
 .main::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:4px;}
@@ -1016,10 +1076,10 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 @media(max-width:600px){.card-grid{grid-template-columns:repeat(2,1fr);}}
 
 /* BADGES PAGE */
-.badges-view{display:none;flex-direction:column;gap:var(--space-6);padding:var(--space-6) var(--space-6) var(--nav-clear);overflow-y:auto;height:100%;width:100%;}
+.badges-view{display:none;flex-direction:column;gap:var(--space-5);padding:0 var(--space-4) var(--nav-clear);overflow-y:auto;height:100%;flex:1 1 auto;min-width:0;}
 .badges-view.active{display:flex;}
 /* ── BADGES v2.2 — hero, prochain badge, familles, tuiles, détail ── */
-.badges-hero{display:flex;align-items:center;gap:var(--space-4);position:relative;}
+.bh-row{display:flex;align-items:center;gap:var(--space-4);}
 .bh-ring{position:relative;width:86px;height:86px;flex:none;}
 .bh-ring svg{transform:rotate(-90deg);display:block;}
 .bh-bg{stroke:var(--surface3);}
@@ -1027,13 +1087,10 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .bh-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-d);}
 .bh-num b{font-size:22px;line-height:1;color:var(--tx1);}
 .bh-num span{font-size:10px;color:var(--tx3);margin-top:2px;}
-.bh-right{flex:1;min-width:0;padding-right:40px;}
-.badges-hero .user-title-wrap{background:none;border:none;padding:0;margin:0;flex-wrap:wrap;}
-.bh-kicker{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:var(--space-1);}
+.bh-right{flex:1;min-width:0;}
+.bh-row .user-title-wrap{background:none;border:none;padding:0;margin:0;flex-wrap:wrap;}
 .bh-hardest{font-size:11px;color:var(--tx3);margin-top:var(--space-1);}
 .bh-hardest b{color:var(--tx2);font-weight:600;}
-.bh-share{position:absolute;top:0;right:0;width:34px;height:34px;border-radius:50%;border:1px solid var(--border-s);background:var(--surface);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--ease);}
-.bh-share:hover{color:var(--red);border-color:var(--red);}
 /* prochain badge / objectif */
 .bn-next{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border-s);border-radius:var(--r-md);padding:var(--space-3) var(--space-14px);display:flex;align-items:center;gap:var(--space-3);cursor:pointer;}
 .bn-med{width:44px;height:44px;flex:none;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:22px;}
@@ -1207,15 +1264,27 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 }
 
 /* STATS VIEW */
-.stats-view{display:none;padding:var(--space-5) var(--space-5) var(--nav-clear);overflow-y:auto;height:100%;width:100%;}
+.stats-view{display:none;padding:0 var(--space-4) var(--nav-clear);overflow-y:auto;height:100%;flex:1 1 auto;min-width:0;}
 .stats-view.active{display:block;}
 
+/* ══ Disposition « colonne principale + rail collant » (1.45.0) ══
+   Avant, tout était centré à 800 px : sur un bureau de 1440 px la
+   page n'occupait que 44 % de la largeur et faisait 3 500 px de
+   haut. La colonne porte le récit, le rail garde donut, à la une et
+   objectifs sous les yeux pendant le défilement. */
+.sv-layout{display:grid;gap:var(--space-5);align-items:start;}
+.sv-col,.sv-rail{display:grid;gap:var(--space-5);align-content:start;min-width:0;}
+.sv-block{display:flex;flex-direction:column;min-width:0;}
+.sv-breakcols{display:grid;gap:var(--space-5);grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+@media(min-width:1000px){
+  .sv-layout{grid-template-columns:minmax(0,1fr) 320px;}
+  .sv-rail{position:sticky;top:var(--space-3);}
+}
+
 /* Stats page title */
-.sv-title{font-family:var(--font-d);font-weight:800;font-size:24px;letter-spacing:-0.5px;margin-bottom:var(--space-5);max-width:800px;margin-left:auto;margin-right:auto;}
-.sv-title span{color:var(--red);}
 
 /* Hero progress block */
-.sv-progress{max-width:800px;margin-left:auto;margin-right:auto;
+.sv-progress{
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:var(--r-lg);
@@ -1245,7 +1314,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 @keyframes prog-full-shine{0%{background-position:100% 0;}100%{background-position:-200% 0;}}
 
 /* Stat cards */
-.sv-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-10px);margin:0 auto var(--space-6px);max-width:800px;}
+.sv-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-10px);}
 @media(min-width:700px){.sv-cards{grid-template-columns:repeat(6,1fr);}}
 @media(max-width:400px){.sv-cards{grid-template-columns:repeat(2,1fr);}}
 .sv-card{
@@ -1270,8 +1339,8 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sv-card.exemplaires{--acc:var(--st-copies);}
 
 /* Section titles & rows */
-.sv-section-title{font-family:var(--font-d);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);margin:var(--space-5) auto var(--space-2);max-width:800px;}
-.sv-rows-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:visible;box-shadow:var(--sh-sm);margin:0 auto var(--space-6px);max-width:800px;}
+.sv-section-title{font-family:var(--font-d);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--tx3);margin:0 0 var(--space-2);}
+.sv-rows-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:visible;box-shadow:var(--sh-sm);}
 .sv-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-3);padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--border);transition:background 0.15s;}
 .sv-row:first-child{border-radius:var(--r-lg) var(--r-lg) 0 0;}
 .sv-row:last-child{border-bottom:none;border-radius:0 0 var(--r-lg) var(--r-lg);}
@@ -1307,10 +1376,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sv-empty-note{padding:var(--space-14px);border-radius:12px;background:var(--surface2);border:1px dashed var(--border);color:var(--tx3);font-size:12px;text-align:center;flex:1;}
 /* Summary band: Highlights + rarity donut side by side (stacks on mobile),
    same 800px column as every other stats section. */
-.sv-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:var(--space-10px);max-width:800px;margin:0 auto var(--space-6px);align-items:stretch;}
-.sv-summary-panel{display:flex;flex-direction:column;min-width:0;}
 /* In-panel variant of the section title (no auto-centering / big top gap) */
-.sv-section-title.sv-sub{margin:0 0 var(--space-2);max-width:none;}
 .sv-feat{display:flex;flex-direction:column;flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh-sm);overflow:hidden;}
 .sv-feat-item{padding:var(--space-3) var(--space-14px);}
 .sv-feat-item + .sv-feat-item{border-top:1px solid var(--border);}
@@ -1342,10 +1408,8 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .bk-qr-hint.bk-qr-warn{color:var(--orange);font-weight:600;}
 
 /* SETTINGS VIEW */
-.settings-view{display:none;padding:var(--space-6) var(--space-6) var(--nav-clear);overflow-y:auto;height:100%;width:100%;}
+.settings-view{display:none;padding:0 var(--space-4) var(--nav-clear);overflow-y:auto;height:100%;flex:1 1 auto;min-width:0;}
 .settings-view.active{display:block;}
-.setv-title{font-family:var(--font-d);font-weight:800;font-size:26px;letter-spacing:-0.5px;margin-bottom:var(--space-5);}
-.setv-title span{color:var(--red);}
 .setv-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);margin-bottom:var(--space-4);}
 .setv-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--tx3);padding:var(--space-3) var(--space-5) 0;}
 .setv-row{display:flex;align-items:center;justify-content:space-between;padding:var(--space-14px) var(--space-5);border-bottom:1px solid var(--border);}
@@ -1809,7 +1873,7 @@ button:not(:disabled):not(.bn-tab):active,
 .owned-tag .ic{width:12px;height:12px;}
 .theme-icon .ic{width:16px;height:16px;display:block;}
 .install-banner-icon .ic{width:18px;height:18px;display:block;}
-.setv-section-title .ic,.setv-title .ic,.sv-section-title .ic{margin-right:2px;}
+.setv-section-title .ic,.sv-section-title .ic{margin-right:2px;}
 
 /* ── Pastilles CSS des 4 couleurs de base (remplacent 🔵🟢🔴🟡) ── */
 .cdot{display:inline-block;width:.85em;height:.85em;border-radius:50%;flex:none;vertical-align:-0.05em;
@@ -1901,13 +1965,13 @@ button:not(:disabled):not(.bn-tab):active,
    son parent). Les extensions horizontales s'arrêtent à mi-chemin
    du voisin interactif pour ne jamais détourner un tap.
    ══════════════════════════════════════════════════════════ */
-/* .qbtn, .modal-close et .bh-share sont DÉJÀ position:absolute — les
+/* .qbtn et .modal-close sont DÉJÀ position:absolute — les
    passer en relative les sortait de leur coin (régression 1.32.0) ;
    leur ::after fonctionne tel quel sur un élément absolu. */
 .schip,.qadd-type,.mqbtn,.sv-tool-tab,
 .user-title-next,.season-pill,.logo,.setv-btn,.toast-action{position:relative;}
 .schip::after,.qbtn::after,.qadd-type::after,.mqbtn::after,.modal-close::after,
-.sv-tool-tab::after,.user-title-next::after,.bh-share::after,.season-pill::after,
+.sv-tool-tab::after,.user-title-next::after,.season-pill::after,
 .logo::after,.setv-btn::after,.toast-action::after,.setv-toggle::before{
   content:'';position:absolute;inset:-5px;}
 /* ⭐/❤️ des tuiles (24 px) : 44×44 chacune — l'étoile s'étend vers la
@@ -1916,7 +1980,7 @@ button:not(:disabled):not(.bn-tab):active,
 .schip[data-s="wishlist"]::after{top:-10px;bottom:-10px;left:-17px;right:-3px;}
 .schip[data-s="favorite"]::after{top:-10px;bottom:-10px;left:-3px;right:-17px;}
 /* + de tuile (34 px) et partage badges (34 px) → 44 */
-.qbtn::after,.bh-share::after{inset:-5px;}
+.qbtn::after{inset:-5px;}
 /* variantes du popover + (30 px) : 44 en vertical, mi-écart en horizontal */
 .qadd-type::after{top:-7px;bottom:-7px;left:-3px;right:-3px;}
 /* − / + de la fiche (22 px) : 44 en vertical, extension vers le compteur
@@ -2037,7 +2101,7 @@ button:not(:disabled):not(.bn-tab):active,
 @media (prefers-reduced-motion:reduce){.qa-hint{animation:none;}}
 
 /* ══ PHASE H — objectifs proches dans Stats (1.41.0) ══ */
-.sv-goals{display:flex;flex-direction:column;gap:8px;margin:0 auto var(--space-4);max-width:800px;}
+.sv-goals{display:flex;flex-direction:column;gap:8px;}
 .sv-goal{background:var(--surface);border:1px solid var(--border-s);border-radius:14px;padding:10px 14px;cursor:pointer;transition:var(--ease);}
 .sv-goal:hover{border-color:var(--red-m);}
 .sv-goal-row{display:flex;align-items:center;gap:14px;}

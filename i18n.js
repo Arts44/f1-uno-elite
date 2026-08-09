@@ -67,8 +67,8 @@ export function applyLanguage(){
   document.querySelectorAll('[data-i18n-aria]').forEach(el=>{
     el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria')));
   });
-  // Re-render grid to update rarity translations (also refreshes the
-  // header total counter through renderCollection)
+  // Re-render grid to update rarity translations (le bandeau de page
+  // de Collection, lui, est réécrit par updateStats() plus bas)
   renderCollection();
 
   // Re-render badges to update badge translations

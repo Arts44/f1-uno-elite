@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.45.0',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'Every page now opens the same way: an icon, a title and one line telling you where you stand. Nothing was removed — the badge ring and the progress bar simply found their place inside it.',
+        'The Stats page fills the screen at last: one main column for the story, and a sidebar that keeps the rarity chart, your highlights and your near goals in view while you scroll. On a wide screen it is three times shorter.',
+      ],
+      fr: [
+        'Chaque page s\'ouvre désormais de la même façon : une icône, un titre, et une ligne qui dit où tu en es. Rien n\'a été supprimé — l\'anneau des badges et la barre de progression y ont simplement trouvé leur place.',
+        'La page Stats occupe enfin l\'écran : une colonne principale pour le récit, et une colonne latérale qui garde la répartition par rareté, tes cartes phares et tes objectifs proches sous les yeux pendant que tu fais défiler. Sur grand écran, elle est trois fois plus courte.',
+      ],
+      es: [
+        'Todas las páginas empiezan ahora igual: un icono, un título y una línea que dice cómo vas. No se ha quitado nada — el anillo de insignias y la barra de progreso simplemente han encontrado su sitio dentro.',
+        'La página de estadísticas por fin ocupa la pantalla: una columna principal para el relato y una lateral que mantiene a la vista el gráfico de rarezas, tus cartas destacadas y tus objetivos cercanos mientras te desplazas. En pantalla ancha es tres veces más corta.',
+      ],
+      zh: [
+        '每个页面现在都以同样的方式开场:一个图标、一个标题,以及一行说明你的进度。没有任何内容被删除——徽章圆环和进度条只是找到了各自的位置。',
+        '统计页终于用满了屏幕:主栏承载主线,侧栏在你滚动时始终显示稀有度分布、精选卡牌和临近目标。在宽屏上,页面长度缩短为原来的三分之一。',
+      ],
+      it: [
+        'Ogni pagina ora si apre allo stesso modo: un\'icona, un titolo e una riga che dice a che punto sei. Non è stato tolto nulla — l\'anello dei distintivi e la barra di avanzamento hanno semplicemente trovato posto lì dentro.',
+        'La pagina Statistiche occupa finalmente lo schermo: una colonna principale per il racconto e una laterale che tiene sott\'occhio la ripartizione per rarità, le carte in evidenza e gli obiettivi vicini mentre scorri. Su schermo largo è tre volte più corta.',
+      ],
+      nl: [
+        'Elke pagina begint nu op dezelfde manier: een pictogram, een titel en één regel die zegt waar je staat. Er is niets verdwenen — de badgering en de voortgangsbalk hebben er gewoon hun plek gevonden.',
+        'De statistiekenpagina vult eindelijk het scherm: een hoofdkolom voor het verhaal en een zijkolom die de zeldzaamheidsverdeling, je uitgelichte kaarten en je nabije doelen in beeld houdt terwijl je scrolt. Op een breed scherm is de pagina drie keer korter.',
+      ],
+      de: [
+        'Jede Seite beginnt jetzt gleich: ein Symbol, ein Titel und eine Zeile, die sagt, wo du stehst. Nichts wurde entfernt — der Abzeichen-Ring und der Fortschrittsbalken haben darin einfach ihren Platz gefunden.',
+        'Die Statistikseite füllt endlich den Bildschirm: eine Hauptspalte für den Verlauf und eine Seitenspalte, die Seltenheitsverteilung, deine Highlights und deine nahen Ziele beim Scrollen im Blick behält. Auf breitem Bildschirm ist sie dreimal kürzer.',
+      ],
+    },
+  },
+  {
     version: '1.44.0',
     date: '2026-08-08',
     changes: {
