@@ -98,7 +98,7 @@ Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chac
 | Crypto | **Web Crypto** natif — SHA-256 (PIN), PBKDF2 + AES-GCM (chiffrement au repos optionnel) |
 | Codes QR | Encodeur mono-fichier vendorisé ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Polices | WOFF2 auto-hébergées (SIL OFL) — aucune requête Google Fonts, 5 thèmes au choix |
-| Tests | **Runner de test intégré à Node** (`node --test`) — 511 tests, aucun framework de test |
+| Tests | **Runner de test intégré à Node** (`node --test`) — 519 tests, aucun framework de test |
 | CI | GitHub Actions — tests + build + vérification de fraîcheur du bundle commité à chaque push/PR |
 
 **Zéro dépendance à l'exécution est une règle de conception, pas un hasard.** Tout ce qu'un framework ou un SDK fournirait — rendu, navigation entre vues, i18n, cache hors-ligne, auth REST, chiffrement, génération de QR — est construit directement sur les API de la plateforme web. L'app que vous installez est exactement le code de ce dépôt.
@@ -176,13 +176,13 @@ Migrer des centaines de valeurs d'espacement en dur vers des tokens, avec pour s
 
 ### Tester une app navigateur sans navigateur
 Tenir la promesse zéro dépendance exclut Jest, Vitest et les harnais de navigateur headless.
-**Solution :** la logique a été factorisée pour être indépendante du navigateur et couverte par **511 tests sur le runner intégré de Node** — aucune dépendance de test, aucun réseau réel. La CI reconstruit aussi le bundle et échoue si l'artefact commité est périmé.
+**Solution :** la logique a été factorisée pour être indépendante du navigateur et couverte par **519 tests sur le runner intégré de Node** — aucune dépendance de test, aucun réseau réel. La CI reconstruit aussi le bundle et échoue si l'artefact commité est périmé.
 
 ---
 
 ### Ce que les tests couvrent — et ce qu'ils ne couvrent pas
 
-511 tests sur le lanceur intégré de Node, sans framework. Être précis sur la frontière compte plus que le nombre :
+519 tests sur le lanceur intégré de Node, sans framework. Être précis sur la frontière compte plus que le nombre :
 
 - **Couvert :** migrations de stockage et schéma de clés par saison ; l'échelle de rareté à sept niveaux, bonus de set complet inclus ; toutes les conditions de badge et le modèle de difficulté ; les listes du collectionneur (manquantes, doubles, échange) ; les allers-retours d'encodage des codes de sauvegarde ; les aides cloud contre un `fetch` simulé, chemins d'échec compris ; la parité des clés i18n sur les 7 langues et la détection de doublons ; le precache du service worker confronté au vrai graphe d'imports ; les contrats de markup de l'accès clavier ; la provenance de chaque `innerHTML` nourri de l'extérieur ; le contraste WCAG AA sur les deux thèmes.
 - **Non couvert :** le rendu réel (aucune assertion DOM au-delà des chaînes de markup), le comportement du service worker à l'exécution, les appels réseau réels, IndexedDB, les invites d'installation, et tout ce qui exige un moteur de navigateur — ces points sont vérifiés à la main et par la passe de captures déterministe, pas par la suite. Le pourcentage de couverture n'est volontairement pas publié : il mesurerait la tranche sans navigateur et se lirait comme s'il mesurait l'application.
@@ -201,7 +201,7 @@ npm install     # installe esbuild, l'unique devDependency
 npm run build   # app.js → app.bundle.js (minifié + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 511 tests, node --test, sans framework
+npm test        # 519 tests, node --test, sans framework
 ```
 
 **Déploiement.** Le dépôt se déploie tel quel sur GitHub Pages : toutes les URL sont relatives, l'app tourne donc à l'identique à la racine d'un domaine, sous un sous-chemin et en localhost. Routine de release : ajouter une entrée de changelog (c'*est* le bump de version) → incrémenter `SW_VERSION` → build → push.
@@ -214,12 +214,13 @@ npm test        # 511 tests, node --test, sans framework
 - **Les notifications d'avis partent du domaine de test de Resend** (`onboarding@resend.dev`). Depuis ce domaine, Resend ne délivre qu'à l'adresse du propriétaire du compte : la notification atteint le mainteneur et personne d'autre. Envoyer ailleurs supposerait de posséder et vérifier un domaine. C'est une limite assumée, pas un défaut : l'avis est enregistré en base dans tous les cas, et un envoi raté ne le bloque jamais.
 - **Les codes de connexion passent par un fournisseur SMTP configuré dans Supabase** — une chaîne entièrement distincte des notifications ci-dessus. Délivrabilité, quotas et réputation d'expéditeur dépendent de ce fournisseur et ne sont pas mesurés par ce dépôt ; les e-mails de connexion sont à considérer comme « au mieux » pour un projet perso.
 - **L'historique de progression n'a pas de rétro-remplissage** — la courbe des stats commence le jour où la fonctionnalité a été installée.
+- **La note Codacy est B, et elle le reste volontairement.** Trois des quatre objectifs de qualité sont au vert : 0 issue ouverte, 4 % de duplication, et 62,72 % de couverture pour un seuil de 60 %. Le quatrième ne l'est pas — 13 des 30 fichiers sources analysés dépassent le seuil de complexité. Ce seuil est réglable, et le monter ferait passer le chiffre au vert sans changer une ligne de code ; il n'a pas été monté, parce que quatre de ces fichiers en font réellement trop. Les deux plus lourds sont `badges.js` et `cloud.js`. Les scinder est le prochain chantier — c'est ce qui sépare le projet de l'export de liste d'échange, et du support multi-saisons. Une réserve sur la métrique elle-même : elle compte des *fichiers*, donc elle pénalise une architecture faite de peu de gros modules — le même code réparti en 300 fichiers passerait sans qu'une ligne change. C'est un fait sur la mesure, pas une excuse : les quatre modules denses le sont réellement, et ce sont eux que le refactor vise.
 
 ---
 
 ## 🔩 Notes d'ingénierie
 
-Zéro dépendance à l'exécution (esbuild seul, au build) ; zéro décalage de mise en page, mesuré au pixel entre les versions ; l'ajout rapide profilé et optimisé (~300 ms → ~45 ms sur mobile moyen) ; chiffrement local optionnel lié au PIN (PBKDF2 + AES-GCM) ; mode spectateur verrouillé dans la logique, pas en CSS ; captures régénérées par un script déterministe versionné ; 511 tests en JS vanilla avec le runner intégré de Node. Détails complets dans le [README anglais](README.md).
+Zéro dépendance à l'exécution (esbuild seul, au build) ; zéro décalage de mise en page, mesuré au pixel entre les versions ; l'ajout rapide profilé et optimisé (~300 ms → ~45 ms sur mobile moyen) ; chiffrement local optionnel lié au PIN (PBKDF2 + AES-GCM) ; mode spectateur verrouillé dans la logique, pas en CSS ; captures régénérées par un script déterministe versionné ; 519 tests en JS vanilla avec le runner intégré de Node. Détails complets dans le [README anglais](README.md).
 
 ---
 
