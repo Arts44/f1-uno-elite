@@ -7,7 +7,7 @@
     "test:watch": "node --test --watch \"tests/*.test.js\"",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
-    "test:cov": "node --test --experimental-test-coverage --test-coverage-exclude='tests/**' --test-coverage-exclude='app.bundle.js' --test-coverage-exclude='*.mjs' --test-coverage-exclude='translations.js' --test-coverage-exclude='data-embedded.js' --test-coverage-exclude='card-descriptions.js' --test-coverage-exclude='cloud-config.js' --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-reporter=spec --test-reporter-destination=stdout \"tests/*.test.js\""
+    "test:cov": "mkdir -p coverage && node --test --experimental-test-coverage --test-coverage-exclude='tests/**' --test-coverage-exclude='app.bundle.js' --test-coverage-exclude='*.mjs' --test-coverage-exclude='translations.js' --test-coverage-exclude='data-embedded.js' --test-coverage-exclude='card-descriptions.js' --test-coverage-exclude='cloud-config.js' --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-reporter=spec --test-reporter-destination=stdout \"tests/*.test.js\""
   },
   "devDependencies": {
     "esbuild": "^0.28.1",
