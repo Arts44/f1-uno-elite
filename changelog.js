@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.49.2',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'Fixed a broken badge link at the top of the README in all six translated versions — it was showing raw link text instead of the badge.',
+      ],
+      fr: [
+        'Correction d\'un lien de badge cassé en tête du README dans les six versions traduites — il affichait du texte de lien brut au lieu du badge.',
+      ],
+      es: [
+        'Corregido un enlace de insignia roto al principio del README en las seis versiones traducidas — mostraba texto de enlace en bruto en vez de la insignia.',
+      ],
+      zh: [
+        '修复了六个翻译版本 README 顶部一个损坏的徽章链接——它显示的是原始链接文本，而不是徽章。',
+      ],
+      it: [
+        'Corretto un link di badge rotto in cima al README nelle sei versioni tradotte — mostrava testo di link grezzo invece del badge.',
+      ],
+      nl: [
+        'Een kapotte badge-link boven aan de README hersteld in alle zes vertaalde versies — die toonde ruwe linktekst in plaats van de badge.',
+      ],
+      de: [
+        'Ein defekter Badge-Link am Anfang der README wurde in allen sechs übersetzten Fassungen repariert — er zeigte rohen Linktext statt des Abzeichens.',
+      ],
+    },
+  },
+  {
     version: '1.49.1',
     date: '2026-08-09',
     changes: {

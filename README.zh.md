@@ -8,7 +8,7 @@
 |---|---|
 | ![导览 —— 五个章节,每页一章](screenshots/tutorial-chapter.jpg) | ![五种闪卡家族,处于减弱后的强度](screenshots/foil-family.jpg) |
 
-![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
+[![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![PWA](https://img.shields.io/badge/PWA-installable%20%2B%20offline%20%E2%9C%93-brightgreen)
 ![Zero runtime deps](https://img.shields.io/badge/runtime%20dependencies-0-blue)
@@ -99,7 +99,7 @@
 | 加密 | 原生 **Web Crypto** — SHA-256（PIN）、PBKDF2 + AES-GCM（可选的静态加密） |
 | 二维码 | 内置的单文件编码器（[Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library)，MIT 许可） |
 | 字体 | 自托管 WOFF2（SIL OFL）— 不请求 Google Fonts，提供 5 套字体主题 |
-| 测试 | **Node 内置测试运行器**（`node --test`）— 519 个测试，未使用测试框架 |
+| 测试 | **Node 内置测试运行器**（`node --test`）— 623 个测试，未使用测试框架 |
 | CI | GitHub Actions — 每次 push/PR 均运行测试、构建，并校验已提交产物是否为最新 |
 
 **零运行时依赖是一条设计规则，而非偶然。** 框架或 SDK 通常提供的一切——渲染、视图切换、国际化、离线缓存、REST 认证、加密、二维码生成——都直接基于 Web 平台 API 实现。你安装的应用，就是这个仓库里的代码本身。
@@ -177,13 +177,13 @@ cache-first 的 Service Worker 让应用在离线时坚如磐石——同时也�
 
 ### 不用浏览器，测试一个浏览器应用
 坚守零依赖的承诺，意味着排除 Jest、Vitest 以及各类无头浏览器测试框架。
-**解法：** 业务逻辑经过重构，可脱离浏览器独立运行，并由 **Node 内置运行器上的 519 个测试**覆盖——没有测试依赖，也不产生真实网络请求。CI 还会重新构建产物包，一旦已提交的构建产物过期即告失败。
+**解法：** 业务逻辑经过重构，可脱离浏览器独立运行，并由 **Node 内置运行器上的 623 个测试**覆盖——没有测试依赖，也不产生真实网络请求。CI 还会重新构建产物包，一旦已提交的构建产物过期即告失败。
 
 ---
 
 ### 测试覆盖了什么 —— 以及没有覆盖什么
 
-519 项测试,跑在 Node 内置的测试运行器上,不用任何框架。说清楚边界,比数字本身更重要:
+623 项测试,跑在 Node 内置的测试运行器上,不用任何框架。说清楚边界,比数字本身更重要:
 
 - **已覆盖:**存储迁移与按赛季划分的键方案;七级稀有度阶梯,含整套收齐的升级;全部徽章条件与难度模型;收藏者清单(缺失、重复、交换);备份码的编解码往返;针对模拟 `fetch` 的云端辅助函数,含失败路径;7 种语言的 i18n 键一致性与重复键检测;以真实导入图校验的 service worker 预缓存;键盘可达性的标记契约;每一处由外部数据填充的 `innerHTML` 的来源;两种主题下的 WCAG AA 对比度。
 - **未覆盖:**真实渲染(除标记字符串外没有 DOM 断言)、service worker 的运行时行为、真实网络请求、IndexedDB、安装提示,以及任何需要浏览器引擎的部分 —— 这些靠手工验证和确定性的截图流程来保证,而不是靠测试套件。覆盖率百分比是刻意不公布的:它衡量的只是无浏览器的那一部分,却容易被读成衡量整个应用。
@@ -202,7 +202,7 @@ npm install     # 安装 esbuild，唯一的 devDependency
 npm run build   # app.js → app.bundle.js（压缩 + sourcemap）
 # → http://localhost:8000/  （index.html）
 
-npm test        # 519 个测试，node --test，无需框架
+npm test        # 623 个测试，node --test，无需框架
 ```
 
 **部署。** 本仓库可原样部署到 GitHub Pages：所有 URL 均为相对路径，因此应用在域名根路径、子路径以及 localhost 下的表现完全一致。发布流程：新增一条更新日志条目（这*就是*版本号提升）→ 提升 `SW_VERSION` → 构建 → 推送。
@@ -221,7 +221,7 @@ npm test        # 519 个测试，node --test，无需框架
 
 ## 🔩 工程说明
 
-运行时零依赖(仅构建时使用 esbuild);版本间零布局偏移,精确到像素测量;快速添加经性能剖析优化(中端手机约 300 毫秒 → 约 45 毫秒);可选的本地加密与 PIN 绑定(PBKDF2 + AES-GCM);旁观者模式在逻辑层锁定而非 CSS;截图由仓库内确定性脚本重新生成，三段动画演示为手工录制;519 个测试基于原生 JS 与 Node 内置测试运行器。完整细节见[英文 README](README.md)。
+运行时零依赖(仅构建时使用 esbuild);版本间零布局偏移,精确到像素测量;快速添加经性能剖析优化(中端手机约 300 毫秒 → 约 45 毫秒);可选的本地加密与 PIN 绑定(PBKDF2 + AES-GCM);旁观者模式在逻辑层锁定而非 CSS;截图由仓库内确定性脚本重新生成，三段动画演示为手工录制;623 个测试基于原生 JS 与 Node 内置测试运行器。完整细节见[英文 README](README.md)。
 
 ---
 

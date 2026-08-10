@@ -8,7 +8,7 @@
 |---|---|
 | ![Visite guidée — cinq chapitres, un par page](screenshots/tutorial-chapter.jpg) | ![Les cinq familles de foil, au niveau atténué](screenshots/foil-family.jpg) |
 
-![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
+[![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![PWA](https://img.shields.io/badge/PWA-installable%20%2B%20offline%20%E2%9C%93-brightgreen)
 ![Zero runtime deps](https://img.shields.io/badge/runtime%20dependencies-0-blue)
@@ -99,7 +99,7 @@ Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chac
 | Crypto | **Web Crypto** natif — SHA-256 (PIN), PBKDF2 + AES-GCM (chiffrement au repos optionnel) |
 | Codes QR | Encodeur mono-fichier vendorisé ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Polices | WOFF2 auto-hébergées (SIL OFL) — aucune requête Google Fonts, 5 thèmes au choix |
-| Tests | **Runner de test intégré à Node** (`node --test`) — 519 tests, aucun framework de test |
+| Tests | **Runner de test intégré à Node** (`node --test`) — 623 tests, aucun framework de test |
 | CI | GitHub Actions — tests + build + vérification de fraîcheur du bundle commité à chaque push/PR |
 
 **Zéro dépendance à l'exécution est une règle de conception, pas un hasard.** Tout ce qu'un framework ou un SDK fournirait — rendu, navigation entre vues, i18n, cache hors-ligne, auth REST, chiffrement, génération de QR — est construit directement sur les API de la plateforme web. L'app que vous installez est exactement le code de ce dépôt.
@@ -177,13 +177,13 @@ Migrer des centaines de valeurs d'espacement en dur vers des tokens, avec pour s
 
 ### Tester une app navigateur sans navigateur
 Tenir la promesse zéro dépendance exclut Jest, Vitest et les harnais de navigateur headless.
-**Solution :** la logique a été factorisée pour être indépendante du navigateur et couverte par **519 tests sur le runner intégré de Node** — aucune dépendance de test, aucun réseau réel. La CI reconstruit aussi le bundle et échoue si l'artefact commité est périmé.
+**Solution :** la logique a été factorisée pour être indépendante du navigateur et couverte par **623 tests sur le runner intégré de Node** — aucune dépendance de test, aucun réseau réel. La CI reconstruit aussi le bundle et échoue si l'artefact commité est périmé.
 
 ---
 
 ### Ce que les tests couvrent — et ce qu'ils ne couvrent pas
 
-519 tests sur le lanceur intégré de Node, sans framework. Être précis sur la frontière compte plus que le nombre :
+623 tests sur le lanceur intégré de Node, sans framework. Être précis sur la frontière compte plus que le nombre :
 
 - **Couvert :** migrations de stockage et schéma de clés par saison ; l'échelle de rareté à sept niveaux, bonus de set complet inclus ; toutes les conditions de badge et le modèle de difficulté ; les listes du collectionneur (manquantes, doubles, échange) ; les allers-retours d'encodage des codes de sauvegarde ; les aides cloud contre un `fetch` simulé, chemins d'échec compris ; la parité des clés i18n sur les 7 langues et la détection de doublons ; le precache du service worker confronté au vrai graphe d'imports ; les contrats de markup de l'accès clavier ; la provenance de chaque `innerHTML` nourri de l'extérieur ; le contraste WCAG AA sur les deux thèmes.
 - **Non couvert :** le rendu réel (aucune assertion DOM au-delà des chaînes de markup), le comportement du service worker à l'exécution, les appels réseau réels, IndexedDB, les invites d'installation, et tout ce qui exige un moteur de navigateur — ces points sont vérifiés à la main et par la passe de captures déterministe, pas par la suite. Le pourcentage de couverture n'est volontairement pas publié : il mesurerait la tranche sans navigateur et se lirait comme s'il mesurait l'application.
@@ -202,7 +202,7 @@ npm install     # installe esbuild, l'unique devDependency
 npm run build   # app.js → app.bundle.js (minifié + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 519 tests, node --test, sans framework
+npm test        # 623 tests, node --test, sans framework
 ```
 
 **Déploiement.** Le dépôt se déploie tel quel sur GitHub Pages : toutes les URL sont relatives, l'app tourne donc à l'identique à la racine d'un domaine, sous un sous-chemin et en localhost. Routine de release : ajouter une entrée de changelog (c'*est* le bump de version) → incrémenter `SW_VERSION` → build → push.
@@ -221,7 +221,7 @@ npm test        # 519 tests, node --test, sans framework
 
 ## 🔩 Notes d'ingénierie
 
-Zéro dépendance à l'exécution (esbuild seul, au build) ; zéro décalage de mise en page, mesuré au pixel entre les versions ; l'ajout rapide profilé et optimisé (~300 ms → ~45 ms sur mobile moyen) ; chiffrement local optionnel lié au PIN (PBKDF2 + AES-GCM) ; mode spectateur verrouillé dans la logique, pas en CSS ; captures régénérées par un script déterministe versionné, les trois démos animées enregistrées à la main ; 519 tests en JS vanilla avec le runner intégré de Node. Détails complets dans le [README anglais](README.md).
+Zéro dépendance à l'exécution (esbuild seul, au build) ; zéro décalage de mise en page, mesuré au pixel entre les versions ; l'ajout rapide profilé et optimisé (~300 ms → ~45 ms sur mobile moyen) ; chiffrement local optionnel lié au PIN (PBKDF2 + AES-GCM) ; mode spectateur verrouillé dans la logique, pas en CSS ; captures régénérées par un script déterministe versionné, les trois démos animées enregistrées à la main ; 623 tests en JS vanilla avec le runner intégré de Node. Détails complets dans le [README anglais](README.md).
 
 ---
 
