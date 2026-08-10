@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.49.1',
+    date: '2026-08-09',
+    changes: {
+      en: [
+        'The README now carries the project\'s code-quality grade as a badge — along with the two measurements that are still in the red behind it, rather than only the good news.',
+      ],
+      fr: [
+        'Le README porte désormais la note de qualité du code sous forme de badge — accompagnée des deux mesures encore au rouge derrière elle, plutôt que de la seule bonne nouvelle.',
+      ],
+      es: [
+        'El README lleva ahora la nota de calidad del código como insignia — junto con las dos mediciones que siguen en rojo detrás de ella, en lugar de solo la buena noticia.',
+      ],
+      zh: [
+        'README 现在以徽章形式展示项目的代码质量评级——同时也写出它背后仍然亮红的两项指标，而不是只报喜。',
+      ],
+      it: [
+        'Il README porta ora il voto di qualità del codice come badge — insieme alle due misure ancora in rosso dietro di esso, invece della sola buona notizia.',
+      ],
+      nl: [
+        'De README draagt nu het codekwaliteitscijfer als badge — samen met de twee metingen die er nog rood achter staan, in plaats van alleen het goede nieuws.',
+      ],
+      de: [
+        'Die README trägt jetzt die Code-Qualitätsnote als Abzeichen — zusammen mit den zwei Messwerten, die dahinter noch auf Rot stehen, statt nur der guten Nachricht.',
+      ],
+    },
+  },
+  {
     version: '1.49.0',
     date: '2026-08-09',
     changes: {

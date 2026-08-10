@@ -4,18 +4,23 @@
 > Il dit **ce qu'on scinde**, **ce qu'on ne scinde pas**, et **pourquoi la
 > différence n'est pas une nuance**.
 
-## Deux objectifs, et un seul est garanti
+## Ce que ce refactor vise — et ce qu'il ne vise pas
 
-Ce refactor poursuit deux buts :
+**Le dépôt est noté A par Codacy** (0 issue, 4 % de duplication). Ce n'est
+donc pas la note qui motive ce chantier — elle est déjà là.
 
-1. **Débloquer ce qui est bloqué** — le multi-saisons (`cloud.js`) et
-   l'export de liste d'échange (`badges.js`). Celui-là est certain.
-2. **Viser la note A par la voie honnête**, c'est-à-dire en rendant le code
-   réellement moins complexe, jamais en déplaçant le seuil.
+Ce qui reste rouge, c'est la **jauge de complexité** : 13 des 30 fichiers
+sources dépassent le seuil, soit 43 % contre un objectif de 10 %. Ce
+document explique pourquoi on ne la fera pas tomber par n'importe quel
+moyen.
 
-**Le second n'est PAS atteint en scindant ces quatre modules seuls.**
-Le chiffrage est ci-dessous. Il valait mieux le savoir avant de commencer
-qu'après une semaine de travail.
+Le refactor poursuit donc **un seul but** :
+
+> **Débloquer ce qui est bloqué** — le multi-saisons (`cloud.js`) et
+> l'export de liste d'échange (`badges.js`).
+
+La jauge s'améliorera en chemin — de 43 % à ~18,8 %, chiffrage ci-dessous —
+sans atteindre les 10 %. Ce n'est pas un échec : ce n'était pas l'objectif.
 
 ## La mesure qui a tranché
 
@@ -80,10 +85,9 @@ Les données (étapes, chapitres) et le moteur peuvent se séparer proprement.
 
 **`render.js` et `pin.js` restent tels quels.**
 
-Les découper les ferait passer sous le seuil et ferait monter la note, sans
-qu'une seule branche ait changé. Ce serait obtenir le A en déplaçant la ligne
-d'arrivée par un autre moyen que le curseur — et le curseur, on a déjà décidé
-de ne pas y toucher.
+Les découper les ferait passer sous le seuil sans qu'une seule branche ait
+changé. Ce serait déplacer la ligne d'arrivée par un autre moyen que le
+curseur — et le curseur, on a déjà décidé de ne pas y toucher.
 
 Si un jour ils se scindent, que ce soit parce qu'une fonctionnalité l'exige,
 jamais parce qu'un chiffre le demande.
@@ -92,23 +96,23 @@ jamais parce qu'un chiffre le demande.
 
 Elle compte des **fichiers**. Une architecture faite de peu de gros modules
 est donc pénalisée par construction : le même code réparti sur 300 fichiers
-de composants donnerait 4,3 % et un A, sans qu'une ligne change.
+de composants donnerait 4,3 %, sans qu'une ligne change.
 
 C'est un fait sur la mesure, pas une excuse. Les quatre modules ci-dessus
 sont réellement denses, et c'est pour eux — pas pour la note — que le
 refactor est prévu.
 
-## Le chiffrage — est-ce que ça suffit pour le A ?
+## Le chiffrage — la jauge tombe-t-elle sous 10 % ?
 
 **Non.** Scinder les quatre modules denses amène de 43,3 % à **18,8 %** de
-fichiers complexes. L'objectif est 10 %.
+fichiers complexes. L'objectif de la jauge est 10 %.
 
 La raison tient à ce que le découpage fait au **dénominateur** : il monte en
 même temps que le numérateur descend. Un module de complexité 377 doit se
 couper en 8 morceaux pour que chacun passe sous la barre, donc il retire 1
 fichier complexe mais ajoute 8 fichiers au total.
 
-| Scénario | Scindés | Dénominateur | Complexes | % | A ? |
+| Scénario | Scindés | Dénominateur | Complexes | % | ≤10 % ? |
 |---|---|---|---|---|---|
 | **A** — les 4 modules denses seuls | 4 → 22 | 48 | 9 | **18,8 %** | ✗ |
 | **B** — les 4 + les 5 fichiers juste au-dessus | 9 → 32 | 53 | 4 | **7,5 %** | ✓ |
@@ -129,14 +133,18 @@ valoir pour l'un et pas pour l'autre.
 **Réserve sur ces chiffres.** La coupure utilisée (~50) est **calibrée pour
 reproduire les 43 % affichés par Codacy**, pas dérivée de sa formule — le
 réglage annoncé est `fileComplexityValueThreshold: 20`, et le lien entre les
-deux n'a pas pu être retrouvé. La conclusion « A n'est pas atteint » est
+deux n'a pas pu être retrouvé. La conclusion « la jauge ne tombe pas sous 10 % » est
 robuste : l'écart entre 18,8 % et 10 % est trop large pour tenir à une erreur
 de calibrage. Les 7,5 % du scénario B, eux, sont à prendre avec précaution.
 
-## Décision : le A est REFUSÉ ici
+## Décision : le découpage COSMÉTIQUE est refusé
+
+Ce qui est refusé ici, ce n'est pas la note A — le dépôt l'a déjà. C'est le
+**découpage cosmétique** : scinder des fichiers dans le seul but de faire
+tomber la jauge de complexité sous 10 %.
 
 Tranché, et noir sur blanc pour que personne ne rouvre le débat dans six
-mois : **la note A n'est pas atteignable sur ce dépôt par une voie honnête.**
+mois :
 
 - Scinder les quatre modules réellement denses mène à **~18,8 %**, pas à 10 %.
 - Atteindre 10 % exigerait de découper en plus des fichiers que **rien ne
@@ -145,14 +153,16 @@ mois : **la note A n'est pas atteignable sur ce dépôt par une voie honnête.**
   compteur. **C'est refusé**, au même titre que monter le seuil ou découper
   `render.js`.
 
-**Le refactor se fait donc pour ce qu'il débloque — le multi-saisons et
-l'export de liste d'échange — pas pour la note.** Si le chiffre s'améliore en
-chemin, tant mieux ; ce n'est pas le critère de réussite. Le critère, c'est
-que `cloud.js` cesse de rendre le multi-saisons pénible et que `badges.js`
-laisse enfin brancher l'export.
+Un découpage qui ne rend pas le code plus clair n'est pas un refactor, c'est
+une mise en scène. Et une jauge qu'on satisfait sans rien améliorer cesse de
+mesurer quoi que ce soit.
 
-La note reste **B**, expliquée dans les README, et ce document est la raison
-écrite de ce choix.
+**Le critère de réussite** n'est donc pas un pourcentage : c'est que
+`cloud.js` cesse de rendre le multi-saisons pénible et que `badges.js` laisse
+enfin brancher l'export de liste d'échange.
+
+La jauge de complexité reste rouge à l'arrivée, expliquée dans les README —
+et ce document est la raison écrite de ce choix.
 
 ## Tests d'abord — là où c'est possible
 
