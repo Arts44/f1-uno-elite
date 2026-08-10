@@ -4,6 +4,7 @@
 
 **An offline-first, installable trading-card collection tracker built with vanilla JavaScript and zero runtime dependencies — no framework, no SDK, no CDN, no backend.**
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4e7d9096628044aba780a0b2000aee8c)](https://app.codacy.com/gh/Arts44/f1-uno-elite?utm_source=github.com&utm_medium=referral&utm_content=Arts44/f1-uno-elite&utm_campaign=Badge_Grade)
 [![tests](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml/badge.svg)](https://github.com/Arts44/f1-uno-elite/actions/workflows/tests.yml)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 ![PWA](https://img.shields.io/badge/PWA-installable%20%2B%20offline%20%E2%9C%93-brightgreen)
