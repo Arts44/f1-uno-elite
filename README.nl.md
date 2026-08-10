@@ -99,7 +99,7 @@ Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten, e
 | Crypto | Native **Web Crypto** — SHA-256 (pincode), PBKDF2 + AES-GCM (optionele versleuteling in rust) |
 | QR-codes | Gevendorde single-file-encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Lettertypen | Zelf gehoste WOFF2 (SIL OFL) — geen Google Fonts-verzoek, 5 thema's naar keuze |
-| Tests | **Ingebouwde testrunner van Node** (`node --test`) — 623 tests, geen testframework |
+| Tests | **Ingebouwde testrunner van Node** (`node --test`) — 651 tests, geen testframework |
 | CI | GitHub Actions — tests + build + versheidscontrole van de gecommitte bundle bij elke push/PR |
 
 **Nul runtime-afhankelijkheden is een ontwerpregel, geen toeval.** Alles wat een framework of SDK normaal levert — rendering, navigatie tussen weergaven, i18n, offline caching, auth via REST, versleuteling, QR-generatie — is rechtstreeks op de webplatform-API's gebouwd. De app die je installeert is exact de code in deze repository.
@@ -177,16 +177,16 @@ Honderden hardgecodeerde spatiëringswaarden migreren naar tokens, met „het zi
 
 ### Een browserapp testen zonder browser
 De belofte van nul afhankelijkheden sluit Jest, Vitest en headless-browsertuigages uit.
-**Oplossing:** de logica is zo gefactoriseerd dat ze browservrij is en wordt gedekt door **623 tests op de ingebouwde runner van Node** — geen testafhankelijkheden, geen echt netwerk. De CI herbouwt bovendien de bundle en faalt als het gecommitte artefact verouderd is.
+**Oplossing:** de logica is zo gefactoriseerd dat ze browservrij is en wordt gedekt door **651 tests op de ingebouwde runner van Node** — geen testafhankelijkheden, geen echt netwerk. De CI herbouwt bovendien de bundle en faalt als het gecommitte artefact verouderd is.
 
 ---
 
 ### Wat de tests dekken — en wat niet
 
-623 tests op Node's ingebouwde runner, zonder framework. Precies zijn over de grens telt zwaarder dan het aantal:
+651 tests op Node's ingebouwde runner, zonder framework. Precies zijn over de grens telt zwaarder dan het aantal:
 
-- **Gedekt:** opslagmigraties en het sleutelschema per seizoen; de zeldzaamheidsladder van zeven niveaus inclusief promotie door een complete set; alle badgevoorwaarden en het moeilijkheidsmodel; de verzamelaarslijsten (ontbrekend, dubbel, ruil); de codeerrondes van back-upcodes; de cloudhulpjes tegen een nagebootste `fetch`, faalpaden inbegrepen; gelijkheid van i18n-sleutels over de 7 talen en detectie van dubbele sleutels; de precache van de service worker tegen de echte importgraaf; de markupcontracten van toetsenbordtoegang; de herkomst van elke van buitenaf gevoede `innerHTML`; WCAG AA-contrast in beide thema's.
-- **Niet gedekt:** het echte renderen (geen DOM-asserties voorbij markupstrings), het gedrag van de service worker tijdens uitvoering, echte netwerkoproepen, IndexedDB, installatieprompts, en alles wat een browserengine vereist — die worden met de hand en door de deterministische screenshotronde geverifieerd, niet door de suite. Het dekkingspercentage wordt bewust niet gepubliceerd: het zou de browservrije snede meten en lezen alsof het de app mat.
+- **Gedekt:** opslagmigraties en het sleutelschema per seizoen; de zeldzaamheidsladder van zeven niveaus inclusief promotie door een complete set; alle badgevoorwaarden en het moeilijkheidsmodel; de verzamelaarslijsten (ontbrekend, dubbel, ruil); de codeerrondes van back-upcodes; de cloudhulpjes tegen een nagebootste `fetch`, faalpaden inbegrepen; gelijkheid van i18n-sleutels over de 7 talen en detectie van dubbele sleutels; de precache van de service worker tegen de echte importgraaf; de markupcontracten van toetsenbordtoegang; de herkomst van elke van buitenaf gevoede `innerHTML`; contrast met de hand gecontroleerd in beide thema's.
+- **Niet gedekt:** het echte renderen (geen DOM-asserties voorbij markupstrings), het gedrag van de service worker tijdens uitvoering, echte netwerkoproepen, IndexedDB, installatieprompts, en alles wat een browserengine vereist — die worden met de hand en door de deterministische screenshotronde geverifieerd, niet door de suite. Het hierboven genoemde percentage meet alleen deze browservrije snede — lees het als zodanig, niet als een maat voor de app.
 
 ## 🚀 Aan de slag
 
@@ -202,7 +202,7 @@ npm install     # installeert esbuild, de enige devDependency
 npm run build   # app.js → app.bundle.js (geminificeerd + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 623 tests, node --test, zonder framework
+npm test        # 651 tests, node --test, zonder framework
 ```
 
 **Deployment.** De repository deployt as-is naar GitHub Pages: elke URL is relatief, dus de app draait identiek op een domeinroot, onder een subpad en op localhost. Releaseroutine: een changelog-vermelding toevoegen (dat *is* de versiebump) → `SW_VERSION` ophogen → builden → pushen.
@@ -215,13 +215,13 @@ npm test        # 623 tests, node --test, zonder framework
 - **Feedbackmeldingen vertrekken vanaf het testdomein van Resend** (`onboarding@resend.dev`). Vanaf dat domein bezorgt Resend alleen op het adres van de accounteigenaar: de melding bereikt de beheerder en niemand anders. Elders vandaan versturen zou betekenen dat je een domein bezit en verifieert. Dit is een aanvaarde beperking, geen fout: de feedback wordt hoe dan ook in de database bewaard, en een mislukte verzending blokkeert dat nooit.
 - **Inlogcodes lopen via een eigen SMTP-provider die in Supabase is ingesteld** — een keten die volledig losstaat van de meldingen hierboven. Bezorging, quota en afzenderreputatie hangen van die provider af en worden door deze repository niet gemeten; beschouw inlogmails als «naar beste vermogen» voor een persoonlijk project.
 - **De voortgangshistorie kent geen back-fill** — de statistiekencurve begint op de dag dat de functie werd geïnstalleerd.
-- **Het Codacy-cijfer is A — en twee van zijn vier kwaliteitsdoelen staan op rood.** Groen: 0 open issues, 4 % duplicatie. Rood: de complexiteit, met 13 van de 30 geanalyseerde bronbestanden boven de drempel (43 %, tegenover een doel van 10 %); en de dekking, lokaal gemeten op 62,72 % maar niet gerapporteerd aan Codacy, dus gelezen als ongemeten. De badge hierboven is echt, maar hij is niet het hele beeld — daarom staat het hele beeld hier. De complexiteitsdrempel is instelbaar en hem verhogen zou die meter groen maken zonder één regel code te wijzigen; hij is niet verhoogd, omdat vier van die bestanden werkelijk te veel doen — de twee zwaarste zijn `badges.js` en `cloud.js`, en ze opsplitsen is het volgende werk, want het is wat het project scheidt van de ruillijst-export en van ondersteuning voor meerdere seizoenen. Eén kanttekening bij de metriek zelf: die telt *bestanden*, en straft dus een architectuur van weinig grote modules af — dezelfde code verdeeld over 300 bestanden zou slagen zonder dat er één regel verandert. Dat is een feit over de meting, geen excuus.
+- **Het Codacy-cijfer is A — en twee van zijn vier kwaliteitsdoelen staan op rood.** Groen: 0 open issues, 4 % duplicatie. Rood: de complexiteit, met 13 van de 30 geanalyseerde bronbestanden boven de drempel (43 %, tegenover een doel van 10 %); en de dekking, op 62,72 % gemeten door de testsuite (Codacy's eigen meter staat op 62 %, over een iets bredere bestandsset) tegenover een doel van 60 % — groen, maar met 2,7 punten marge. De badge hierboven is echt, maar hij is niet het hele beeld — daarom staat het hele beeld hier. De complexiteitsdrempel is instelbaar en hem verhogen zou die meter groen maken zonder één regel code te wijzigen; hij is niet verhoogd, omdat vier van die bestanden werkelijk te veel doen — de twee zwaarste zijn `badges.js` en `cloud.js`, en ze opsplitsen is het volgende werk, want het is wat het project scheidt van de ruillijst-export en van ondersteuning voor meerdere seizoenen. Eén kanttekening bij de metriek zelf: die telt *bestanden*, en straft dus een architectuur van weinig grote modules af — dezelfde code verdeeld over 300 bestanden zou slagen zonder dat er één regel verandert. Dat is een feit over de meting, geen excuus.
 
 ---
 
 ## 🔩 Engineering-notities
 
-Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); nul layoutverschuiving, per pixel gemeten tussen versies; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo, de drie geanimeerde demo's met de hand opgenomen; 623 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
+Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); nul layoutverschuiving, per pixel gemeten tussen versies; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo, de drie geanimeerde demo's met de hand opgenomen; 651 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
 
 ---
 

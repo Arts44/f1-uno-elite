@@ -203,6 +203,7 @@ describe('README — les chiffres ne dérivent pas', () => {
     ['470 tests', 'compte de tests d\'avant le chantier bugs'],
     ['511 tests', 'compte de tests d\'avant les tests fmt* et aléa'],
     ['519 tests', 'compte de tests d\'avant la parité README'],
+    ['623 tests', 'compte de tests d\'avant les affirmations vérifiables'],
     ['111 badges', 'nombre de badges d\'avant la v3'],
   ];
 
@@ -219,7 +220,7 @@ describe('README — les chiffres ne dérivent pas', () => {
   // valeur. Le séparateur décimal est laissé libre : 62,72 en
   // français et 62.72 en anglais sont la même mesure.
   const FAITS = [
-    { nom: 'compte de tests', motif: /\b623\b/ },
+    { nom: 'compte de tests', motif: /\b651\b/ },
     { nom: 'nombre de cartes', motif: /\b101\b/ },
     { nom: 'nombre de badges', motif: /\b120\b/ },
     { nom: 'couverture', motif: /\b62[.,]72\b/ },
@@ -232,5 +233,109 @@ describe('README — les chiffres ne dérivent pas', () => {
         assert.match(s, motif, `${f} : le ${nom} est absent ou a une autre valeur`);
       });
     }
+  }
+});
+
+/* ══════════════════════════════════════════════════════════
+   6. AFFIRMATIONS VÉRIFIABLES
+
+   Les blocs précédents vérifient que les 7 README disent la MÊME
+   chose. Ils ne vérifient pas que ce qu'ils disent soit VRAI —
+   et deux affirmations fausses sont passées au travers :
+
+     · « A WCAG-AA contrast scan runs against both themes »
+       alors qu'aucun scan n'est commité (CLAUDE.md le dit :
+       « there is no such script committed in this repo ») ;
+     · « Coverage percentage is deliberately not published »
+       en même temps qu'un pourcentage publié deux sections plus
+       haut.
+
+   La plupart des affirmations d'un README ne sont pas
+   mécanisables — « le gel visuel est reproductible », « le mode
+   spectateur est verrouillé dans la logique » demandent un
+   lecteur. Mais deux familles le sont, et ce sont justement
+   celles qui ont dérivé :
+
+     A. une affirmation qui promet un OUTIL doit être adossée à
+        un fichier qui existe ;
+     B. le README ne doit pas se contredire lui-même sur un
+        chiffre qu'il publie par ailleurs.
+   ══════════════════════════════════════════════════════════ */
+describe('README — les affirmations qui engagent un artefact', () => {
+  /* A. Promesse d'outil → le fichier doit exister.
+     Chaque entrée : un motif qui, s'il apparaît, EXIGE le fichier. */
+  const PROMESSES = [
+    {
+      quoi: 'un scan de contraste automatisé',
+      motifs: [/contrast scan/i, /scan de contraste/i, /WCAG[- ]AA/i],
+      fichiers: ['contrast-check.mjs', 'scripts/contrast.mjs', 'tests/contrast.test.js'],
+    },
+    {
+      quoi: 'un script de captures déterministe',
+      motifs: [/deterministic in-repo script/i, /script déterministe/i],
+      fichiers: ['capture_screenshots.py'],
+    },
+  ];
+
+  for(const f of TOUS){
+    const s = sansCode(lire(f));
+    for(const { quoi, motifs, fichiers } of PROMESSES){
+      const promis = motifs.some(m => m.test(s));
+      test(`${f} — ${quoi} : promesse et artefact concordent`, () => {
+        if(!promis) return;                       // rien de promis, rien à tenir
+        const existe = fichiers.some(p => {
+          try { readFileSync(new URL(`../${p}`, import.meta.url)); return true; }
+          catch(e){ return false; }
+        });
+        assert.ok(existe,
+          `${f} promet ${quoi}, mais aucun de ces fichiers n'existe : ${fichiers.join(', ')}. `
+          + 'Soit on écrit l\'outil, soit on retire la phrase.');
+      });
+    }
+  }
+
+  /* B. Le README ne peut pas publier un chiffre ET dire qu'il ne le
+     publie pas. C'est exactement la contradiction qui a survécu au
+     passage de la couverture de « non remontée » à 62 %. */
+  const NIE_PUBLIER = [
+    /deliberately not published/i,
+    /volontairement pas publié/i,
+    /no se publica a propósito/i,
+    /non è pubblicata di proposito/i,
+    /bewust niet gepubliceerd/i,
+    /bewusst nicht veröffentlicht/i,
+    /刻意不公布/,
+  ];
+
+  for(const f of TOUS){
+    const s = sansCode(lire(f));
+    test(`${f} — ne publie pas un chiffre en disant qu'il ne le publie pas`, () => {
+      const publie = /\b62[.,]\d\d?\s*%/.test(s);
+      const nie = NIE_PUBLIER.some(m => m.test(s));
+      assert.ok(!(publie && nie),
+        `${f} : le pourcentage de couverture est publié ET déclaré non publié`);
+    });
+  }
+
+  /* La couverture remonte désormais à Codacy : plus aucun README ne
+     doit affirmer le contraire. */
+  const NIE_REMONTER = [
+    /not reported to Codacy/i,
+    /non remontée à Codacy/i,
+    /no reportada a Codacy/i,
+    /non riportata a Codacy/i,
+    /niet gerapporteerd aan Codacy/i,
+    /nicht an Codacy gemeldet/i,
+    /没有上报到 Codacy/,
+  ];
+
+  for(const f of TOUS){
+    const s = sansCode(lire(f));
+    test(`${f} — n'affirme plus que la couverture n'est pas remontée`, () => {
+      const menteur = NIE_REMONTER.find(m => m.test(s));
+      assert.ok(!menteur,
+        `${f} : la couverture EST remontée à Codacy depuis le correctif du mkdir — `
+        + 'cette phrase est fausse.');
+    });
   }
 });

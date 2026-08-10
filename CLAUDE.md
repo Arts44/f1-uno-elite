@@ -234,6 +234,16 @@ A change is **not done** until all of these pass. Run them before you say the wo
 8. **Manual browser pass (what tests can't cover):** serve over HTTP and check what you touched — DOM rendering, modal, theming, font switching, animations (incl. `prefers-reduced-motion`), the tutorial's DOM flow, PWA install, offline reload, and QR visual output. State clearly which manual checks you did and which you couldn't.
 9. **Docs:** if behaviour or structure changed, update `README.md` (and this file) so they still match reality.
 
+> **Hors du dépôt, donc hors de portée des tests : la DESCRIPTION GitHub.**
+> Le champ « About » du dépôt (visible en haut de la page, et dans les
+> résultats de recherche) contient des chiffres qu'aucun test ne peut
+> atteindre — il a annoncé « 416 tests » longtemps après que le compte
+> réel ait changé. À vérifier à la main à chaque fois qu'un chiffre du
+> README bouge. Même remarque pour les *topics* et le lien de site.
+>
+> 🇫🇷 La description GitHub n'est pas dans le dépôt : aucun test ne la
+> couvre. La relire quand un chiffre change.
+
 🇫🇷 Avant de dire « terminé » : `node --check` propre, `npm test` vert (+ test ajouté si logique modifiée), bundle reconstruit et commité si module bundlé, `SW_VERSION` incrémenté si le shell change, 7 langues à jour, aucun chemin en `/`, pas de `console.log` de debug, passe manuelle navigateur (HTTP) sur ce que tu as touché, et docs synchronisées.
 
 ---

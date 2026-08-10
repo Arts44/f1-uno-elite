@@ -99,7 +99,7 @@ Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chac
 | Crypto | **Web Crypto** natif — SHA-256 (PIN), PBKDF2 + AES-GCM (chiffrement au repos optionnel) |
 | Codes QR | Encodeur mono-fichier vendorisé ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Polices | WOFF2 auto-hébergées (SIL OFL) — aucune requête Google Fonts, 5 thèmes au choix |
-| Tests | **Runner de test intégré à Node** (`node --test`) — 623 tests, aucun framework de test |
+| Tests | **Runner de test intégré à Node** (`node --test`) — 651 tests, aucun framework de test |
 | CI | GitHub Actions — tests + build + vérification de fraîcheur du bundle commité à chaque push/PR |
 
 **Zéro dépendance à l'exécution est une règle de conception, pas un hasard.** Tout ce qu'un framework ou un SDK fournirait — rendu, navigation entre vues, i18n, cache hors-ligne, auth REST, chiffrement, génération de QR — est construit directement sur les API de la plateforme web. L'app que vous installez est exactement le code de ce dépôt.
@@ -177,16 +177,16 @@ Migrer des centaines de valeurs d'espacement en dur vers des tokens, avec pour s
 
 ### Tester une app navigateur sans navigateur
 Tenir la promesse zéro dépendance exclut Jest, Vitest et les harnais de navigateur headless.
-**Solution :** la logique a été factorisée pour être indépendante du navigateur et couverte par **623 tests sur le runner intégré de Node** — aucune dépendance de test, aucun réseau réel. La CI reconstruit aussi le bundle et échoue si l'artefact commité est périmé.
+**Solution :** la logique a été factorisée pour être indépendante du navigateur et couverte par **651 tests sur le runner intégré de Node** — aucune dépendance de test, aucun réseau réel. La CI reconstruit aussi le bundle et échoue si l'artefact commité est périmé.
 
 ---
 
 ### Ce que les tests couvrent — et ce qu'ils ne couvrent pas
 
-623 tests sur le lanceur intégré de Node, sans framework. Être précis sur la frontière compte plus que le nombre :
+651 tests sur le lanceur intégré de Node, sans framework. Être précis sur la frontière compte plus que le nombre :
 
-- **Couvert :** migrations de stockage et schéma de clés par saison ; l'échelle de rareté à sept niveaux, bonus de set complet inclus ; toutes les conditions de badge et le modèle de difficulté ; les listes du collectionneur (manquantes, doubles, échange) ; les allers-retours d'encodage des codes de sauvegarde ; les aides cloud contre un `fetch` simulé, chemins d'échec compris ; la parité des clés i18n sur les 7 langues et la détection de doublons ; le precache du service worker confronté au vrai graphe d'imports ; les contrats de markup de l'accès clavier ; la provenance de chaque `innerHTML` nourri de l'extérieur ; le contraste WCAG AA sur les deux thèmes.
-- **Non couvert :** le rendu réel (aucune assertion DOM au-delà des chaînes de markup), le comportement du service worker à l'exécution, les appels réseau réels, IndexedDB, les invites d'installation, et tout ce qui exige un moteur de navigateur — ces points sont vérifiés à la main et par la passe de captures déterministe, pas par la suite. Le pourcentage de couverture n'est volontairement pas publié : il mesurerait la tranche sans navigateur et se lirait comme s'il mesurait l'application.
+- **Couvert :** migrations de stockage et schéma de clés par saison ; l'échelle de rareté à sept niveaux, bonus de set complet inclus ; toutes les conditions de badge et le modèle de difficulté ; les listes du collectionneur (manquantes, doubles, échange) ; les allers-retours d'encodage des codes de sauvegarde ; les aides cloud contre un `fetch` simulé, chemins d'échec compris ; la parité des clés i18n sur les 7 langues et la détection de doublons ; le precache du service worker confronté au vrai graphe d'imports ; les contrats de markup de l'accès clavier ; la provenance de chaque `innerHTML` nourri de l'extérieur ; le contraste vérifié à la main sur les deux thèmes.
+- **Non couvert :** le rendu réel (aucune assertion DOM au-delà des chaînes de markup), le comportement du service worker à l'exécution, les appels réseau réels, IndexedDB, les invites d'installation, et tout ce qui exige un moteur de navigateur — ces points sont vérifiés à la main et par la passe de captures déterministe, pas par la suite. Le pourcentage cité plus haut ne mesure que cette tranche sans navigateur — à lire comme tel, pas comme une mesure de l'application.
 
 ## 🚀 Démarrer
 
@@ -202,7 +202,7 @@ npm install     # installe esbuild, l'unique devDependency
 npm run build   # app.js → app.bundle.js (minifié + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 623 tests, node --test, sans framework
+npm test        # 651 tests, node --test, sans framework
 ```
 
 **Déploiement.** Le dépôt se déploie tel quel sur GitHub Pages : toutes les URL sont relatives, l'app tourne donc à l'identique à la racine d'un domaine, sous un sous-chemin et en localhost. Routine de release : ajouter une entrée de changelog (c'*est* le bump de version) → incrémenter `SW_VERSION` → build → push.
@@ -215,13 +215,13 @@ npm test        # 623 tests, node --test, sans framework
 - **Les notifications d'avis partent du domaine de test de Resend** (`onboarding@resend.dev`). Depuis ce domaine, Resend ne délivre qu'à l'adresse du propriétaire du compte : la notification atteint le mainteneur et personne d'autre. Envoyer ailleurs supposerait de posséder et vérifier un domaine. C'est une limite assumée, pas un défaut : l'avis est enregistré en base dans tous les cas, et un envoi raté ne le bloque jamais.
 - **Les codes de connexion passent par un fournisseur SMTP configuré dans Supabase** — une chaîne entièrement distincte des notifications ci-dessus. Délivrabilité, quotas et réputation d'expéditeur dépendent de ce fournisseur et ne sont pas mesurés par ce dépôt ; les e-mails de connexion sont à considérer comme « au mieux » pour un projet perso.
 - **L'historique de progression n'a pas de rétro-remplissage** — la courbe des stats commence le jour où la fonctionnalité a été installée.
-- **La note Codacy est A — et deux de ses quatre objectifs de qualité sont au rouge.** Au vert : 0 issue ouverte, 4 % de duplication. Au rouge : la complexité, avec 13 des 30 fichiers sources analysés au-dessus du seuil (43 %, pour un objectif de 10 %) ; et la couverture, mesurée localement à 62,72 % mais non remontée à Codacy, donc lue comme non mesurée. Le badge ci-dessus est réel, mais il n'est pas le tableau complet — c'est pourquoi le tableau complet est ici. Le seuil de complexité est réglable, et le monter ferait passer cette jauge au vert sans changer une ligne de code ; il n'a pas été monté, parce que quatre de ces fichiers en font réellement trop — les deux plus lourds sont `badges.js` et `cloud.js`, et les scinder est le prochain chantier, puisque c'est ce qui sépare le projet de l'export de liste d'échange et du support multi-saisons. Une réserve sur la métrique elle-même : elle compte des *fichiers*, donc elle pénalise une architecture faite de peu de gros modules — le même code réparti en 300 fichiers passerait sans qu'une ligne change. C'est un fait sur la mesure, pas une excuse.
+- **La note Codacy est A — et deux de ses quatre objectifs de qualité sont au rouge.** Au vert : 0 issue ouverte, 4 % de duplication. Au rouge : la complexité, avec 13 des 30 fichiers sources analysés au-dessus du seuil (43 %, pour un objectif de 10 %) ; et la couverture, à 62,72 % mesurés par la suite de tests (la jauge de Codacy affiche 62 %, sur un ensemble de fichiers un peu plus large) pour un objectif de 60 % — au vert, mais avec 2,7 points de marge. Le badge ci-dessus est réel, mais il n'est pas le tableau complet — c'est pourquoi le tableau complet est ici. Le seuil de complexité est réglable, et le monter ferait passer cette jauge au vert sans changer une ligne de code ; il n'a pas été monté, parce que quatre de ces fichiers en font réellement trop — les deux plus lourds sont `badges.js` et `cloud.js`, et les scinder est le prochain chantier, puisque c'est ce qui sépare le projet de l'export de liste d'échange et du support multi-saisons. Une réserve sur la métrique elle-même : elle compte des *fichiers*, donc elle pénalise une architecture faite de peu de gros modules — le même code réparti en 300 fichiers passerait sans qu'une ligne change. C'est un fait sur la mesure, pas une excuse.
 
 ---
 
 ## 🔩 Notes d'ingénierie
 
-Zéro dépendance à l'exécution (esbuild seul, au build) ; zéro décalage de mise en page, mesuré au pixel entre les versions ; l'ajout rapide profilé et optimisé (~300 ms → ~45 ms sur mobile moyen) ; chiffrement local optionnel lié au PIN (PBKDF2 + AES-GCM) ; mode spectateur verrouillé dans la logique, pas en CSS ; captures régénérées par un script déterministe versionné, les trois démos animées enregistrées à la main ; 623 tests en JS vanilla avec le runner intégré de Node. Détails complets dans le [README anglais](README.md).
+Zéro dépendance à l'exécution (esbuild seul, au build) ; zéro décalage de mise en page, mesuré au pixel entre les versions ; l'ajout rapide profilé et optimisé (~300 ms → ~45 ms sur mobile moyen) ; chiffrement local optionnel lié au PIN (PBKDF2 + AES-GCM) ; mode spectateur verrouillé dans la logique, pas en CSS ; captures régénérées par un script déterministe versionné, les trois démos animées enregistrées à la main ; 651 tests en JS vanilla avec le runner intégré de Node. Détails complets dans le [README anglais](README.md).
 
 ---
 
