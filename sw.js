@@ -50,6 +50,7 @@ const SHELL_ASSETS = [
   'collector.js',
   'install.js',
   'cloud.js',
+  'cloud-http.js',
   'settings-sync.js',
   'update.js',
   'changelog.js',

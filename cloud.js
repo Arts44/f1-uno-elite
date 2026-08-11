@@ -13,6 +13,7 @@
    the Supabase origin, so no API response is ever served from cache.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { cloudConfig, isCloudConfigured, authHeaders, cloudFetch, logFailure } from './cloud-http.js';
 import { deniedForViewer } from './session.js';
 import { t, escapeHtml, setSafeHTML } from './i18n.js';
 import { collectionSnapshot, _showImportDialog } from './storage.js';
@@ -24,21 +25,10 @@ import { createSegmentedInput } from './otp-input.js';
 
 export const SESSION_KEY = 'f1uno_cloud_session';
 
-/* ── Config (filled by the user in cloud-config.js) ──
-   PROVENANCE DE cfg.url — la réponse aux alertes SSRF portées sur les
-   fetch() de ce module. L'URL vient d'UNE seule source : le littéral
-   écrit dans cloud-config.js, un fichier VERSIONNÉ dans le dépôt et
-   servi avec l'app. Elle n'est jamais lue depuis une saisie, une
-   sauvegarde importée, un lien #backup=, une réponse réseau ni le
-   localStorage. Un attaquant capable de la modifier a déjà réécrit les
-   fichiers servis : il n'a plus besoin d'un SSRF.
-   Le seul traitement appliqué est la suppression des « / » finaux, pour
-   que la concaténation des chemins reste stable. ── */
-export function cloudConfig(){
-  const c = (typeof window !== 'undefined' && window.__F1UNO_CLOUD) || {};
-  return (c.url && c.anonKey) ? { url: c.url.replace(/\/+$/, ''), anonKey: c.anonKey } : null;
-}
-export function isCloudConfigured(){ return !!cloudConfig(); }
+// Baril de transition : la surface publique de cloud.js ne bouge pas
+// tant que les trois consommateurs n'ont pas été repointés (pas 5).
+export { cloudConfig, isCloudConfigured, authHeaders };
+
 
 /* ══════════════════════════════════════════════════════════
    PURE HELPERS (unit-tested)
@@ -82,16 +72,6 @@ export function buildUpsertRow(userId, season, snapshot){
   return { user_id: userId, season, data: snapshot };
 }
 
-// Headers for GoTrue/PostgREST. Without a user token, the anon key is
-// used as the bearer (required by Supabase even for anonymous calls).
-export function authHeaders(cfg, accessToken){
-  return {
-    'apikey': cfg.anonKey,
-    'Authorization': `Bearer ${accessToken || cfg.anonKey}`,
-    'Content-Type': 'application/json',
-  };
-}
-
 /* ── Session persistence ── */
 export function loadSession(){
   try {
@@ -120,12 +100,12 @@ export async function sendMagicLink(email){
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-configured');
   const redirectTo = encodeURIComponent(location.origin + location.pathname);
-  const resp = await fetch(`${cfg.url}/auth/v1/otp?redirect_to=${redirectTo}`, {
+  const resp = await cloudFetch(`${cfg.url}/auth/v1/otp?redirect_to=${redirectTo}`, {
     method: 'POST',
     cache: 'no-store',
     headers: authHeaders(cfg),
     body: JSON.stringify({ email, create_user: true }),
-  }).catch(() => { throw new Error('offline'); });
+  });
   if(!resp.ok){
     const body = await resp.text().catch(() => '');
     log('cloud: otp failed', resp.status, body);
@@ -161,14 +141,14 @@ export async function verifyOtpCode(email, code){
   if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-configured');
-  const resp = await fetch(`${cfg.url}/auth/v1/verify`, {
+  const resp = await cloudFetch(`${cfg.url}/auth/v1/verify`, {
     method: 'POST',
     cache: 'no-store',
     headers: authHeaders(cfg),
     body: JSON.stringify({ type: 'email', email, token: code }),
-  }).catch(() => { throw new Error('offline'); });
+  });
   if(!resp.ok){
-    log('cloud: verify failed', resp.status, await resp.text().catch(() => ''));
+    await logFailure('cloud: verify failed', resp);
     throw new Error(resp.status === 429 ? 'rate-limited' : 'code-invalid');
   }
   const d = await resp.json().catch(() => null);
@@ -207,7 +187,7 @@ export function sendCooldownRemaining(lastSentAt, now, cooldownMs = SEND_COOLDOW
 
 // Fetch the user profile (id + email) for a fresh token.
 async function _fetchUser(cfg, accessToken){
-  const resp = await fetch(`${cfg.url}/auth/v1/user`, {
+  const resp = await cloudFetch(`${cfg.url}/auth/v1/user`, {
     cache: 'no-store',
     headers: authHeaders(cfg, accessToken),
   });
@@ -221,12 +201,12 @@ async function _refresh(cfg, refreshToken){
   // fix 1.40.0 : un échec RÉSEAU (tunnel, avion) n'est pas un refus du
   // serveur — il remonte 'offline' et la session reste récupérable.
   // Seul un vrai refus (resp !ok) vaut 'refresh-failed' → déconnexion.
-  const resp = await fetch(`${cfg.url}/auth/v1/token?grant_type=refresh_token`, {
+  const resp = await cloudFetch(`${cfg.url}/auth/v1/token?grant_type=refresh_token`, {
     method: 'POST',
     cache: 'no-store',
     headers: authHeaders(cfg),
     body: JSON.stringify({ refresh_token: refreshToken }),
-  }).catch(() => { throw new Error('offline'); });
+  });
   if(!resp.ok) throw new Error('refresh-failed');
   const d = await resp.json();
   return {
@@ -292,7 +272,7 @@ export async function signOut(){
   clearSession(); // local state first: signing out must always succeed
   if(cfg && session){
     try {
-      await fetch(`${cfg.url}/auth/v1/logout`, {
+      await cloudFetch(`${cfg.url}/auth/v1/logout`, {
         method: 'POST',
         cache: 'no-store',
         headers: authHeaders(cfg, session.access_token),
@@ -327,7 +307,7 @@ export async function pushCollection(){
   _requireOnline();
   const { session, userId } = await _requireSession();
   const row = buildUpsertRow(userId, _currentSeason, collectionSnapshot(backupIncludes()));
-  const resp = await fetch(`${cfg.url}/rest/v1/collections?on_conflict=user_id,season`, {
+  const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?on_conflict=user_id,season`, {
     method: 'POST',
     cache: 'no-store',
     headers: {
@@ -335,14 +315,14 @@ export async function pushCollection(){
       'Prefer': 'resolution=merge-duplicates,return=representation',
     },
     body: JSON.stringify([row]),
-  }).catch(() => { throw new Error('offline'); });
+  });
   if(resp.status === 401 || resp.status === 403){
     // token révoqué côté serveur : session morte — purge + message typé
     clearSession();
     throw new Error('not-signed-in');
   }
   if(!resp.ok){
-    log('cloud: push failed', resp.status, await resp.text().catch(() => ''));
+    await logFailure('cloud: push failed', resp);
     throw new Error('push-failed');
   }
   const rows = await resp.json().catch(() => null);
@@ -362,18 +342,18 @@ export async function pullCollection(){
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
   const { session } = await _requireSession();
-  const resp = await fetch(
+  const resp = await cloudFetch(
     `${cfg.url}/rest/v1/collections?season=eq.${_currentSeason}&select=data,updated_at`, {
     cache: 'no-store',
     headers: authHeaders(cfg, session.access_token),
-  }).catch(() => { throw new Error('offline'); });
+  });
   if(resp.status === 401 || resp.status === 403){
     // token révoqué côté serveur : session morte — purge + message typé
     clearSession();
     throw new Error('not-signed-in');
   }
   if(!resp.ok){
-    log('cloud: pull failed', resp.status, await resp.text().catch(() => ''));
+    await logFailure('cloud: pull failed', resp);
     throw new Error('pull-failed');
   }
   const rows = await resp.json().catch(() => null);
@@ -399,14 +379,14 @@ export async function requestEmailChange(newEmail){
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
   const { session } = await _requireSession();
-  const resp = await fetch(`${cfg.url}/auth/v1/user`, {
+  const resp = await cloudFetch(`${cfg.url}/auth/v1/user`, {
     method: 'PUT',
     cache: 'no-store',
     headers: { ...authHeaders(cfg, session.access_token), 'Content-Type': 'application/json' },
     body: JSON.stringify({ email: newEmail }),
-  }).catch(() => { throw new Error('offline'); });
+  });
   if(!resp.ok){
-    log('cloud: email change failed', resp.status, await resp.text().catch(() => ''));
+    await logFailure('cloud: email change failed', resp);
     throw new Error(resp.status === 429 ? 'rate-limited' : 'email-change-failed');
   }
   return true;
@@ -420,13 +400,13 @@ export async function cloudDeleteAll(){
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
   const { session, userId } = await _requireSession();
-  const resp = await fetch(`${cfg.url}/rest/v1/collections?user_id=eq.${userId}`, {
+  const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?user_id=eq.${userId}`, {
     method: 'DELETE',
     cache: 'no-store',
     headers: authHeaders(cfg, session.access_token),
-  }).catch(() => { throw new Error('offline'); });
+  });
   if(!resp.ok){
-    log('cloud: delete failed', resp.status, await resp.text().catch(() => ''));
+    await logFailure('cloud: delete failed', resp);
     throw new Error('delete-failed');
   }
   return true;
@@ -439,7 +419,7 @@ export async function fetchCloudMeta(){
   const session = await getValidSession();
   if(!session) return null;
   try {
-    const resp = await fetch(
+    const resp = await cloudFetch(
       `${cfg.url}/rest/v1/collections?season=eq.${_currentSeason}&select=updated_at`, {
       cache: 'no-store',
       headers: authHeaders(cfg, session.access_token),
