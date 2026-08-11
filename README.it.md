@@ -221,7 +221,7 @@ npm test        # 651 test, node --test, senza framework
 
 ## 🔩 Note di ingegneria
 
-Zero dipendenze a runtime (solo esbuild, in build); zero spostamenti di layout, misurati al pixel tra le versioni; l'aggiunta rapida profilata e ottimizzata (~300 ms → ~45 ms su un telefono medio); cifratura locale opzionale legata al PIN (PBKDF2 + AES-GCM); modalità spettatore bloccata nella logica, non nel CSS; screenshot rigenerati da uno script deterministico nel repo, le tre demo animate registrate a mano; 651 test in JS vanilla con il runner integrato di Node. Dettagli completi nel [README inglese](README.md).
+Zero dipendenze a runtime (solo esbuild, in build); soglia tipografica di 11 px verificata su 5 caratteri × 2 temi × 320/375/desktop (una sola eccezione, l'« ÉLITE » del logo a 8 px, che è branding); spostamento di layout misurato a ogni passata visiva sull'intera griglia — quasi nullo, non nullo: lo scheletro combacia con la tessera mediana a ±5 px agli estremi; l'aggiunta rapida profilata e ottimizzata (~300 ms → ~45 ms su un telefono medio, misura singola non ripetuta in CI); cifratura locale opzionale legata al PIN (PBKDF2 + AES-GCM); modalità spettatore bloccata nella logica, non nel CSS; screenshot rigenerati da uno script deterministico nel repo, le tre demo animate registrate a mano; 651 test in JS vanilla con il runner integrato di Node. Dettagli completi nel [README inglese](README.md).
 
 ---
 

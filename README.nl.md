@@ -221,7 +221,7 @@ npm test        # 651 tests, node --test, zonder framework
 
 ## 🔩 Engineering-notities
 
-Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); nul layoutverschuiving, per pixel gemeten tussen versies; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo, de drie geanimeerde demo's met de hand opgenomen; 651 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
+Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); typografische ondergrens van 11 px geverifieerd over 5 lettertypethema's × 2 kleurthema's × 320/375/desktop (één uitzondering, de « ÉLITE » in het woordmerk op 8 px, dat is branding); layoutverschuiving gemeten bij elke visuele ronde over het hele raster — bijna nul, niet nul: het skelet komt overeen met de mediane tegel, met ±5 px aan de uiteinden; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon, eenmalige meting, niet herhaald in CI); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo, de drie geanimeerde demo's met de hand opgenomen; 651 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
 
 ---
 

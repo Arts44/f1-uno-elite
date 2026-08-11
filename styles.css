@@ -179,7 +179,7 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .pin-flow-step{font-size:13px;color:var(--tx2);margin-bottom:var(--space-5);text-align:center;}
 .pin-flow-num{font-variant-numeric:tabular-nums;font-weight:700;color:var(--tx3);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-pill);padding:1px 8px;margin-left:4px;font-size:11px;}
 .pin-flow-cancel{background:none;border:1.5px solid var(--border);border-radius:var(--r-pill);color:var(--tx2);font-size:12px;font-weight:600;padding:7px 18px;cursor:pointer;font-family:var(--font-b);margin-top:var(--space-4);}
-.sec-chip{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--tx3);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-pill);padding:2px 8px;margin-left:6px;vertical-align:2px;}
+.sec-chip{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--tx3);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-pill);padding:2px 8px;margin-left:6px;vertical-align:2px;}
 .sec-chip.on{color:var(--green);background:var(--green-s);border-color:var(--green-m);}
 
 .pin-keypad {
@@ -330,7 +330,7 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .changelog-dialog .import-dialog-title{text-align:center;}
 .changelog-list{max-height:min(55vh,420px);overflow-y:auto;display:flex;flex-direction:column;gap:var(--space-4);margin:var(--space-3) 0 var(--space-4);}
 .changelog-ver{font-weight:800;font-size:14px;color:var(--tx1);}
-.changelog-date{font-weight:600;font-size:11.5px;color:var(--tx3);margin-left:var(--space-2);}
+.changelog-date{font-weight:600;font-size:12px;color:var(--tx3);margin-left:var(--space-2);}
 .changelog-entry ul{margin:var(--space-6px) 0 0;padding-left:var(--space-5);display:flex;flex-direction:column;gap:var(--space-1);}
 .changelog-entry li{font-size:12.5px;line-height:1.5;color:var(--tx2);}
 
@@ -849,7 +849,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    foil. Badge : pastille 🏁 en coin du visuel, pendant de la couronne
    champion. 100 % statique — rien à couper en prefers-reduced-motion. */
 .card.set-complete{outline:1.5px solid color-mix(in srgb, var(--tx1) 30%, transparent);outline-offset:3px;}
-.set-flag{position:absolute;top:6px;right:6px;z-index:2;display:inline-flex;align-items:center;justify-content:center;height:20px;padding:0 var(--space-6px);border-radius:var(--r-pill);font-size:10px;background:var(--surface);border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,0.15);}
+.set-flag{position:absolute;top:6px;right:6px;z-index:2;display:inline-flex;align-items:center;justify-content:center;height:20px;padding:0 var(--space-6px);border-radius:var(--r-pill);font-size:11px;background:var(--surface);border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,0.15);}
 /* Carte réserve : le 🔄 occupe déjà le coin — le 🏁 glisse dessous */
 .replacement-icon ~ .set-flag{top:32px;}
 /* Fiche carte : même badge sur le visuel + liseré inset neutre (le
@@ -901,17 +901,17 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 
 /* Card body */
 .card-body{padding:var(--space-10px) var(--space-3) var(--space-10px);position:relative;z-index:1;flex:1 0 auto;}
-.card-num{font-family:var(--font-d);font-weight:700;font-size:10px;letter-spacing:0.5px;color:var(--tx1);margin-bottom:2px;}
+.card-num{font-family:var(--font-d);font-weight:700;font-size:11px;letter-spacing:0.5px;color:var(--tx1);margin-bottom:2px;}
 .card-name{font-family:var(--font-d);font-weight:700;font-size:13px;line-height:1.2;margin-bottom:2px;}
-.card-year{font-family:var(--font-d);font-weight:600;font-size:9px;color:var(--tx1);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.5px;}
-.card-team{font-size:10px;color:var(--tx1);margin-bottom:var(--space-1);line-height:1.3;}
-.card-rarity{display:inline-flex;align-items:center;gap:3px;padding:2px var(--space-2);border-radius:6px;font-size:10px;font-weight:600;}
+.card-year{font-family:var(--font-d);font-weight:600;font-size:11px;color:var(--tx1);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.5px;}
+.card-team{font-size:11px;color:var(--tx1);margin-bottom:var(--space-1);line-height:1.3;}
+.card-rarity{display:inline-flex;align-items:center;gap:3px;padding:2px var(--space-2);border-radius:6px;font-size:11px;font-weight:600;}
 .card-rarity-row{display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-1);}
 .card-rarity-row .status-chips{display:flex;gap:3px;}
 
 /* Owned summary */
 .card-owned-summary{display:flex;flex-wrap:wrap;gap:var(--space-1);margin-top:var(--space-1);margin-bottom:var(--space-1);}
-.owned-tag{font-size:10px;padding:2px var(--space-2);border-radius:6px;background:var(--surface2);color:var(--tx2);font-weight:500;display:flex;align-items:center;gap:3px;}
+.owned-tag{font-size:11px;padding:2px var(--space-2);border-radius:6px;background:var(--surface2);color:var(--tx2);font-weight:500;display:flex;align-items:center;gap:3px;}
 .owned-tag.blue{background:#E3EEF9;color:#1a3a6b;}
 .owned-tag.green{background:#E3F5E9;color:#0d4a1f;}
 .owned-tag.red{background:#FFE8EC;color:#cc0000;}
@@ -1007,7 +1007,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .mo-desc{font-size:13px;line-height:1.6;color:var(--tx2);padding:var(--space-3);background:var(--surface2);border-radius:var(--r-md);margin-bottom:var(--space-4);}
 .mo-info-row{display:flex;gap:var(--space-2);margin-bottom:var(--space-4);flex-wrap:wrap;}
 .mib{flex:1;min-width:100px;padding:var(--space-3);background:var(--surface2);border-radius:var(--r-md);}
-.mib-l{font-size:10px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:var(--space-1);}
+.mib-l{font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--tx3);margin-bottom:var(--space-1);}
 .mib-v{font-family:var(--font-d);font-weight:700;font-size:15px;}
 
 /* MODAL — exemplaires par type (grid 4 colonnes) */
@@ -1029,13 +1029,13 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .mo-type-cell.has-qty{border-color:rgba(52,199,89,0.3);background:rgba(52,199,89,0.06);}
 [data-theme="dark"] .mo-type-cell.has-qty{background:rgba(52,199,89,0.1);}
 .mo-type-cell .mo-cell-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.mo-type-cell .mo-cell-label{font-size:9px;font-weight:600;text-align:center;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.mo-type-cell .mo-cell-label{font-size:11px;font-weight:600;text-align:center;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
 .mo-type-cell .mo-qty-wrap{display:flex;align-items:center;gap:1px;background:var(--surface);border-radius:8px;padding:1px;border:1px solid var(--border);}
 .mo-type-cell .mqbtn{width:22px;height:22px;border-radius:6px;border:none;background:transparent;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--ease);font-family:var(--font-d);font-weight:700;color:var(--tx2);}
 .mo-type-cell .mqbtn:hover{background:var(--red-s);color:var(--red);}
 .mo-type-cell .mqbtn:active{transform:scale(0.9);}
 .mo-type-cell .mqval{font-family:var(--font-d);font-weight:800;font-size:13px;min-width:20px;text-align:center;color:var(--tx1);}
-.mo-grid-row-label{grid-column:1/-1;font-size:9px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--tx3);margin-top:var(--space-1);padding:0 2px;}
+.mo-grid-row-label{grid-column:1/-1;font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:var(--tx3);margin-top:var(--space-1);padding:0 2px;}
 .mo-type-cell.empty{visibility:hidden;}
 
 /* BG */
@@ -1065,7 +1065,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   display:flex;align-items:center;justify-content:center;transition:transform 0.1s ease,border-color 0.1s ease;}
 .qadd-type:hover{transform:scale(1.08);border-color:var(--green);}
 .qadd-qty{position:absolute;top:-5px;right:-5px;min-width:14px;height:14px;padding:0 3px;border-radius:7px;
-  background:var(--green);color:#fff;font-size:9px;font-weight:700;
+  background:var(--green);color:#fff;font-size:11px;font-weight:700;
   display:flex;align-items:center;justify-content:center;}
 
 @media(max-width:900px){.app{grid-template-columns:1fr;}}
@@ -1082,7 +1082,11 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .bh-fg{stroke:var(--red);stroke-linecap:round;}
 .bh-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-d);}
 .bh-num b{font-size:22px;line-height:1;color:var(--tx1);}
-.bh-num span{font-size:10px;color:var(--tx3);margin-top:2px;}
+/* 10 → 11 px : le « / 120 » est le dénominateur du compteur de badges,
+   donc une information. L'anneau qui l'entoure fait 86 px et ne bouge
+   pas ; la pile interne passe de 36,5 à 38 px, le libellé de 24,1 à
+   26,5 px de large. Aucun débordement, aucun décalage. */
+.bh-num span{font-size:11px;color:var(--tx3);margin-top:2px;}
 .bh-right{flex:1;min-width:0;}
 .bh-row .user-title-wrap{background:none;border:none;padding:0;margin:0;flex-wrap:wrap;}
 .bh-hardest{font-size:11px;color:var(--tx3);margin-top:var(--space-1);}
@@ -1091,7 +1095,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .bn-next{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border-s);border-radius:var(--r-md);padding:var(--space-3) var(--space-14px);display:flex;align-items:center;gap:var(--space-3);cursor:pointer;}
 .bn-med{width:44px;height:44px;flex:none;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:22px;}
 .bn-body{flex:1;min-width:0;}
-.bn-k{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--red);}
+.bn-k{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--red);}
 .bn-n{font-weight:700;font-size:14px;margin:1px 0 5px;font-family:var(--font-d);color:var(--tx1);}
 .bn-bar{height:5px;border-radius:3px;background:var(--surface3);overflow:hidden;}
 .bn-bar i{display:block;height:100%;border-radius:3px;background:var(--red);}
@@ -1124,7 +1128,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .bl-rung.done .bl-dot{border-color:var(--green);background:var(--green-s);}
 .bl-rung.cur .bl-dot{border-color:var(--red);box-shadow:0 0 0 4px var(--red-glow);}
 .bl-rung.lock .bl-dot{filter:grayscale(1);opacity:0.45;}
-.bl-lbl{font-size:9px;color:var(--tx3);font-variant-numeric:tabular-nums;}
+.bl-lbl{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums;}
 .bl-rung.done .bl-lbl{color:var(--green);}
 .bl-rung.cur .bl-lbl{color:var(--tx1);font-weight:700;}
 /* tuiles */
@@ -1132,17 +1136,23 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .badge-tile{--p:0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;position:relative;padding:4px 0;border-radius:12px;}
 .bt-med{width:52px;height:52px;border-radius:50%;background:var(--surface2);border:2px solid var(--border-s);display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;transition:transform 0.15s ease;}
 .badge-tile:hover .bt-med{transform:translateY(-2px);}
-.bt-name{font-size:9.5px;font-weight:600;color:var(--tx2);text-align:center;line-height:1.15;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.bt-name{font-size:12px;font-weight:600;color:var(--tx2);text-align:center;line-height:1.15;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
 .badge-tile.un .bt-med{border-color:var(--fam);background:color-mix(in srgb,var(--fam) 14%,var(--surface2));}
 .badge-tile.un .bt-name{color:var(--tx1);}
 .badge-tile.prog .bt-med{border:none;background-image:conic-gradient(var(--fam) calc(var(--p)*1%),var(--surface3) 0);}
 .badge-tile.prog .bt-med::before{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--surface2);}
 .badge-tile.prog .bt-med span{position:relative;}
 .badge-tile.prog .bt-name{margin-top:9px;}
-.bt-pp{position:absolute;top:44px;left:50%;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--border-s);color:var(--tx2);font-size:8px;font-weight:700;padding:1px 5px;border-radius:8px;font-variant-numeric:tabular-nums;z-index:2;}
+.bt-pp{position:absolute;top:44px;left:50%;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--border-s);color:var(--tx2);font-size:11px;font-weight:700;padding:1px 5px;border-radius:8px;font-variant-numeric:tabular-nums;z-index:2;}
+/* .bt-pp est passé de 8 à 11 px comme le reste du plancher. Elle porte
+   une INFORMATION (« 8/25 » — l'avancement du badge), pas une décoration.
+   Coût mesuré à 320 px : la pastille passe de 35,8 à 44,8 px de large sur
+   une tuile de 88,7 (elle reste dedans), et l'écart avec le nom du badge
+   tombe de 11 à 6 px. Zéro décalage : elle est en position:absolute, la
+   hauteur de tuile ne bouge pas. */
 .badge-tile.lock .bt-med{filter:grayscale(1);opacity:0.4;}
 .badge-tile.lock .bt-name{color:var(--tx3);opacity:0.75;}
-.bt-chk{position:absolute;top:0;right:calc(50% - 30px);width:16px;height:16px;border-radius:50%;background:var(--green);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);z-index:2;}
+.bt-chk{position:absolute;top:0;right:calc(50% - 30px);width:16px;height:16px;border-radius:50%;background:var(--green);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);z-index:2;}
 .badge-tile:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
 /* Éternel : champ_all porte l'identité or existante */
 .badge-tile.eternal .bt-med{border:2px solid transparent;background:linear-gradient(var(--surface2),var(--surface2)) padding-box,linear-gradient(120deg,var(--surface3),var(--gold),var(--surface3)) border-box;}
@@ -1158,7 +1168,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .bd-bar i{display:block;height:100%;background:var(--fam,var(--red));}
 .bd-sub{font-size:11px;color:var(--tx3);margin-bottom:var(--space-2);}
 .bd-chips{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:var(--space-2);}
-.bd-chip{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:10px;color:var(--tx2);}
+.bd-chip{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;font-size:11px;color:var(--tx2);}
 .bd-chip.miss{opacity:0.55;text-decoration:line-through;}
 .bd-actions{display:flex;gap:var(--space-2);}
 .bd-btn{background:var(--surface2);border:1px solid var(--border-s);border-radius:var(--r-pill);padding:7px 16px;font-family:var(--font-b);font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;transition:var(--ease);}
@@ -1179,7 +1189,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .badge-toast{position:fixed;left:50%;transform:translate(-50%,16px);bottom:calc(var(--nav-clear) + 6px);z-index:300;display:flex;align-items:center;gap:var(--space-10px);background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-md);padding:var(--space-10px) var(--space-4);box-shadow:var(--sh-lg);opacity:0;pointer-events:none;transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.22,0.9,0.36,1);cursor:pointer;}
 .badge-toast.show{opacity:1;transform:translate(-50%,0);pointer-events:all;}
 .bgt-med{width:36px;height:36px;border-radius:50%;background:var(--red-s);display:flex;align-items:center;justify-content:center;font-size:18px;}
-.bgt-k{font-size:9px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);}
+.bgt-k{font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);}
 .bgt-n{font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--tx1);}
 @media (prefers-reduced-motion: reduce){
   .badge-tile.just-unlocked .bt-med,.badge-particle{animation:none;}
@@ -1249,7 +1259,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .bn-tab.active .bn-icon{opacity:0;transform:translateY(-8px);} /* l'icône vit dans la pastille */
 .bn-label{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:10.5px;font-weight:700;line-height:1;white-space:nowrap;
+  font-size:11px;font-weight:700;line-height:1;white-space:nowrap;
   color:var(--red);text-shadow:0 1px 3px var(--surface),0 0 8px var(--surface);
   opacity:0;transform:translateY(3px);
   transition:opacity 0.2s ease, transform 0.2s ease;pointer-events:none;
@@ -1376,11 +1386,21 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sv-feat{display:flex;flex-direction:column;flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh-sm);overflow:hidden;}
 .sv-feat-item{padding:var(--space-3) var(--space-14px);}
 .sv-feat-item + .sv-feat-item{border-top:1px solid var(--border);}
-.sv-feat-label{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--tx3);margin-bottom:var(--space-6px);}
+.sv-feat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--tx3);margin-bottom:var(--space-6px);}
 .sv-feat-name{font-weight:700;font-size:13px;color:var(--tx1);}
 .sv-feat-sub{font-size:12px;font-weight:600;margin-top:var(--space-1);color:var(--tx2);}
 .sv-donut-row{display:flex;align-items:center;gap:var(--space-5);flex-wrap:wrap;flex:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:var(--space-14px);box-shadow:var(--sh-sm);}
-.sv-donut{width:140px;height:140px;flex-shrink:0;margin:0 auto;}
+.sv-donut{width:165px;height:165px;flex-shrink:0;margin:0 auto;}
+/* 165 et non 140 : le viewBox fait 120, donc le libellé interne de 8 px
+   est rendu à 8 × 165/120 = 11 px. On agrandit le DONUT, pas le texte —
+   grossir la police à l'intérieur d'un SVG déséquilibrerait le tracé.
+   DETTE CONNUE, laissée telle quelle : « cartes possédées » mesure
+   67,2 unités de viewBox pour un trou de 64 — le libellé mord donc
+   légèrement sur l'anneau. Le défaut est ANTÉRIEUR à l'agrandissement
+   (la mise à l'échelle conserve le rapport) ; il devient seulement plus
+   visible. Le corriger veut dire reformuler le libellé dans les 7
+   langues : c'est une décision de rédaction, pas un ajustement de CSS,
+   et elle ne se prend pas en fin de chantier typographique. */
 .sv-donut-big{font-size:22px;font-weight:800;fill:var(--tx1);font-family:var(--font-d);}
 .sv-donut-small{font-size:8px;fill:var(--tx3);}
 .sv-legend{display:flex;flex-direction:column;gap:var(--space-6px);flex:1;min-width:140px;}
@@ -1393,8 +1413,8 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sv-dot{fill:var(--red);}
 .sv-grid{stroke:var(--border);stroke-dasharray:4 4;}
 .sv-axis{stroke:var(--border);}
-.sv-axis-label{font-size:10px;fill:var(--tx3);font-family:var(--font-b);}
-.sv-note{font-size:10px;color:var(--tx3);margin:var(--space-6px) auto 0;max-width:800px;}
+.sv-axis-label{font-size:11px;fill:var(--tx3);font-family:var(--font-b);}
+.sv-note{font-size:11px;color:var(--tx3);margin:var(--space-6px) auto 0;max-width:800px;}
 
 /* BACKUP QR */
 .bk-qr-wrap{display:flex;flex-direction:column;align-items:center;gap:var(--space-2);padding:var(--space-3);background:var(--surface2);border:1px solid var(--border);border-radius:12px;}
@@ -1438,7 +1458,7 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sv-tool-cat{flex:none;font-size:14px;}
 .sv-tool-num{flex:none;font-variant-numeric:tabular-nums;color:var(--tx3);font-size:12px;min-width:38px;}
 .sv-tool-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.sv-tool-chip{flex:none;font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);}
+.sv-tool-chip{flex:none;font-size:11px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);}
 .sv-tool-wish{flex:none;font-size:13px;}
 .sv-tool-types{flex:none;display:inline-flex;gap:6px;font-size:12px;color:var(--tx2);}
 .sv-tool-type{white-space:nowrap;}
@@ -1593,15 +1613,15 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 }
 
 /* RETIRED BADGE */
-.retired-badge{display:inline-block;font-size:8px;font-weight:800;letter-spacing:0.5px;padding:1px var(--space-1);border-radius:4px;background:rgba(139,0,0,0.15);color:#8b0000;margin-left:var(--space-1);vertical-align:middle;text-transform:uppercase;font-family:var(--font-b);}
+.retired-badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:0.5px;padding:1px var(--space-1);border-radius:4px;background:rgba(139,0,0,0.15);color:#8b0000;margin-left:var(--space-1);vertical-align:middle;text-transform:uppercase;font-family:var(--font-b);}
 
 
 /* USER TITLE */
 .user-title-wrap{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-14px);border-radius:12px;background:var(--surface2);border:1px solid var(--border);margin-bottom:var(--space-1);}
 .user-title-icon{font-size:20px;}
 .user-title-text{font-family:var(--font-d);font-weight:800;font-size:14px;letter-spacing:-0.3px;}
-.user-title-sub{font-size:10px;color:var(--tx3);margin-left:auto;}
-.user-title-next{font-size:10px;color:var(--tx3);margin-top:2px;}
+.user-title-sub{font-size:11px;color:var(--tx3);margin-left:auto;}
+.user-title-next{font-size:11px;color:var(--tx3);margin-top:2px;}
 .title-picker{margin-top:var(--space-2);max-height:200px;overflow-y:auto;}
 .title-picker-grid{display:flex;flex-wrap:wrap;gap:var(--space-1);}
 .title-pick{display:flex;align-items:center;gap:var(--space-1);padding:var(--space-1) var(--space-2);border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:11px;font-weight:600;cursor:pointer;transition:var(--ease);}
@@ -1646,9 +1666,9 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .tut-rail i.now span{display:block;height:100%;background:var(--red);border-radius:var(--r-pill);}
 
 .tut-kicker{display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);}
-.tut-chapter{font-family:var(--font-d);font-weight:700;font-size:10px;letter-spacing:0.12em;
+.tut-chapter{font-family:var(--font-d);font-weight:700;font-size:11px;letter-spacing:0.12em;
   text-transform:uppercase;color:var(--red);}
-.tut-count{font-family:var(--font-d);font-weight:600;font-size:10px;color:var(--tx3);
+.tut-count{font-family:var(--font-d);font-weight:600;font-size:11px;color:var(--tx3);
   font-variant-numeric:tabular-nums;margin-left:auto;}
 .tut-title{font-family:var(--font-d);font-weight:800;font-size:17px;line-height:1.2;
   color:var(--tx1);margin:0 0 var(--space-1);}
@@ -1898,11 +1918,11 @@ button:not(:disabled, .bn-tab):active,
   border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);
   display:flex;flex-direction:column;pointer-events:none;
 }
-.sk-visual{height:150px;}
+.sk-visual{height:120px;}   /* = .card-visual, mesuré, pas approché */
 .sk-body{padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2);}
 .sk-line{height:10px;border-radius:var(--r-sm);}
 .sk-line.w40{width:40%;} .sk-line.w70{width:70%;} .sk-line.w55{width:55%;}
-.sk-chip{height:18px;width:96px;border-radius:var(--r-sm);margin-top:var(--space-1);}
+.sk-chip{height:26px;width:96px;border-radius:var(--r-sm);margin-top:var(--space-1);}
 .sk-visual,.sk-line,.sk-chip{
   background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 37%,var(--surface2) 63%);
   background-size:400% 100%;
@@ -2023,10 +2043,26 @@ button:not(:disabled, .bn-tab):active,
 .modal-visual .team-mono{font-size:52px;}
 .team-rule{width:44px;height:2.5px;border-radius:2px;background:#fff;opacity:.9;}
 .modal-visual .team-rule{width:70px;}
-.team-name{font-size:7.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;
+.team-name{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
   color:rgba(255,255,255,.82);text-align:center;line-height:1.25;max-width:94%;
   text-shadow:0 1px 6px rgba(0,0,0,.8);}
-.modal-visual .team-name{font-size:10px;}
+.modal-visual .team-name{font-size:13px;}
+
+/* Sur la TUILE seulement : le nom d'écurie est borné à 2 lignes et
+   l'emblème remonte, ce qui réserve le bas du visuel au bouton « + ».
+   Avant, les noms longs (Mercedes-AMG Petronas Formula One Team,
+   Aston Martin Aramco…) passaient DERRIÈRE le bouton : des glyphes
+   masqués, sans rien qui signale la coupe — ça se lit comme un bug de
+   rendu. Une ellipse, elle, dit « c'est tronqué ».
+   Limite assumée : -webkit-line-clamp coupe à la ligne, pas au mot
+   (« …FORMULA ON… »). Aucun réglage CSS ne déplace ce point ; le nom
+   complet reste lisible dans la fiche, à 13 px.
+   Le -18px n'est pas arrondi : à 320 px, avec -16, le bas du nom
+   tombait 1 px DANS le bouton. 18 dégage la boîte de ligne entière et
+   laisse encore 7 px de marge en haut du visuel. */
+.card-visual .team-name{display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden;max-width:100%;}
+.card-visual .team-emblem{transform:translateY(-18px);}
 
 /* ══════════════════════════════════════════════════════════
    v2.3 PHASE C ① — ZONES TACTILES ≥ 44 px
@@ -2138,7 +2174,7 @@ button:not(:disabled, .bn-tab):active,
 /* ── BADGES v3 (1.36.0) : famille Écuries + ligne de difficulté ── */
 .bf-ecuries{--fam:#6692FF;}
 .bd-diff{display:flex;align-items:center;gap:8px;margin:6px 0 2px;}
-.bd-diff-lb{font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;}
+.bd-diff-lb{font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:99px;}
 .dl-facile{background:var(--green-s);color:#1B7A3D;}
 .dl-modere{background:#FFF3D6;color:#946800;}
 .dl-difficile{background:var(--red-s);color:var(--red-ink,#C50026);}
@@ -2151,12 +2187,12 @@ button:not(:disabled, .bn-tab):active,
 .bd-diff-pct{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums;}
 
 /* indicateur de difficulté sur chaque tuile (1.37.0) */
-.bt-diff{font-size:8px;font-weight:800;letter-spacing:.03em;padding:1px 6px;border-radius:99px;margin-top:2px;}
+.bt-diff{font-size:11px;font-weight:800;letter-spacing:.03em;padding:1px 6px;border-radius:99px;margin-top:2px;}
 
 /* sélecteur de titre v3 : liste complète triée par difficulté */
 .title-picker{max-height:280px;}
 .title-pick{display:flex;align-items:center;gap:6px;min-height:30px;}
-.title-pick .tp-diff{margin-left:auto;font-size:8px;font-weight:800;padding:1px 6px;border-radius:99px;flex:none;}
+.title-pick .tp-diff{margin-left:auto;font-size:11px;font-weight:800;padding:1px 6px;border-radius:99px;flex:none;}
 .tp-locked{opacity:.45;filter:grayscale(.6);cursor:default;pointer-events:none;}
 
 /* ══ PHASE E — hint d'ajout rapide (1.39.0) ══ */

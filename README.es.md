@@ -221,7 +221,7 @@ npm test        # 651 tests, node --test, sin framework
 
 ## 🔩 Notas de ingeniería
 
-Cero dependencias en ejecución (solo esbuild, al compilar); cero desplazamiento de diseño, medido al píxel entre versiones; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado, las tres demos animadas grabadas a mano; 651 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
+Cero dependencias en ejecución (solo esbuild, al compilar); suelo tipográfico de 11 px verificado en 5 tipografías × 2 temas × 320/375/escritorio (una sola excepción, el « ÉLITE » del logotipo a 8 px, que es marca); desplazamiento de diseño medido en cada pasada visual sobre la rejilla entera — casi nulo, no nulo: el esqueleto coincide con la baldosa mediana con ±5 px en los extremos; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio, medición única no repetida en CI); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado, las tres demos animadas grabadas a mano; 651 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
 
 ---
 

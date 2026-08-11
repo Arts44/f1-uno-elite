@@ -221,7 +221,7 @@ npm test        # 651 Tests, node --test, ohne Framework
 
 ## 🔩 Engineering-Notizen
 
-Null Laufzeitabhängigkeiten (nur esbuild, beim Build); null Layoutverschiebung, pixelgenau zwischen Versionen gemessen; das schnelle Hinzufügen profiliert und optimiert (~300 ms → ~45 ms auf einem Mittelklasse-Handy); optionale lokale Verschlüsselung am PIN (PBKDF2 + AES-GCM); Zuschauermodus in der Logik verriegelt, nicht im CSS; Screenshots von einem deterministischen Skript im Repo regeneriert, die drei animierten Demos von Hand aufgezeichnet; 651 Tests in Vanilla-JS mit Nodes eingebautem Runner. Alle Details im [englischen README](README.md).
+Null Laufzeitabhängigkeiten (nur esbuild, beim Build); typografische Untergrenze von 11 px, geprüft über 5 Schriftthemen × 2 Farbthemen × 320/375/Desktop (eine einzige Ausnahme, das « ÉLITE » der Wortmarke mit 8 px, das ist Branding); Layoutverschiebung bei jedem visuellen Durchgang über das ganze Raster gemessen — fast null, nicht null: Das Skelett trifft die mittlere Kachel, an den Rändern mit ±5 px Abweichung; das schnelle Hinzufügen profiliert und optimiert (~300 ms → ~45 ms auf einem Mittelklasse-Handy, Einzelmessung, in der CI nicht wiederholt); optionale lokale Verschlüsselung am PIN (PBKDF2 + AES-GCM); Zuschauermodus in der Logik verriegelt, nicht im CSS; Screenshots von einem deterministischen Skript im Repo regeneriert, die drei animierten Demos von Hand aufgezeichnet; 651 Tests in Vanilla-JS mit Nodes eingebautem Runner. Alle Details im [englischen README](README.md).
 
 ---
 

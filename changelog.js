@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.50.0',
+    date: '2026-08-11',
+    changes: {
+      en: [
+        'Small text is bigger. Every informative label now sits at 11 px or above — checked across all five font themes, both colour themes, and from a 320 px phone to a desktop window.',
+        'Long team names on the collection tiles now end in « … » over two lines instead of sliding behind the + button. The complete name is still there when you open the card.',
+        'The rarity donut in Stats is larger, so the label inside it is finally legible.',
+      ],
+      fr: [
+        'Les petits textes sont plus grands. Tout libellé porteur d\'information est désormais à 11 px au minimum — vérifié sur les cinq thèmes de police, les deux thèmes de couleur, et d\'un téléphone de 320 px à une fenêtre d\'ordinateur.',
+        'Les noms d\'écurie longs sur les tuiles se terminent maintenant par « … » sur deux lignes au lieu de passer derrière le bouton +. Le nom complet reste visible en ouvrant la carte.',
+        'Le donut des raretés dans les Stats est plus grand : le libellé à l\'intérieur est enfin lisible.',
+      ],
+      es: [
+        'Los textos pequeños son más grandes. Toda etiqueta informativa está ahora a 11 px como mínimo — comprobado en los cinco temas de tipografía, los dos temas de color y desde un móvil de 320 px hasta una ventana de escritorio.',
+        'Los nombres de escudería largos en las casillas terminan ahora en « … » en dos líneas en vez de pasar por detrás del botón +. El nombre completo sigue estando al abrir la carta.',
+        'El donut de rarezas en Estadísticas es más grande: la etiqueta de dentro por fin se lee.',
+      ],
+      zh: [
+        '小号文字变大了。所有承载信息的标签现在至少为 11 px——已在五种字体主题、两种配色主题以及从 320 px 手机到桌面窗口的宽度下逐一核验。',
+        '卡片格子上过长的车队名现在以两行加「…」结尾，不再滑到 + 按钮后面。打开卡片仍可看到完整名称。',
+        '统计页的稀有度圆环图更大了，里面的标签终于看得清。',
+      ],
+      it: [
+        'I testi piccoli sono più grandi. Ogni etichetta informativa è ora ad almeno 11 px — verificato sui cinque temi tipografici, sui due temi di colore e da un telefono da 320 px a una finestra desktop.',
+        'I nomi di scuderia lunghi sulle tessere terminano ora con « … » su due righe invece di finire dietro il pulsante +. Il nome completo resta visibile aprendo la carta.',
+        'Il donut delle rarità nelle Statistiche è più grande: l\'etichetta al suo interno è finalmente leggibile.',
+      ],
+      nl: [
+        'Kleine tekst is groter. Elk informatief label staat nu op minstens 11 px — gecontroleerd op alle vijf lettertypethema\'s, beide kleurthema\'s, en van een telefoon van 320 px tot een bureaubladvenster.',
+        'Lange teamnamen op de tegels eindigen nu met « … » over twee regels in plaats van achter de +-knop te verdwijnen. De volledige naam staat er nog steeds als je de kaart opent.',
+        'De zeldzaamheidsdonut in Statistieken is groter, waardoor het label erin eindelijk leesbaar is.',
+      ],
+      de: [
+        'Kleine Texte sind größer. Jede informationstragende Beschriftung steht jetzt bei mindestens 11 px — geprüft über alle fünf Schriftthemen, beide Farbthemen und von einem 320-px-Telefon bis zum Desktop-Fenster.',
+        'Lange Teamnamen auf den Kacheln enden nun mit « … » über zwei Zeilen, statt hinter dem +-Knopf zu verschwinden. Der vollständige Name steht weiterhin beim Öffnen der Karte.',
+        'Der Seltenheits-Donut in den Statistiken ist größer, sodass die Beschriftung darin endlich lesbar ist.',
+      ],
+    },
+  },
+  {
     version: '1.49.2',
     date: '2026-08-09',
     changes: {

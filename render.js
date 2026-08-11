@@ -90,6 +90,7 @@ export function showGridSkeleton(count = 12){
           <div class="sk-line w40"></div>
           <div class="sk-line w70"></div>
           <div class="sk-line w55"></div>
+          <div class="sk-line w70"></div>
           <div class="sk-chip"></div>
         </div>
       </div>`).join('');
