@@ -292,8 +292,15 @@ export async function signOut(){
    utilisateur (claim `sub` du JWT si le profil n'a pas été résolu). ── */
 // Errors are thrown as Error(code) with code ∈
 // {'offline','not-signed-in','push-failed','pull-failed','no-data','bad-data'}
+// LA question « le navigateur se sait-il hors ligne ? », posée une fois.
+// Deux façons de s'en servir, parce que les contrats diffèrent : les
+// actions déclenchées par l'utilisateur LÈVENT un code typé (il faut le
+// lui dire), la lecture d'arrière-plan RENVOIE null (rien à annoncer).
+export function isOffline(){
+  return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
 export function _requireOnline(){
-  if(typeof navigator !== 'undefined' && navigator.onLine === false) throw new Error('offline');
+  if(isOffline()) throw new Error('offline');
 }
 export async function _requireSession(){
   const session = await getValidSession();

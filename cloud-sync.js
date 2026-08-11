@@ -26,7 +26,10 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { cloudConfig, isCloudConfigured, authHeaders, cloudFetch, logFailure } from './cloud-http.js';
-import { loadSession, clearSession, getValidSession, _requireOnline, _requireSession } from './cloud-auth.js';
+import {
+  loadSession, clearSession, getValidSession,
+  isOffline, _requireOnline, _requireSession,
+} from './cloud-auth.js';
 import { deniedForViewer } from './session.js';
 import { collectionSnapshot, _showImportDialog } from './storage.js';
 import { backupIncludes } from './settings-sync.js';
@@ -142,6 +145,12 @@ export async function cloudDeleteAll(){
 export async function fetchCloudMeta(){
   const cfg = cloudConfig();
   if(!cfg) return null;
+  // Hors ligne : on ne tente RIEN. Cette fonction était la seule des cinq
+  // à ne pas poser la question — elle lançait donc une requête vouée à
+  // échouer chaque fois qu'on ouvrait le Compte sans connexion.
+  // Elle RENVOIE null au lieu de lever : son contrat est « une date ou
+  // rien », et l'appelant (_fillLastBackup) n'affiche pas d'erreur.
+  if(isOffline()) return null;
   const session = await getValidSession();
   if(!session) return null;
   try {

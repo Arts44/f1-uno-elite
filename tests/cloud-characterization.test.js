@@ -431,17 +431,23 @@ describe('D · push et pull depuis les Réglages', () => {
     assert.notEqual(txt('cloudLastBackup'), '…');
   });
 
-  test('hors-ligne, la ligne « dernière sauvegarde » INTERROGE quand même le réseau', async () => {
-    // Observé, pas jugé : `_requireOnline()` garde push, pull, le
-    // changement d'e-mail et la suppression — mais PAS fetchCloudMeta().
-    // Ouvrir les Réglages hors connexion déclenche donc une requête qui
-    // échouera. Sans conséquence visible (la ligne retombe sur « jamais »),
-    // mais c'est une asymétrie réelle. À traiter hors de ce chantier.
+  test('hors-ligne, la ligne « dernière sauvegarde » ne tente RIEN', async () => {
+    // ── TEST RÉÉCRIT SCIEMMENT, le comportement a changé ──
+    // La version de caractérisation figeait l'inverse : fetchCloudMeta()
+    // était la seule des cinq fonctions réseau à ne pas poser la question
+    // « suis-je hors ligne ? », et lançait donc une requête vouée à
+    // échouer chaque fois qu'on ouvrait le Compte sans connexion.
+    // C'était une ASYMÉTRIE, pas une décision : rien ne la justifiait, et
+    // aucun autre comportement n'en dépendait (la ligne retombait déjà
+    // sur « jamais »). L'ancienne assertion — « INTERROGE quand même le
+    // réseau » — est remplacée, pas ajustée.
     globalThis.navigator.onLine = false;
     route('select=updated_at', resp(200, [{ updated_at: '2026-01-02T03:04:05Z' }]));
     open();
     await settle();
-    assert.equal(calls.filter(c => c.url.includes('select=updated_at')).length, 1);
+    assert.equal(calls.filter(c => c.url.includes('select=updated_at')).length, 0);
+    assert.equal(txt('cloudLastBackup'), 'cloud.never',
+      'la ligne affiche « jamais » — comme avant, mais sans requête inutile');
   });
 
   test('métadonnée illisible : la ligne retombe sur « jamais », sans erreur', async () => {
