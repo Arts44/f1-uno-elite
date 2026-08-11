@@ -13,19 +13,14 @@
    the Supabase origin, so no API response is ever served from cache.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
-import { cloudConfig, isCloudConfigured, authHeaders, cloudFetch, logFailure } from './cloud-http.js';
+import { isCloudConfigured } from './cloud-http.js';
 import {
-  loadSession, clearSession, getValidSession,
-  isValidOtpFormat, sendCooldownRemaining, sendMagicLink, verifyOtpCode,
-  signOut, requestEmailChange, _requireOnline, _requireSession,
+  loadSession, sendCooldownRemaining, isValidOtpFormat,
+  sendMagicLink, verifyOtpCode, signOut, requestEmailChange,
 } from './cloud-auth.js';
-import { deniedForViewer } from './session.js';
+import { pushCollection, pullCollection, fetchCloudMeta } from './cloud-sync.js';
 import { t, escapeHtml, setSafeHTML } from './i18n.js';
-import { collectionSnapshot, _showImportDialog } from './storage.js';
-import { backupIncludes } from './settings-sync.js';
 import { icon } from './icons.js';
-import { markBackupDone } from './backup.js';
-import { _currentSeason } from './data.js';
 import { createSegmentedInput } from './otp-input.js';
 
 /* ── Baril de transition (pas 5 le supprimera) ──
@@ -44,122 +39,10 @@ export {
   SEND_COOLDOWN_MS, sendCooldownRemaining,
   getValidSession, handleAuthRedirect, signOut, requestEmailChange,
 } from './cloud-auth.js';
-
-// PostgREST upsert body for one (user, season) row. Pure for tests.
-// updated_at is intentionally absent: the server trigger owns it.
-export function buildUpsertRow(userId, season, snapshot){
-  return { user_id: userId, season, data: snapshot };
-}
-
-// Upsert the current season's snapshot. Returns the server updated_at.
-export async function pushCollection(){
-  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
-  const cfg = cloudConfig();
-  if(!cfg) throw new Error('not-signed-in');
-  _requireOnline();
-  const { session, userId } = await _requireSession();
-  const row = buildUpsertRow(userId, _currentSeason, collectionSnapshot(backupIncludes()));
-  const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?on_conflict=user_id,season`, {
-    method: 'POST',
-    cache: 'no-store',
-    headers: {
-      ...authHeaders(cfg, session.access_token),
-      'Prefer': 'resolution=merge-duplicates,return=representation',
-    },
-    body: JSON.stringify([row]),
-  });
-  if(resp.status === 401 || resp.status === 403){
-    // token révoqué côté serveur : session morte — purge + message typé
-    clearSession();
-    throw new Error('not-signed-in');
-  }
-  if(!resp.ok){
-    await logFailure('cloud: push failed', resp);
-    throw new Error('push-failed');
-  }
-  const rows = await resp.json().catch(() => null);
-  const updatedAt = rows && rows[0] && rows[0].updated_at;
-  // A successful cloud push IS a backup: reset the local backup reminder.
-  try { markBackupDone(); } catch(e){}
-  log('cloud: pushed season', _currentSeason, 'updated_at', updatedAt);
-  return updatedAt || null;
-}
-
-// Fetch the cloud snapshot for the current season and hand it to the
-// EXISTING import dialog (merge / replace / cancel) — the local
-// collection is never overwritten silently.
-export async function pullCollection(){
-  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
-  const cfg = cloudConfig();
-  if(!cfg) throw new Error('not-signed-in');
-  _requireOnline();
-  const { session } = await _requireSession();
-  const resp = await cloudFetch(
-    `${cfg.url}/rest/v1/collections?season=eq.${_currentSeason}&select=data,updated_at`, {
-    cache: 'no-store',
-    headers: authHeaders(cfg, session.access_token),
-  });
-  if(resp.status === 401 || resp.status === 403){
-    // token révoqué côté serveur : session morte — purge + message typé
-    clearSession();
-    throw new Error('not-signed-in');
-  }
-  if(!resp.ok){
-    await logFailure('cloud: pull failed', resp);
-    throw new Error('pull-failed');
-  }
-  const rows = await resp.json().catch(() => null);
-  if(!Array.isArray(rows)) throw new Error('bad-data');
-  if(rows.length === 0) throw new Error('no-data');
-  const snapshot = rows[0].data;
-  if(!snapshot || typeof snapshot !== 'object' || !snapshot.owned) throw new Error('bad-data');
-  _showImportDialog(snapshot); // merge / replace / cancel — user decides
-  return rows[0].updated_at || null;
-}
-
-// True when a session exists locally (used by the Account view to gate
-// cloud-scoped actions; token freshness is re-checked by the actions).
-export function isCloudSignedIn(){
-  return isCloudConfigured() && !!loadSession();
-}
-
-// Danger zone: delete EVERY season row of the signed-in user (RLS keeps
-// this scoped to their own rows server-side).
-export async function cloudDeleteAll(){
-  if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
-  const cfg = cloudConfig();
-  if(!cfg) throw new Error('not-signed-in');
-  _requireOnline();
-  const { session, userId } = await _requireSession();
-  const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?user_id=eq.${userId}`, {
-    method: 'DELETE',
-    cache: 'no-store',
-    headers: authHeaders(cfg, session.access_token),
-  });
-  if(!resp.ok){
-    await logFailure('cloud: delete failed', resp);
-    throw new Error('delete-failed');
-  }
-  return true;
-}
-
-// Lightweight metadata read for the "last cloud backup" line.
-export async function fetchCloudMeta(){
-  const cfg = cloudConfig();
-  if(!cfg) return null;
-  const session = await getValidSession();
-  if(!session) return null;
-  try {
-    const resp = await cloudFetch(
-      `${cfg.url}/rest/v1/collections?season=eq.${_currentSeason}&select=updated_at`, {
-      cache: 'no-store',
-      headers: authHeaders(cfg, session.access_token),
-    });
-    if(!resp.ok) return null;
-    const rows = await resp.json();
-    return (Array.isArray(rows) && rows[0] && rows[0].updated_at) || null;
-  } catch(e){ return null; }
-}
+export {
+  buildUpsertRow, pushCollection, pullCollection,
+  isCloudSignedIn, cloudDeleteAll, fetchCloudMeta,
+} from './cloud-sync.js';
 
 /* ══════════════════════════════════════════════════════════
    SETTINGS UI (rendered by pin.js renderSettings)

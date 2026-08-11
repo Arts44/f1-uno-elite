@@ -52,6 +52,7 @@ const SHELL_ASSETS = [
   'cloud.js',
   'cloud-http.js',
   'cloud-auth.js',
+  'cloud-sync.js',
   'settings-sync.js',
   'update.js',
   'changelog.js',
