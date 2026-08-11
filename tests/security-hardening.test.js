@@ -129,7 +129,7 @@ describe('provenance — toute donnée externe est échappée', () => {
   test('les quatre sites à donnée externe sont couverts', () => {
     // Recensés par balayage de tous les innerHTML des modules livrés.
     assert.match(read('storage.js'), /tEsc\('imp\.sub'/);        // import JSON / #backup=
-    assert.match(read('cloud.js'), /escapeHtml\(email\)/);        // session cloud
+    assert.match(read('cloud-ui.js'), /escapeHtml\(email\)/);     // session cloud
     assert.match(read('feedback.js'), /escapeHtml\(r\.message\)/); // retours serveur
     // badges.js : `active.name` EST toujours interpolé, et c'est correct
     // depuis le correctif — `active` ne peut plus venir que de
@@ -191,7 +191,8 @@ describe('tutoriel 1.47.0 — rien d’externe ne transite par la bulle', () => 
    à la place du pattern qu'on a fait taire.
    ══════════════════════════════════════════════════════════ */
 describe('aléa — Math.random() ne doit jamais toucher la sécurité', () => {
-  const SENSIBLES = ['secure-store.js', 'pin.js', 'cloud.js', 'backup.js'];
+  const SENSIBLES = ['secure-store.js', 'pin.js', 'backup.js',
+    'cloud-http.js', 'cloud-auth.js', 'cloud-sync.js', 'cloud-ui.js'];
 
   test('aucun Math.random() dans les modules sensibles', () => {
     for(const f of SENSIBLES){

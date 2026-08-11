@@ -51,11 +51,13 @@ describe('segSanitize — chiffres seuls, tronqués à la longueur', () => {
 });
 
 describe('contrats de la refonte (niveau source)', () => {
-  test('cloud.js consomme le composant — plus de rendu OTP artisanal', () => {
-    const src = read('cloud.js');
+  test('l’UI cloud consomme le composant — plus de rendu OTP artisanal', () => {
+    // Le contrat a suivi cloud.js → cloud-ui.js lors du découpage :
+    // c'est la couche d'interface qui monte le composant.
+    const src = read('cloud-ui.js');
     assert.match(src, /createSegmentedInput/);
     assert.equal(/otp-box/.test(src), false,
-      'le markup des cases appartient au composant, pas à cloud.js');
+      'le markup des cases appartient au composant, pas à cloud-ui.js');
   });
 
   test('l’accent actif est celui de la marque, plus le bleu', () => {
