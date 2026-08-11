@@ -28,7 +28,7 @@ import {
 import { maybeHandleBackupHash } from './backup.js';
 import { isTutorialSeen, markTutorialSeen } from './tutorial.js';
 import { initInstall, maybeShowInstallBanner } from './install.js';
-import { handleAuthRedirect } from './cloud.js';
+import { handleAuthRedirect } from './cloud-auth.js';
 import { initUpdateFlow, maybeOfferWhatsNew } from './update.js';
 
 // Magic-link return: if the URL carries a GoTrue #access_token fragment,

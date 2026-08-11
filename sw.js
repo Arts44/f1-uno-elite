@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v113';
+const SW_VERSION = 'v114';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -49,7 +49,6 @@ const SHELL_ASSETS = [
   'tutorial.js',
   'collector.js',
   'install.js',
-  'cloud.js',
   'cloud-http.js',
   'cloud-auth.js',
   'cloud-sync.js',

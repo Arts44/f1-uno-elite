@@ -32,7 +32,8 @@ const isAllowed = url => ALLOWED.some(a => url.includes(a));
 const SHIPPED = [
   'index.html', 'index-dev.html', 'styles.css', 'manifest.webmanifest',
   'app.js', 'render.js', 'pin.js', 'data.js', 'storage.js', 'badges.js',
-  'stats.js', 'account.js', 'cloud.js', 'otp-input.js', 'tutorial.js',
+  'stats.js', 'account.js', 'otp-input.js', 'tutorial.js',
+  'cloud-http.js', 'cloud-auth.js', 'cloud-sync.js', 'cloud-ui.js',
   'install.js', 'update.js', 'backup.js', 'sw.js', 'data-embedded.js',
 ];
 

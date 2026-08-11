@@ -7,7 +7,8 @@ import './_setup.js';
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
-import { pushCollection, pullCollection, loadSession, saveSession, getValidSession } from '../cloud.js';
+import { pushCollection, pullCollection } from '../cloud-sync.js';
+import { loadSession, saveSession, getValidSession } from '../cloud-auth.js';
 
 const CFG = { url: 'https://demo.supabase.co', anonKey: 'anon-key' };
 const FUTURE = Math.floor(Date.now() / 1000) + 3600;

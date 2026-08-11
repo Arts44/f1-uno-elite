@@ -7,7 +7,7 @@ import {
   validateFeedbackMessage, buildFeedbackPayload, feedbackCooldownRemaining,
   sendFeedback, fetchMyFeedback,
 } from '../feedback.js';
-import { SESSION_KEY } from '../cloud.js';
+import { SESSION_KEY } from '../cloud-auth.js';
 import { APP_VERSION } from '../changelog.js';
 
 // A decodable JWT (header.payload.sig) whose sub is auth.uid()

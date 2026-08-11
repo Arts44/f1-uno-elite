@@ -104,7 +104,7 @@ describe('registres de clés — périmètres', () => {
 describe('inventaire localStorage — aucune clé hors registre', () => {
   const SOURCES = [
     'storage.js', 'badges.js', 'history.js', 'backup.js', 'pin.js',
-    'tutorial.js', 'settings-sync.js', 'secure-store.js', 'cloud.js',
+    'tutorial.js', 'settings-sync.js', 'secure-store.js', 'cloud-auth.js',
     'install.js', 'update.js', 'session.js', 'i18n.js', 'data.js',
     'render.js', 'stats.js', 'app.js', 'feedback.js',
   ];

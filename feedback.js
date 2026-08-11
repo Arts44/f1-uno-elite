@@ -16,10 +16,15 @@ import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
 import { t, escapeHtml, setSafeHTML } from './i18n.js';
 import { APP_VERSION } from './changelog.js';
+// feedback.js n'a rien à voir avec la synchronisation d'une collection :
+// il envoie un retour utilisateur. Il importait pourtant cloud.js — 726
+// lignes traînant storage, backup, data, settings-sync, icons, otp-input
+// et le DOM — pour six fonctions d'authentification et de transport.
+// C'est ce consommateur-là qui a motivé le découpage.
+import { cloudConfig, isCloudConfigured, authHeaders } from './cloud-http.js';
 import {
-  cloudConfig, isCloudConfigured, authHeaders, getValidSession,
-  loadSession, decodeJwtSub, sendCooldownRemaining,
-} from './cloud.js';
+  getValidSession, loadSession, decodeJwtSub, sendCooldownRemaining,
+} from './cloud-auth.js';
 
 export const FEEDBACK_MIN = 3;      // mirrors the SQL check constraint
 export const FEEDBACK_MAX = 1000;   // mirrors the SQL check constraint

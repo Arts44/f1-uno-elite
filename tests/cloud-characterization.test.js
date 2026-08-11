@@ -23,7 +23,16 @@ import { resetStorage } from './_setup.js';
 import { installDom, resetDom, mount } from './_dom.js';
 
 installDom();
-const cloud = await import('../cloud.js');
+// Les modules sont importés dynamiquement APRÈS installDom() : leurs
+// dépendances lisent `document` au chargement. `cloud` agrège les
+// quatre couches pour que les tests restent écrits en termes de
+// comportement, pas d'arborescence de fichiers.
+const cloud = {
+  ...await import('../cloud-http.js'),
+  ...await import('../cloud-auth.js'),
+  ...await import('../cloud-sync.js'),
+  ...await import('../cloud-ui.js'),
+};
 const {
   cloudSectionHTML, bindCloudSection, classifyOtpError,
   getValidSession, saveSession, loadSession, clearSession,

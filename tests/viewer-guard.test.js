@@ -62,7 +62,8 @@ describe('confirmations : aucune dépendance à confirm() natif', () => {
   const stripComments = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
   test('aucun confirm() natif dans les modules de l’app', () => {
-    for (const f of ['pin.js', 'render.js', 'app.js', 'account.js', 'storage.js', 'cloud.js', 'backup.js']) {
+    for (const f of ['pin.js', 'render.js', 'app.js', 'account.js', 'storage.js', 'backup.js',
+      'cloud-auth.js', 'cloud-sync.js', 'cloud-ui.js']) {
       const code = stripComments(read(f)).replace(/confirmDialog\s*\(/g, 'X(');
       assert.equal(/(^|[^.\w])confirm\s*\(/m.test(code), false,
         `${f} utilise confirm() natif — passer par confirmDialog()`);

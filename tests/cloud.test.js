@@ -4,13 +4,14 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import {
-  parseSessionFromHash, isSessionExpired, authHeaders,
+  parseSessionFromHash, isSessionExpired,
   loadSession, saveSession, clearSession, SESSION_KEY,
-  cloudConfig, isCloudConfigured,
-  decodeJwtSub, buildUpsertRow,
+  decodeJwtSub,
   verifyOtpCode, sendCooldownRemaining, SEND_COOLDOWN_MS,
   normalizeOtpInput, isValidOtpFormat, classifyOtpError,
-} from '../cloud.js';
+} from '../cloud-auth.js';
+import { cloudConfig, isCloudConfigured, authHeaders } from '../cloud-http.js';
+import { buildUpsertRow } from '../cloud-sync.js';
 
 const CFG = { url: 'https://proj.supabase.co', anonKey: 'anon-key-123' };
 
