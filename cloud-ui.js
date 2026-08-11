@@ -26,12 +26,26 @@ import { t, escapeHtml, setSafeHTML } from './i18n.js';
 import { icon } from './icons.js';
 import { createSegmentedInput } from './otp-input.js';
 
-// État du cool-down d'envoi : il appartient à l'UI (c'est elle qui
-// bloque le bouton), et il descendra dans cloud-ui.js au pas 4.
-// `sendCooldownRemaining` reste pur, dans cloud-auth.js — feedback.js
-// l'utilise avec SON propre horodatage. Helper partagé, état local :
-// c'est déjà le motif du dépôt.
+// État du cool-down d'envoi : il appartient à l'UI, c'est elle qui bloque
+// le bouton. `sendCooldownRemaining` reste PUR, dans cloud-auth.js —
+// feedback.js l'utilise avec SON propre horodatage. Helper partagé, état
+// local à chaque consommateur : c'est déjà le motif du dépôt.
 let _lastOtpSentAt = 0;
+
+/* ── Remise à zéro du cool-down — pour les TESTS uniquement ──
+   L'état vit dans ce module et rien ne le rendait joignable de
+   l'extérieur. Conséquence concrète : les tests de caractérisation ont
+   dû piloter une horloge (remplacer Date.now, avancer un compteur entre
+   chaque cas) pour purger un compteur de 60 s qui survivait d'un test au
+   suivant. Beaucoup de machinerie pour une variable.
+
+   `at` permet aussi de POSITIONNER l'horodatage — un test peut ainsi
+   vérifier la fin du décompte sans toucher au temps :
+       _resetCooldown(Date.now() - SEND_COOLDOWN_MS - 1000)
+
+   Rien en production n'appelle cette fonction : le cool-down y est armé
+   par un envoi réussi ou par un 429, et par rien d'autre. ── */
+export function _resetCooldown(at = 0){ _lastOtpSentAt = at; }
 
 /* ── Factorisation n°4 : la règle de validation d'adresse ──
    Elle existait en deux copies (connexion et changement d'e-mail). Une

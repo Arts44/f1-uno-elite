@@ -48,12 +48,11 @@ const SESSION = () => ({
   expires_at: nowSec() + 3600, user: { id: 'u1', email: 'a@b.c' },
 });
 
-// Une horloge que les tests avancent : le cool-down d'envoi est un état
-// de MODULE (`_lastOtpSentAt`), non réinitialisable de l'extérieur.
-// Avancer l'horloge de 61 s entre deux tests est le seul moyen de le
-// purger — et c'est en soi une caractéristique du module.
-let _clock = 1_700_000_000_000;
-const NOW = () => _clock;
+// Plus d'horloge pilotée : `_resetCooldown()` purge l'état de module
+// directement. La version précédente remplaçait Date.now et avançait un
+// compteur de 61 s entre chaque cas, pour joindre une variable que rien
+// n'exposait — beaucoup de machinerie autour d'un défaut de conception.
+const NOW = () => Date.now();
 
 const resp = (status, body) => ({
   ok: status >= 200 && status < 300, status,
@@ -90,9 +89,7 @@ beforeEach(() => {
   orig.clearTimeout = globalThis.clearTimeout;
   orig.setInterval = globalThis.setInterval;
   orig.clearInterval = globalThis.clearInterval;
-  orig.now = Date.now;
-
-  Date.now = NOW;
+  cloud._resetCooldown();
   globalThis.setTimeout = fn => { timeouts.push(fn); return timeouts.length; };
   globalThis.clearTimeout = () => {};
   globalThis.setInterval = fn => { intervals.push(fn); fn(); return intervals.length; };
@@ -114,8 +111,6 @@ afterEach(() => {
     fetch: orig.fetch, setTimeout: orig.setTimeout, clearTimeout: orig.clearTimeout,
     setInterval: orig.setInterval, clearInterval: orig.clearInterval,
   });
-  Date.now = orig.now;
-  _clock += SEND_COOLDOWN_MS + 1000;   // purge le cool-down de module
 });
 
 /** Monte la section et câble : l'état de départ vient du localStorage. */
@@ -684,7 +679,9 @@ describe('G · lien magique et actions de compte', () => {
     $('cloudEmail').value = 'a@b.co';
     await $('cloudSendBtn').click();
     assert.equal($('cloudSendBtn').disabled, true);
-    _clock += SEND_COOLDOWN_MS + 1000;      // 61 s plus tard
+    // On recule l'horodatage d'envoi au-delà du cool-down, au lieu
+    // d'avancer le temps : même effet, sans toucher à Date.now.
+    cloud._resetCooldown(Date.now() - SEND_COOLDOWN_MS - 1000);
     intervals.forEach(fn => fn());          // le tick suivant
     assert.equal($('cloudSendBtn').disabled, false);
     assert.equal($('cloudSendBtn').textContent, 'cloud.send_link');
