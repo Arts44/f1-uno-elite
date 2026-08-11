@@ -737,7 +737,13 @@ export function layoutNavBead(){
   if(!bar || !inner) return;
   const tabs = _beadTabs();
   if(!tabs.length) return;
-  _beadW = Math.min(window.innerWidth - 24, 560);
+  // Math.max(1, …) : `window.innerWidth` vaut 0 tant que la fenêtre n'a
+  // pas de dimensions — onglet en arrière-plan au premier rendu, panneau
+  // masqué, course pendant un redimensionnement. On obtenait alors -24,
+  // donc <svg width="-24" viewBox="0 0 -24 58"> et une erreur du moteur
+  // de rendu (« A negative value is not valid »). La barre était de toute
+  // façon invisible ; on borne pour ne pas produire un SVG invalide.
+  _beadW = Math.max(1, Math.min(window.innerWidth - 24, 560));
   _beadG = _beadGeom(_beadW, tabs.length);
   inner.style.width = _beadW + 'px';
   if(pill){ pill.style.left = _beadG.pad + 'px'; pill.style.right = _beadG.pad + 'px'; }
