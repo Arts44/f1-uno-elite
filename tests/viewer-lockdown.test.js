@@ -47,8 +47,12 @@ describe('refus logique, action par action', () => {
   const GUARDED = {
     'storage.js': ['deleteLocalCollectionData', 'triggerImport', 'exportCollection', '_showImportDialog'],
     'backup.js':  ['generateBackupCode', 'maybeHandleBackupHash'],
-    'cloud.js':   ['pushCollection', 'pullCollection', 'cloudDeleteAll', 'signOut',
-                   'requestEmailChange', 'sendMagicLink', 'verifyOtpCode', 'handleAuthRedirect'],
+    // Le découpage de cloud.js déplace ces fonctions de fichier ; le
+    // contrat, lui, ne bouge pas — chacune doit toujours refuser en
+    // tête. La table suit les fonctions, elle ne les relâche pas.
+    'cloud.js':      ['pushCollection', 'pullCollection', 'cloudDeleteAll'],
+    'cloud-auth.js': ['signOut', 'requestEmailChange', 'sendMagicLink',
+                      'verifyOtpCode', 'handleAuthRedirect'],
     'account.js': ['openDeleteModal'],
   };
 
