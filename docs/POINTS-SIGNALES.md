@@ -182,7 +182,32 @@ ajout discret au coin d'un autre commit.
 
 ---
 
-## 6. Le plancher de hauteur de tuile n'a pas été reconfirmé
+## 6. `cloudDeleteSeason()` renvoie `true` même quand rien n'a été supprimé
+
+`cloud-sync.js → cloudDeleteSeason(season)` renvoie `true` dès que la
+réponse HTTP est `ok`. PostgREST répond `204` **que la clause ait touché
+une ligne ou zéro** : la fonction ne distingue pas « supprimé » de
+« il n'y avait rien ».
+
+Sans conséquence aujourd'hui — la zone danger ne fait qu'appeler et
+rafraîchir. Mais c'est exactement le genre de valeur qu'on branchera un
+jour sur un message de confirmation, et « Saison supprimée » s'afficherait
+alors sur une suppression qui n'a rien supprimé.
+
+**Parade, si on veut la certitude** : relire après coup.
+`listCloudSeasons()` ou `fetchSeasonMeta(season)` (qui renvoie `null`
+quand la ligne n'existe plus) donnent la preuve que la valeur de retour
+ne porte pas. C'est la méthode utilisée pour vérifier la suppression de
+la ligne 2026 le 12/08/2026.
+
+Une alternative existe côté serveur — `Prefer: return=representation`
+ferait renvoyer les lignes supprimées, donc leur nombre — au prix d'une
+réponse plus lourde. À arbitrer le jour où un appelant a besoin de la
+distinction.
+
+---
+
+## 7. Le plancher de hauteur de tuile n'a pas été reconfirmé
 
 `--card-h` vaut 320. Le **plancher** — la plus petite valeur qui ne
 comprime aucun bloc — a été mesuré à **300** sur la MAQUETTE (feuille de
@@ -199,7 +224,7 @@ chiffre de départ est à remesurer, pas à reprendre ici.
 
 ---
 
-## 7. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
+## 8. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
 
 Passée en `width:min(380px, 100vw - 24px)` avec un remplissage
 `clamp(20px, 6vw, 48px)`. Mesuré après : à 320 px la boîte fait 287 et
