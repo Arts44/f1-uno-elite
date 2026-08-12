@@ -145,7 +145,30 @@ chiffre de départ est à remesurer, pas à reprendre ici.
 
 ---
 
-## 5. `.login-box` fait 380 px de large, en dur
+## 5. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
+
+Passée en `width:min(380px, 100vw - 24px)` avec un remplissage
+`clamp(20px, 6vw, 48px)`. Mesuré après : à 320 px la boîte fait 287 et
+ne dépasse plus ; à 1280 elle vaut 380 comme avant. Vérifié sur les
+deux écrans qui l'utilisent (langue, PIN) × deux thèmes × 320/375/1280
+— aucun enfant hors de la boîte, aucun défilement horizontal.
+
+**Ce que ça ne débloque PAS — et c'est définitif.**
+La grille de langues à **3 colonnes reste impossible sur mobile**, et
+la cause n'est pas la boîte : c'est la **largeur minimale d'un bouton**.
+Une option mesure au moins ~121 px (pastille ISO 33 + libellé +
+remplissage), donc trois colonnes demandent **383 px de contenu**. Même
+fluide, la boîte n'en offre que **247 à 320 px** et **295 à 375**. Il
+manquerait encore 88 px sur l'écran le plus large des deux.
+
+> **L'idée des 3 colonnes est classée.** Elle ne se rouvre pas en
+> élargissant la boîte — elle ne se rouvrirait qu'en retirant la
+> pastille ISO ou en tronquant les libellés, ce qui coûte plus que le
+> problème de rythme qu'elle prétendait résoudre. La disposition
+> retenue est la dernière ligne pleine largeur alignée à gauche
+> (1.52.2).
+
+### L'état d'origine, pour mémoire
 
 `styles.css → .login-box{width:380px}` — une largeur **fixe**, pas un
 `max-width`, pas de fluide.

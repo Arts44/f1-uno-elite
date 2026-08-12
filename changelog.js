@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.52.3',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'In the dark theme, the badge difficulty pill for the highest level now reads gold-on-black instead of blending into the page — it was the only one of the five levels without a dark-theme colour, which made the top of the scale the least visible instead of the most.',
+        'On small screens, the sign-in and language panel no longer overflows the display: its rounded corners, border and shadow are visible again.',
+      ],
+      fr: [
+        'En thème sombre, la pastille de difficulté du niveau le plus élevé s\'affiche désormais en or plein au lieu de se fondre dans la page — c\'était le seul des cinq niveaux sans couleur dédiée au thème sombre, ce qui rendait le sommet de l\'échelle le moins visible au lieu du plus visible.',
+        'Sur petit écran, le panneau de connexion et de choix de langue ne déborde plus de l\'affichage : ses coins arrondis, sa bordure et son ombre sont de nouveau visibles.',
+      ],
+      es: [
+        'En el tema oscuro, la pastilla de dificultad del nivel más alto se muestra ahora en oro pleno en lugar de fundirse con la página — era el único de los cinco niveles sin color propio para el tema oscuro, lo que hacía que la cima de la escala fuera la menos visible.',
+        'En pantallas pequeñas, el panel de acceso y de idioma ya no se sale de la pantalla: sus esquinas redondeadas, su borde y su sombra vuelven a verse.',
+      ],
+      zh: [
+        '深色主题下，最高难度等级的标记现在显示为实心金色，不再与页面融为一体——它是五个等级中唯一没有深色主题配色的，结果让最高等级反而最不显眼。',
+        '在小屏幕上，登录与语言选择面板不再超出屏幕：圆角、边框和阴影重新可见。',
+      ],
+      it: [
+        'Nel tema scuro, la pastiglia di difficoltà del livello più alto è ora in oro pieno invece di confondersi con la pagina — era l\'unico dei cinque livelli senza un colore dedicato al tema scuro, il che rendeva la cima della scala la meno visibile.',
+        'Su schermi piccoli, il pannello di accesso e di scelta della lingua non straborda più dal display: angoli arrotondati, bordo e ombra sono di nuovo visibili.',
+      ],
+      nl: [
+        'In het donkere thema is het moeilijkheidslabel van het hoogste niveau nu vol goud in plaats van op te gaan in de pagina — het was het enige van de vijf niveaus zonder eigen donkere kleur, waardoor de top van de schaal juist het minst opviel.',
+        'Op kleine schermen valt het aanmeld- en taalkeuzepaneel niet meer buiten het scherm: de afgeronde hoeken, rand en schaduw zijn weer zichtbaar.',
+      ],
+      de: [
+        'Im dunklen Design erscheint das Schwierigkeits-Label der höchsten Stufe jetzt in vollem Gold, statt mit der Seite zu verschmelzen — es war die einzige der fünf Stufen ohne eigene Dunkelfarbe, wodurch die Spitze der Skala am wenigsten auffiel.',
+        'Auf kleinen Bildschirmen ragt das Anmelde- und Sprachauswahlfeld nicht mehr über den Bildschirm hinaus: Abgerundete Ecken, Rahmen und Schatten sind wieder sichtbar.',
+      ],
+    },
+  },
+  {
     version: '1.52.2',
     date: '2026-08-12',
     changes: {

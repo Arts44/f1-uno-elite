@@ -144,8 +144,18 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  padding:52px var(--space-12) 44px;
-  width: 380px;
+  /* Largeur FLUIDE — elle était figée à 380 px. Sur un écran de 320,
+     la boîte débordait de 60 px (de −30 à gauche à +350 à droite) :
+     ses bords arrondis, sa bordure et son ombre étaient coupés, et
+     body{overflow-x:hidden} masquait le symptôme sans le corriger.
+     C'est l'écran que 100 % des nouveaux utilisateurs voient en
+     premier — choix de langue, installation, déverrouillage.
+     Le remplissage suit, sinon rétrécir la boîte réduirait la largeur
+     utile : la grille des langues a besoin de 252 px pour ses deux
+     colonnes, et 48 px de marge de chaque côté n'en laisseraient que
+     192 sur un écran de 320. */
+  padding:52px clamp(20px, 6vw, var(--space-12)) 44px;
+  width: min(380px, 100vw - 24px);
   box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(232,0,45,0.08);
   display: flex; flex-direction: column; align-items: center; gap:0;
   animation: loginReveal 0.5s ease both;
@@ -2229,6 +2239,20 @@ button:not(:disabled, .bn-tab):active,
 [data-theme="dark"] .dl-modere{background:#33290a;color:#f7c948;}
 [data-theme="dark"] .dl-difficile{background:#3a0f18;color:#ff7f95;}
 [data-theme="dark"] .dl-extreme{background:#2a1745;color:#c4a6ff;}
+/* ── .dl-legendaire en thème sombre : L'INVERSION ──
+   Cette surcharge MANQUAIT — les quatre autres niveaux l'avaient, pas
+   celui-ci. Conséquence mesurée : le sommet de l'échelle passait du
+   PLUS distinct en clair (contraste 15,72 avec le fond de page, chip
+   noir sur page crème) au MOINS distinct en sombre (1,09 — son
+   #1a1816 est presque exactement le fond #100e0f). Une inversion, pas
+   une simple fadeur : « modéré » y était plus visible que « légendaire ».
+   Le principe est celui du thème clair, renversé : ce qui est sombre
+   sur page claire devient clair sur page sombre. Contraste avec la
+   page : 1,09 → 12,56. Texte/fond : 11,56, soit AAA dans les deux
+   thèmes.
+   L'or tire l'œil, et c'est sa fonction — un sommet d'échelle doit se
+   voir, et ces badges sont rares par construction. */
+[data-theme="dark"] .dl-legendaire{background:var(--gold);color:#1a1816;}
 .bd-diff-pct{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums;}
 
 /* indicateur de difficulté sur chaque tuile (1.37.0) */
