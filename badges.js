@@ -170,15 +170,24 @@ export function seedNewAutoBadges(){
   return seeded;
 }
 
-// Load manual badges from localStorage
+/* Charge les badges de la saison COURANTE depuis le localStorage.
+
+   LES DEUX `else` NE SONT PAS COSMÉTIQUES. Sans eux, une saison qui
+   n'a pas encore de badges enregistrés laissait les objets de module
+   INCHANGÉS — donc porteurs des badges de la saison précédente. Le
+   premier déblocage appelait saveManualBadges(), qui les écrivait sous
+   la clé de la NOUVELLE saison : la fuite devenait permanente.
+   Démontré avant correction : 4 cartes possédées en 2026, et 9 badges
+   automatiques dans la clé 2026, dont 7 hérités de 2025.
+   Même famille que la fuite de titre corrigée en 1.47.4. */
 export function loadManualBadges(){
   try {
     const s = secureGet(_storageKey('badges'));
-    if(s) manualBadges = JSON.parse(s);
+    manualBadges = s ? JSON.parse(s) : {};
   } catch(e){ manualBadges = {}; }
   try {
     const a = secureGet(_storageKey('auto_badges'));
-    if(a) autoBadgeUnlocked = JSON.parse(a);
+    autoBadgeUnlocked = a ? JSON.parse(a) : {};
   } catch(e){ autoBadgeUnlocked = {}; }
 }
 export function saveManualBadges(){ secureSet(_storageKey('badges'), JSON.stringify(manualBadges)); secureSet(_storageKey('auto_badges'), JSON.stringify(autoBadgeUnlocked)); }

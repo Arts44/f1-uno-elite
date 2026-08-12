@@ -50,7 +50,11 @@ These are the rules that, if broken, ship a bug to production or violate the pro
    2. le **cache HTTP du navigateur**, qui continue de servir l'ancien `app.bundle.js` même après ça.
 
    La recette qui marche, dans cet ordre :
-   **purge SW + `caches` → rechargement avec une URL MODIFIÉE** (`index.html?v=<n>`). Un simple `location.reload()` ne perce pas le cache HTTP.
+   1. purge SW + `caches` ;
+   2. **`fetch(f, {cache:'reload'})` sur chaque sous-ressource** modifiée (`styles.css`, `app.bundle.js`, `translations.js`…) ;
+   3. rechargement avec une **URL MODIFIÉE** (`index.html?v=<n>`).
+
+   Les trois étapes sont nécessaires. Un `location.reload()` ne perce pas le cache HTTP ; et changer l'URL du **document** ne purge pas `styles.css`, qui a sa **propre** entrée de cache — piège rencontré une fois de plus après que cette règle a été écrite sans son étape 2.
 
    Pourquoi c'est une règle et pas un conseil : plusieurs mesures ont été prises sur du code périmé avant qu'on s'en aperçoive, et des conclusions ont dû être jetées. Une mesure faite sur un bundle obsolète ne se voit pas — elle a l'air juste.
 

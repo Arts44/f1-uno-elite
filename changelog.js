@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.52.1',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'Fixed a bug where switching to a season that had no badges yet made it inherit the previous season\'s unlocked badges — permanently, since an automatic badge is never re-locked. Each season now sees only its own.',
+      ],
+      fr: [
+        'Correction d\'un bug : basculer vers une saison qui n\'avait pas encore de badges lui faisait hériter des badges débloqués de la saison précédente — définitivement, puisqu\'un badge automatique ne se reverrouille jamais. Chaque saison ne voit désormais que les siens.',
+      ],
+      es: [
+        'Corregido un error: cambiar a una temporada que aún no tenía insignias hacía que heredara las desbloqueadas de la anterior — de forma permanente, ya que una insignia automática nunca se vuelve a bloquear. Cada temporada ve ahora solo las suyas.',
+      ],
+      zh: [
+        '修复了一个问题：切换到尚无徽章的赛季时，它会继承上一赛季已解锁的徽章——而且是永久性的，因为自动徽章不会重新上锁。现在每个赛季只显示自己的徽章。',
+      ],
+      it: [
+        'Corretto un bug: passare a una stagione che non aveva ancora badge le faceva ereditare quelli sbloccati della stagione precedente — in modo permanente, dato che un badge automatico non si riblocca mai. Ogni stagione vede ora solo i propri.',
+      ],
+      nl: [
+        'Een bug verholpen: overschakelen naar een seizoen zonder badges liet dat seizoen de ontgrendelde badges van het vorige erven — permanent, want een automatische badge gaat nooit weer op slot. Elk seizoen ziet nu alleen de eigen badges.',
+      ],
+      de: [
+        'Fehler behoben: Der Wechsel zu einer Saison ohne eigene Abzeichen ließ sie die freigeschalteten Abzeichen der vorherigen Saison erben — dauerhaft, denn ein automatisches Abzeichen wird nie wieder gesperrt. Jede Saison sieht jetzt nur ihre eigenen.',
+      ],
+    },
+  },
+  {
     version: '1.52.0',
     date: '2026-08-12',
     changes: {

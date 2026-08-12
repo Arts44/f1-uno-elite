@@ -102,6 +102,12 @@ describe('badges v3 — semis silencieux (rétrocompat)', () => {
   });
 
   test('un badge déjà débloqué (timestamp) n’est jamais retouché', () => {
+    // Le décor doit passer par le STOCKAGE, pas seulement par la mémoire :
+    // seedNewAutoBadges() appelle loadManualBadges(), qui relit la clé de
+    // la saison — et qui, depuis la correction de la fuite inter-saisons,
+    // REMET À ZÉRO quand la clé est absente. Un état injecté uniquement en
+    // mémoire n'existe pas dans l'application.
+    localStorage.setItem('f1uno_auto_badges_2025', JSON.stringify({ first_card: 1754550000000 }));
     setAutoBadgeUnlocked({ first_card: 1754550000000 });
     txBatch(() => { setTypeData(CARDS_DB[0].id, CARDS_DB[0].types[0], 'owned', true); setTypeData(CARDS_DB[0].id, CARDS_DB[0].types[0], 'qty', 1); });
     seedNewAutoBadges();
