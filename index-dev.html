@@ -142,6 +142,12 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- Marqueur d'entrée DÉVELOPPEMENT. Il n'ouvre AUCUN accès : il ne
+     déverrouille rien, ne contourne ni le PIN ni le mode spectateur.
+     Il rend seulement visibles les saisons marquées `test: true` dans
+     metadata.json → seasons[]. index.html (production) ne le pose pas,
+     et un test garantit qu'il ne s'y trouvera jamais. -->
+<script>window.__F1UNO_DEV = true;</script>
 <script src="data-embedded.js"></script>
 <script src="translations.js"></script>
 <script src="cloud-config.js"></script>

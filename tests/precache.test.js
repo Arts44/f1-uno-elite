@@ -78,12 +78,27 @@ describe('SHELL_ASSETS', () => {
      première visite en ligne — et l'app affiche son état vide sur un
      appareil qui a pourtant tout le reste en cache. La liste des saisons
      vit dans metadata.json ; ce test la suit au lieu de la recopier. */
-  test('chaque saison déclarée a son fichier de cartes précaché', () => {
+  test('chaque saison LIVRÉE a son fichier de cartes précaché', () => {
     const meta = JSON.parse(readFileSync(root + 'data/metadata.json', 'utf8'));
     const manquants = (meta.seasons || [])
+      .filter(s => !s.test)
       .map(s => `data/cards-${s.year}.json`)
       .filter(f => !SHELL.includes(f));
     assert.deepEqual(manquants, [],
-      `saisons déclarées mais hors precache : ${manquants.join(', ')}`);
+      `saisons livrées mais hors precache : ${manquants.join(', ')}`);
+  });
+
+  /* L'autre sens, et c'est celui qui compte pour la production : une
+     saison de développement ne doit PAS être mise en cache hors ligne
+     chez un visiteur. Sans ce test, ajouter `test: true` dans seasons[]
+     en oubliant de retirer l'entrée du SHELL passerait inaperçu. */
+  test('aucune saison de test n’entre dans le precache', () => {
+    const meta = JSON.parse(readFileSync(root + 'data/metadata.json', 'utf8'));
+    const intrus = (meta.seasons || [])
+      .filter(s => s.test)
+      .map(s => `data/cards-${s.year}.json`)
+      .filter(f => SHELL.includes(f));
+    assert.deepEqual(intrus, [],
+      `saisons de test précachées : ${intrus.join(', ')}`);
   });
 });

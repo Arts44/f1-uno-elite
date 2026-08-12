@@ -136,7 +136,8 @@
     },
     {
       "year": 2026,
-      "cardCount": 10
+      "cardCount": 10,
+      "test": true
     }
   ],
   "typeBadgeRarity": {

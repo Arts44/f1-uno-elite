@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v125';
+const SW_VERSION = 'v126';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -74,13 +74,14 @@ const SHELL_ASSETS = [
   'data/circuits.json',
   'data/badges.json',
   'data/cards-2025.json',
-  // Une entree par saison declaree dans metadata.json (seasons[]).
-  // tests/precache.test.js compare les deux listes : une saison ajoutee
-  // la-bas et pas ici fait echouer la suite.
+  // Une entree par saison LIVREE de metadata.json (seasons[]).
+  // Les saisons marquees test: true en sont exclues : elles ne servent
+  // qu a l entree de developpement et n ont pas a etre mises en cache
+  // hors ligne pour un visiteur. tests/precache.test.js verifie les deux
+  // sens — livree donc presente, test donc absente.
   // NB volontairement sans apostrophes : le test extrait les chaines
   // entre quotes simples, et une apostrophe dans un commentaire lui
   // fabrique une entree fantome.
-  'data/cards-2026.json',
 ];
 
 self.addEventListener('install', event => {

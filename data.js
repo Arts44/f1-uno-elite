@@ -142,6 +142,29 @@ export function _applyMetadata(meta){
    maximum sur ce tableau ; sans référence déclarée, posséder les 12
    pilotes PRÉSENTS débloquerait « tous les pilotes » — définitivement,
    puisqu'un badge automatique ne se reverrouille jamais. */
+/* ── Saison de DÉVELOPPEMENT ──
+   Une saison peut porter `test: true` dans seasons[]. Elle sert à
+   exercer les chemins multi-saisons avant que les vraies cartes
+   existent — et elle n'a rien à faire sous les yeux d'un visiteur.
+
+   Ce n'est PAS une question de permissions : il n'y a rien à protéger,
+   juste des données de test à ne pas livrer. Aucune authentification,
+   aucune séquence secrète, aucune porte dérobée — le dépôt en a déjà
+   écarté une pour le PIN, et pour la même raison.
+
+   Le mécanisme est celui du POINT D'ENTRÉE : index-dev.html pose
+   `window.__F1UNO_DEV`, index.html ne le pose pas. La liste des saisons
+   reste UNIQUE (seasons[] dans metadata.json) ; seule sa lecture
+   filtre. Deux tests garantissent qu'index.html ne peut pas poser le
+   marqueur et qu'aucune saison de test n'entre dans le precache. */
+export function isDevBuild(){
+  return typeof window !== 'undefined' && window.__F1UNO_DEV === true;
+}
+export function isTestSeason(year = _currentSeason){
+  const s = SEASONS.find(x => x.year === year);
+  return !!(s && s.test);
+}
+
 export function seasonCardCount(year = _currentSeason){
   const s = SEASONS.find(x => x.year === year);
   return s && Number.isInteger(s.cardCount) ? s.cardCount : null;
@@ -163,7 +186,8 @@ export function seasonCatalogueState(){
    le localStorage garde une trace (une saison retirée du fichier ne doit
    pas faire disparaître la collection qu'on a saisie dedans). */
 export function availableSeasons(){
-  const set = new Set(SEASONS.map(s => s.year));
+  // Les saisons `test: true` n'existent que pour l'entrée de développement.
+  const set = new Set(SEASONS.filter(s => !s.test || isDevBuild()).map(s => s.year));
   for(let i = 0; i < localStorage.length; i++){
     const m = localStorage.key(i).match(/^f1uno_owned_(\d+)$/);
     if(m) set.add(parseInt(m[1], 10));
@@ -243,7 +267,13 @@ export async function loadAppData(){
        Désormais le catalogue est VIDÉ dès que la réponse n'est pas
        exploitable. Mieux vaut un écran vide, qui se voit, qu'un
        catalogue faux, qui ne se voit pas. */
-    if(cardsResp && cardsResp.ok){
+    if(isTestSeason() && !isDevBuild()){
+      // Ceinture ET bretelles : même si une saison de test se retrouvait
+      // sélectionnée en production (état persisté, URL bricolée), son
+      // catalogue ne se charge pas. La grille affiche son état vide.
+      log(`Saison de test ${_currentSeason} ignorée hors développement`);
+      _applyCards([]);
+    } else if(cardsResp && cardsResp.ok){
       _applyCards(await cardsResp.json());
     } else {
       log(`Aucun catalogue pour la saison ${_currentSeason} — CARDS_DB vidé`);

@@ -247,7 +247,13 @@ A change is **not done** until all of these pass. Run them before you say the wo
 5. **i18n:** any new user-facing string exists as a key in **all 7 languages** in `translations.js`; nothing is hard-coded.
 6. **Relative paths:** no new URL starts with `/`.
 7. **Logging:** no stray debug `console.log`; `DEBUG` is `false`.
-8. **Manual browser pass (what tests can't cover):** serve over HTTP and check what you touched — DOM rendering, modal, theming, font switching, animations (incl. `prefers-reduced-motion`), the tutorial's DOM flow, PWA install, offline reload, and QR visual output. State clearly which manual checks you did and which you couldn't.
+8. **Manual browser pass (what tests can't cover) — et ce n'est PAS une formalité de fin de chantier.**
+
+   > ⚠️ **Cas vécu, 1.53.0.** L'app affichait le catalogue de la saison précédente sous l'étiquette d'une saison sans données. Un état vide a été câblé dans `renderGrid`, les **tests unitaires étaient tous verts** — et la vérification navigateur a montré que le correctif ne corrigeait rien : 10 cartes de 2026 s'affichaient sous « 2027 », avec un bandeau annonçant « 10 des 20 cartes de 2027 ». Le silence avait été remplacé par une **fausse information**, ce qui est pire. La vraie cause était deux couches plus haut, dans `loadAppData()`.
+   >
+   > Les tests unitaires ne voyaient rien parce qu'ils testaient la fonction corrigée, pas le chemin réel. **Un test vert ne prouve pas qu'un défaut est corrigé — il prouve que ce qu'on a pensé à tester passe.**
+
+    serve over HTTP and check what you touched — DOM rendering, modal, theming, font switching, animations (incl. `prefers-reduced-motion`), the tutorial's DOM flow, PWA install, offline reload, and QR visual output. State clearly which manual checks you did and which you couldn't.
 9. **Docs:** if behaviour or structure changed, update `README.md` (and this file) so they still match reality.
 
 > **Hors du dépôt, donc hors de portée des tests : la DESCRIPTION GitHub.**
