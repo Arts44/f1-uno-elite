@@ -454,7 +454,24 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--space-14px);padding:var(--space-4);width:100%;max-width:none;}
 
 /* CARD */
-.card{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);transition:var(--ease);cursor:pointer;position:relative;border:1.5px solid var(--border);display:flex;flex-direction:column;}
+/* ══════════════════════════════════════════════════════════
+   HAUTEUR DE TUILE FIXE — la boîte ne s'étire plus, le contenu
+   s'adapte dedans.
+
+   LE DÉFAUT CORRIGÉ : la hauteur dépendait du nombre de lignes du
+   nom d'écurie (0 à 3) et de la présence de la pastille
+   d'exemplaires. 13 hauteurs distinctes mesurées à 375 px, de
+   246,69 à 292,69. Comme la grille aligne ses rangées sur la plus
+   haute tuile, une seule carte à nom long allongeait TOUTE sa
+   rangée et laissait ses voisines avec du vide.
+
+   --card-h est la hauteur de CONTENU (box-sizing content-box) :
+   320 déclaré rend ~332 avec bordures et remplissage.
+   320 et non le plancher mesuré de 300 : les noms de 2026 sont
+   inconnus, et refaire ce chantier coûte plus cher que la marge.
+   ══════════════════════════════════════════════════════════ */
+:root{--card-h:320px;}
+.card{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);transition:var(--ease);cursor:pointer;position:relative;border:1.5px solid var(--border);display:flex;flex-direction:column;height:var(--card-h);}
 .card:hover{transform:translateY(-3px);box-shadow:var(--sh-lg);border-color:var(--red-m);}
 
 /* Card visual */
@@ -900,17 +917,30 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .type-badge{position:absolute;top:6px;right:6px;font-size:9px;font-weight:700;padding:2px var(--space-6px);border-radius:5px;background:rgba(0,0,0,0.55);color:white;letter-spacing:0.2px;backdrop-filter:blur(2px);}
 
 /* Card body */
-.card-body{padding:var(--space-10px) var(--space-3) var(--space-10px);position:relative;z-index:1;flex:1 0 auto;}
+/* flex:1 1 auto + min-height:0 : le corps occupe ce qui reste sous le
+   visuel et n'impose plus sa hauteur naturelle à la tuile. */
+.card-body{padding:var(--space-10px) var(--space-3) var(--space-10px);position:relative;z-index:1;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;}
 .card-num{font-family:var(--font-d);font-weight:700;font-size:11px;letter-spacing:0.5px;color:var(--tx1);margin-bottom:2px;}
-.card-name{font-family:var(--font-d);font-weight:700;font-size:13px;line-height:1.2;margin-bottom:2px;}
+/* Borné à 2 lignes : sans ça le pire cas est dicté par un seul GP à
+   rallonge (« Gran Premio Del Made In Italy E Dell'Emilia-Romagna »,
+   4 lignes / 62,4 px) qui imposerait 344 px à toute la grille. Six
+   cartes sont concernées ; le nom complet reste lisible dans la fiche. */
+.card-name{font-family:var(--font-d);font-weight:700;font-size:13px;line-height:1.2;margin-bottom:2px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .card-year{font-family:var(--font-d);font-weight:600;font-size:11px;color:var(--tx1);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.5px;}
 .card-team{font-size:11px;color:var(--tx1);margin-bottom:var(--space-1);line-height:1.3;}
 .card-rarity{display:inline-flex;align-items:center;gap:3px;padding:2px var(--space-2);border-radius:6px;font-size:11px;font-weight:600;}
-.card-rarity-row{display:flex;align-items:center;justify-content:space-between;margin-top:var(--space-1);}
+/* margin-top:auto — la rangée rareté et la pastille d'exemplaires
+   tombent en BAS de la tuile. Effet de bord voulu : elles s'alignent
+   d'une tuile à l'autre sur toute la rangée, ce qu'une hauteur
+   variable rendait impossible. */
+.card-rarity-row{display:flex;align-items:center;justify-content:space-between;margin-top:auto;}
 .card-rarity-row .status-chips{display:flex;gap:3px;}
 
 /* Owned summary */
-.card-owned-summary{display:flex;flex-wrap:wrap;gap:var(--space-1);margin-top:var(--space-1);margin-bottom:var(--space-1);}
+/* min-height : l'emplacement est TOUJOURS réservé, occupé ou non —
+   sinon les 61 cartes sans exemplaire seraient plus courtes. */
+.card-owned-summary{display:flex;flex-wrap:wrap;gap:var(--space-1);margin-top:var(--space-1);margin-bottom:var(--space-1);min-height:20px;}
 .owned-tag{font-size:11px;padding:2px var(--space-2);border-radius:6px;background:var(--surface2);color:var(--tx2);font-weight:500;display:flex;align-items:center;gap:3px;}
 .owned-tag.blue{background:#E3EEF9;color:#1a3a6b;}
 .owned-tag.green{background:#E3F5E9;color:#0d4a1f;}
@@ -1918,8 +1948,14 @@ button:not(:disabled, .bn-tab):active,
   border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);
   display:flex;flex-direction:column;pointer-events:none;
 }
+/* Le squelette reprend la MÊME hauteur fixe que la tuile. Tant que les
+   tuiles avaient 13 hauteurs, il ne pouvait coller qu'à la médiane et
+   se trompait de ±5 px aux extrêmes — c'était structurel et le README
+   le disait. Avec une hauteur unique, il est EXACT. */
+.sk-card{height:var(--card-h);}
 .sk-visual{height:120px;}   /* = .card-visual, mesuré, pas approché */
-.sk-body{padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2);}
+.sk-body{padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2);flex:1 1 auto;min-height:0;}
+.sk-chip{margin-top:auto;}   /* comme .card-rarity-row : collé en bas */
 .sk-line{height:10px;border-radius:var(--r-sm);}
 .sk-line.w40{width:40%;} .sk-line.w70{width:70%;} .sk-line.w55{width:55%;}
 .sk-chip{height:26px;width:96px;border-radius:var(--r-sm);margin-top:var(--space-1);}

@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.52.0',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'All collection tiles are now exactly the same height. Before, a long team name or a copies pill made one tile taller — and it stretched its whole row, leaving the neighbours with dead space. The rarity chips now line up across a row, and the loading skeleton matches the tiles exactly.',
+      ],
+      fr: [
+        'Toutes les tuiles de la collection ont maintenant exactement la même hauteur. Avant, un nom d\'écurie long ou une pastille d\'exemplaires rendait une tuile plus haute — et elle allongeait toute sa rangée, laissant du vide chez les voisines. Les pastilles de rareté s\'alignent désormais d\'une tuile à l\'autre, et l\'écran de chargement colle exactement aux tuiles.',
+      ],
+      es: [
+        'Todas las casillas de la colección tienen ahora exactamente la misma altura. Antes, un nombre de escudería largo o una pastilla de ejemplares hacía una casilla más alta — y estiraba toda su fila, dejando huecos en las vecinas. Las pastillas de rareza se alinean ahora entre casillas, y la pantalla de carga encaja exactamente.',
+      ],
+      zh: [
+        '收藏页的所有卡片现在高度完全一致。此前，较长的车队名或数量标记会让某张卡片变高，并把整行都撑高，旁边的卡片则留出空白。稀有度标记现在会在同一行中对齐，加载占位也与卡片完全吻合。',
+      ],
+      it: [
+        'Tutte le tessere della collezione hanno ora esattamente la stessa altezza. Prima, un nome di scuderia lungo o una pastiglia di copie rendeva una tessera più alta — e allungava tutta la sua riga, lasciando vuoto nelle vicine. Le pastiglie di rarità ora si allineano da una tessera all\'altra, e lo scheletro di caricamento combacia esattamente.',
+      ],
+      nl: [
+        'Alle tegels in de collectie hebben nu exact dezelfde hoogte. Voorheen maakte een lange teamnaam of een exemplaren-label één tegel hoger — en die rekte de hele rij op, waardoor de buren lege ruimte hielden. De zeldzaamheidslabels liggen nu op één lijn, en het laadskelet sluit exact aan.',
+      ],
+      de: [
+        'Alle Kacheln der Sammlung haben jetzt exakt dieselbe Höhe. Zuvor machte ein langer Teamname oder ein Exemplar-Label eine Kachel höher — und die streckte die ganze Zeile, sodass bei den Nachbarn Leerraum blieb. Die Seltenheits-Labels stehen nun auf einer Linie, und das Lade-Skelett passt exakt.',
+      ],
+    },
+  },
+  {
     version: '1.51.0',
     date: '2026-08-12',
     changes: {
