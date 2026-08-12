@@ -983,6 +983,33 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 /* EMPTY */
 .empty{grid-column:1/-1;text-align:center;padding:80px var(--space-10);color:var(--tx3);}
 
+/* ══════════════════════════════════════════════════════════
+   ÉTAT DU CATALOGUE DE SAISON — deux intensités, DEUX TONS
+   Un catalogue partiel est un état NORMAL et temporaire (les cartes
+   arrivent par boosters, la saisie s'étale). Il informe : surface
+   neutre, texte secondaire, un ⓘ — aucune couleur d'alerte, aucun ⚠.
+   Un catalogue vide est plus proche d'un problème de données : il peut
+   être affirmatif, et il occupe la grille entière.
+   ══════════════════════════════════════════════════════════ */
+.season-partial{grid-column:1/-1;display:flex;gap:12px;align-items:flex-start;
+  background:var(--surface2);border:1px solid var(--border);border-radius:12px;
+  padding:12px 14px;margin-bottom:4px;}
+.season-partial .sp-ic{flex:0 0 auto;width:20px;height:20px;color:var(--tx3);margin-top:1px;}
+.season-partial .sp-txt{font-size:12px;line-height:1.45;color:var(--tx2);}
+.season-partial .sp-txt b{color:var(--tx1);font-weight:700;}
+.season-partial .sp-sub{display:block;margin-top:3px;color:var(--tx3);font-size:11px;}
+/* display:block OBLIGATOIRE — un <span> reste inline, et `height` ne
+   s'y applique pas : la barre était invisible dans la maquette. */
+.season-partial .sp-bar{display:block;margin-top:7px;height:4px;border-radius:2px;
+  background:var(--surface3);overflow:hidden;}
+.season-partial .sp-bar i{display:block;height:4px;background:var(--tx3);border-radius:2px;}
+
+.season-empty{grid-column:1/-1;text-align:center;padding:56px var(--space-6);}
+.season-empty .se-ic{width:44px;height:44px;margin:0 auto var(--space-3);color:var(--tx3);opacity:.8;}
+.season-empty .se-title{font-family:var(--font-d);font-size:17px;font-weight:700;color:var(--tx1);margin-bottom:var(--space-2);}
+.season-empty .se-body{font-size:13px;line-height:1.5;color:var(--tx2);max-width:290px;margin:0 auto;}
+.season-empty .se-hint{display:block;margin-top:var(--space-10px);font-size:12px;color:var(--tx3);}
+
 /* MODAL */
 .mo{position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);z-index:300;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
 .mo.open{opacity:1;pointer-events:all;}

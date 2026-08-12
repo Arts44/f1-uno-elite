@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.53.0',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'A season whose cards cannot be loaded now says so, instead of silently showing the previous season\'s cards under the new season\'s name. The grid shows a clear empty state naming the season, and the counters follow.',
+        'While a season\'s card list is still being filled in, a discreet note above the grid says how many of the total are in yet — and complete-collection badges now wait for the rest instead of unlocking early on a partial list.',
+      ],
+      fr: [
+        'Une saison dont les cartes ne peuvent pas être chargées le dit maintenant, au lieu d\'afficher en silence les cartes de la saison précédente sous le nom de la nouvelle. La grille montre un état vide clair qui nomme la saison, et les compteurs suivent.',
+        'Tant que la liste des cartes d\'une saison se remplit, une note discrète au-dessus de la grille indique combien sont déjà au catalogue — et les badges de collection complète attendent le reste au lieu de se débloquer trop tôt sur une liste partielle.',
+      ],
+      es: [
+        'Una temporada cuyas cartas no se pueden cargar ahora lo dice, en vez de mostrar en silencio las cartas de la temporada anterior bajo el nombre de la nueva. La rejilla muestra un estado vacío claro que nombra la temporada, y los contadores lo siguen.',
+        'Mientras la lista de cartas de una temporada se completa, una nota discreta sobre la rejilla indica cuántas ya están en el catálogo — y las insignias de colección completa esperan al resto en lugar de desbloquearse antes de tiempo.',
+      ],
+      zh: [
+        '当某个赛季的卡片无法加载时，现在会明确说明，而不再默默地把上一赛季的卡片显示在新赛季的名下。网格会显示写明赛季的空状态，计数也随之归零。',
+        '在某赛季的卡片清单仍在录入期间，网格上方会有一条低调的提示，说明已录入多少张——完整收藏类徽章也会等待其余卡片，不再因清单不全而提前解锁。',
+      ],
+      it: [
+        'Una stagione le cui carte non possono essere caricate ora lo dice, invece di mostrare in silenzio le carte della stagione precedente sotto il nome della nuova. La griglia mostra uno stato vuoto chiaro che nomina la stagione, e i contatori si adeguano.',
+        'Finché l\'elenco delle carte di una stagione si completa, una nota discreta sopra la griglia indica quante sono già a catalogo — e i badge da collezione completa aspettano le altre invece di sbloccarsi in anticipo.',
+      ],
+      nl: [
+        'Een seizoen waarvan de kaarten niet geladen kunnen worden zegt dat nu, in plaats van stilzwijgend de kaarten van het vorige seizoen onder de nieuwe naam te tonen. Het raster toont een duidelijke lege staat met de naam van het seizoen, en de tellers volgen.',
+        'Zolang de kaartenlijst van een seizoen nog wordt aangevuld, meldt een subtiele notitie boven het raster hoeveel er al in de catalogus staan — en badges voor een volledige collectie wachten op de rest in plaats van te vroeg te ontgrendelen.',
+      ],
+      de: [
+        'Eine Saison, deren Karten nicht geladen werden können, sagt das jetzt, statt stillschweigend die Karten der vorherigen Saison unter dem neuen Namen zu zeigen. Das Raster zeigt einen klaren Leerzustand mit dem Namen der Saison, und die Zähler folgen.',
+        'Solange die Kartenliste einer Saison noch ergänzt wird, nennt ein dezenter Hinweis über dem Raster, wie viele bereits im Katalog sind — und Abzeichen für vollständige Sammlungen warten auf den Rest, statt bei unvollständiger Liste zu früh freizuschalten.',
+      ],
+    },
+  },
+  {
     version: '1.52.3',
     date: '2026-08-12',
     changes: {

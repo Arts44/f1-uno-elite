@@ -191,6 +191,19 @@ export function _applyCards(cardsData){
   cardsData.forEach(c => CARDS_DB.push(c));
 }
 
+/* Repli embarqué limité aux CARTES de la saison courante. L'ancien
+   _loadEmbedded() rechargeait aussi métadonnées, circuits et badges —
+   inutile ici, ils viennent d'être appliqués, et ça masquait le cas
+   « cette saison n'a pas de données embarquées ». */
+function _loadEmbeddedCards(){
+  const e = window.__F1UNO_EMBEDDED;
+  if(!e) return false;
+  const k = 'cards' + _currentSeason;
+  if(!e[k] || !e[k].length) return false;
+  _applyCards(e[k]);
+  return true;
+}
+
 function _loadEmbedded(){
   const e = window.__F1UNO_EMBEDDED;
   if(!e) return false;
@@ -220,18 +233,31 @@ export async function loadAppData(){
     if(badgesResp && badgesResp.ok){
       _applyBadges(await badgesResp.json());
     }
+    /* ── LE SILENCE QU'ON TUE ICI ──
+       Avant : sur un 404, `_applyCards` n'était jamais appelé et
+       CARDS_DB gardait le catalogue de la saison PRÉCÉDENTE. L'app
+       affichait alors 101 cartes de 2025 sous une étiquette 2026, sans
+       un mot — et le garde-fou `if(!CARDS_DB.length)` ne se déclenchait
+       pas, puisque la liste n'était pas vide. Un garde-fou qui existe et
+       ne protège pas est pire que pas de garde-fou.
+       Désormais le catalogue est VIDÉ dès que la réponse n'est pas
+       exploitable. Mieux vaut un écran vide, qui se voit, qu'un
+       catalogue faux, qui ne se voit pas. */
     if(cardsResp && cardsResp.ok){
       _applyCards(await cardsResp.json());
+    } else {
+      log(`Aucun catalogue pour la saison ${_currentSeason} — CARDS_DB vidé`);
+      _applyCards([]);
+      // Repli hors ligne : uniquement si les données embarquées
+      // couvrent CETTE saison. Sinon on laisse vide — l'écran de
+      // collection affiche son état vide, qui nomme la saison.
+      if(_loadEmbeddedCards()){
+        log(`Données embarquées utilisées: ${CARDS_DB.length} cartes`);
+      }
     }
 
     if(!CARDS_DB.length){
-      // Try embedded data as fallback (works on file://)
-      if(_loadEmbedded()){
-        log(`Données embarquées utilisées: ${CARDS_DB.length} cartes`);
-      } else {
-        console.error('Erreur critique: aucune carte chargée');
-        _showDataError('Impossible de charger les données.');
-      }
+      log('Aucune carte pour cette saison — état vide affiché par la grille');
     } else {
       log(`Données chargées: ${CARDS_DB.length} cartes, saison ${_currentSeason}`);
     }

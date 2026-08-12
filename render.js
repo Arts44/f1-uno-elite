@@ -2,10 +2,11 @@
    RENDER — grid, modal, views, toast
    ══════════════════════════════════════════════════════════ */
 import { DEBUG, log } from './logger.js';
-import { t, escapeHtml, safeImagePath } from './i18n.js';
+import { t, tEsc, escapeHtml, safeImagePath, setSafeHTML } from './i18n.js';
 import {
   CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityChipClass, rarityChipStyle,
-  CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_MONOGRAMS, TEAM_LIVERIES, sortTypesCanonical
+  CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_MONOGRAMS, TEAM_LIVERIES, sortTypesCanonical,
+  seasonCatalogueState, _currentSeason
 } from './data.js';
 import { icon, typeIcon, HELMET_SVG } from './icons.js';
 import {
@@ -183,6 +184,33 @@ export function defaultBaseType(card){
   return card.types.find(t=>CARD_TYPES[t] && !CARD_TYPES[t].foil) || card.types[0];
 }
 
+/* ── Les deux états de catalogue ──
+   Deux intensités, deux TONS. Le partiel est un état normal et
+   temporaire pendant la saisie au fil des boosters : il informe, il
+   n'alarme pas — surface neutre, pas de couleur d'alerte, un ⓘ et non
+   un ⚠. Le vide est plus proche d'un problème de données : il peut être
+   affirmatif.
+   Le texte du partiel reste dans le registre de ce que l'utilisateur a
+   sous les yeux — « les compteurs », « la complétion » — plutôt que de
+   parler de badges devant une grille de cartes. */
+function _seasonPartialHTML(cat, season){
+  const pct = Math.round(cat.charge / cat.total * 100);
+  return `${icon('info', 'sp-ic')}
+    <div class="sp-txt">${tEsc('season.partial', { n: cat.charge, total: cat.total, season })}
+      <span class="sp-sub">${tEsc('season.partial_sub', { reste: cat.total - cat.charge })}</span>
+      <span class="sp-bar"><i style="width:${pct}%"></i></span>
+    </div>`;
+}
+function _seasonEmptyHTML(season){
+  return `<div class="season-empty">
+    ${icon('layers', 'se-ic')}
+    <div class="se-title">${tEsc('season.empty_title', { season })}</div>
+    <div class="se-body">${t('season.empty_body')}
+      <span class="se-hint">${t('season.empty_hint')}</span>
+    </div>
+  </div>`;
+}
+
 export function renderGrid(cards){
   const grid=document.getElementById('cardGrid');
   if(DEBUG){
@@ -216,7 +244,28 @@ export function renderGrid(cards){
   }
   grid.innerHTML='';
   log('renderGrid called with', cards.length, 'cards');
-  if(!cards.length) return; // DB empty (cannot happen once data is loaded)
+
+  /* ── ÉTAT DU CATALOGUE DE LA SAISON — trois intensités, un mécanisme ──
+     Le total est DÉCLARÉ dans metadata.json → seasons[], jamais déduit
+     de la longueur du tableau chargé (voir data.js).
+       0 carte        → état vide, affirmatif : c'est un problème de
+                        données, et le dire vaut mieux que l'escamoter
+       0 < n < total  → bandeau d'information, la grille reste visible
+       n === total    → rien
+     Le défaut corrigé ici : un 404 sur le fichier de cartes laissait
+     CARDS_DB avec le catalogue de la saison PRÉCÉDENTE, et l'app
+     affichait 101 cartes de 2025 sous une étiquette 2026, sans un mot. */
+  const cat = seasonCatalogueState();
+  if(cat.etat === 'vide' || !cards.length){
+    setSafeHTML(grid, _seasonEmptyHTML(_currentSeason));
+    return;
+  }
+  if(cat.etat === 'partiel'){
+    const banner = document.createElement('div');
+    banner.className = 'season-partial';
+    setSafeHTML(banner, _seasonPartialHTML(cat, _currentSeason));
+    grid.appendChild(banner);
+  }
 
   log('Starting to render cards...');
   let renderedCount = 0;
