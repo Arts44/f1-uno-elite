@@ -69,7 +69,7 @@
 
 ## ✨ Cosa fa
 
-Tenere traccia di una collezione completa di carte **F1 UNO Élite** — 101 carte, ciascuna in fino a 16 varianti (colori base, foil, dual, Wild, Nitro, promo):
+Tenere traccia di una collezione completa di carte **F1 UNO Élite** — 101 carte per la stagione 2025, ciascuna in fino a 16 varianti (colori base, foil, dual, Wild, Nitro, promo):
 
 - 📇 **Gestione completa della collezione** — possedute / doppioni / wishlist / preferite, quantità per variante, l’intera collezione sempre in vista.
 - ➕ **Aggiunta rapida con un gesto** — un pulsante + su ogni tessera apre un selettore di varianti: un tocco aggiunge una copia, con toast «Annulla». L’intestazione mostra i progressi in tempo reale (possedute/totale) sopra una sottile linea di avanzamento.

@@ -69,7 +69,7 @@ C'est une **PWA** : installez-la depuis votre navigateur et elle fonctionne comm
 
 ## ✨ Ce que ça fait
 
-Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes, chacune existant en jusqu'à 16 variantes (couleurs de base, foils, duals, Wild, Nitro, promos) :
+Suivre une collection complète de cartes **F1 UNO Élite** — 101 cartes pour la saison 2025, chacune existant en jusqu'à 16 variantes (couleurs de base, foils, duals, Wild, Nitro, promos) :
 
 - 📇 **Gestion complète de la collection** — possédées / doubles / wishlist / favoris, quantités par variante, l’ensemble de la collection toujours visible.
 - ➕ **Ajout rapide en un geste** — un bouton + sur chaque tuile ouvre un sélecteur de variantes : un appui ajoute un exemplaire, avec un toast « Annuler ». Le bandeau de la page Collection affiche la progression en direct : une barre, puis possédées / manquantes / doubles.

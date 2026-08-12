@@ -69,7 +69,7 @@ It's a **PWA**: install it from your browser and it runs like a native app, full
 
 ## ✨ What it does
 
-Track a complete **F1 UNO Élite** trading-card collection — 101 cards, each existing in up to 16 variants (base colours, foils, duals, Wild, Nitro, promos):
+Track a complete **F1 UNO Élite** trading-card collection — 101 cards for the 2025 season, each existing in up to 16 variants (base colours, foils, duals, Wild, Nitro, promos):
 
 - 📇 **Full collection management** — owned / doubles / wishlist / favourites, per-variant quantities, the whole collection always in view.
 - ➕ **One-gesture quick add** — a + button on every tile opens a variant picker: one tap adds a copy, with an Undo toast. The Collection page header shows your live progress: a bar plus owned / missing / doubles.

@@ -23,7 +23,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { t, applyLanguage } from './i18n.js';
-import { _currentSeason } from './data.js';
+import { _currentSeason, CARDS_DB } from './data.js';
 import { loadData } from './storage.js';
 import { isViewer } from './session.js';
 import { loadManualBadges } from './badges.js';
@@ -590,7 +590,7 @@ function _showBubble(step, i, opts = {}, el = null){
       <span class="tut-count">${ch.n} / ${ch.of}</span>
     </div>
     <h2 class="tut-title">${t('tut.' + step.id + '_t')}</h2>
-    <p class="tut-text">${opts.missing ? t('tut.missing') : t('tut.' + step.id + '_d')}</p>
+    <p class="tut-text">${opts.missing ? t('tut.missing') : t('tut.' + step.id + '_d', { n: CARDS_DB.length })}</p>
     <div class="tut-btns">
       <button class="tut-quit" id="tutQuit" type="button" aria-label="${t('tut.quit')}">
         <span class="tut-lg">${t('tut.quit')}</span><span class="tut-sm" aria-hidden="true">✕</span>

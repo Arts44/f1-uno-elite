@@ -235,3 +235,31 @@ describe('of: \'teams\' — le nombre d’écuries n’est plus écrit en dur', 
     assert.ok(Number.isFinite(e) && e > 0, `effort non fini : ${e}`);
   });
 });
+
+/* ── Étape 4 : les libellés ────────────────────────────────── */
+describe('libellés — le chiffre suit la saison, ou disparaît', () => {
+  beforeEach(() => { resetTout(); });
+  const T = () => globalThis.window.__T;
+  const BT = () => globalThis.window.__BADGE_T;
+
+  test('plus aucun « 101 » écrit en dur dans les phrases des 7 langues', () => {
+    for (const lg of ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de']){
+      assert.ok(!/101/.test(T()[lg]['tut.coll_intro_d']), `${lg} : le tutoriel annonce encore 101`);
+      assert.ok(!/101/.test(BT().legend_101[lg].desc), `${lg} : le badge annonce encore 101`);
+      assert.match(BT().legend_101[lg].desc, /\{n\}/, `${lg} : le badge doit porter {n}`);
+      assert.match(T()[lg]['tut.coll_intro_d'], /\{n\}/, `${lg} : le tutoriel doit porter {n}`);
+    }
+  });
+
+  test('le repli sans chiffre existe dans les 7 langues', () => {
+    for (const lg of ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de']){
+      const v = T()[lg]['b.all_cards'];
+      assert.ok(v && v.length > 5, `${lg} : b.all_cards manquante`);
+      assert.ok(!/\{n\}|\d/.test(v), `${lg} : le repli ne doit contenir AUCUN chiffre`);
+    }
+  });
+
+  test('« title.legend_101 » reste intacte — c’est un nom de clé, pas une affirmation', () => {
+    assert.equal(T().fr['title.legend_101'], 'Légende vivante');
+  });
+});

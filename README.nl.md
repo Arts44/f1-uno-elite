@@ -69,7 +69,7 @@ Het is een **PWA**: installeer haar vanuit je browser en ze draait als een nativ
 
 ## ✨ Wat het doet
 
-Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten, elk in tot 16 varianten (basiskleuren, foils, duals, Wild, Nitro, promo's):
+Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten voor het seizoen 2025, elk in tot 16 varianten (basiskleuren, foils, duals, Wild, Nitro, promo's):
 
 - 📇 **Volledig collectiebeheer** — in bezit / dubbelen / verlanglijst / favorieten, aantallen per variant, de hele collectie altijd in beeld.
 - ➕ **Snel toevoegen met één gebaar** — een +-knop op elke tegel opent een variantkiezer: één tik voegt een exemplaar toe, met een “Ongedaan maken”-melding. De koptekst toont je live voortgang (in bezit/totaal) boven een dunne voortgangslijn.

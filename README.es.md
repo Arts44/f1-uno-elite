@@ -69,7 +69,7 @@ Es una **PWA**: instálala desde tu navegador y funciona como una app nativa, to
 
 ## ✨ Qué hace
 
-Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas, cada una en hasta 16 variantes (colores base, foils, duales, Wild, Nitro, promos):
+Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas de la temporada 2025, cada una en hasta 16 variantes (colores base, foils, duales, Wild, Nitro, promos):
 
 - 📇 **Gestión completa de la colección** — en propiedad / repetidas / wishlist / favoritas, cantidades por variante, toda la colección siempre a la vista.
 - ➕ **Añadido rápido con un gesto** — un botón + en cada casilla abre un selector de variantes: un toque añade un ejemplar, con aviso «Deshacer». La cabecera de la página Colección muestra tu progreso en vivo: una barra más poseídas / que faltan / repetidas.

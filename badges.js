@@ -442,6 +442,23 @@ export function getBadgeCards(badgeId){
   return [];
 }
 
+/* ── Description d'un badge : le chiffre vient de la saison ──
+   « Posséder les 101 cartes » était vrai en 2025 et faux au millésime
+   suivant. Le libellé porte donc {n}, rempli par le total DÉCLARÉ.
+
+   Et quand aucun total n'est déclaré ? On ne remplit pas {n} avec une
+   estimation : le libellé d'un badge est une PROMESSE — « atteins ce
+   nombre et tu l'auras » — et promettre un chiffre faux est pire que
+   ne pas en donner. On bascule sur une formulation sans chiffre. Le
+   badge est de toute façon indébloquable dans ce cas (`partiel`), donc
+   les deux se tiennent : pas de chiffre, pas de déblocage. */
+function _descTexte(b, tr){
+  const brut = tr.desc || b.desc || '';
+  if(!brut.includes('{n}')) return brut;
+  const total = seasonCardCount();
+  return total === null ? t('b.all_cards') : brut.replace('{n}', total);
+}
+
 /* ── Détail d'un badge (panneau inline sous la grille de sa famille) ──
    Description, progression, date de déblocage, cartes contributives
    (getBadgeCards inchangé), objectif épinglable (auto verrouillé),
@@ -455,7 +472,7 @@ function _detailHTML(b, fam){
   const tr = (window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {});
   const diff = badgeDifficulty(b);
   let h = `<div class="bd-name">${b.emoji} ${tr.name || b.name}</div>
-    <div class="bd-desc">${tr.desc || b.desc || ''}</div>
+    <div class="bd-desc">${_descTexte(b, tr)}</div>
     <div class="bd-diff"><span class="bd-diff-lb dl-${difficultyLabelKey(diff).slice(7)}">${t(difficultyLabelKey(diff))}</span><span class="bd-diff-pct">${t('b.difficulty')} ${diff} %</span></div>`;
   if(unlocked){
     const d = badgeUnlockDate(store, b.id);

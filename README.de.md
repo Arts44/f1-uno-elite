@@ -69,7 +69,7 @@ Es ist eine **PWA**: aus dem Browser installiert läuft sie wie eine native App,
 
 ## ✨ Was sie kann
 
-Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten — 101 Karten, jede in bis zu 16 Varianten (Grundfarben, Foils, Duals, Wild, Nitro, Promos):
+Eine komplette **F1 UNO Élite**-Sammelkartensammlung verwalten — 101 Karten für die Saison 2025, jede in bis zu 16 Varianten (Grundfarben, Foils, Duals, Wild, Nitro, Promos):
 
 - 📇 **Vollständige Sammlungsverwaltung** — im Besitz / Dubletten / Wunschliste / Favoriten, Stückzahlen pro Variante, die gesamte Sammlung immer im Blick.
 - ➕ **Schnelles Hinzufügen mit einer Geste** — ein +-Button auf jeder Kachel öffnet eine Variantenauswahl: ein Tipp fügt ein Exemplar hinzu, mit „Rückgängig“-Toast. Der Header zeigt deinen Fortschritt live (besessen/gesamt) über einer feinen Fortschrittslinie.
