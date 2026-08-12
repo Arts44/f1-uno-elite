@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.57.0',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'The keypad has a clear key at last, in the empty corner it always had: one press wipes the whole entry instead of tapping backspace four times. It stays greyed out when there is nothing to clear.',
+        'Setting up a code can now go back. Until now, once your first four digits were in you had to type four wrong digits on purpose to return to step 1 of 2, and nothing let you leave and reconsider having a code at all.',
+      ],
+      fr: [
+        'Le pavé a enfin une touche pour tout effacer, dans le coin resté vide : un appui vide la saisie entière, au lieu de quatre appuis sur la correction. Elle reste grisée quand il n\'y a rien à effacer.',
+        'La création d\'un code peut désormais reculer. Jusqu\'ici, une fois les quatre premiers chiffres saisis, il fallait taper quatre chiffres faux exprès pour revenir à l\'étape 1 sur 2 — et rien ne permettait de ressortir pour reconsidérer l\'idée même d\'un code.',
+      ],
+      es: [
+        'El teclado tiene por fin una tecla para borrarlo todo, en la esquina que seguía vacía: una pulsación vacía la entrada entera en lugar de cuatro toques de corrección. Queda atenuada cuando no hay nada que borrar.',
+        'La creación de un código ya puede retroceder. Hasta ahora, una vez introducidos los cuatro primeros dígitos, había que teclear cuatro dígitos erróneos a propósito para volver al paso 1 de 2, y nada permitía salir y replantearse tener un código.',
+      ],
+      zh: [
+        '数字键盘终于在一直空着的那个角上有了清除键：按一次清空整条输入，不用连按四次退格。没有内容可清除时它保持灰显。',
+        '设置密码现在可以后退了。此前输入前四位后，只能故意输错四位才能回到第 1/2 步，也没有任何出口让你重新考虑要不要设密码。',
+      ],
+      it: [
+        'Il tastierino ha finalmente un tasto per cancellare tutto, nell\'angolo rimasto vuoto: una pressione svuota l\'intera immissione invece di quattro tocchi di correzione. Resta in grigio quando non c\'è nulla da cancellare.',
+        'La creazione di un codice ora può tornare indietro. Finora, inseriti i primi quattro numeri, bisognava digitarne quattro sbagliati apposta per tornare al passo 1 di 2, e nulla permetteva di uscire e ripensare l\'idea stessa di un codice.',
+      ],
+      nl: [
+        'Het toetsenblok heeft eindelijk een wistoets, in de hoek die altijd leeg bleef: één druk wist de hele invoer in plaats van vier keer corrigeren. Hij blijft grijs zolang er niets te wissen valt.',
+        'Een code aanmaken kan nu terug. Tot nu toe moest je, zodra de eerste vier cijfers stonden, expres vier foute cijfers typen om terug te keren naar stap 1 van 2, en niets liet je eruit om de code zelf te heroverwegen.',
+      ],
+      de: [
+        'Der Ziffernblock hat endlich eine Löschtaste, in der Ecke, die immer leer blieb: ein Druck leert die ganze Eingabe statt viermal Rücktaste. Sie bleibt ausgegraut, solange es nichts zu löschen gibt.',
+        'Die Code-Erstellung kann jetzt zurück. Bisher musste man nach den ersten vier Ziffern absichtlich vier falsche tippen, um zu Schritt 1 von 2 zurückzukehren, und nichts führte wieder hinaus, um die Idee eines Codes noch einmal zu überdenken.',
+      ],
+    },
+  },
+  {
     version: '1.56.1',
     date: '2026-08-12',
     changes: {

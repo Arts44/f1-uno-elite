@@ -86,3 +86,96 @@ describe('carte Sécurité & i18n', () => {
     });
   }
 });
+
+/* ══════════════════════════════════════════════════════════
+   LA TOUCHE MANQUANTE + LA MARCHE ARRIÈRE (1.57.0)
+
+   Le pavé est une grille 3 × 4 dont la dernière rangée était
+   [⌫] [0] [trou]. Le trou reçoit UN rôle stable — tout effacer —
+   et jamais un second selon l'état : une touche qui change de sens
+   entre deux appuis, au même endroit, est un piège qui ne se voit
+   qu'à l'usage.
+
+   Le vrai manque était ailleurs : la création n'avait AUCUNE marche
+   arrière. Passé en 2/2, le seul moyen de revenir en 1/2 était de
+   taper 4 chiffres faux exprès.
+   ══════════════════════════════════════════════════════════ */
+describe('pavé PIN — touche « tout effacer » et marche arrière', () => {
+  const pin = read('pin.js');
+  const css = read('styles.css');
+
+  test('les QUATRE pavés portent la touche, et elle part désactivée', () => {
+    const pads = pin.match(/class="pin-key zero"/g) || [];
+    const clears = pin.match(/class="pin-key clear"[^>]*/g) || [];
+    assert.equal(clears.length, pads.length, 'un pavé de pin.js sans touche « effacer »');
+    assert.ok(pads.length >= 3, 'les pavés de pin.js ont disparu ?');
+    for (const c of clears) assert.match(c, /\sdisabled/, 'la touche doit partir désactivée');
+    for (const f of ['index.html', 'index-dev.html']){
+      const html = read(f);
+      assert.match(html, /class="pin-key clear"[^>]*\sdisabled/, `${f} : touche absente ou active`);
+      assert.match(html, /data-action="pinClear"/, `${f} : action non câblée`);
+    }
+  });
+
+  test('le rôle ne bascule jamais : aucune touche de pavé ne navigue', () => {
+    const clears = pin.match(/class="pin-key clear"[\s\S]{0,220}?<\/button>/g) || [];
+    for (const c of clears){
+      assert.ok(!/step_back|back_to_choice/.test(c),
+        'la touche du pavé ne doit pas porter la navigation d’étape');
+    }
+  });
+
+  test('la touche suit la saisie (désactivée quand il n’y a rien à effacer)', () => {
+    assert.match(pin, /\.pin-key\.clear'\)\.forEach\(k => \{\s*k\.disabled = pinEntry\.length === 0;/,
+      'l’état doit être repeint dans updatePinDots — le seul passage obligé');
+  });
+
+  test('pinClear vide TOUT (et ne se contente pas d’un caractère)', () => {
+    assert.match(pin, /export function pinClear\(\)[\s\S]*?pinEntry = '';/);
+  });
+
+  test('la création peut reculer : 2/2 → 1/2 et sortie du tunnel', () => {
+    assert.match(pin, /id="setupBackBtn"/, 'bouton de retour absent de la création');
+    assert.match(pin, /#setupBackBtn'\)/, 'le bouton existe mais n’est pas récupéré');
+    assert.match(pin, /pin\.step_back/);
+    assert.match(pin, /pin\.back_to_choice/);
+    assert.match(pin, /showSetupScreen\(\);/,
+      'à 1/2, le retour doit rendre la main à la question d’origine');
+  });
+
+  test('le flux de réglages gagne le retour, sans perdre « Annuler »', () => {
+    assert.match(pin, /id="pinFlowBack"/);
+    assert.match(pin, /id="pinFlowCancel"/);
+    assert.match(pin, /#pinFlowBack'\)\.hidden = idx === 0/,
+      'pas de retour à la première étape : il n’y a rien derrière');
+  });
+
+  test('les trois clés existent dans les 7 langues', () => {
+    const T = globalThis.window.__T;
+    for (const lg of LANGS){
+      for (const k of ['pin.clear', 'pin.step_back', 'pin.back_to_choice']){
+        assert.ok(T[lg] && T[lg][k], `${lg} : ${k} manquante`);
+      }
+    }
+  });
+
+  /* Le test de source disait « câblée » et il avait raison : le `case
+     'pinClear'` existait bien. Mais la délégation de initEvents() n'est
+     posée qu'APRÈS l'authentification, et le pavé sert D'ABORD à
+     déverrouiller. La touche était donc visible, activée, sans effet sur
+     l'écran de connexion. Trouvé au navigateur, pas ici — d'où ce test,
+     qui vérifie le câblage PRÉ-connexion, celui qui manquait. */
+  test('la touche est câblée AVANT l’authentification, comme les chiffres', () => {
+    const app = read('app.js');
+    const preLogin = app.slice(app.indexOf('_pinEventListenersAttached'));
+    assert.match(preLogin, /closest\('\[data-action="pinDel"\]'\)/,
+      'repère perdu : le bloc pré-connexion a changé de forme');
+    assert.match(preLogin, /closest\('\[data-action="pinClear"\]'\)/,
+      'sans ce câblage, la touche ne fait rien sur l’écran de déverrouillage');
+  });
+
+  test('la grille du pavé ne peut plus être élargie par son contenu', () => {
+    assert.match(css, /\.pin-keypad\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/,
+      'sans minmax(0,…), un libellé large déforme les colonnes (mesuré : 70/70/86)');
+  });
+});

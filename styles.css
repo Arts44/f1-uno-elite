@@ -194,7 +194,13 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 
 .pin-keypad {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* minmax(0,…) et pas 1fr seul : `1fr` vaut `minmax(auto, 1fr)`, donc le
+     contenu le plus large ÉLARGIT sa colonne. Mesuré avec un libellé
+     « Effacer » sur la 3e touche : colonnes 70 / 70 / 86 px, chiffres
+     décalés. C'est aussi pourquoi cette touche porte un pictogramme et
+     non un mot — « Löschen », « Wissen », « 清除 » n'ont pas la même
+     largeur, et la grille ne doit pas dépendre de la langue. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap:var(--space-10px);
   width: 100%;
 }
@@ -217,6 +223,18 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .pin-key.del { font-size: 1rem; color: var(--tx3); }
 .pin-key.del:hover { color: var(--red); border-color: var(--red); }
 .pin-key.zero { grid-column: 2; }
+/* ── « Tout effacer » — la case libre du pavé (1.57.0) ──
+   Un rôle, toujours le même. Désactivée quand il n'y a rien à effacer :
+   à sa place, sans effet, plutôt qu'apparaissant et disparaissant — une
+   touche qui va et vient déplace les voisines sous le doigt. */
+.pin-key.clear { display: flex; align-items: center; justify-content: center; color: var(--tx3); }
+.pin-key.clear .ic { width: 20px; height: 20px; display: block; }
+.pin-key.clear:hover:not([disabled]) { color: var(--red); border-color: var(--red); }
+.pin-key.clear[disabled] { opacity: 0.35; cursor: default; }
+.pin-key.clear[disabled]:hover { color: var(--tx3); border-color: var(--border); background: var(--surface2); }
+.pin-key.clear[disabled]:active { transform: none; background: var(--surface2); }
+/* Navigation d'étape : sous le pavé, en texte — jamais dans la grille. */
+.pin-flow-actions { display: flex; gap: var(--space-2); justify-content: center; flex-wrap: wrap; }
 .pin-error-msg {
   margin-top: var(--space-4);
   font-size: 0.8rem;

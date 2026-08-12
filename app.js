@@ -20,7 +20,7 @@ import { seedNewAutoBadges,
   toggleTitlePicker, getUnlockedTitles, selectTitle
 } from './badges.js';
 import {
-  pinKey, pinDel, showAdminPinScreen, showSetupScreen,
+  pinKey, pinDel, pinClear, showAdminPinScreen, showSetupScreen,
   needsLanguageChoice, showLanguageScreen,
   _bindViewerBrowseBtn, isViewerModeAllowed, isSetupDone, isPinEnabled,
   setAuthenticated, applySavedFont
@@ -218,6 +218,10 @@ function initEvents(){
         pinDel();
         break;
       }
+      case 'pinClear': {
+        pinClear();
+        break;
+      }
       case 'toggleTheme': break; // handled by pre-login global listener
       case 'exportCollection': {
         exportCollection();
@@ -330,6 +334,20 @@ if(!window._pinEventListenersAttached) {
     if(el) {
       log('PIN delete button click detected');
       pinDel();
+    }
+  }, { passive: true });
+
+  /* « Tout effacer » DOIT être câblée ici aussi, et pas seulement dans la
+     délégation de initEvents() : cette dernière n'existe qu'APRÈS
+     l'authentification, alors que le pavé sert d'abord à déverrouiller.
+     Câblée seulement là-bas, la touche était visible, activée, et sans
+     effet sur l'écran de connexion — trouvé au navigateur, pas aux tests
+     de source, qui la voyaient bien « câblée ». */
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-action="pinClear"]');
+    if(el) {
+      log('PIN clear button click detected');
+      pinClear();
     }
   }, { passive: true });
 }

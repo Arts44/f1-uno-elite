@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maquette n°3 — pavé PIN</title>
+<link rel="stylesheet" href="./styles.css">
+<style>
+  html,body{height:auto;overflow:auto;}
+  body{margin:0;padding:24px;background:var(--bg);color:var(--tx1);display:block;}
+  .mk-t{font:700 20px/1.3 var(--font-d,system-ui);margin:0 0 6px;color:var(--tx1);}
+  .mk-h{font:600 12px/1.4 var(--font-b,system-ui);color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin:0 0 4px;}
+  .mk-p{font:400 13px/1.6 var(--font-b,system-ui);color:var(--tx2);max-width:80ch;margin:0 0 18px;}
+  .mk-sec{margin:0 0 46px;}
+  .mk-row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .mk-cap{font:500 11px/1.4 var(--font-b,system-ui);color:var(--tx3);margin:0 0 8px;text-align:center;}
+  .mk-pane{border:1px dashed var(--border);border-radius:14px;padding:14px;}
+  .mk-pane .login-box{width:300px;padding:20px 18px 18px;margin:0;}
+  .mk-note{font:400 12px/1.5 var(--font-b,system-ui);color:var(--tx3);margin:8px 0 0;max-width:300px;}
+  #mkTheme{position:fixed;right:20px;top:20px;z-index:9;padding:9px 14px;border-radius:999px;
+    border:1px solid var(--border);background:var(--surface);color:var(--tx1);
+    font:600 12px/1 var(--font-b,system-ui);cursor:pointer;min-height:36px;}
+  /* — échafaudage de maquette — */
+  .mk-hole{border:1px dashed var(--border);border-radius:12px;opacity:.5;display:flex;
+    align-items:center;justify-content:center;font:600 10px/1 var(--font-b,system-ui);color:var(--tx3);}
+  .pin-key.clear{font-size:.95rem;color:var(--tx3);display:flex;align-items:center;justify-content:center;}
+  .pin-key.clear .ic{width:20px;height:20px;}
+  /* Sécurité de grille : sans minmax(0,…), le contenu le plus large
+     ÉLARGIT sa colonne — c'est ce qui déforme le pavé avec un libellé. */
+  .mk-pane .pin-keypad{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .mk-deform .pin-keypad{grid-template-columns:repeat(3,1fr);}
+  .pin-key.clear:hover{color:var(--red);border-color:var(--red);}
+  .pin-key.clear[disabled]{opacity:.35;cursor:default;}
+  .pin-key.clear[disabled]:hover{color:var(--tx3);border-color:var(--border);background:var(--surface2);}
+  .pin-back{background:none;border:1.5px solid var(--border);border-radius:var(--r-pill);color:var(--tx2);
+    font:600 12px/1 var(--font-b,system-ui);padding:8px 18px;cursor:pointer;margin-top:var(--space-4);}
+  .mk-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+<button id="mkTheme" type="button">Thème sombre</button>
+<h1 class="mk-t">n°3 — Pavé PIN · la touche qui manque</h1>
+<p class="mk-p">Feuille de style réelle (<code>styles.css</code>), balisage réel du pavé. Le pavé est une grille
+3 × 4 : la dernière rangée est <b>[⌫] [0] [trou]</b>. Le trou est en bas à droite, dans les quatre écrans qui
+utilisent le pavé.</p>
+<div id="out"></div>
+
+<script>
+const DOTS = n => `<div class="otp-wrap pin-segs"><div class="otp-boxes" aria-hidden="true">${
+  [0,1,2,3].map(i => `<span class="otp-box${i<n?' filled':''}">${i<n?'•':'<span class="otp-caret"></span>'}</span>`).join('')
+}</div></div>`;
+
+const KEYS = last => `<div class="pin-keypad">
+  ${[1,2,3,4,5,6,7,8,9].map(d => `<button class="pin-key" type="button">${d}</button>`).join('')}
+  <button class="pin-key del" type="button">⌫</button>
+  <button class="pin-key zero" type="button">0</button>
+  ${last}
+</div>`;
+
+const IC = i => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"
+  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${i}</svg>`;
+const X_CIRCLE = IC('<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>');
+const ARROW_L  = IC('<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>');
+
+const HOLE  = `<div class="mk-hole">(vide)</div>`;
+const CLEAR = (on = true) => `<button class="pin-key clear" type="button"${on ? '' : ' disabled'}
+  aria-label="Effacer la saisie">${X_CIRCLE}</button>`;
+const BACK_KEY = `<button class="pin-key clear" type="button" aria-label="Étape précédente">${ARROW_L}</button>`;
+const CLEAR_MOT = `<button class="pin-key clear mk-mot" type="button">Effacer</button>`;
+
+const LOCK = `<svg class="pin-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+  <path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`;
+
+/* Un écran = un contexte + une disposition. */
+function screen({ title, step, dots, last, below = '', note = '' }){
+  return `<div>
+    <div class="mk-pane"><div class="login-box">
+      ${LOCK}
+      <div class="pin-flow-title">${title}</div>
+      ${step ? `<div class="pin-flow-step">${step.txt} <span class="pin-flow-num">${step.n}</span></div>` : '<div style="height:10px"></div>'}
+      ${DOTS(dots)}
+      ${KEYS(last)}
+      <div class="mk-actions">${below}</div>
+    </div></div>
+    ${note ? `<p class="mk-note">${note}</p>` : ''}
+  </div>`;
+}
+
+const CANCEL = `<button class="pin-back" type="button">Annuler</button>`;
+const BACK   = `<button class="pin-back" type="button">← Étape précédente</button>`;
+const QUIT   = `<button class="pin-back" type="button">← Revenir au choix</button>`;
+
+document.getElementById('out').innerHTML = `
+<section class="mk-sec">
+  <p class="mk-h">État actuel</p>
+  <h2 class="mk-t">Ce qui existe, et ce qui manque exactement</h2>
+  <p class="mk-p">Quatre écrans utilisent le pavé. Deux ont déjà une sortie (un bouton « Annuler » sous le
+  pavé) ; deux n'en ont aucune. <b>Aucun des quatre</b> ne permet d'effacer la saisie entière : seul ⌫,
+  chiffre par chiffre.</p>
+  <div class="mk-row">
+    ${screen({ title:'Déverrouillage', dots:3, last:HOLE,
+      note:'<b>Verrouillage.</b> Aucune sortie — et c\'est normal : il n\'y a rien à annuler, on est devant la porte. Mais trois chiffres mal tapés se reprennent en trois appuis.' })}
+    ${screen({ title:'Choisir un code', step:{txt:'Confirme ton code', n:'2/2'}, dots:2, last:HOLE,
+      note:'<b>Création — le vrai trou.</b> Une fois les 4 premiers chiffres saisis, on passe en 2/2 <b>sans retour possible</b> : ni vers 1/2, ni vers la question « veux-tu un code ? ». La seule issue est de taper 4 chiffres faux pour provoquer une erreur.' })}
+    ${screen({ title:'Changer le code', step:{txt:'Nouveau code', n:'2/3'}, dots:1, last:HOLE, below:CANCEL,
+      note:'<b>Réglages.</b> A déjà « Annuler » (abandon total), mais pas de retour à l\'étape précédente.' })}
+  </div>
+</section>
+
+<section class="mk-sec">
+  <p class="mk-h">Disposition A</p>
+  <h2 class="mk-t">Une touche contextuelle dans le trou</h2>
+  <p class="mk-p">La case libre reçoit une touche dont le sens dépend de l'état : <b>Effacer</b> quand des
+  chiffres sont saisis, <b>Retour</b> quand la saisie est vide et qu'une étape précédente existe. Un seul
+  ajout, jamais de case morte.</p>
+  <div class="mk-row">
+    ${screen({ title:'Déverrouillage', dots:3, last:CLEAR(),
+      note:'Saisie en cours → la touche efface tout.' })}
+    ${screen({ title:'Choisir un code', step:{txt:'Confirme ton code', n:'2/2'}, dots:0, last:BACK_KEY,
+      note:'Saisie vide + étape précédente → la même touche devient « Retour ».' })}
+    ${screen({ title:'Choisir un code', step:{txt:'Confirme ton code', n:'2/2'}, dots:2, last:CLEAR(),
+      note:'<b>Le défaut :</b> au même endroit, sous le même doigt, la touche vient de changer de sens. On appuie pour effacer, on recule d\'une étape — ou l\'inverse.' })}
+  </div>
+</section>
+
+<section class="mk-sec">
+  <p class="mk-h">Disposition B</p>
+  <h2 class="mk-t">Un rôle stable dans le pavé, la navigation en dehors</h2>
+  <p class="mk-p">La case libre reçoit <b>Effacer</b>, et rien d'autre, jamais — grisée quand il n'y a rien à
+  effacer, donc à sa place mais sans effet. La navigation (retour d'étape, abandon) reste <b>sous</b> le pavé,
+  en texte, là où « Annuler » vit déjà dans deux écrans sur quatre. Les deux gestes ne se disputent jamais le
+  même doigt.</p>
+  <div class="mk-row">
+    ${screen({ title:'Déverrouillage', dots:3, last:CLEAR(),
+      note:'Rien à ajouter dessous : il n\'y a rien à annuler devant une porte fermée.' })}
+    ${screen({ title:'Choisir un code', step:{txt:'Entre ton code', n:'1/2'}, dots:0, last:CLEAR(false),
+      below:QUIT, note:'Touche grisée (rien à effacer). Le retour sort du tunnel : on revient à « veux-tu un code ? ».' })}
+    ${screen({ title:'Choisir un code', step:{txt:'Confirme ton code', n:'2/2'}, dots:2, last:CLEAR(),
+      below:BACK, note:'2/2 → 1/2 : on peut changer d\'avis sur le code choisi sans le taper faux exprès.' })}
+    ${screen({ title:'Changer le code', step:{txt:'Nouveau code', n:'2/3'}, dots:1, last:CLEAR(),
+      below:`${BACK}${CANCEL}`, note:'Les réglages gardent « Annuler » et gagnent le retour d\'étape.' })}
+  </div>
+</section>
+
+<section class="mk-sec">
+  <p class="mk-h">Disposition C</p>
+  <h2 class="mk-t">Le trou reste, tout passe en texte sous le pavé</h2>
+  <p class="mk-p">Aucune touche ajoutée : « Tout effacer » et « Retour » deviennent deux boutons de texte
+  sous le pavé. Le pavé reste strictement numérique.</p>
+  <div class="mk-row">
+    ${screen({ title:'Déverrouillage', dots:3, last:HOLE,
+      below:`<button class="pin-back" type="button">Tout effacer</button>`,
+      note:'Le pavé reste un pavé de chiffres — mais le trou reste un trou, et le geste le plus fréquent (corriger) descend hors de la zone du pouce.' })}
+    ${screen({ title:'Choisir un code', step:{txt:'Confirme ton code', n:'2/2'}, dots:2, last:HOLE,
+      below:`<button class="pin-back" type="button">Tout effacer</button>${BACK}`,
+      note:'Deux boutons de texte côte à côte sous le pavé : la sortie est là, mais l\'écran s\'allonge et la hiérarchie se brouille.' })}
+  </div>
+</section>`;
+
+document.getElementById('out').innerHTML += `
+<section class="mk-sec">
+  <p class="mk-h">Mesure — ce qui a écarté le libellé</p>
+  <h2 class="mk-t">Un mot dans le pavé déforme le pavé</h2>
+  <p class="mk-p">Premier essai : écrire « Effacer » sur la touche. Les colonnes valent
+  <code>repeat(3, 1fr)</code>, et <code>1fr</code> vaut <code>minmax(auto, 1fr)</code> : le contenu le plus
+  large <b>élargit sa colonne</b>. Mesuré à 249 px de boîte : <b>70 / 70 / 86 px</b> — la dernière colonne
+  déborde, les chiffres se décalent. Et ce n'est pas qu'une question de CSS : le mot change de longueur dans
+  les 7 langues (« Löschen », « Wissen », « 清除 »), donc la largeur du pavé dépendrait de la langue.
+  Un pictogramme n'a pas de traduction — c'est pour ça que les dispositions ci-dessus en utilisent un.</p>
+  <div class="mk-row">
+    <div class="mk-pane mk-deform"><p class="mk-cap">Libellé — colonnes 70 / 70 / 86</p><div class="login-box" style="width:249px">
+      ${DOTS(2)}${KEYS(CLEAR_MOT)}</div></div>
+    <div class="mk-pane"><p class="mk-cap">Pictogramme — colonnes égales</p><div class="login-box" style="width:249px">
+      ${DOTS(2)}${KEYS(CLEAR())}</div></div>
+  </div>
+</section>`;
+
+document.getElementById('mkTheme').addEventListener('click', e => {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  e.currentTarget.textContent = dark ? 'Thème sombre' : 'Thème clair';
+});
+</script>
+</body>
+</html>

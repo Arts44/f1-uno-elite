@@ -128,6 +128,12 @@ function updatePinDots() { // nom historique — repeint toutes les .pin-segs
       b.classList.toggle('active', i === active);
     });
   });
+  // La touche « tout effacer » suit la saisie : présente à sa place,
+  // sans effet quand il n'y a rien à effacer. Repeinte ICI parce que
+  // c'est le seul endroit traversé par TOUTES les écritures de pinEntry.
+  document.querySelectorAll('.pin-key.clear').forEach(k => {
+    k.disabled = pinEntry.length === 0;
+  });
 }
 
 // Échec : secousse + contour d'erreur (orange, jamais l'accent), message,
@@ -172,6 +178,21 @@ export function pinDel() {
     pinEntry = pinEntry.slice(0, -1);
     updatePinDots();
   }
+}
+
+/* ── Tout effacer (1.57.0) ──
+   La case libre du pavé (3 × 4 : [⌫] [0] [trou]) reçoit UN rôle, et
+   toujours le même : vider la saisie. Elle ne devient jamais « Retour »
+   selon l'état — une touche qui change de sens entre deux appuis, au
+   même endroit sous le même doigt, est un piège qui ne se voit qu'à
+   l'usage. La navigation d'étape vit SOUS le pavé, en texte.
+   Effacer une saisie n'ouvre aucune porte : la touche est donc présente
+   partout, y compris au déverrouillage, où l'on tape le plus souvent. */
+export function pinClear() {
+  if (pinEntry.length === 0) return;
+  pinEntry = '';
+  _segReveal = -1;
+  updatePinDots();
 }
 
 async function checkPin(opts={}) {
@@ -333,12 +354,51 @@ function showSetupPinEntry(ls, subtitle){
       <button class="pin-key" data-digit="9" type="button">9</button>
       <button class="pin-key del" data-action="pinDel" type="button">⌫</button>
       <button class="pin-key zero" data-digit="0" type="button">0</button>
+        <button class="pin-key clear" data-action="pinClear" type="button" disabled aria-label="${t('pin.clear')}">${icon('xCircle')}</button>
     </div>
-    <div class="pin-error-msg" id="pin-error"></div>`;
+    <div class="pin-error-msg" id="pin-error"></div>
+    <button class="pin-flow-cancel" id="setupBackBtn" type="button"></button>`;
   pinEntry = '';
+
+  /* ── La marche arrière de la création (1.57.0) ──
+     Il n'y en avait AUCUNE. Une fois les 4 premiers chiffres saisis, on
+     basculait en 2/2 sans retour possible : ni vers 1/2 pour changer de
+     code, ni vers la question « veux-tu un code ? ». La seule issue
+     était de taper 4 chiffres FAUX exprès pour provoquer l'erreur qui
+     ramène à 1/2. C'était le vrai manque, sous la demande d'une touche.
+     Le bouton vit SOUS le pavé, en texte, comme « Annuler » ailleurs :
+     la navigation d'étape ne partage jamais un doigt avec les chiffres. */
+  const back = box.querySelector('#setupBackBtn');
+  const paintBack = () => {
+    const confirming = window._setupPhase === 'confirm';
+    back.textContent = confirming ? t('pin.step_back') : t('pin.back_to_choice');
+  };
+  const toStep1 = () => {
+    window._setupPhase = 'enter';
+    window._setupFirstPin = '';
+    pinEntry = '';
+    box.querySelector('.setup-sub').innerHTML = `${t('setup.enter')} <span class="pin-flow-num">1/2</span>`;
+    box.querySelector('#pin-error').textContent = '';
+    updatePinDots();
+    paintBack();
+  };
+  back.addEventListener('click', e => {
+    e.stopPropagation();
+    if(window._setupPhase === 'confirm') toStep1();
+    else {
+      // Sortie du tunnel : on rend la main à la question d'origine.
+      window._setupCheckOverride = null;
+      window._setupPhase = null;
+      window._setupFirstPin = '';
+      pinEntry = '';
+      showSetupScreen();
+    }
+  });
+
   // Override checkPin to do setup-confirm flow
   window._setupPhase = 'enter';
   window._setupFirstPin = '';
+  paintBack();
   window._setupCheckOverride = async ()=>{
     if(window._setupPhase === 'enter'){
       window._setupFirstPin = pinEntry;
@@ -346,6 +406,7 @@ function showSetupPinEntry(ls, subtitle){
       pinEntry = '';
       box.querySelector('.setup-sub').innerHTML = `${t('setup.confirm')} <span class="pin-flow-num">2/2</span>`;
       updatePinDots();
+      paintBack();
     } else {
       if(pinEntry === window._setupFirstPin){
         const hash = await sha256(pinEntry);
@@ -360,6 +421,7 @@ function showSetupPinEntry(ls, subtitle){
         window._setupPhase = 'enter';
         window._setupFirstPin = '';
         box.querySelector('.setup-sub').innerHTML = `${t('setup.enter')} <span class="pin-flow-num">1/2</span>`;
+        paintBack();
         _segsError(t('setup.mismatch'));
       }
     }
@@ -444,6 +506,7 @@ function _askPin(onOk){
         ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="pin-key" data-digit="${d}" type="button">${d}</button>`).join('')}
         <button class="pin-key del" data-action="pinDel" type="button">⌫</button>
         <button class="pin-key zero" data-digit="0" type="button">0</button>
+        <button class="pin-key clear" data-action="pinClear" type="button" disabled aria-label="${t('pin.clear')}">${icon('xCircle')}</button>
       </div>
       <div class="pin-error-msg" id="pin-error"></div>
       <button style="background:none;border:1.5px solid var(--border);border-radius:100px;color:var(--tx2);font-size:12px;font-weight:600;padding:7px 18px;cursor:pointer;font-family:var(--font-b);margin-top:14px;" id="askPinCancelBtn">${t('adm.cancel')}</button>
@@ -491,18 +554,30 @@ function _pinFlow(title, steps, onDone){
         ${[1,2,3,4,5,6,7,8,9].map(d=>`<button class="pin-key" data-digit="${d}" type="button">${d}</button>`).join('')}
         <button class="pin-key del" data-action="pinDel" type="button">⌫</button>
         <button class="pin-key zero" data-digit="0" type="button">0</button>
+        <button class="pin-key clear" data-action="pinClear" type="button" disabled aria-label="${t('pin.clear')}">${icon('xCircle')}</button>
       </div>
       <div class="pin-error-msg" id="pin-error" role="alert" aria-live="assertive"></div>
-      <button class="pin-flow-cancel" id="pinFlowCancel" type="button">${t('adm.cancel')}</button>
+      <div class="pin-flow-actions">
+        <button class="pin-flow-cancel" id="pinFlowBack" type="button" hidden>${t('pin.step_back')}</button>
+        <button class="pin-flow-cancel" id="pinFlowCancel" type="button">${t('adm.cancel')}</button>
+      </div>
     </div>`;
   document.body.appendChild(overlay);
   let idx = 0; const ctx = {};
+  /* Le retour n'existe QU'À partir de la 2e étape : à la première, il n'y
+     a rien derrière — « Annuler » est déjà la sortie. Un bouton présent
+     mais inerte y mentirait sur ce qui est possible. */
   const setStep = () => {
     overlay.querySelector('#pinFlowPrompt').textContent = t(steps[idx].prompt);
     overlay.querySelector('#pinFlowNum').textContent = `${idx+1}/${steps.length}`;
     overlay.querySelector('#pin-error').textContent = ''; // l'erreur appartient à SON étape
+    overlay.querySelector('#pinFlowBack').hidden = idx === 0;
     pinEntry = ''; _segReveal = -1; updatePinDots();
   };
+  overlay.querySelector('#pinFlowBack').addEventListener('click', e => {
+    e.stopPropagation();
+    if(idx > 0){ idx--; setStep(); }
+  });
   const close = () => {
     overlay.remove(); pinEntry = '';
     window._adminOverlayActive = false;
@@ -555,6 +630,7 @@ export function showAdminPinScreen(){
         <button class="pin-key" data-digit="9" type="button">9</button>
         <button class="pin-key del" data-action="pinDel" type="button">⌫</button>
         <button class="pin-key zero" data-digit="0" type="button">0</button>
+        <button class="pin-key clear" data-action="pinClear" type="button" disabled aria-label="${t('pin.clear')}">${icon('xCircle')}</button>
       </div>
       <div class="pin-error-msg" id="pin-error"></div>
       <div style="display:flex;gap:10px;margin-top:14px;width:100%;justify-content:center;">

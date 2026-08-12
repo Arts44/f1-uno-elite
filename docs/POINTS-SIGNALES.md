@@ -128,7 +128,31 @@ inatteignables tant que le fichier est incomplet, ce qui est honnête.
 
 ---
 
-## 4. Le plancher de hauteur de tuile n'a pas été reconfirmé
+## 4. Un émoji oublié par la passe de 1.31.0
+
+`index.html` (et `index-dev.html`) : le bouton du mode spectateur porte
+encore `👁 Parcourir` en dur.
+
+```html
+<button class="viewer-browse-btn" id="viewerBrowseBtn" … data-i18n="login.browse">👁 Parcourir</button>
+```
+
+Deux défauts d'un coup :
+
+1. **C'est le dernier émoji d'interface** — la passe de 1.31.0 les a tous
+   remplacés par des SVG (`icons.js`), sauf celui-ci. `eye` existe déjà
+   dans `icons.js`, il n'y a rien à dessiner.
+2. **Le texte est en dur ET traduit** : `data-i18n="login.browse"` écrase
+   le contenu au premier `applyLanguage()`, donc l'émoji ne survit que
+   jusqu'au premier rendu — il n'apparaît qu'en français, par accident.
+
+Correction : `icon('eye')` + le libellé par `data-i18n`, comme partout
+ailleurs. Trouvé pendant le chantier du pavé PIN (1.57.0), délibérément
+pas emporté avec lui.
+
+---
+
+## 5. Le plancher de hauteur de tuile n'a pas été reconfirmé
 
 `--card-h` vaut 320. Le **plancher** — la plus petite valeur qui ne
 comprime aucun bloc — a été mesuré à **300** sur la MAQUETTE (feuille de
@@ -145,7 +169,7 @@ chiffre de départ est à remesurer, pas à reprendre ici.
 
 ---
 
-## 5. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
+## 6. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
 
 Passée en `width:min(380px, 100vw - 24px)` avec un remplissage
 `clamp(20px, 6vw, 48px)`. Mesuré après : à 320 px la boîte fait 287 et
