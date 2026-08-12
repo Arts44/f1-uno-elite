@@ -894,8 +894,67 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
   to   { transform: rotate(360deg) scale(1.45); }
 }
 
-.crown{position:absolute;top:6px;left:7px;font-size:13px;}
-.replacement-icon{position:absolute;top:6px;right:6px;font-size:11px;background:linear-gradient(135deg,#FF6B35,#FFD700);color:white;padding:3px var(--space-6px);border-radius:8px;font-weight:600;letter-spacing:0.2px;backdrop-filter:blur(2px);box-shadow:0 2px 6px rgba(255,107,53,0.3);z-index:2;}
+/* ══════════════════════════════════════════════════════════
+   MARQUEURS DE COIN — un socle, quatre glyphes, aucune teinte
+   (1.58.0)
+
+   POURQUOI CES JETONS NE SUIVENT PAS LE THÈME. C'est la question
+   qu'on se posera en les lisant, alors autant y répondre ici : le
+   fond d'un marqueur n'est pas la page, c'est le VISUEL de la
+   carte — livrée rose Alpine, cyan Mercedes, tracé de circuit,
+   foil, monogramme pâle. Sur une tuile Mercedes, le thème sombre
+   ne rend pas le fond sombre. Un jeton qui basculerait avec le
+   thème ne serait donc juste que par accident. Voile fixe + glyphe
+   blanc, c'est le seul repère stable des deux côtés.
+
+   POURQUOI PAS DE COULEUR. Les tuiles portent déjà la couleur
+   d'écurie, la rareté et les foils ; un marqueur teinté de plus est
+   du bruit sur une information secondaire. Les quatre se lisent par
+   leur FORME — couronne anguleuse, flèches circulaires, arceau
+   d'écoute, rosette pleine.
+
+   CONTRASTE MESURÉ du glyphe sur le voile composité, pire cas =
+   visuel blanc pur : 4,76 (seuil WCAG 1.4.11 pour un objet
+   graphique : 3). Un voile à 0.46 n'y donnait que 3,47, soit une
+   marge d'une décimale ; 0.55 la triple sans assombrir les tuiles
+   sombres (19,45 → 19,72).
+   ══════════════════════════════════════════════════════════ */
+:root{
+  --mark-ink:#FFFFFF;
+  --mark-scrim:rgba(0,0,0,0.55);
+  --mark-ring:rgba(255,255,255,0.20);
+  --mark-shadow:0 1px 3px rgba(0,0,0,0.45);
+  --mark-box:22px;
+  --mark-glyph:14px;
+  --mark-inset:6px;
+  --mark-stack:32px;   /* 2e marqueur du même coin */
+}
+.card-visual .crown,
+.card-visual .replacement-icon,
+.card-visual .director-icon,
+.card-visual .set-flag,
+.modal-visual .set-flag{
+  position:absolute;z-index:2;padding:0;
+  width:var(--mark-box);height:var(--mark-box);
+  display:flex;align-items:center;justify-content:center;
+  border-radius:var(--r-pill);
+  background:var(--mark-scrim);
+  border:1px solid var(--mark-ring);
+  box-shadow:var(--mark-shadow);
+  backdrop-filter:blur(2px);
+  color:var(--mark-ink);
+}
+.card-visual .crown .ic,
+.card-visual .replacement-icon .ic,
+.card-visual .director-icon .ic,
+.card-visual .set-flag .ic,
+.modal-visual .set-flag .ic{
+  width:var(--mark-glyph);height:var(--mark-glyph);display:block;filter:none;
+}
+.card-visual .crown{top:var(--mark-inset);left:var(--mark-inset);}
+.card-visual .replacement-icon,
+.card-visual .director-icon,
+.card-visual .set-flag{top:var(--mark-inset);right:var(--mark-inset);}
 
 /* ── SET COMPLET — au moins 1 exemplaire de CHAQUE type de la carte.
    Liseré : fin double anneau NEUTRE hors de la tuile (outline décalé),
@@ -903,13 +962,17 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    foil. Badge : pastille 🏁 en coin du visuel, pendant de la couronne
    champion. 100 % statique — rien à couper en prefers-reduced-motion. */
 .card.set-complete{outline:1.5px solid color-mix(in srgb, var(--tx1) 30%, transparent);outline-offset:3px;}
-.set-flag{position:absolute;top:6px;right:6px;z-index:2;display:inline-flex;align-items:center;justify-content:center;height:20px;padding:0 var(--space-6px);border-radius:var(--r-pill);font-size:11px;background:var(--surface);border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,0.15);}
-/* Carte réserve : le 🔄 occupe déjà le coin — le 🏁 glisse dessous */
-.replacement-icon ~ .set-flag{top:32px;}
+/* Un marqueur de CATÉGORIE occupe déjà le coin : le sceau glisse dessous.
+   Les deux sélecteurs, pas seulement la réserve — le directeur porte le
+   même rôle depuis 1.58.0, et un seul des deux aurait suffi à laisser
+   passer une superposition. */
+.replacement-icon ~ .set-flag,
+.director-icon ~ .set-flag{top:var(--mark-stack);}
 /* Fiche carte : même badge sur le visuel + liseré inset neutre (le
    liseré externe est un langage de tuile ; ici il suit le visuel) */
 .modal-visual.set-complete{box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--tx1) 30%, transparent);}
-.modal-visual .set-flag{top:10px;right:52px;height:24px;font-size:12px;}
+.modal-visual{--mark-box:26px;--mark-glyph:16px;}
+.modal-visual .set-flag{top:10px;right:52px;}
 
 /* ── Rareté ÉTERNEL (7e niveau) — « balayage stellaire » ──
    Liseré or (remplace le double-ring set-complet — le badge 🏁 reste),
@@ -2120,12 +2183,10 @@ button:not(:disabled, .bn-tab):active,
    (17 px sur la ligne card-num) : dimension figée, PAS 1em — le
    remplacement ne doit pas bouger la hauteur des tuiles champions. */
 .ic-crown{color:var(--gold,#FACC15);width:17px;height:17px;vertical-align:-5px;}
-.crown{color:var(--gold,#FACC15);}
-.crown .ic{width:15px;height:15px;display:block;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));}
-.replacement-icon .ic{width:12px;height:12px;display:block;}
-.set-flag{color:var(--gold,#B8860B);}
-.set-flag .ic{width:14px;height:14px;display:block;}
-.modal-visual .set-flag .ic{width:16px;height:16px;}
+/* L'or reste sur le CORPS de la carte, pas dans le coin : .ic-crown est
+   posée sur une surface de thème (ligne « #004 · ♛ »), où la teinte est
+   légitime. Les marqueurs de coin, eux, sont neutres — voir le bloc
+   MARQUEURS DE COIN plus haut. */
 .ic-seal .ic-hole{stroke:var(--surface,#fff);stroke-width:2.2;}
 .ic-danger{color:var(--red);}
 .ic-danger .ic-hole{stroke:#fff;stroke-width:2;}

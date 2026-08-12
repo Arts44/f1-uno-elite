@@ -302,7 +302,8 @@ def check_overlaps(page):
       if(!t4) return ['tuile #004 introuvable'];
       const rT=s=>{const e=t4.querySelector(s);return e?e.getBoundingClientRect():null;};
       const tEls={crown:rT('.crown'),flag:rT('.set-flag'),qbtn:rT('.qbtn'),chip:rT('.card-rarity'),
-                  repl:rT('.replacement-icon')};
+                  repl:rT('.replacement-icon'),
+                  dir:rT('.director-icon')};
       for(const s of ['s1','s2','s3']){const sr=rT('.eternal-spark.'+s);
         for(const k of Object.keys(tEls)) if(overlap(sr,tEls[k])) out.push('tile:'+s+'x'+k);}
       t4.click();

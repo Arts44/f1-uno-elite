@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.58.0',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'Team principals now carry a corner marker too, the pit-wall headset of their category. Reserve drivers and team principals share the same tile visual, the team monogram, so until now nothing told them apart without reading the name.',
+        'Corner markers lost their colours: they read by shape on a dark translucent disc, legible on pale liveries and circuit outlines alike. Tiles already carry team colour, rarity and foils; one more tinted badge was noise on secondary information.',
+        'Grand Prix cards get no marker on purpose: their circuit outline already tells them apart. Markers exist to separate what would otherwise be confused.',
+      ],
+      fr: [
+        'Les directeurs d\'écurie ont eux aussi un marqueur de coin : le casque-micro du muret, celui de leur catégorie. Réserve et directeur partagent le même visuel de tuile, le monogramme d\'écurie — rien ne les distinguait sans lire le nom.',
+        'Les marqueurs de coin ont perdu leurs couleurs : ils se lisent par leur forme, sur une pastille sombre translucide, aussi bien sur une livrée pâle que sur un tracé de circuit. Les tuiles portent déjà la couleur d\'écurie, la rareté et les foils ; un marqueur teinté de plus était du bruit.',
+        'Les cartes Grand Prix n\'ont volontairement pas de marqueur : leur tracé de circuit les distingue déjà. Un marqueur sert à séparer ce qui se confondrait.',
+      ],
+      es: [
+        'Los directores de equipo tienen también un marcador de esquina: los auriculares de muro de su categoría. Reserva y director comparten el mismo visual de casilla, el monograma del equipo, y nada los distinguía sin leer el nombre.',
+        'Los marcadores de esquina han perdido el color: se leen por su forma sobre un disco oscuro translúcido, legible tanto en decoraciones pálidas como en trazados de circuito. Las casillas ya llevan color de equipo, rareza y foils.',
+        'Las cartas de Gran Premio no llevan marcador a propósito: su trazado de circuito ya las distingue. Un marcador sirve para separar lo que se confundiría.',
+      ],
+      zh: [
+        '车队领队现在也有角标了，就是其类别的围墙耳麦。替补车手和领队共用同一种卡面图案——车队字母组合，此前不读名字就分不出来。',
+        '角标去掉了颜色：它们靠形状识别，衬在半透明深色圆底上，无论浅色涂装还是赛道轮廓都清晰。卡片本就有车队颜色、稀有度和闪卡效果。',
+        '大奖赛卡片刻意不加角标：赛道轮廓已经足以区分。角标是用来分开会混淆的东西的。',
+      ],
+      it: [
+        'Anche i team principal hanno un marcatore d\'angolo: la cuffia da muretto della loro categoria. Riserva e team principal condividono la stessa immagine di tessera, il monogramma della scuderia, e nulla li distingueva senza leggere il nome.',
+        'I marcatori d\'angolo hanno perso i colori: si leggono dalla forma, su un dischetto scuro traslucido, leggibile sia su livree chiare sia su tracciati di circuito. Le tessere portano già colore scuderia, rarità e foil.',
+        'Le carte Gran Premio non hanno marcatore, di proposito: il tracciato del circuito le distingue già. Un marcatore serve a separare ciò che si confonderebbe.',
+      ],
+      nl: [
+        'Teambazen hebben nu ook een hoekmarkering: de pitmuurheadset van hun categorie. Reservecoureur en teambaas delen dezelfde tegelafbeelding, het teammonogram, en niets onderscheidde ze zonder de naam te lezen.',
+        'De hoekmarkeringen zijn hun kleur kwijt: ze lezen op vorm, op een donker doorschijnend schijfje, leesbaar op bleke livreien én op circuitlijnen. Tegels dragen al teamkleur, zeldzaamheid en foils.',
+        'Grand Prix-kaarten krijgen met opzet geen markering: hun circuitlijn onderscheidt ze al. Een markering scheidt wat anders verward zou worden.',
+      ],
+      de: [
+        'Teamchefs haben jetzt ebenfalls eine Eckmarkierung: das Boxenmauer-Headset ihrer Kategorie. Ersatzfahrer und Teamchef teilen dasselbe Kachelbild, das Teammonogramm, und nichts unterschied sie ohne den Namen zu lesen.',
+        'Die Eckmarkierungen haben ihre Farben verloren: Sie werden über die Form gelesen, auf einer dunklen, durchscheinenden Scheibe, lesbar auf hellen Lackierungen wie auf Streckenverläufen. Kacheln tragen bereits Teamfarbe, Seltenheit und Foils.',
+        'Grand-Prix-Karten bekommen bewusst keine Markierung: Ihr Streckenverlauf unterscheidet sie schon. Eine Markierung trennt, was sonst verwechselt würde.',
+      ],
+    },
+  },
+  {
     version: '1.57.0',
     date: '2026-08-12',
     changes: {

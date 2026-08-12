@@ -103,9 +103,42 @@ describe('marqueurs de coin de tuile', () => {
     assert.match(icon('copy'), /<rect/, 'copy doit rester un dessin de rectangles, pas un arc');
   });
 
-  test('le sceau glisse sous la pastille réserve (règle de non-recouvrement)', () => {
-    assert.match(css, /\.replacement-icon\s*~\s*\.set-flag\s*\{[^}]*top:\s*32px/,
-      'sans cette règle, sceau et pastille se superposent au même coin');
+  test('le sceau glisse sous LES DEUX marqueurs de catégorie', () => {
+    // Un seul des deux sélecteurs aurait suffi à laisser passer une
+    // superposition : le directeur porte le même rôle que la réserve.
+    assert.match(css, /\.replacement-icon\s*~\s*\.set-flag\s*,\s*\n?\s*\.director-icon\s*~\s*\.set-flag\s*\{[^}]*top:\s*var\(--mark-stack\)/,
+      'sans ces DEUX règles, sceau et marqueur se superposent au même coin');
+    assert.match(css, /--mark-stack:\s*\d+px/, '--mark-stack doit être un jeton, pas une valeur répétée');
+  });
+
+  /* ── Les marqueurs de coin sont neutres (1.58.0) ──
+     La tuile porte déjà la couleur d'écurie, la rareté et les foils : un
+     marqueur teinté de plus est du bruit sur une information secondaire.
+     Les quatre se lisent par leur FORME. */
+  test('aucun marqueur de coin ne porte de teinte propre', () => {
+    const bloc = css.slice(css.indexOf('MARQUEURS DE COIN'), css.indexOf('SET COMPLET'));
+    assert.ok(bloc.length > 200, 'bloc des marqueurs introuvable');
+    assert.ok(!/var\(--gold|#FACC15|#B8860B|#FF6B35|#FFD700/.test(bloc),
+      'un marqueur de coin a repris une teinte');
+    for (const jeton of ['--mark-ink', '--mark-scrim', '--mark-box', '--mark-glyph']) {
+      assert.match(css, new RegExp(jeton + ':'), `jeton ${jeton} absent`);
+    }
+  });
+
+  test('l’or reste sur le CORPS de la carte, pas dans le coin', () => {
+    // .ic-crown est posée sur une surface de thème (ligne « #004 · ♛ ») :
+    // la teinte y est légitime, et sa disparition serait une régression.
+    assert.match(css, /\.ic-crown\{color:var\(--gold/);
+  });
+
+  test('le directeur porte un marqueur, le Grand Prix n’en porte pas', () => {
+    const render = readFileSync(new URL('../render.js', import.meta.url), 'utf8');
+    assert.match(render, /category==='directeur'\?`<span class="director-icon"[^`]*icon\('headset'\)/,
+      'le directeur doit porter le casque-micro de sa catégorie');
+    assert.ok(!/category==='gp'\?`<span class="[a-z-]*icon"/.test(render),
+      'le Grand Prix ne doit PAS recevoir de marqueur : son tracé de circuit est déjà unique');
+    assert.match(render, /ON MARQUE CE QUI SE CONFOND/,
+      'la règle doit rester écrite là où les marqueurs sont posés');
   });
 });
 

@@ -405,12 +405,28 @@ function buildCardEl(card){
     el.innerHTML=`
       ${isEternal?'<span class="eternal-spark s1" aria-hidden="true">✦</span><span class="eternal-spark s2" aria-hidden="true">✦</span><span class="eternal-spark s3" aria-hidden="true">✦</span>':''}
       <div class="card-visual ${bestType?ct.css:''}${!isOwned?' not-owned':''}" style="--rarc:${rarity.color}">
+        ${/* ══ MARQUEURS DE COIN — deux règles contre-intuitives ══
+              (1) ON MARQUE CE QUI SE CONFOND, PAS CE QUI EST DÉJÀ DISTINCT.
+              Le visuel se choisit plus bas dans cet ordre : circuit (gp),
+              casque + numéro (pilote), monogramme d'écurie (directeur OU
+              réserve), icône de catégorie. Réserve et directeur partagent
+              donc EXACTEMENT le même visuel — c'est la seule paire qu'on ne
+              peut pas distinguer sans lire le nom, et c'est pour ça qu'elles
+              seules portent un marqueur de catégorie. Le pilote et le Grand
+              Prix ont chacun un visuel unique : leur ajouter un marqueur
+              dupliquerait ce qui est déjà là (un damier sur une carte qui
+              montre déjà le tracé du circuit).
+              NE « COMPLÈTE » DONC PAS LA SÉRIE : l'absence de marqueur sur
+              GP et pilote est le résultat de la règle, pas un oubli.
+
+              (2) LE MARQUEUR EST NEUTRE, ET SES JETONS NE SUIVENT PAS LE
+              THÈME (voir --mark-* dans styles.css). Son fond n'est pas la
+              page : c'est le VISUEL de la carte — livrée rose Alpine, cyan
+              Mercedes, tracé de circuit, foil. Un jeton qui basculerait
+              clair/sombre avec le thème ne serait juste que par accident. ══ */''}
         ${card.champion?`<span class="crown" aria-hidden="true">${icon('crown')}</span>`:''}
-        ${/* Marqueur de coin « réserve » : le MÊME tracé que l'icône de la
-              catégorie réserve (icons.js → swap). Il utilisait `refresh`,
-              qui dit « recharger », pas « remplaçant » — deux dessins pour
-              un seul concept, visibles côte à côte dès qu'on ouvrait Stats. */''}
         ${card.category==='reserve'?`<span class="replacement-icon" aria-hidden="true">${icon('swap')}</span>`:''}
+        ${card.category==='directeur'?`<span class="director-icon" aria-hidden="true">${icon('headset')}</span>`:''}
         ${isSet?`<span class="set-flag" role="img" aria-label="${t('set.complete')}" title="${t('set.complete')}">${icon('seal')}</span>`:''}
         ${card.category==='gp' && circuitSVG(card.id,'card') ? circuitSVG(card.id,'card') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : `<span class="card-cat-ic">${catIcon(card.category)}</span>`}
         <button class="qbtn" type="button" data-action="quickAdd" data-card="${card.id}" aria-label="${t('quick.add')}" title="${t('quick.add')}">+</button>
