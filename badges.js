@@ -4,7 +4,7 @@
 import { t, getLang } from './i18n.js';
 import { icon } from './icons.js';
 import { pageHeadHTML, pageHeadBtn } from './pagehead.js';
-import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES, seasonCatalogueState } from './data.js';
+import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES, seasonCatalogueState, seasonCardCount } from './data.js';
 import {
   _storageKey, getTypeData,
   cardOwned, cardWishlist, cardDoubles, cardFavorite,
@@ -49,16 +49,40 @@ export function evaluateBadgeCondition(badge){
   if(!cond) return {cur:0, max:1};
 
   const metric = cond.metric;
-  const target = cond.value;
+  /* ── `of: 'season'` — le seuil EST la taille de la saison ──
+     Un palier arbitraire (5 favoris, 20 cartes bleues) traverse un
+     changement de saison sans broncher. Un seuil qui vaut « toutes les
+     cartes », non : 101 était la taille du catalogue 2025, pas une
+     quantité remarquable. Écrit en dur, il devient faux au millésime
+     suivant — décerné à tort si la saison en compte moins, inatteignable
+     si elle en compte plus.
+
+     Le total vient donc de `seasonCardCount()`, c'est-à-dire de
+     `metadata.seasons[].cardCount` : une valeur DÉCLARÉE, qui vaut 101
+     même quand le fichier n'en contient que 40. JAMAIS `CARDS_DB.length`
+     — ce serait réintroduire exactement le défaut qu'on corrige, et le
+     rendre invisible : un fichier partiel se prouverait complet
+     lui-même. */
+  const parSaison = cond.of === 'season';
+  const totalDeclare = parSaison ? seasonCardCount() : null;
+  const target = parSaison
+    // Total inconnu : on affiche la meilleure estimation disponible pour
+    // que la progression reste lisible, mais `partiel` ci-dessous
+    // interdit le déblocage. On montre un chiffre, on n'en tire rien.
+    ? (totalDeclare === null ? (CARDS_DB.length || 1) : totalDeclare)
+    : cond.value;
   // Catalogue incomplet + métrique relative ⇒ résultat marqué `partiel`.
-  const partiel = METRIQUES_RELATIVES.has(metric)
-    && seasonCatalogueState().etat === 'partiel';
+  // Idem dès que le seuil est celui de la saison et que le catalogue
+  // n'est pas COMPLET : ni partiel, ni vide, ni inconnu ne suffisent.
+  const partiel = (METRIQUES_RELATIVES.has(metric)
+      && seasonCatalogueState().etat === 'partiel')
+    || (parSaison && seasonCatalogueState().etat !== 'complet');
   const marque = r => partiel ? { ...r, partiel: true } : r;
 
   switch(metric){
     case 'owned_count': {
       const n = CARDS_DB.filter(c => cardOwned(c.id)).length;
-      return {cur: Math.min(n, target), max: target};
+      return marque({cur: Math.min(n, target), max: target});
     }
     case 'wishlist_count': {
       const n = CARDS_DB.filter(c => cardWishlist(c.id)).length;
