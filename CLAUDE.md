@@ -45,16 +45,15 @@ These are the rules that, if broken, ship a bug to production or violate the pro
 8. **Serve over HTTP — never `file://`. HARD RULE (for running/testing).** ES-module loading and `fetch()` of `data/*.json` are both blocked over `file://`. Always serve the folder over a local HTTP server before testing.
    🇫🇷 Toujours servir en HTTP local ; `file://` casse les modules ES et le `fetch` des JSON.
 
-9. **Vider le cache AVANT de mesurer quoi que ce soit dans le navigateur. HARD RULE (pour vérifier).** Il y a **deux** caches, et purger le premier ne suffit pas :
-   1. le **service worker** et ses caches (`caches.keys()` → `caches.delete()`, plus `registration.unregister()`) ;
-   2. le **cache HTTP du navigateur**, qui continue de servir l'ancien `app.bundle.js` même après ça.
+9. **Vider le cache AVANT de mesurer quoi que ce soit dans le navigateur. HARD RULE (pour vérifier).** Il y a **TROIS pièges**, et ils se découvrent un par un — cette règle a dû être corrigée trois fois :
 
-   La recette qui marche, dans cet ordre :
-   1. purge SW + `caches` ;
-   2. **`fetch(f, {cache:'reload'})` sur chaque sous-ressource** modifiée (`styles.css`, `app.bundle.js`, `translations.js`…) ;
-   3. rechargement avec une **URL MODIFIÉE** (`index.html?v=<n>`).
+   | Piège | Ce qui sert du périmé | Ce qui le perce |
+   |---|---|---|
+   | 1. Service worker | tout le shell précaché | `registration.unregister()` + `caches.delete()` sur chaque clé |
+   | 2. Cache HTTP du **document** | `index.html` | rechargement avec une **URL modifiée** (`?v=<n>`) — `location.reload()` ne suffit pas |
+   | 3. Cache HTTP des **sous-ressources** | `styles.css`, `app.bundle.js`, `translations.js`… | `fetch(f, {cache:'reload'})` sur **chacune** — changer l'URL du document ne les touche pas, elles ont leur propre entrée |
 
-   Les trois étapes sont nécessaires. Un `location.reload()` ne perce pas le cache HTTP ; et changer l'URL du **document** ne purge pas `styles.css`, qui a sa **propre** entrée de cache — piège rencontré une fois de plus après que cette règle a été écrite sans son étape 2.
+   La recette complète, dans cet ordre : **purger SW + `caches` → `fetch(…,{cache:'reload'})` sur les sous-ressources modifiées → recharger avec une URL modifiée.**
 
    Pourquoi c'est une règle et pas un conseil : plusieurs mesures ont été prises sur du code périmé avant qu'on s'en aperçoive, et des conclusions ont dû être jetées. Une mesure faite sur un bundle obsolète ne se voit pas — elle a l'air juste.
 

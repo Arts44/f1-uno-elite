@@ -125,3 +125,43 @@ introduit exactement le bug qu'elle prétend supprimer.
 Les métriques à seuil **absolu** (`owned_count >= 101`, `total_qty`,
 `doubles_count`…) ne sont pas concernées : elles restent simplement
 inatteignables tant que le fichier est incomplet, ce qui est honnête.
+
+---
+
+## 4. Le plancher de hauteur de tuile n'a pas été reconfirmé
+
+`--card-h` vaut 320. Le **plancher** — la plus petite valeur qui ne
+comprime aucun bloc — a été mesuré à **300** sur la MAQUETTE (feuille de
+style injectée), pas sur le CSS définitif.
+
+Sur le code final, toutes les valeurs testées ont renvoyé la même
+hauteur de grille (17 052 px), signe que les surcharges de `--card-h`
+n'étaient pas reprises par le rendu. Le plancher n'a donc pas pu être
+re-dérivé.
+
+**Sans conséquence connue** : la marge choisie (320) couvre largement le
+300 mesuré. Mais si quelqu'un veut un jour resserrer la hauteur, le
+chiffre de départ est à remesurer, pas à reprendre ici.
+
+---
+
+## 5. `.login-box` fait 380 px de large, en dur
+
+`styles.css → .login-box{width:380px}` — une largeur **fixe**, pas un
+`max-width`, pas de fluide.
+
+Conséquence sur un écran de 320 px : la boîte **dépasse de 60 px**
+(elle déborde de −30 à gauche et +350 à droite). Rien ne se voit
+aujourd'hui parce que `body{overflow-x:hidden}` coupe le débordement et
+que le contenu tient dans les 284 px utiles — mais le débordement est
+réel, et il interdit toute disposition plus large.
+
+**Découvert en évaluant une grille de langues à 3 colonnes** : trois
+boutons demandent ~380 px de contenu, la boîte n'en offre que 284. La
+disposition a été écartée pour cette raison, et non pour un défaut qui
+lui serait propre.
+
+Corriger demanderait de passer `.login-box` en `max-width` + largeur
+fluide, ce qui touche **tous** les écrans qui l'utilisent (choix de
+langue, installation, PIN). À traiter comme un chantier, pas comme un
+ajustement.
