@@ -307,23 +307,23 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 /* Soutien — un lien, dans la grammaire des boutons existants. Aucun
    traitement racoleur : ni couleur d'accent, ni pastille, ni animation.
    Le cœur suffit à dire ce que c'est. */
-/* Deux destinations pour une seule entrée : la ligne s'empile —
-   texte au-dessus, boutons dessous — plutôt que de serrer deux
-   pilules à droite d'un paragraphe de trois lignes à 375 px. Le reste
-   du bloc « À propos » garde sa grammaire (une ligne, un contrôle). */
-/* Double sélecteur VOLONTAIRE : .setv-row est déclarée plus bas dans
-   le fichier ; à spécificité égale elle gagnerait et la ligne
-   resterait centrée. */
-.setv-row.setv-row-stack{flex-direction:column;align-items:stretch;gap:var(--space-3);}
-/* Boutons à leur largeur naturelle, alignés sur le bord gauche du
-   texte — pas étirés : deux pilules pleine largeur pèseraient plus
-   lourd que la ligne qu'elles accompagnent. */
-.setv-row-links{display:flex;gap:var(--space-2);flex-wrap:wrap;}
-.setv-row-links .setv-btn{display:inline-flex;align-items:center;justify-content:center;
+/* UNE LIGNE = UNE ACTION, y compris ici. Les deux destinations avaient
+   été empilées dans une seule ligne (texte au-dessus, boutons dessous),
+   ce qui faisait de « À propos » la seule carte à deux grammaires.
+   Elles ont maintenant chacune la leur, comme Version, Nouveautés et
+   Vérifier les mises à jour.
+   Mesuré avant de trancher : remettre les DEUX boutons à droite d'une
+   seule ligne tenait à 375 px, mais à 320 la colonne de texte tombait
+   de 173 à 127 px, le titre passait sur 3 lignes, les boutons
+   s'enroulaient quand même — et la carte devenait PLUS HAUTE qu'avant.
+   L'irrégularité n'était pas supprimée, elle passait du bouton au
+   texte. */
+a.setv-btn{display:inline-flex;align-items:center;justify-content:center;
   text-decoration:none;min-height:36px;}
 #supportRow .setv-row-label .ic{color:var(--red);margin-right:2px;}
-/* Hors ligne : visiblement inerte, et le sous-titre l'explique. */
-.setv-row-links .setv-btn.is-off{opacity:0.45;pointer-events:none;cursor:default;}
+/* Hors ligne : visiblement inerte, et le sous-titre de CHAQUE ligne
+   l'explique (le texte n'est plus partagé entre les deux). */
+a.setv-btn.is-off{opacity:0.45;pointer-events:none;cursor:default;}
 
 .setv-version{font-family:var(--font-b);font-size:13px;font-weight:700;color:var(--tx2);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-pill);padding:var(--space-1) var(--space-14px);white-space:nowrap;}
 .changelog-dialog{max-width:460px;text-align:left;}

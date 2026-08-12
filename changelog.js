@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.51.0',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'In Settings → About, the project links are now two separate rows — “Support the project” with its Ko-fi button, “Source code” with its GitHub button — instead of one row with two buttons stacked underneath. The whole card now reads the same way: one row, one action.',
+      ],
+      fr: [
+        'Dans Réglages → À propos, les liens du projet forment maintenant deux lignes distinctes — « Soutenir le projet » avec son bouton Ko-fi, « Code source » avec son bouton GitHub — au lieu d\'une ligne avec deux boutons empilés dessous. Toute la carte se lit désormais pareil : une ligne, une action.',
+      ],
+      es: [
+        'En Ajustes → Acerca de, los enlaces del proyecto forman ahora dos filas distintas — «Apoyar el proyecto» con su botón Ko-fi y «Código fuente» con el suyo de GitHub — en vez de una fila con dos botones apilados debajo. Toda la tarjeta se lee igual: una fila, una acción.',
+      ],
+      zh: [
+        '在「设置 → 关于」中，项目链接现在分成两行——「支持这个项目」配 Ko-fi 按钮，「源代码」配 GitHub 按钮——不再是一行下面叠着两个按钮。整张卡片的读法统一了：一行一个操作。',
+      ],
+      it: [
+        'In Impostazioni → Informazioni, i link del progetto sono ora due righe distinte — «Sostenere il progetto» con il pulsante Ko-fi e «Codice sorgente» con quello GitHub — invece di una riga con due pulsanti impilati sotto. Tutta la scheda si legge allo stesso modo: una riga, un\'azione.',
+      ],
+      nl: [
+        'In Instellingen → Over staan de projectlinks nu op twee aparte regels — “Het project steunen” met de Ko-fi-knop en “Broncode” met de GitHub-knop — in plaats van één regel met twee knoppen eronder. De hele kaart leest nu hetzelfde: één regel, één actie.',
+      ],
+      de: [
+        'Unter Einstellungen → Über stehen die Projektlinks jetzt in zwei getrennten Zeilen — „Das Projekt unterstützen“ mit dem Ko-fi-Knopf und „Quellcode“ mit dem GitHub-Knopf — statt in einer Zeile mit zwei Knöpfen darunter. Die ganze Karte liest sich nun gleich: eine Zeile, eine Aktion.',
+      ],
+    },
+  },
+  {
     version: '1.50.0',
     date: '2026-08-11',
     changes: {

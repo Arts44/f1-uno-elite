@@ -784,18 +784,23 @@ export function renderSettings(){
         </div>
         <button class="setv-btn" id="checkUpdBtn">${t('upd.check_btn')}</button>
       </div>` : ''}
-      ${(SUPPORT_URL || SOURCE_URL) ? `
-      <div class="setv-row setv-row-stack" id="supportRow">
+      ${SUPPORT_URL ? `
+      <div class="setv-row support-row" id="supportRow">
         <div class="setv-row-left">
           <div class="setv-row-label">${icon('handshake')} ${t('s.support')}</div>
           <div class="setv-row-sub">${t('s.support_sub')}</div>
         </div>
-        <div class="setv-row-links">
-          ${SUPPORT_URL ? `<a class="setv-btn" id="supportBtn" href="${SUPPORT_URL}"
-             target="_blank" rel="noopener noreferrer">${t('s.support_btn')}</a>` : ''}
-          ${SOURCE_URL ? `<a class="setv-btn" id="sourceBtn" href="${SOURCE_URL}"
-             target="_blank" rel="noopener noreferrer">${t('s.source_btn')}</a>` : ''}
+        <a class="setv-btn" id="supportBtn" href="${SUPPORT_URL}"
+           target="_blank" rel="noopener noreferrer">${t('s.support_btn')}</a>
+      </div>` : ''}
+      ${SOURCE_URL ? `
+      <div class="setv-row support-row" id="sourceRow">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.source_label')}</div>
+          <div class="setv-row-sub">${t('s.source_note')}</div>
         </div>
+        <a class="setv-btn" id="sourceBtn" href="${SOURCE_URL}"
+           target="_blank" rel="noopener noreferrer">${t('s.source_btn')}</a>
       </div>` : ''}
     </div>
 
@@ -907,19 +912,27 @@ export function renderSettings(){
      que de laisser l'utilisateur tomber sur la page d'erreur du
      navigateur. L'état se remet à jour dès le retour du réseau —
      l'app est hors-ligne d'abord, ce cas est la norme, pas l'exception. */
-  const liens = [...el.querySelectorAll('#supportRow .setv-btn')];
-  if(liens.length){
-    const sub = el.querySelector('#supportRow .setv-row-sub');
+  /* Les deux liens vivent maintenant sur DEUX lignes (une ligne = une
+     action). Le sélecteur porte donc sur la classe partagée, pas sur un
+     id : avec `#supportRow` seul, la ligne « Code source » serait restée
+     cliquable hors ligne — le bug que ce découpage aurait introduit. */
+  const rows = [...el.querySelectorAll('.support-row')].map(row => ({
+    lien: row.querySelector('.setv-btn'),
+    sub: row.querySelector('.setv-row-sub'),
+    // chaque ligne retrouve SON texte : le sous-titre n'est plus partagé
+    cle: row.id === 'sourceRow' ? 's.source_note' : 's.support_sub',
+  })).filter(r => r.lien);
+  if(rows.length){
     const online = () => {
       const up = navigator.onLine !== false;
-      liens.forEach(a => {
-        a.classList.toggle('is-off', !up);
-        a.setAttribute('aria-disabled', up ? 'false' : 'true');
+      rows.forEach(({ lien, sub, cle }) => {
+        lien.classList.toggle('is-off', !up);
+        lien.setAttribute('aria-disabled', up ? 'false' : 'true');
+        if(sub) sub.textContent = up ? t(cle) : t('s.support_offline');
       });
-      if(sub) sub.textContent = up ? t('s.support_sub') : t('s.support_offline');
     };
     online();
-    liens.forEach(a => a.addEventListener('click', e => {
+    rows.forEach(({ lien }) => lien.addEventListener('click', e => {
       if(navigator.onLine === false) e.preventDefault();
     }));
     window.addEventListener('online', online);
