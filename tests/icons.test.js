@@ -81,6 +81,28 @@ describe('marqueurs de coin de tuile', () => {
     }
   });
 
+  /* `swap` et `refresh` sont deux paires d'arcs fléchés : comparés à 12 et
+     14 px ils sont le même dessin pour l'œil. Ils ne peuvent donc pas
+     désigner deux choses différentes dans la même app. `swap` est réservé
+     à la réserve ; les doubles ont `copy`, le rechargement garde `refresh`. */
+  test('swap ne sert QU’À la réserve', () => {
+    const sources = ['../render.js', '../stats.js', '../badges.js', '../update.js', '../pin.js']
+      .map(f => readFileSync(new URL(f, import.meta.url), 'utf8'));
+    const usages = sources.flatMap(s => [...s.matchAll(/icon\('swap'[^)]*\)/g)].map(m => m[0]));
+    assert.equal(usages.length, 1,
+      `swap est utilisé ${usages.length} fois : il ne doit désigner que la réserve`);
+    assert.equal(meta.categories.reserve.icon, 'swap');
+  });
+
+  test('les doubles ne dessinent PAS un arc fléché (voisin de swap)', () => {
+    const render = readFileSync(new URL('../render.js', import.meta.url), 'utf8');
+    const stats = readFileSync(new URL('../stats.js', import.meta.url), 'utf8');
+    assert.match(render, /'doubles',\s*'copy'/, 'le statut « doubles » doit utiliser copy');
+    assert.ok(!/icon\('refresh'\)/.test(stats),
+      'les outils de collectionneur ne doivent plus emprunter refresh');
+    assert.match(icon('copy'), /<rect/, 'copy doit rester un dessin de rectangles, pas un arc');
+  });
+
   test('le sceau glisse sous la pastille réserve (règle de non-recouvrement)', () => {
     assert.match(css, /\.replacement-icon\s*~\s*\.set-flag\s*\{[^}]*top:\s*32px/,
       'sans cette règle, sceau et pastille se superposent au même coin');

@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.56.1',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'Duplicates now have their own symbol — two stacked cards — instead of the circular arrows they shared with reserve drivers. Side by side at that size, the two drawings were indistinguishable.',
+      ],
+      fr: [
+        'Les doubles ont désormais leur propre symbole — deux cartes superposées — au lieu des flèches circulaires qu\'ils partageaient avec les pilotes de réserve. À cette taille, les deux dessins ne se distinguaient pas.',
+      ],
+      es: [
+        'Los repetidos tienen ahora su propio símbolo —dos cartas superpuestas— en lugar de las flechas circulares que compartían con los pilotos de reserva. A ese tamaño, los dos dibujos no se distinguían.',
+      ],
+      zh: [
+        '重复卡现在有了自己的符号——两张叠放的卡片——不再与替补车手共用circular箭头。在那个尺寸下，两个图形根本分不出来。',
+      ],
+      it: [
+        'I doppioni hanno ora un simbolo proprio — due carte sovrapposte — invece delle frecce circolari che condividevano con i piloti di riserva. A quella dimensione i due disegni non si distinguevano.',
+      ],
+      nl: [
+        'Dubbele kaarten hebben nu hun eigen symbool — twee kaarten op elkaar — in plaats van de ronde pijlen die ze deelden met reservecoureurs. Op dat formaat waren de twee tekeningen niet te onderscheiden.',
+      ],
+      de: [
+        'Doppelte haben jetzt ein eigenes Symbol — zwei übereinanderliegende Karten — statt der Kreispfeile, die sie sich mit Ersatzfahrern teilten. In dieser Größe waren die beiden Zeichnungen nicht zu unterscheiden.',
+      ],
+    },
+  },
+  {
     version: '1.56.0',
     date: '2026-08-12',
     changes: {

@@ -38,6 +38,26 @@ export function liveryHTML(team){
   return `<span class="lvb" style="--c1:${lv.c1};--c2:${lv.c2}" aria-hidden="true"></span>`;
 }
 
+/* ── LE CASQUE SIGNALE UN NUMÉRO, PAS UNE CATÉGORIE. Décision, pas oubli.
+   Le visuel de tuile se choisit dans cet ordre (voir plus bas, au rendu) :
+   circuit (gp) → casque + numéro (pilote AVEC numéro) → monogramme
+   d'écurie (directeur ou réserve) → icône de catégorie.
+
+   D'où un écart qui SE VOIT et qu'on prend pour un bug : #070 Vandoorne
+   (réserve) et #076 Vowles (directeur) portent tous deux un monogramme,
+   alors que Vandoorne est un pilote. Ce n'est pas la catégorie qui décide,
+   c'est le numéro : `driverNumbers` ne contient que les 25 titulaires, et
+   AUCUN des 8 réservistes — un réserviste n'a pas de numéro de course
+   attribué. Même en autorisant le casque pour la catégorie réserve, cette
+   fonction renverrait null et le rendu retomberait sur le monogramme.
+
+   Deux variantes ont été examinées et écartées (arbitrage 1.55.1) :
+   - casque SANS numéro pour les réservistes : ils perdraient le
+     monogramme, seule chose qui les rattache à leur écurie sur la tuile ;
+   - casque + monogramme : chargerait la tuile pour dire ce que le texte
+     dit déjà juste en dessous.
+   Bottas et Zhou rendent le cas concret : ils ont eu un numéro, ils n'en
+   ont plus pour 2025. Le visuel suit les données, pas le CV. ── */
 export function driverNumberHTML(card){
   const d=DRIVER_NUMBERS[card.name];
   if(!d) return null;
@@ -624,7 +644,7 @@ function _renderModalStatus(card){
   el.innerHTML='';
   const states=[
     ['owned',    'check',   cardOwned(card.id),    'status.owned'],
-    ['doubles',  'refresh', cardDoubles(card.id),  'status.doubles'],
+    ['doubles',  'copy',    cardDoubles(card.id),  'status.doubles'],
     ['wishlist', 'star',    cardWishlist(card.id), 'status.wishlist'],
     ['favorite', 'heart',   cardFavorite(card.id), 'status.fav'],
   ];

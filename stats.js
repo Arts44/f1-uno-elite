@@ -573,7 +573,7 @@ const _doublesExtra = r => `<span class="sv-tool-types">${r.types.map(ty =>
 function _toolPanelHTML(tool){
   if(tool === 'doubles'){
     const rows = doublesList();
-    if(!rows.length) return `<div class="sv-tool-empty">${icon('refresh')} ${t('st.doubles_empty')}</div>`;
+    if(!rows.length) return `<div class="sv-tool-empty">${icon('copy')} ${t('st.doubles_empty')}</div>`;
     return rows.map(r => _toolRow(r, _doublesExtra(r))).join('');
   }
   if(tool === 'trade'){
@@ -582,7 +582,7 @@ function _toolPanelHTML(tool){
     return `
       <div class="sv-tool-subtitle">${icon('search')} ${t('tools.want')} <span class="sv-tool-n">${want.length}</span></div>
       ${want.length ? want.map(r => _toolRow(r, _missingExtra(r))).join('') : `<div class="sv-tool-empty">${t('st.missing_empty')}</div>`}
-      <div class="sv-tool-subtitle">${icon('refresh')} ${t('tools.offer')} <span class="sv-tool-n">${offer.length}</span></div>
+      <div class="sv-tool-subtitle">${icon('copy')} ${t('tools.offer')} <span class="sv-tool-n">${offer.length}</span></div>
       ${offer.length ? offer.map(r => _toolRow(r, _doublesExtra(r))).join('') : `<div class="sv-tool-empty">${t('st.doubles_empty')}</div>`}`;
   }
   const rows = missingCards();

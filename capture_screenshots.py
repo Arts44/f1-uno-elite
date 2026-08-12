@@ -22,7 +22,7 @@ Le contrôle anti-collision des étoiles ✦ de la tuile Éternel fait
 échouer le script (exit 1) : une capture qui montre un chevauchement
 ne doit pas atteindre le README.
 """
-import json, sys, pathlib
+import atexit, json, os, sys, pathlib
 from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent
@@ -32,6 +32,41 @@ I18N.mkdir(parents=True, exist_ok=True)
 LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de']
 URL = 'http://localhost:8124/index.html'
 FAILS = []
+
+# ══════════════════════════════════════════════════════════
+#   LE SCRIPT NE PEUT PLUS MOURIR EN SILENCE
+#
+#   Vécu : check_seed_honesty() levait une exception (une syntaxe
+#   f'...' de Python écrite dans un corps JS) et mourait AVANT le
+#   `if FAILS` final. Tout ce qui précédait — y compris le contrôle
+#   anti-collision — n'était donc jamais rapporté, pendant que le
+#   script affichait une trentaine de lignes « OK ». Un contrôle qui
+#   échoue sans le dire est pire qu'un contrôle absent : il donne la
+#   confiance sans la vérification.
+#
+#   Le rapport ci-dessous s'affiche À LA SORTIE, quoi qu'il arrive :
+#   fin normale, échec de contrôle, ou exception n'importe où. Il
+#   distingue les deux cas, parce qu'ils n'ont pas le même sens —
+#   « des contrôles ont échoué » ≠ « des contrôles n'ont pas tourné ».
+#   os._exit contourne les autres gestionnaires atexit : à ce stade
+#   il n'y a plus rien à ranger, et le code de sortie doit survivre.
+# ══════════════════════════════════════════════════════════
+_REACHED_END = False
+
+
+@atexit.register
+def _rapport_final():
+    if FAILS:
+        print('\nÉCHECS :', *FAILS, sep='\n  ')
+    if not _REACHED_END:
+        print('\n⚠️  RAPPORT INCOMPLET — le script s\'est arrêté avant la fin.')
+        print('   Les contrôles suivants N\'ONT PAS TOURNÉ. Ne considère aucune')
+        print('   capture comme validée : lis la trace ci-dessus et relance.')
+        sys.stdout.flush()
+        os._exit(1)
+    if FAILS:
+        sys.stdout.flush()
+        os._exit(1)
 
 # ══════════════════════════════════════════════════════════
 #   SEED — déterministe, calculé depuis les données du dépôt
@@ -571,8 +606,10 @@ def check_seed_honesty(browser_factory):
 
 check_seed_honesty(sync_playwright)
 
+# Tous les contrôles ont TOURNÉ (qu'ils passent ou non). Le rapport de
+# sortie peut désormais parler d'échecs plutôt que d'absence de contrôle.
+_REACHED_END = True
 if FAILS:
-    print('ÉCHECS :', *FAILS, sep='\n  ')
     sys.exit(1)
 print(f'\nTOUTES CAPTURES OK — seed : {OWNED_COUNT}/101 cartes, '
       f'{len(AUTO_BADGES)} badges auto, {len(MANUAL_BADGES)} manuels')
