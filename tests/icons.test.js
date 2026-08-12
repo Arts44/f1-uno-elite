@@ -51,6 +51,42 @@ describe('icon() — interface', () => {
   });
 });
 
+/* ── Marqueurs de coin de tuile ──
+   Trois marqueurs se posent en absolu sur .card-visual : couronne
+   (champion, haut-gauche), pastille réserve (haut-droite) et sceau set
+   complet (haut-droite, décalé sous la pastille quand les deux sont là).
+
+   Le défaut corrigé en 1.55.1 : la pastille réserve dessinait `refresh`
+   (« recharger ») pendant que la catégorie réserve dessinait `swap`
+   (« remplaçant »). Deux tracés pour un concept, visibles côte à côte.
+   Rien ne l'attrapait — d'où ces trois tests, qui lisent la SOURCE. */
+describe('marqueurs de coin de tuile', () => {
+  const render = readFileSync(new URL('../render.js', import.meta.url), 'utf8');
+  const markerLine = re => (render.match(re) || [''])[0];
+
+  test('le marqueur réserve dessine la MÊME icône que la catégorie réserve', () => {
+    const line = markerLine(/<span class="replacement-icon"[^\n]*/);
+    assert.ok(line, 'marqueur réserve introuvable dans render.js');
+    const used = (line.match(/icon\('([^']+)'\)/) || [])[1];
+    assert.equal(used, meta.categories.reserve.icon,
+      `la tuile dessine « ${used} », la catégorie « ${meta.categories.reserve.icon} »`);
+  });
+
+  test('les trois marqueurs passent par icon() — aucun émoji résiduel', () => {
+    for (const cls of ['crown', 'replacement-icon', 'set-flag']) {
+      const line = markerLine(new RegExp(`<span class="${cls}"[^\\n]*`));
+      assert.ok(line, `marqueur ${cls} introuvable`);
+      assert.match(line, /\$\{icon\('/, `${cls} : le marqueur n'utilise pas icon()`);
+      assert.ok(!/\p{Extended_Pictographic}/u.test(line), `${cls} : émoji résiduel`);
+    }
+  });
+
+  test('le sceau glisse sous la pastille réserve (règle de non-recouvrement)', () => {
+    assert.match(css, /\.replacement-icon\s*~\s*\.set-flag\s*\{[^}]*top:\s*32px/,
+      'sans cette règle, sceau et pastille se superposent au même coin');
+  });
+});
+
 describe('teamLiveries — parité et couverture CSS', () => {
   test('mêmes clés que teamColors (metadata.json)', () => {
     assert.deepEqual(Object.keys(meta.teamLiveries).sort(), Object.keys(meta.teamColors).sort());

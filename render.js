@@ -386,7 +386,11 @@ function buildCardEl(card){
       ${isEternal?'<span class="eternal-spark s1" aria-hidden="true">✦</span><span class="eternal-spark s2" aria-hidden="true">✦</span><span class="eternal-spark s3" aria-hidden="true">✦</span>':''}
       <div class="card-visual ${bestType?ct.css:''}${!isOwned?' not-owned':''}" style="--rarc:${rarity.color}">
         ${card.champion?`<span class="crown" aria-hidden="true">${icon('crown')}</span>`:''}
-        ${card.category==='reserve'?`<span class="replacement-icon" aria-hidden="true">${icon('refresh')}</span>`:''}
+        ${/* Marqueur de coin « réserve » : le MÊME tracé que l'icône de la
+              catégorie réserve (icons.js → swap). Il utilisait `refresh`,
+              qui dit « recharger », pas « remplaçant » — deux dessins pour
+              un seul concept, visibles côte à côte dès qu'on ouvrait Stats. */''}
+        ${card.category==='reserve'?`<span class="replacement-icon" aria-hidden="true">${icon('swap')}</span>`:''}
         ${isSet?`<span class="set-flag" role="img" aria-label="${t('set.complete')}" title="${t('set.complete')}">${icon('seal')}</span>`:''}
         ${card.category==='gp' && circuitSVG(card.id,'card') ? circuitSVG(card.id,'card') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : `<span class="card-cat-ic">${catIcon(card.category)}</span>`}
         <button class="qbtn" type="button" data-action="quickAdd" data-card="${card.id}" aria-label="${t('quick.add')}" title="${t('quick.add')}">+</button>

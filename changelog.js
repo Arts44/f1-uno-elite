@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.55.1',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'The corner marker on reserve-driver tiles now uses the same swap symbol as the reserve category. It was drawing a "reload" symbol instead — one idea told twice, in two different ways.',
+      ],
+      fr: [
+        'Le marqueur de coin des tuiles de pilotes de réserve utilise désormais le même symbole d\'échange que la catégorie réserve. Il dessinait un symbole « recharger » : une même idée racontée deux fois, de deux façons différentes.',
+      ],
+      es: [
+        'El marcador de esquina de las casillas de pilotos de reserva usa ahora el mismo símbolo de relevo que la categoría reserva. Antes dibujaba un símbolo de «recargar»: una misma idea contada dos veces, de dos formas distintas.',
+      ],
+      zh: [
+        '替补车手卡格右上角的标记现在使用与替补类别相同的交换符号。此前它画的是"刷新"符号——同一个意思，用了两种不同的画法。',
+      ],
+      it: [
+        'Il marcatore d\'angolo delle tessere dei piloti di riserva usa ora lo stesso simbolo di scambio della categoria riserva. Prima disegnava un simbolo di "ricarica": una stessa idea raccontata due volte, in due modi diversi.',
+      ],
+      nl: [
+        'De hoekmarkering op tegels van reservecoureurs gebruikt nu hetzelfde wisselsymbool als de categorie reserve. Er stond een "herladen"-symbool: één idee, twee keer verteld, op twee manieren.',
+      ],
+      de: [
+        'Die Eckmarkierung auf Kacheln von Ersatzfahrern verwendet jetzt dasselbe Wechselsymbol wie die Kategorie Ersatzfahrer. Zuvor stand dort ein "Neu laden"-Symbol — ein Gedanke, zweimal erzählt, auf zwei Arten.',
+      ],
+    },
+  },
+  {
     version: '1.55.0',
     date: '2026-08-12',
     changes: {

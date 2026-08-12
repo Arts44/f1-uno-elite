@@ -266,7 +266,8 @@ def check_overlaps(page):
       const t4=[...document.querySelectorAll('.card')].find(c=>c.querySelector('.card-num')?.textContent.startsWith('#004'));
       if(!t4) return ['tuile #004 introuvable'];
       const rT=s=>{const e=t4.querySelector(s);return e?e.getBoundingClientRect():null;};
-      const tEls={crown:rT('.crown'),flag:rT('.set-flag'),qbtn:rT('.qbtn'),chip:rT('.card-rarity')};
+      const tEls={crown:rT('.crown'),flag:rT('.set-flag'),qbtn:rT('.qbtn'),chip:rT('.card-rarity'),
+                  repl:rT('.replacement-icon')};
       for(const s of ['s1','s2','s3']){const sr=rT('.eternal-spark.'+s);
         for(const k of Object.keys(tEls)) if(overlap(sr,tEls[k])) out.push('tile:'+s+'x'+k);}
       t4.click();
@@ -550,10 +551,14 @@ def check_seed_honesty(browser_factory):
         pg.goto(URL)
         pg.wait_for_selector('.card', timeout=20000)
         pg.wait_for_timeout(1500)
-        derived = set(pg.evaluate("""() => {
-          const raw = localStorage.getItem(f'f1uno_auto_badges_{SEASON}');
+        # La clé passe en ARGUMENT : écrite dans le corps JS, la syntaxe
+        # f'...' de Python n'y était pas interpolée et le navigateur la
+        # lisait comme du JS invalide — le contrôle plantait au lieu de
+        # contrôler, et il plantait AVANT le rapport des échecs.
+        derived = set(pg.evaluate("""(key) => {
+          const raw = localStorage.getItem(key);
           return raw ? Object.keys(JSON.parse(raw)) : [];
-        }"""))
+        }""", f'f1uno_auto_badges_{SEASON}'))
         c.close()
         b.close()
     undeserved = sorted(pre_dated - derived)
