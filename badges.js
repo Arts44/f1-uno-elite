@@ -4,7 +4,7 @@
 import { t, getLang } from './i18n.js';
 import { icon } from './icons.js';
 import { pageHeadHTML, pageHeadBtn } from './pagehead.js';
-import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES } from './data.js';
+import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES, seasonCatalogueState } from './data.js';
 import {
   _storageKey, getTypeData,
   cardOwned, cardWishlist, cardDoubles, cardFavorite,
@@ -26,6 +26,21 @@ export function setManualBadges(v){ manualBadges = v; }
 export function setAutoBadgeUnlocked(v){ autoBadgeUnlocked = v; }
 
 // Evaluate badge progress from JSON condition config
+/* ── Les métriques dont le MAXIMUM vient du fichier chargé ──
+   Ces six-là calculent leur dénominateur sur CARDS_DB : « toutes les
+   cartes de la catégorie », « toutes celles de l'écurie ». C'est juste
+   quand le catalogue est complet, et FAUX quand il ne l'est pas encore :
+   avec 40 cartes sur 101, posséder les 12 pilotes PRÉSENTS satisferait
+   « tous les pilotes ».
+   On ne corrige pas le dénominateur — il n'est pas déductible d'un
+   simple total. On refuse le DÉBLOCAGE tant que le catalogue est
+   incomplet, ce que `partiel` signale à isAutoBadgeUnlocked(). La
+   progression, elle, reste affichée : l'utilisateur voit où il en est. */
+const METRIQUES_RELATIVES = new Set([
+  'category_owned', 'category_set', 'champion_owned',
+  'team_set', 'teams_owned_count', 'teams_set_count',
+]);
+
 export function evaluateBadgeCondition(badge){
   // If badge has a progress function (hardcoded fallback), use it
   if(typeof badge.progress === 'function') return badge.progress();
@@ -35,6 +50,10 @@ export function evaluateBadgeCondition(badge){
 
   const metric = cond.metric;
   const target = cond.value;
+  // Catalogue incomplet + métrique relative ⇒ résultat marqué `partiel`.
+  const partiel = METRIQUES_RELATIVES.has(metric)
+    && seasonCatalogueState().etat === 'partiel';
+  const marque = r => partiel ? { ...r, partiel: true } : r;
 
   switch(metric){
     case 'owned_count': {
@@ -63,12 +82,12 @@ export function evaluateBadgeCondition(badge){
         ? CARDS_DB.filter(c => c.champion)
         : CARDS_DB.filter(c => c.category === cond.value);
       const n = all.filter(c => cardOwned(c.id)).length;
-      return {cur: n, max: all.length};
+      return marque({cur: n, max: all.length});
     }
     case 'champion_owned': {
       const all = CARDS_DB.filter(c => c.champion);
       const n = all.filter(c => cardOwned(c.id)).length;
-      return {cur: n, max: all.length};
+      return marque({cur: n, max: all.length});
     }
     case 'type_owned': {
       const tf = cond.typeFilter;
@@ -99,12 +118,12 @@ export function evaluateBadgeCondition(badge){
     case 'teams_owned_count': {
       const teams = [...new Set(CARDS_DB.map(c => c.team).filter(Boolean))];
       const n = teams.filter(tm => CARDS_DB.filter(c => c.team === tm).every(c => cardOwned(c.id))).length;
-      return {cur: Math.min(n, target), max: target};
+      return marque({cur: Math.min(n, target), max: target});
     }
     case 'team_set': {
       const all = CARDS_DB.filter(c => c.team === target);
       const n = all.filter(c => cardSetComplete(c.id)).length;
-      return {cur: n, max: all.length || 1};
+      return marque({cur: n, max: all.length || 1});
     }
     case 'teams_set_count': {
       const teams = [...new Set(CARDS_DB.map(c => c.team).filter(Boolean))];
@@ -112,12 +131,12 @@ export function evaluateBadgeCondition(badge){
         const cs = CARDS_DB.filter(c => c.team === tm);
         return cs.length && cs.every(c => cardSetComplete(c.id));
       }).length;
-      return {cur: Math.min(n, target), max: target};
+      return marque({cur: Math.min(n, target), max: target});
     }
     case 'category_set': {
       const all = CARDS_DB.filter(c => c.category === target);
       const n = all.filter(c => cardSetComplete(c.id)).length;
-      return {cur: n, max: all.length || 1};
+      return marque({cur: n, max: all.length || 1});
     }
     case 'rarity_count': {
       const n = CARDS_DB.filter(c => cardRarity(c) === cond.rarity).length;
@@ -198,7 +217,10 @@ export function saveManualBadges(){ secureSet(_storageKey('badges'), JSON.string
 // sont vrais, la règle « une fois débloqué, toujours débloqué » ne change pas.
 export function isAutoBadgeUnlocked(badge){
   const p = evaluateBadgeCondition(badge);
-  const currently = p.cur >= p.max;
+  // `partiel` : la condition est satisfaite SUR LE CATALOGUE CHARGÉ, mais
+  // celui-ci ne couvre pas encore toute la saison. Débloquer ici serait
+  // définitif — rien ne reverrouille un badge automatique.
+  const currently = p.cur >= p.max && !p.partiel;
   if(currently && !autoBadgeUnlocked[badge.id]){
     autoBadgeUnlocked[badge.id] = Date.now();
     saveManualBadges();

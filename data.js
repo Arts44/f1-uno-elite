@@ -12,6 +12,8 @@ import { updateStats } from './stats.js';
 export let _currentSeason = 2025;
 export function setCurrentSeason(season){ _currentSeason = season; }
 
+let SEASONS = [];
+
 // Metadata-derived tables (populated by _applyMetadata)
 export let CARD_TYPES = {};
 export let TYPE_BADGE_RARITY = {};
@@ -120,6 +122,54 @@ export function _applyMetadata(meta){
   TEAM_MONOGRAMS = meta.teamMonograms || {};
   TEAM_LIVERIES = meta.teamLiveries || {};
   ROLE_BASE_RARITY = meta.roleBaseRarity;
+  SEASONS = Array.isArray(meta.seasons) ? meta.seasons : [];
+}
+
+/* ── Saisons DÉCLARÉES — deux besoins, une seule structure ──
+   `metadata.json → seasons[] = [{year, cardCount}]`.
+
+   1. `year` rend une saison SÉLECTIONNABLE même si le localStorage n'en
+      contient aucune trace. Sans ça, une saison neuve n'apparaissait
+      jamais — et sans pastille, impossible de créer ses données : le
+      poule/œuf.
+   2. `cardCount` est le total de RÉFÉRENCE. Il répond à une seule
+      question — « ce catalogue est-il complet ? » — et c'est
+      volontairement la seule chose qu'il fait.
+
+   POURQUOI PAS DÉDUIRE LE TOTAL DE CARDS_DB.length : sur un fichier
+   saisi au fil de l'eau (40 cartes sur 101), la longueur du tableau
+   chargé n'est pas le total de la saison. 23 badges calculent leur
+   maximum sur ce tableau ; sans référence déclarée, posséder les 12
+   pilotes PRÉSENTS débloquerait « tous les pilotes » — définitivement,
+   puisqu'un badge automatique ne se reverrouille jamais. */
+export function seasonCardCount(year = _currentSeason){
+  const s = SEASONS.find(x => x.year === year);
+  return s && Number.isInteger(s.cardCount) ? s.cardCount : null;
+}
+
+/* Le catalogue chargé couvre-t-il toute la saison ?
+   `null` quand aucun total n'est déclaré : on ne sait pas, et on ne
+   PRÉSUME pas — l'appelant décide quoi faire d'une inconnue. */
+export function seasonCatalogueState(){
+  const total = seasonCardCount();
+  const charge = CARDS_DB.length;
+  if(total === null) return { total: null, charge, etat: 'inconnu' };
+  if(charge === 0)   return { total, charge, etat: 'vide' };
+  if(charge < total) return { total, charge, etat: 'partiel' };
+  return { total, charge, etat: 'complet' };
+}
+
+/* Les saisons sélectionnables : celles DÉCLARÉES, unies à celles dont
+   le localStorage garde une trace (une saison retirée du fichier ne doit
+   pas faire disparaître la collection qu'on a saisie dedans). */
+export function availableSeasons(){
+  const set = new Set(SEASONS.map(s => s.year));
+  for(let i = 0; i < localStorage.length; i++){
+    const m = localStorage.key(i).match(/^f1uno_owned_(\d+)$/);
+    if(m) set.add(parseInt(m[1], 10));
+  }
+  set.add(_currentSeason);
+  return [...set].sort((a, b) => b - a);
 }
 
 function _applyCircuits(circData){
@@ -214,15 +264,8 @@ export function _renderSeasonPills(){
   const container = document.getElementById('seasonPills');
   if(!container) return;
   container.innerHTML = '';
-  // Detect available seasons from localStorage + current
-  const seasons = new Set([2025]);
-  for(let i = 0; i < localStorage.length; i++){
-    const key = localStorage.key(i);
-    const m = key.match(/^f1uno_owned_(\d+)$/);
-    if(m) seasons.add(parseInt(m[1], 10));
-  }
-  // Check for available card JSON files (we know 2025 exists)
-  [...seasons].sort((a,b) => b - a).forEach(s => {
+  // Saisons déclarées ∪ saisons présentes en stockage — plus de 2025 en dur
+  availableSeasons().forEach(s => {
     const btn = document.createElement('button');
     btn.className = 'season-pill' + (s === _currentSeason ? ' active' : '');
     btn.textContent = s;

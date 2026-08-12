@@ -129,6 +129,16 @@
       "color": "#ffd000"
     }
   },
+  "seasons": [
+    {
+      "year": 2025,
+      "cardCount": 101
+    },
+    {
+      "year": 2026,
+      "cardCount": 10
+    }
+  ],
   "typeBadgeRarity": {
     "blue": "common",
     "green": "common",
