@@ -26,13 +26,14 @@ import { resetStorage } from './_setup.js';
 import { _applyMetadata, _applyCards, _applyBadges, CARDS_DB, seasonCardCount } from '../data.js';
 import { setTypeData, txBatch } from '../storage.js';
 import { evaluateBadgeCondition, isAutoBadgeUnlocked, setAutoBadgeUnlocked } from '../badges.js';
+import { badgeEffort, _resetDifficultyCache } from '../difficulty.js';
 
 /* resetStorage() ne vide QUE le localStorage : la collection chargée
    reste en mémoire dans storage.js, et les badges débloqués dans
    badges.js. Un test qui l'ignore mesure l'état laissé par le test
    précédent — c'est ce qui a fait échouer deux de ces tests à leur
    première écriture. On remet donc explicitement l'état de module. */
-const resetTout = () => { resetStorage(); setAutoBadgeUnlocked({}); };
+const resetTout = () => { resetStorage(); setAutoBadgeUnlocked({}); _resetDifficultyCache(); };
 
 const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
 const cardsFile = JSON.parse(readFileSync(new URL('../data/cards-2025.json', import.meta.url), 'utf8'));
@@ -145,5 +146,47 @@ describe('§0 — un badge débloqué ne se reverrouille jamais', () => {
     ownAll(CARDS_DB);
     assert.equal(isAutoBadgeUnlocked(BADGE_SEASON), true,
       'retirer un badge obtenu à tort serait un retour en arrière, pas un nettoyage');
+  });
+});
+
+/* ── Étape 2 : legend_101 sur le total déclaré ─────────────── */
+describe('legend_101 — « toutes les cartes », plus « 101 »', () => {
+  beforeEach(() => { resetTout(); });
+
+  const legend = () => badgesJson.auto.find(b => b.id === 'legend_101');
+
+  test('la condition ne code plus la taille du catalogue', () => {
+    const c = legend().condition;
+    assert.equal(c.of, 'season');
+    assert.equal(c.value, undefined, '101 ne doit plus être écrit en dur');
+  });
+
+  test('data-embedded.js est en parité (repli hors ligne)', () => {
+    const emb = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+    assert.match(emb, /"id":"legend_101"[^}]*"condition":\{"metric":"owned_count","operator":">=","of":"season"\}/);
+    assert.ok(!/"metric":"owned_count","operator":">=","value":101/.test(emb),
+      'le repli hors ligne garderait l’ancien seuil');
+  });
+
+  test('catalogue complet : 101 sur 101, comme avant', () => {
+    loadComplete();
+    const p = evaluateBadgeCondition(legend());
+    assert.equal(p.max, 101);
+    ownAll(CARDS_DB);
+    assert.equal(evaluateBadgeCondition(legend()).cur, 101);
+    assert.equal(isAutoBadgeUnlocked(legend()), true);
+  });
+
+  test('catalogue partiel : possédé en entier, TOUJOURS pas débloqué', () => {
+    loadPartial(40);
+    ownAll(CARDS_DB);
+    assert.equal(isAutoBadgeUnlocked(legend()), false,
+      'c’est LE faux positif que le chantier supprime');
+  });
+
+  test('le modèle de difficulté suit — pas de NaN dans l’échelle', () => {
+    loadComplete();
+    const e = badgeEffort(legend());
+    assert.ok(Number.isFinite(e) && e > 0, `effort non fini : ${e}`);
   });
 });

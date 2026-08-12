@@ -69,7 +69,7 @@
       "condition": {
         "metric": "owned_count",
         "operator": ">=",
-        "value": 101
+        "of": "season"
       }
     },
     {

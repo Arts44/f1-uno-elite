@@ -18,7 +18,7 @@
    logarithmique : étale le bas de l'échelle et fait converger le
    sommet (Grand Chelem) vers 100 sans tasser le haut.
    ══════════════════════════════════════════════════════════ */
-import { CARDS_DB, AUTO_BADGES, MANUAL_BADGES } from './data.js';
+import { CARDS_DB, AUTO_BADGES, MANUAL_BADGES, seasonCardCount } from './data.js';
 
 const UNIT = {
   blue:1, green:1, red:1, yellow:1,
@@ -58,7 +58,18 @@ export function badgeEffort(badge){
   if(MANUAL_EFFORT[badge.id] !== undefined) return MANUAL_EFFORT[badge.id];
   const c = badge.condition;
   if(!c) return 1;
-  const v = c.value;
+  /* « miroir exact » n'est pas une formule de politesse : quand
+     evaluateBadgeCondition a appris `of: 'season'`, ce fichier devait
+     l'apprendre aussi. Sans ça `c.value` vaut undefined, l'effort vaut
+     NaN, et TOUTE l'échelle de difficulté s'effondre — pas seulement le
+     badge concerné, puisque les scores sont normalisés les uns par
+     rapport aux autres. Quatre tests l'ont dit tout de suite.
+     Le repli sur CARDS_DB.length ne sert qu'à garder un score fini
+     quand aucun total n'est déclaré ; le déblocage, lui, reste refusé
+     par `partiel` côté evaluateBadgeCondition. */
+  const v = c.of === 'season'
+    ? (seasonCardCount() ?? CARDS_DB.length)
+    : c.value;
   const teamOf = t => CARDS_DB.filter(x => x.team === t);
   switch(c.metric){
     case 'owned_count': return CHOICE * v;
