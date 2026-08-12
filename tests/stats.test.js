@@ -128,3 +128,38 @@ describe('exports gardés pour l’export de liste d’échange', () => {
       'le commentaire qui explique la décision doit rester');
   });
 });
+
+/* ── Répartitions : sommaire + colonne large (1.56.0) ──
+   Deux invariants que rien d'autre ne tient, et dont l'oubli ne se
+   verrait qu'à l'œil, tard :
+   1. « Par type de carte » ne doit PAS retourner dans la grille de
+      colonnes — c'est justement ce que la correction supprime ;
+   2. le sommaire doit rester des boutons. Des ancres href="#id"
+      écriraient dans location.hash, que l'app lit au démarrage. */
+describe('répartitions — sommaire ancré et colonne large', () => {
+  const src = readFileSync(new URL('../stats.js', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+
+  test('le bloc « par type » est hors de .sv-breakcols et en sous-colonnes', () => {
+    const grid = src.match(/<div class="sv-breakcols">([\s\S]*?)<\/div>/);
+    assert.ok(grid, '.sv-breakcols introuvable');
+    assert.ok(!grid[1].includes("t('st.by_type')"),
+      'la colonne de 16 lignes est retournée dans la grille');
+    assert.match(src, /st\.by_type[\s\S]{0,120}sv-rows-split/,
+      'le bloc « par type » ne demande plus ses sous-colonnes');
+    assert.match(css, /\.sv-rows-split\{[^}]*repeat\(auto-fit,\s*minmax\(270px/,
+      'les sous-colonnes doivent dégrader progressivement (auto-fit), pas sauter de 3 à 1');
+  });
+
+  test('le sommaire est fait de boutons — jamais d’ancres', () => {
+    const nav = src.match(/<nav class="sv-jump"[\s\S]*?<\/nav>/);
+    assert.ok(nav, 'sommaire introuvable');
+    assert.ok(!/<a\s/.test(nav[0]), 'une ancre écrirait dans location.hash');
+    assert.match(nav[0], /data-jump="svTools"/, 'le saut vers les outils a disparu');
+  });
+
+  test('les pastilles se resserrent sous 380 px (elles tenaient sur 3 lignes)', () => {
+    assert.match(css, /@media \(max-width:380px\)\{[^}]*\.sv-jump\b/,
+      'sans ce palier, le sommaire fait 3 lignes à 320 px');
+  });
+});

@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.56.0',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'Statistics open with a row of markers: each breakdown announces how many lines it holds, and one tap takes you straight to the collector tools. You no longer scroll blind to find out what comes next.',
+        'The card-type breakdown, with its 16 lines, is no longer squeezed into a column: it spans the full width and lays its lines out in sub-columns. The other three now end at roughly the same height, so the empty space under the short ones is gone.',
+      ],
+      fr: [
+        'Les statistiques s\'ouvrent sur une barre de repères : chaque répartition annonce son nombre de lignes, et une pastille saute directement aux outils de collectionneur. Plus besoin de faire défiler à l\'aveugle pour savoir ce qui vient.',
+        'La répartition par type de carte, avec ses 16 lignes, n\'est plus tassée en colonne : elle prend toute la largeur et répartit ses lignes en sous-colonnes. Les trois autres se terminent désormais à peu près à la même hauteur, et le vide sous les plus courtes a disparu.',
+      ],
+      es: [
+        'Las estadísticas se abren con una barra de referencias: cada desglose anuncia cuántas líneas tiene y una pastilla salta directamente a las herramientas de coleccionista. Ya no hay que desplazarse a ciegas para saber qué viene después.',
+        'El desglose por tipo de carta, con sus 16 líneas, ya no va apretado en una columna: ocupa todo el ancho y reparte sus líneas en subcolumnas. Los otros tres terminan ahora casi a la misma altura y el hueco bajo los más cortos ha desaparecido.',
+      ],
+      zh: [
+        '统计页顶部新增一排导航标签：每个分布都标出自己有多少行，还有一枚可直接跳到收藏工具。不必再盲目滚动才知道下面是什么。',
+        '有 16 行的卡片类型分布不再挤在一列里：它现在占满宽度，把行分到多个子列中。另外三个分布的高度也接近了，短分布下方的空白消失了。',
+      ],
+      it: [
+        'Le statistiche si aprono con una barra di riferimenti: ogni ripartizione dichiara quante righe contiene e una pastiglia porta direttamente agli strumenti da collezionista. Non serve più scorrere alla cieca per sapere cosa viene dopo.',
+        'La ripartizione per tipo di carta, con le sue 16 righe, non è più compressa in una colonna: occupa tutta la larghezza e distribuisce le righe in sottocolonne. Le altre tre finiscono ora quasi alla stessa altezza e il vuoto sotto le più corte è sparito.',
+      ],
+      nl: [
+        'De statistieken openen met een rij herkenningspunten: elke verdeling zegt hoeveel regels ze telt, en één chip springt meteen naar de verzamelaarstools. Blind scrollen om te weten wat er komt, hoeft niet meer.',
+        'De verdeling per kaarttype, met 16 regels, zit niet langer geperst in een kolom: ze neemt de volle breedte en verdeelt haar regels over subkolommen. De andere drie eindigen nu ongeveer even hoog, en de lege ruimte onder de kortste is weg.',
+      ],
+      de: [
+        'Die Statistik beginnt mit einer Reihe von Wegweisern: Jede Aufschlüsselung nennt ihre Zeilenzahl, und eine Chip führt direkt zu den Sammlerwerkzeugen. Blindes Scrollen, um zu sehen was kommt, entfällt.',
+        'Die Aufschlüsselung nach Kartentyp mit ihren 16 Zeilen ist nicht länger in eine Spalte gequetscht: Sie nimmt die volle Breite ein und verteilt ihre Zeilen auf Unterspalten. Die anderen drei enden jetzt etwa gleich hoch, die Leere unter den kurzen ist verschwunden.',
+      ],
+    },
+  },
+  {
     version: '1.55.1',
     date: '2026-08-12',
     changes: {

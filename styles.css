@@ -1358,6 +1358,38 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sv-col,.sv-rail{display:grid;gap:var(--space-5);align-content:start;min-width:0;}
 .sv-block{display:flex;flex-direction:column;min-width:0;}
 .sv-breakcols{display:grid;gap:var(--space-5);grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+/* ── Répartitions (1.56.0) ──
+   Sommaire de repères : rien n'est caché, on annonce seulement ce qui
+   vient et on permet d'y aller. Les pastilles s'enroulent ; à 375 px
+   elles tiennent sur DEUX lignes (mesuré), ce qui reste un repère et
+   non un obstacle. */
+.sv-jump{display:flex;flex-wrap:wrap;gap:var(--space-2);}
+.sv-jump-chip{display:inline-flex;align-items:center;gap:var(--space-6px);min-height:36px;
+  padding:var(--space-2) var(--space-3);border-radius:var(--r-pill);border:1px solid var(--border);
+  background:var(--surface);color:var(--tx1);font-family:var(--font-b);font-size:12px;font-weight:600;
+  cursor:pointer;transition:background 0.15s,border-color 0.15s;}
+.sv-jump-chip:hover{background:var(--surface3);border-color:var(--tx3);}
+.sv-jump-chip:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
+.sv-jump-n,.sv-jump-arrow{font-weight:700;color:var(--tx3);}
+.sv-jump-skip{border-style:dashed;color:var(--tx2);}
+/* Sous 380 px les cinq pastilles s'enroulaient sur TROIS lignes (124 px
+   de hauteur mesurés à 320) : un repère qui prend trois lignes n'est plus
+   un repère, c'est un obstacle de plus avant le contenu. Resserrées, elles
+   tiennent sur deux lignes jusqu'à 320 px — sans rien retirer du texte. */
+@media (max-width:380px){
+  .sv-jump{gap:var(--space-6px);}
+  .sv-jump-chip{font-size:11px;padding:var(--space-2);gap:4px;}
+}
+/* La colonne de 16 lignes n'est plus une colonne : pleine largeur, ses
+   lignes en sous-colonnes. minmax(270px) donne 3 sous-colonnes au-delà
+   de ~880 px, 2 entre ~570 et ~880, 1 en dessous — la dégradation est
+   progressive, elle ne saute pas de 3 à 1. */
+.sv-rows-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));overflow:hidden;}
+.sv-rows-split .sv-row{border-bottom:1px solid var(--border);border-radius:0;}
+/* 16 lignes sur 3 sous-colonnes laissent une orpheline sur le dernier
+   rang : sa bordure basse doublerait celle du conteneur, juste sous elle
+   et sur un tiers de largeur. */
+.sv-rows-split .sv-row:last-child{border-bottom:none;}
 @media(min-width:1000px){
   .sv-layout{grid-template-columns:minmax(0,1fr) 320px;}
   .sv-rail{position:sticky;top:var(--space-3);}

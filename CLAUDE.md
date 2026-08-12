@@ -55,6 +55,8 @@ These are the rules that, if broken, ship a bug to production or violate the pro
 
    La recette complète, dans cet ordre : **purger SW + `caches` → `fetch(…,{cache:'reload'})` sur les sous-ressources modifiées → recharger avec une URL modifiée.**
 
+   **Le piège 1 ne s'arrête pas aux fichiers du dépôt.** Le service worker intercepte **toute** navigation dans sa portée (`./`) — y compris un fichier que tu viens de créer et qui n'a **jamais** existé auparavant. Une page de maquette écrite il y a deux minutes a été servie périmée : le SW répondait à sa place, et la page affichait une version antérieure d'elle-même. Le symptôme est déroutant (« mon `window.go` n'existe pas alors qu'il est dans le fichier ») et n'évoque pas le cache. **Avant de servir une page de travail temporaire, purge le SW** — ou sers-la depuis un autre port, hors de la portée.
+
    Pourquoi c'est une règle et pas un conseil : plusieurs mesures ont été prises sur du code périmé avant qu'on s'en aperçoive, et des conclusions ont dû être jetées. Une mesure faite sur un bundle obsolète ne se voit pas — elle a l'air juste.
 
    **Corollaire pour les mesures de mise en page :** `requestAnimationFrame` **ne se déclenche pas** dans un onglet ou un panneau masqué. Toute attente de stabilisation qui repose dessus ne stabilise rien et renvoie des valeurs oscillantes. Utiliser `setTimeout` seul.
@@ -277,6 +279,7 @@ A change is **not done** until all of these pass. Run them before you say the wo
 - **Stats progression history has no back-fill** — the curve starts empty the day the feature was installed. Don't try to reconstruct past data; there's no per-card timestamp.
 - **`data-embedded.js` must stay in parity with the real `data/metadata.json`** (a few tests assert this) — it's the offline fallback.
 - **Viewer mode** silently blocks write actions via the `VIEWER_BLOCKED` set in `app.js`; forget to list a new write action there and read-only mode leaks writes.
+- **Ne recliquez pas la navigation pour « forcer » l'affichage d'une vue.** Les transitions entre vues (1.32.0) ont une durée ; un clic pendant la transition la **relance depuis le début**. Un script d'automatisation qui cliquait sur l'onglet Stats toutes les 200 ms tant que la vue n'apparaissait pas ne l'a **jamais** fait apparaître — chaque clic annulait le précédent, et le symptôme (« la vue ne s'affiche pas ») ressemble à une panne, pas à un excès de zèle. **Un seul clic, puis attendre** (~1,5 s suffit ; poller l'apparition du contenu, pas recliquer).
 - **Arc browser** hides behind a Chrome UA and has no install support; `install.js` detects it via `--arc-palette-*` CSS vars and shows an honest message. Don't "simplify" that away.
 - **Driver-number fonts** (Orbitron / Racing Sans One) are intentionally fixed and must **not** follow the font-theme picker.
 - **Colour/contrast:** stat and rarity palettes are contrast-checked in **both** light and dark themes. If you change chart/tile/rarity colours, re-check contrast in both themes (the `dataviz` skill provides a palette-contrast validator; there is no such script committed in this repo).

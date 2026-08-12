@@ -210,11 +210,12 @@ export function renderStats(){
   });
   const champPct = champions > 0 ? Math.round((champOwned/champions)*100) : 0;
   catRowsArr.push(svRow(icon('trophy'), t('st.champions'), champOwned, champions, champPct));
-  const catRows = catRowsArr.join('');
+  const catRows = catRowsArr.filter(Boolean).join('');
+  const catCount = catRowsArr.filter(Boolean).length;
 
   // — Par type de carte —
   const typeIds = Object.keys(CARD_TYPES);
-  const typeRows = typeIds.map(typeId => {
+  const typeRowsArr = typeIds.map(typeId => {
     const ct = CARD_TYPES[typeId];
     const cardsWithType = CARDS_DB.filter(c=>c.types.includes(typeId));
     if(cardsWithType.length === 0) return '';
@@ -238,7 +239,9 @@ export function renderStats(){
     const dotStyle = isGradient ? `background:${bgStyle}` : `background:${bgStyle}`;
     const dotIcon = `<span class="sv-type-dot${ct.foil?' sv-type-dot-foil':''}" style="${dotStyle}"></span>`;
     return svRow(dotIcon, t('type.'+typeId)||ct.label, ownedWithType, cardsWithType.length, typePct);
-  }).join('');
+  }).filter(Boolean);
+  const typeRows = typeRowsArr.join('');
+  const typeCount = typeRowsArr.length;
 
   // — Par équipe —
   const TEAM_SHORT = {
@@ -249,7 +252,7 @@ export function renderStats(){
     'Stake F1 Team KICK Sauber':'Sauber'
   };
   const teams = [...new Set(CARDS_DB.map(c=>c.team).filter(Boolean))].sort();
-  const teamRows = teams.map(team => {
+  const teamRowsArr = teams.map(team => {
     const teamCards = CARDS_DB.filter(c=>c.team===team);
     if(teamCards.length === 0) return '';
     const teamOwned = teamCards.filter(c=>cardOwned(c.id)).length;
@@ -257,10 +260,12 @@ export function renderStats(){
     const color = (TEAM_COLORS&&TEAM_COLORS[team]) || 'var(--red)';
     const dot = `<span class="sv-team-dot" style="background:${color}"></span>`;
     return svRow(dot, TEAM_SHORT[team]||team, teamOwned, teamCards.length, teamPct);
-  }).join('');
+  }).filter(Boolean);
+  const teamRows = teamRowsArr.join('');
+  const teamCount = teamRowsArr.length;
 
   // — Par rareté —
-  const rarityRows = RARITY_KEYS.map(rKey => {
+  const rarityRowsArr = RARITY_KEYS.map(rKey => {
     const rar = RARITIES[rKey];
     if(!rar) return '';
     const ownedAtRar = CARDS_DB.filter(c => cardOwned(c.id) && cardRarity(c) === rKey).length;
@@ -281,7 +286,9 @@ export function renderStats(){
       ? `<span class="rar-${rKey}-text">${t('rar.'+rKey)}</span>`
       : `<span style="color:color-mix(in srgb, ${rar.color} var(--ink-mix,100%), #000)">${t('rar.'+rKey)}</span>`;
     return svRow(dot, label, ownedAtRar, reachable, rarPct);
-  }).join('');
+  }).filter(Boolean);
+  const rarityRows = rarityRowsArr.join('');
+  const rarityCount = rarityRowsArr.length;
 
   // — Cartes phares (highlights) — computed from current data only.
   // "Last added card" is deliberately omitted: no per-card timestamp
@@ -391,7 +398,7 @@ export function renderStats(){
 
   // — Outils de collectionneur : onglets Manquantes / Doubles / Échange —
   const toolsHtml = `
-    <section class="sv-block">
+    <section class="sv-block" id="svTools">
     <div class="sv-section-title">${icon('wrench')} ${t('st.tools')}</div>
     <div class="sv-tools">
       <div class="sv-tools-tabs" role="tablist" aria-label="${t('st.tools')}">
@@ -430,7 +437,37 @@ export function renderStats(){
   //    historique) tient la colonne large ; le rail garde donut,
   //    à la une et objectifs sous les yeux pendant le défilement.
   //    Aucun calcul n'a changé : seuls les conteneurs bougent.
-  const block = (title, body) => `<section class="sv-block"><div class="sv-section-title">${title}</div>${body}</section>`;
+  const block = (title, body, id) => `<section class="sv-block"${id?` id="${id}"`:''}><div class="sv-section-title">${title}</div>${body}</section>`;
+
+  /* ── Répartitions : sommaire ancré + colonne large (1.56.0) ──
+     AVANT : quatre blocs dans une grille auto-fit. « Par type de carte »
+     y tenait 16 lignes contre 5 pour les catégories, d'où 511 px de vide
+     sous la colonne courte, et 1 919 px de répartitions sur mobile —
+     2,7 écrans avant d'atteindre les outils, sans savoir ce qui venait.
+
+     DEUX corrections, aucune ne cache quoi que ce soit :
+     1. La colonne longue cesse d'être une colonne. « Par type » passe
+        pleine largeur et répartit ses lignes en sous-colonnes ; les trois
+        blocs restants, de hauteurs voisines, tiennent sur un rang.
+        L'irrégularité est supprimée, pas contournée — rien à maintenir.
+     2. Un sommaire de repères annonce chaque bloc avec son nombre de
+        lignes, et saute aux outils. On sait ce qui vient AVANT de faire
+        défiler. C'est ce qui répond au cas mobile, que (1) ne touche pas.
+
+     Un repli mémorisé a été écarté : il n'aurait rien changé au premier
+     regard (rien ne doit être caché par défaut), et un état persistant
+     s'oublie — il aurait fini par faire croire qu'on avait tout vu. */
+  const jump = [
+    ['svByCat',    t('st.by_cat'),    catCount],
+    ['svByTeam',   t('st.by_team'),   teamCount],
+    ['svByRarity', t('st.by_rarity'), rarityCount],
+    ['svByType',   t('st.by_type'),   typeCount],
+  ].filter(j => j[2] > 0);
+  const jumpHtml = `
+    <nav class="sv-jump" aria-label="${t('st.jump')}">
+      ${jump.map(([id, label, n]) => `<button class="sv-jump-chip" type="button" data-jump="${id}">${label}<span class="sv-jump-n">${n}</span></button>`).join('')}
+      <button class="sv-jump-chip sv-jump-skip" type="button" data-jump="svTools">${t('st.tools')}<span class="sv-jump-arrow" aria-hidden="true">↓</span></button>
+    </nav>`;
 
   el.innerHTML = pageHeadHTML({
     icon: 'chart',
@@ -458,12 +495,15 @@ export function renderStats(){
           <div class="sv-card exemplaires"><div class="sv-card-value">${totalExemplaires}</div><div class="sv-card-label">${t('st.copies')}</div></div>
         </div>`)}
 
+        ${jumpHtml}
+
         <div class="sv-breakcols">
-          ${catRows    ? block(t('st.by_cat'),    `<div class="sv-rows-block">${catRows}</div>`)    : ''}
-          ${typeRows   ? block(t('st.by_type'),   `<div class="sv-rows-block">${typeRows}</div>`)   : ''}
-          ${teamRows   ? block(t('st.by_team'),   `<div class="sv-rows-block">${teamRows}</div>`)   : ''}
-          ${rarityRows ? block(t('st.by_rarity'), `<div class="sv-rows-block">${rarityRows}</div>`) : ''}
+          ${catRows    ? block(t('st.by_cat'),    `<div class="sv-rows-block">${catRows}</div>`,    'svByCat')    : ''}
+          ${teamRows   ? block(t('st.by_team'),   `<div class="sv-rows-block">${teamRows}</div>`,   'svByTeam')   : ''}
+          ${rarityRows ? block(t('st.by_rarity'), `<div class="sv-rows-block">${rarityRows}</div>`, 'svByRarity') : ''}
         </div>
+
+        ${typeRows ? block(t('st.by_type'), `<div class="sv-rows-block sv-rows-split">${typeRows}</div>`, 'svByType') : ''}
 
         ${toolsHtml}
         ${block(t('st.history'), histHtml)}
@@ -485,6 +525,17 @@ export function renderStats(){
     };
     gl.addEventListener('click', toggle);
     gl.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); toggle(); } });
+  });
+
+  /* Sommaire : saut vers un bloc. Des BOUTONS, pas des ancres — un
+     href="#id" écrirait dans location.hash, que l'app lit au démarrage
+     (lien #backup=, retour d'authentification). Un repère de lecture n'a
+     pas à laisser de trace dans l'URL. */
+  el.querySelectorAll('[data-jump]').forEach(b => {
+    b.addEventListener('click', () => {
+      const target = el.querySelector('#' + b.dataset.jump);
+      if(target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   });
 
   // Onglets outils : bascule locale (lecture seule, pas d'écriture)
