@@ -190,3 +190,48 @@ describe('legend_101 — « toutes les cartes », plus « 101 »', () => {
     assert.ok(Number.isFinite(e) && e > 0, `effort non fini : ${e}`);
   });
 });
+
+/* ── Étape 3 : les deux badges « toutes les écuries » ───────── */
+describe('of: \'teams\' — le nombre d’écuries n’est plus écrit en dur', () => {
+  beforeEach(() => { resetTout(); });
+  const bid = id => badgesJson.auto.find(b => b.id === id);
+
+  test('teams_owned_10 et teamset_all ne codent plus « 10 »', () => {
+    for (const id of ['teams_owned_10', 'teamset_all']){
+      assert.equal(bid(id).condition.of, 'teams', id);
+      assert.equal(bid(id).condition.value, undefined, `${id} : 10 écrit en dur`);
+    }
+  });
+
+  test('les paliers arbitraires 2 et 5 écuries ne bougent PAS', () => {
+    assert.equal(bid('teams_owned_2').condition.value, 2);
+    assert.equal(bid('teams_owned_5').condition.value, 5);
+    assert.equal(bid('teams_owned_2').condition.of, undefined,
+      '« 2 écuries » est un palier, pas une propriété du catalogue');
+  });
+
+  test('catalogue complet : max = nombre réel d’écuries (10 en 2025)', () => {
+    loadComplete();
+    assert.equal(evaluateBadgeCondition(bid('teams_owned_10')).max, 10);
+  });
+
+  test('catalogue partiel : indébloquable, même en possédant tout le fichier', () => {
+    loadPartial(40);
+    ownAll(CARDS_DB);
+    const p = evaluateBadgeCondition(bid('teams_owned_10'));
+    assert.ok(p.partiel, '« toutes les écuries » n’a pas de sens sur un catalogue incomplet');
+    assert.equal(isAutoBadgeUnlocked(bid('teams_owned_10')), false);
+  });
+
+  test('parité data-embedded pour les deux', () => {
+    const emb = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+    assert.match(emb, /"metric":"teams_owned_count","operator":">=","of":"teams"/);
+    assert.match(emb, /"metric":"teams_set_count","operator":">=","of":"teams"/);
+  });
+
+  test('la difficulté reste finie (le Grand Chelem garde son sommet)', () => {
+    loadComplete();
+    const e = badgeEffort(bid('teamset_all'));
+    assert.ok(Number.isFinite(e) && e > 0, `effort non fini : ${e}`);
+  });
+});

@@ -67,8 +67,8 @@ export function badgeEffort(badge){
      Le repli sur CARDS_DB.length ne sert qu'à garder un score fini
      quand aucun total n'est déclaré ; le déblocage, lui, reste refusé
      par `partiel` côté evaluateBadgeCondition. */
-  const v = c.of === 'season'
-    ? (seasonCardCount() ?? CARDS_DB.length)
+  const v = c.of === 'season' ? (seasonCardCount() ?? CARDS_DB.length)
+    : c.of === 'teams' ? new Set(CARDS_DB.map(x => x.team).filter(Boolean)).size
     : c.value;
   const teamOf = t => CARDS_DB.filter(x => x.team === t);
   switch(c.metric){

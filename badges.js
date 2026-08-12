@@ -64,19 +64,32 @@ export function evaluateBadgeCondition(badge){
      rendre invisible : un fichier partiel se prouverait complet
      lui-même. */
   const parSaison = cond.of === 'season';
+  /* `of: 'teams'` — « toutes les écuries ». Le nombre d'écuries n'est PAS
+     déclaré dans metadata.seasons[] (seul cardCount l'est), et on a
+     refusé d'ajouter un `teamCount` : ce serait une seconde source de
+     vérité à tenir à jour, donc à laisser diverger un jour.
+     On compte donc les écuries du catalogue — ce qui est exact À LA
+     CONDITION que le catalogue soit complet, et c'est précisément ce que
+     `partiel` garantit ci-dessous. « Toutes les écuries » n'a de toute
+     façon aucun sens sur un catalogue incomplet : mieux vaut le badge
+     indébloquable qu'attribué à tort. */
+  const parEcuries = cond.of === 'teams';
+  const nbEcuries = () => new Set(CARDS_DB.map(c => c.team).filter(Boolean)).size;
   const totalDeclare = parSaison ? seasonCardCount() : null;
   const target = parSaison
     // Total inconnu : on affiche la meilleure estimation disponible pour
     // que la progression reste lisible, mais `partiel` ci-dessous
     // interdit le déblocage. On montre un chiffre, on n'en tire rien.
     ? (totalDeclare === null ? (CARDS_DB.length || 1) : totalDeclare)
+    : parEcuries ? (nbEcuries() || 1)
     : cond.value;
   // Catalogue incomplet + métrique relative ⇒ résultat marqué `partiel`.
-  // Idem dès que le seuil est celui de la saison et que le catalogue
-  // n'est pas COMPLET : ni partiel, ni vide, ni inconnu ne suffisent.
+  // Idem dès que le seuil est celui de la saison (cartes ou écuries) et
+  // que le catalogue n'est pas COMPLET : ni partiel, ni vide, ni inconnu
+  // ne suffisent.
   const partiel = (METRIQUES_RELATIVES.has(metric)
       && seasonCatalogueState().etat === 'partiel')
-    || (parSaison && seasonCatalogueState().etat !== 'complet');
+    || ((parSaison || parEcuries) && seasonCatalogueState().etat !== 'complet');
   const marque = r => partiel ? { ...r, partiel: true } : r;
 
   switch(metric){

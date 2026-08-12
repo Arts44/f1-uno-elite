@@ -441,7 +441,7 @@
       "condition": {
         "metric": "teams_owned_count",
         "operator": ">=",
-        "value": 10
+        "of": "teams"
       }
     },
     {
@@ -453,7 +453,7 @@
       "condition": {
         "metric": "teams_set_count",
         "operator": ">=",
-        "value": 10
+        "of": "teams"
       }
     },
     {
