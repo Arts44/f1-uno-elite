@@ -152,7 +152,37 @@ pas emporté avec lui.
 
 ---
 
-## 5. Le plancher de hauteur de tuile n'a pas été reconfirmé
+## 5. Les marqueurs de coin sont muets pour un lecteur d'écran
+
+`render.js` pose trois marqueurs sur `.card-visual`. Deux sont
+`aria-hidden="true"` :
+
+| Marqueur | Exposé ? |
+|---|---|
+| Sceau « set complet » | **oui** — `role="img"` + `aria-label` traduit |
+| Réserve (`swap`) | non — `aria-hidden="true"` |
+| Directeur (`headset`) | non — `aria-hidden="true"` |
+| Couronne champion | non — mais l'info est reprise en texte dans `.card-num` |
+
+Conséquence : **la seule information qui distingue une carte réserve
+d'une carte directeur est invisible pour un lecteur d'écran** — les deux
+partagent le même visuel (monogramme d'écurie) et le même texte (nom,
+écurie, année). C'est précisément l'ambiguïté que le marqueur existe pour
+lever ; elle reste entière sans la vue.
+
+Ce n'est pas une régression de 1.58.0 : la réserve était déjà
+`aria-hidden` depuis l'origine. Le directeur a hérité de la convention
+existante plutôt que d'introduire une divergence — mais la convention
+était le défaut.
+
+**Correction attendue** : deux clés i18n ×7 (`mark.reserve`,
+`mark.director`), `role="img"` + `aria-label`, sur le modèle du sceau.
+Deux catégories, deux clés, sept langues : ça mérite son passage, pas un
+ajout discret au coin d'un autre commit.
+
+---
+
+## 6. Le plancher de hauteur de tuile n'a pas été reconfirmé
 
 `--card-h` vaut 320. Le **plancher** — la plus petite valeur qui ne
 comprime aucun bloc — a été mesuré à **300** sur la MAQUETTE (feuille de
@@ -169,7 +199,7 @@ chiffre de départ est à remesurer, pas à reprendre ici.
 
 ---
 
-## 6. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
+## 7. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
 
 Passée en `width:min(380px, 100vw - 24px)` avec un remplissage
 `clamp(20px, 6vw, 48px)`. Mesuré après : à 320 px la boîte fait 287 et

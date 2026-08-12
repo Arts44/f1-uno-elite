@@ -148,7 +148,11 @@ export function classifyOtpError(status, body){
   return 'otp-failed';
 }
 
-// Verify the 6-digit code from the email (GoTrue /verify). This is the
+// Verify the emailed code (GoTrue /verify). NOT six digits: Supabase's
+// "Email OTP Length" is configurable and THIS PROJECT USES 8 — see
+// isValidOtpFormat() below, which accepts 6 to 10. The old wording said
+// "6-digit code" and was simply wrong; it was copied into a report before
+// anyone re-read the helper two functions down. This is the
 // PRIMARY sign-in path: typing a code works in every context — installed
 // PWA (standalone), plain browser, mobile — unlike the magic link, which
 // always opens in the default browser and never reaches the installed
