@@ -390,7 +390,7 @@ function buildCardEl(card){
       <div class="card-body">
         <div class="card-num">#${card.id} ${card.champion?`· ${icon('crown','ic-crown')}`:''}</div>
         <div class="card-name">${card.name} ${card.category==='pilote'?card.nationality||'':''} ${card.retired?`<span class="retired-badge">${t('m.retired')}</span>`:''}</div>
-        <div class="card-year">${card.season||2025}</div>
+        <div class="card-year">${card.season||_currentSeason}</div>
         <div class="card-team">${TEAM_COLORS[card.team]?`<span class="team-dot" style="background:${TEAM_COLORS[card.team]}"></span>`:''}${card.team||''}</div>
         <div class="card-rarity-row">
           <span class="card-rarity${rarityChipClass(rKey)}" style="${rarityChipStyle(rKey,rarity.color)}">${t('rar.'+rKey)} ${isEternal?`<span class="eternal-stars">${'✦'.repeat(rarity.stars)}</span>`:'★'.repeat(rarity.stars)}</span>

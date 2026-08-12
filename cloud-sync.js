@@ -58,13 +58,22 @@ function _rejectIfRevoked(resp){
 }
 
 // Upsert the current season's snapshot. Returns the server updated_at.
-export async function pushCollection(){
+/* ── LA SAISON EST UN ARGUMENT ──
+   Elle était un AMBIANT : `_currentSeason` lu à trois endroits, donc
+   impossible de pousser 2026 sans basculer l'application, ni de tirer
+   une saison qu'on n'a pas à l'écran. Le serveur, lui, était prêt
+   depuis le début — la clé primaire est (user_id, season).
+   Le défaut « saison courante » reste, mais il remonte d'un cran : au
+   site d'appel, où il est un choix d'interface et non une règle de
+   synchronisation. Les anciens noms restent exportés et délèguent, pour
+   que les consommateurs n'aient pas à bouger en même temps. */
+export async function pushSeason(season){
   if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
   const { session, userId } = await _requireSession();
-  const row = buildUpsertRow(userId, _currentSeason, collectionSnapshot(backupIncludes()));
+  const row = buildUpsertRow(userId, season, collectionSnapshot(backupIncludes()));
   const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?on_conflict=user_id,season`, {
     method: 'POST',
     cache: 'no-store',
@@ -83,21 +92,21 @@ export async function pushCollection(){
   const updatedAt = rows && rows[0] && rows[0].updated_at;
   // A successful cloud push IS a backup: reset the local backup reminder.
   try { markBackupDone(); } catch(e){}
-  log('cloud: pushed season', _currentSeason, 'updated_at', updatedAt);
+  log('cloud: pushed season', season, 'updated_at', updatedAt);
   return updatedAt || null;
 }
 
 // Fetch the cloud snapshot for the current season and hand it to the
 // EXISTING import dialog (merge / replace / cancel) — the local
 // collection is never overwritten silently.
-export async function pullCollection(){
+export async function pullSeason(season){
   if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
   const { session } = await _requireSession();
   const resp = await cloudFetch(
-    `${cfg.url}/rest/v1/collections?season=eq.${_currentSeason}&select=data,updated_at`, {
+    `${cfg.url}/rest/v1/collections?season=eq.${season}&select=data,updated_at`, {
     cache: 'no-store',
     headers: authHeaders(cfg, session.access_token),
   });
@@ -142,7 +151,7 @@ export async function cloudDeleteAll(){
 }
 
 // Lightweight metadata read for the "last cloud backup" line.
-export async function fetchCloudMeta(){
+export async function fetchSeasonMeta(season){
   const cfg = cloudConfig();
   if(!cfg) return null;
   // Hors ligne : on ne tente RIEN. Cette fonction était la seule des cinq
@@ -155,7 +164,7 @@ export async function fetchCloudMeta(){
   if(!session) return null;
   try {
     const resp = await cloudFetch(
-      `${cfg.url}/rest/v1/collections?season=eq.${_currentSeason}&select=updated_at`, {
+      `${cfg.url}/rest/v1/collections?season=eq.${season}&select=updated_at`, {
       cache: 'no-store',
       headers: authHeaders(cfg, session.access_token),
     });
@@ -163,4 +172,37 @@ export async function fetchCloudMeta(){
     const rows = await resp.json();
     return (Array.isArray(rows) && rows[0] && rows[0].updated_at) || null;
   } catch(e){ return null; }
+}
+
+/* ── Compatibilité : les trois noms d'origine, sur la saison courante ──
+   C'est ICI que `_currentSeason` est lu, et nulle part ailleurs. Le
+   défaut d'interface est donc explicite et à un seul endroit. */
+export const pushCollection = () => pushSeason(_currentSeason);
+export const pullCollection = () => pullSeason(_currentSeason);
+export const fetchCloudMeta = () => fetchSeasonMeta(_currentSeason);
+
+/* ── listCloudSeasons() — ce que le multi-saisons attendait ──
+   Même requête que fetchSeasonMeta, SANS le filtre `season=eq.` : le
+   serveur renvoie une ligne par saison sauvegardée. Impossible avant,
+   puisque la requête était figée sur la saison affichée.
+   Renvoie [] plutôt que null en cas d'échec : l'appelant affiche une
+   liste vide, ce qui est vrai, au lieu de distinguer un cas d'erreur
+   dont il ne peut rien faire. */
+export async function listCloudSeasons(){
+  const cfg = cloudConfig();
+  if(!cfg) return [];
+  if(isOffline()) return [];
+  const session = await getValidSession();
+  if(!session) return [];
+  try {
+    const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?select=season,updated_at`, {
+      cache: 'no-store',
+      headers: authHeaders(cfg, session.access_token),
+    });
+    if(!resp.ok) return [];
+    const rows = await resp.json();
+    return Array.isArray(rows)
+      ? rows.filter(r => Number.isInteger(r.season)).sort((a, b) => b.season - a.season)
+      : [];
+  } catch(e){ return []; }
 }

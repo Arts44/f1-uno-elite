@@ -88,7 +88,10 @@ export function installFixtures(){
   CARDS.forEach(c => CARDS_DB.push(structuredClone(c)));
 }
 
-/** Persist a collection for season 2025 so loadData() picks it up. */
+/* La saison des fixtures reste 2025 : c'est la saison de référence des
+   suites existantes, et la figer garde les tests lisibles. Les tests
+   multi-saisons déclarent la leur explicitement via setCurrentSeason().
+   Persist a collection for season 2025 so loadData() picks it up. */
 export function seedCollection(coll){
   localStorage.setItem('f1uno_version', '2');
   localStorage.setItem('f1uno_owned_2025', JSON.stringify(coll));

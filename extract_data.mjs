@@ -105,10 +105,21 @@ CARDS_DB.forEach(c => {
   }
 });
 
-// ── Build cards-2025.json ──
-const cards2025 = CARDS_DB.map(c => ({
+/* ── La saison est un PARAMÈTRE, plus une constante ──
+   Elle était écrite en dur à quatre endroits. Ce script régénère aussi
+   metadata.json : le relancer sans paramètre aurait écrasé les saisons
+   déclarées et les écuries ajoutées à la main.
+   Usage : node extract_data.mjs [année]   (défaut : 2025) */
+const SEASON = parseInt(process.argv[2] || '2025', 10);
+if(!Number.isInteger(SEASON) || SEASON < 2000){
+  console.error(`Saison invalide : ${process.argv[2]}`);
+  process.exit(1);
+}
+
+// ── Build cards-<SEASON>.json ──
+const cards = CARDS_DB.map(c => ({
   id: c.id,
-  season: 2025,
+  season: SEASON,
   number: parseInt(c.id, 10),
   name: c.name,
   team: c.team || '',
@@ -160,13 +171,31 @@ const metadata = {
 const dataDir = join(__dirname, 'data');
 if(!existsSync(dataDir)) mkdirSync(dataDir);
 
-writeFileSync(join(dataDir, 'cards-2025.json'), JSON.stringify(cards2025, null, 2), 'utf8');
-console.log(`✓ cards-2025.json: ${cards2025.length} cards`);
+writeFileSync(join(dataDir, `cards-${SEASON}.json`), JSON.stringify(cards, null, 2), 'utf8');
+console.log(`✓ cards-${SEASON}.json: ${cards.length} cards`);
 
 writeFileSync(join(dataDir, 'circuits.json'), JSON.stringify(circuits, null, 2), 'utf8');
 console.log(`✓ circuits.json: ${Object.keys(circuits).length} circuits`);
 
-writeFileSync(join(dataDir, 'metadata.json'), JSON.stringify(metadata, null, 2), 'utf8');
-console.log(`✓ metadata.json: static config`);
+/* metadata.json est FUSIONNÉ, plus écrasé. Le fichier vivant contient
+   des choses que ce script ne connaît pas — seasons[], et les écuries
+   ou pilotes ajoutés à la main pour une saison qu'il ne traite pas.
+   Les écraser silencieusement, c'est perdre du travail de saisie. */
+const metaPath = join(dataDir, 'metadata.json');
+let fusion = metadata;
+if(existsSync(metaPath)){
+  const vivant = JSON.parse(readFileSync(metaPath, 'utf8'));
+  fusion = { ...vivant, ...metadata };
+  for(const cle of ['driverNumbers', 'teamColors', 'teamMonograms', 'teamLiveries']){
+    fusion[cle] = { ...(vivant[cle] || {}), ...(metadata[cle] || {}) };
+  }
+  fusion.seasons = vivant.seasons || [];
+  const i = fusion.seasons.findIndex(x => x.year === SEASON);
+  const entree = { year: SEASON, cardCount: cards.length };
+  if(i >= 0) fusion.seasons[i] = entree; else fusion.seasons.push(entree);
+  fusion.seasons.sort((a, b) => a.year - b.year);
+}
+writeFileSync(metaPath, JSON.stringify(fusion, null, 2), 'utf8');
+console.log(`✓ metadata.json: fusionné (saison ${SEASON} = ${cards.length} cartes)`);
 
 console.log('Extraction complete!');

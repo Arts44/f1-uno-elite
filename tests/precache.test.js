@@ -72,4 +72,18 @@ describe('SHELL_ASSETS', () => {
   test('SW_VERSION est bien présent et versionné', () => {
     assert.match(sw, /const SW_VERSION = 'v\d+';/);
   });
+
+  /* Le fichier de cartes de CHAQUE saison déclarée doit être précaché.
+     Sans ça, une saison neuve n'est consultable hors ligne qu'après une
+     première visite en ligne — et l'app affiche son état vide sur un
+     appareil qui a pourtant tout le reste en cache. La liste des saisons
+     vit dans metadata.json ; ce test la suit au lieu de la recopier. */
+  test('chaque saison déclarée a son fichier de cartes précaché', () => {
+    const meta = JSON.parse(readFileSync(root + 'data/metadata.json', 'utf8'));
+    const manquants = (meta.seasons || [])
+      .map(s => `data/cards-${s.year}.json`)
+      .filter(f => !SHELL.includes(f));
+    assert.deepEqual(manquants, [],
+      `saisons déclarées mais hors precache : ${manquants.join(', ')}`);
+  });
 });

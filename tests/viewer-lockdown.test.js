@@ -50,7 +50,9 @@ describe('refus logique, action par action', () => {
     // Le découpage de cloud.js déplace ces fonctions de fichier ; le
     // contrat, lui, ne bouge pas — chacune doit toujours refuser en
     // tête. La table suit les fonctions, elle ne les relâche pas.
-    'cloud-sync.js': ['pushCollection', 'pullCollection', 'cloudDeleteAll'],
+    // pushCollection/pullCollection sont devenus des délégués d'une ligne
+    // vers pushSeason/pullSeason : c'est là que vit désormais le garde.
+    'cloud-sync.js': ['pushSeason', 'pullSeason', 'cloudDeleteAll'],
     'cloud-auth.js': ['signOut', 'requestEmailChange', 'sendMagicLink',
                       'verifyOtpCode', 'handleAuthRedirect'],
     'account.js': ['openDeleteModal'],

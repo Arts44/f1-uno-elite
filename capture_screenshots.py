@@ -12,7 +12,7 @@ Ce qu'il produit :
   screenshots/*.jpg|png          états partagés (EN), dimensions historiques
   screenshots/i18n/<st>.<lg>.jpg 4 états × 7 langues
 
-Le SEED est calculé ICI à partir de data/cards-2025.json : même entrée,
+Le SEED est calculé ICI à partir de data/cards-<SEASON>.json : même entrée,
 même sortie, aucune dérive possible entre deux gels. Il met en scène
 l'app à son meilleur — sets complets, champion Éternel, badges datés,
 objectif épinglé, cloud connecté — sans jamais afficher de vraie
@@ -36,7 +36,10 @@ FAILS = []
 # ══════════════════════════════════════════════════════════
 #   SEED — déterministe, calculé depuis les données du dépôt
 # ══════════════════════════════════════════════════════════
-CARDS = json.loads((ROOT / 'data' / 'cards-2025.json').read_text())
+# La saison est un PARAMÈTRE : elle était écrite en dur à six endroits.
+#   python3 capture_screenshots.py [année]      (défaut : 2025)
+SEASON = int(sys.argv[1]) if len(sys.argv) > 1 else 2025
+CARDS = json.loads((ROOT / 'data' / f'cards-{SEASON}.json').read_text())
 CARDS = CARDS['cards'] if isinstance(CARDS, dict) else CARDS
 BY_ID = {c['id']: c for c in CARDS}
 
@@ -162,11 +165,11 @@ SEED = {
     'f1uno_setup_done': 'true',
     'f1uno_seen_version': '1.29.0',
     'f1uno_changes_since_backup': '0',
-    'f1uno_owned_2025': json.dumps(OWNED),
-    'f1uno_auto_badges_2025': json.dumps(AUTO_BADGES),
-    'f1uno_badges_2025': json.dumps(MANUAL_BADGES),
-    'f1uno_history_2025': json.dumps(HISTORY),
-    'f1uno_pinned_badge_2025': 'pilote_all',   # objectif épinglé
+    f'f1uno_owned_{SEASON}': json.dumps(OWNED),
+    f'f1uno_auto_badges_{SEASON}': json.dumps(AUTO_BADGES),
+    f'f1uno_badges_{SEASON}': json.dumps(MANUAL_BADGES),
+    f'f1uno_history_{SEASON}': json.dumps(HISTORY),
+    f'f1uno_pinned_badge_{SEASON}': 'pilote_all',   # objectif épinglé
     'f1uno_title': json.dumps({'id': 'gp_all', 'name': 'GP collector', 'emoji': '🏁', 'source': 'badge'}),
     'f1uno_cloud_session': json.dumps(CLOUD_SESSION),
     'f1uno_backup_inc_sec': 'false',
@@ -538,17 +541,17 @@ with sync_playwright() as p:
 #   est un mensonge : la capture échoue.
 # ══════════════════════════════════════════════════════════
 def check_seed_honesty(browser_factory):
-    pre_dated = set(json.loads(SEED['f1uno_auto_badges_2025']).keys())
+    pre_dated = set(json.loads(SEED[f'f1uno_auto_badges_{SEASON}']).keys())
     with browser_factory() as pw:
         b = pw.chromium.launch(headless=True)
         c = b.new_context(viewport={'width': 420, 'height': 900})
-        c.add_init_script(init_script('en', 'dark', f1uno_auto_badges_2025='{}'))
+        c.add_init_script(init_script('en', 'dark', **{f'f1uno_auto_badges_{SEASON}': '{}'}))
         pg = c.new_page()
         pg.goto(URL)
         pg.wait_for_selector('.card', timeout=20000)
         pg.wait_for_timeout(1500)
         derived = set(pg.evaluate("""() => {
-          const raw = localStorage.getItem('f1uno_auto_badges_2025');
+          const raw = localStorage.getItem(f'f1uno_auto_badges_{SEASON}');
           return raw ? Object.keys(JSON.parse(raw)) : [];
         }"""))
         c.close()
