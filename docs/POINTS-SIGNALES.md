@@ -1,0 +1,127 @@
+# Points signalés, non corrigés
+
+> Trouvés en chemin pendant un autre chantier, et **délibérément laissés
+> tels quels** pour ne pas mélanger un déplacement avec un changement de
+> comportement. Chacun attend son propre commit, et pour certains sa
+> propre décision.
+>
+> Un point n'entre ici que s'il est **démontré**, pas soupçonné.
+
+---
+
+## 1. Deux champs de données inertes
+
+Même famille : un champ qui existe dans les données, que tout lecteur
+suppose utilisé, et que le code ignore complètement.
+
+### `season` sur les badges — inerte, et dangereux
+
+7 badges de `data/badges.json` portent `"season": 2025`
+(`legend_101`, `pilote_all`, `reserve_all`, `director_all`, `gp_all`,
+`launch_day`, `prediction`). **`badges.js` ne lit jamais ce champ** —
+`grep -n "season" badges.js` ne renvoie rien.
+
+Conséquence : ils s'évaluent à l'identique dans toutes les saisons.
+`legend_101` (« posséder les 101 cartes ») sera décerné à tort si 2026
+en compte moins, et inatteignable s'il en compte plus.
+
+**Décision prise** : passer à des seuils **relatifs** (« toutes les
+cartes », « toutes les cartes d'une catégorie ») plutôt qu'absolus. Ça
+survit à n'importe quel millésime et supprime la dépendance au champ.
+**Chantier à part**, après le multi-saisons : il touche des badges déjà
+débloqués, des libellés i18n ×7 qui disent « 101 », l'affichage de la
+progression et le modèle de difficulté.
+
+⚠️ **Voir le point 3** : un seuil relatif calculé sur le fichier chargé
+est faux si le fichier est partiel. Le total doit être **déclaré**, pas
+déduit.
+
+### `g` sur les livrées d'écurie — inerte, et perpétué par un test
+
+`data/metadata.json → teamLiveries[*].g` décrit un geste géométrique
+(`lame`, `coin`, `vague`…). **`liveryHTML()` n'utilise que `c1` et
+`c2`** : le champ ne produit rien.
+
+Il est pourtant **gardé par un test** (`tests/icons.test.js` :
+« 10 gestes distincts — aucune géométrie partagée entre écuries »). Le
+test perpétue donc l'illusion que le champ sert à quelque chose : en
+ajoutant deux écuries factices pour 2026, il a fallu **inventer deux
+gestes** (`essai-a`, `essai-b`) uniquement pour le satisfaire.
+
+**Deux issues acceptables, la troisième est refusée :**
+- retirer `g` **et son test** ;
+- ou lui **donner un usage réel** dans le rendu ;
+- ~~le laisser tel quel~~ — c'est ce qui a fait inventer deux gestes
+  pour rien.
+
+---
+
+## 2. Fuite inter-saisons des badges — bug ACTUEL, pas un risque futur
+
+`badges.js → loadManualBadges()` :
+
+```js
+const a = secureGet(_storageKey('auto_badges'));
+if(a) autoBadgeUnlocked = JSON.parse(a);   // ← si la clé est absente,
+                                            //   l'objet n'est PAS vidé
+```
+
+**Quand on bascule vers une saison qui n'a pas encore de badges
+enregistrés, `autoBadgeUnlocked` et `manualBadges` gardent le contenu de
+la saison précédente.** Le premier déblocage déclenche
+`saveManualBadges()`, qui écrit alors les badges de l'ancienne saison
+**sous la clé de la nouvelle**. La fuite devient permanente.
+
+**Démontré** : collection 2026 réduite à 4 cartes, clé
+`f1uno_auto_badges_2026` supprimée, bascule 2025 → 2026.
+Résultat : **9 badges automatiques dans la clé 2026**, dont 7 hérités de
+2025 (`collector_10`, `hunter_25`, `massive_50`, `blue_20`…) — alors que
+4 cartes seulement sont possédées.
+
+C'est **la même famille que la fuite de titre** déjà corrigée
+(`f1uno_title` → `f1uno_title_<année>`). Le correctif tient en deux
+`else` :
+
+```js
+if(a) autoBadgeUnlocked = JSON.parse(a); else autoBadgeUnlocked = {};
+```
+
+Priorité : **haute**. Ce bug touche n'importe quel utilisateur qui
+bascule de saison, indépendamment du multi-saisons.
+
+---
+
+## 3. Fichier de cartes partiel — 23 badges se débloquent trop tôt
+
+Scénario réel : saisir les cartes **au fil de l'eau** (elles arrivent par
+boosters), donc un `cards-2026.json` incomplet pendant des semaines.
+
+23 badges automatiques calculent leur `max` **à partir du fichier
+chargé**, pas d'un total déclaré :
+
+| Métrique | Badges | `max` calculé |
+|---|---|---|
+| `category_owned` | 4 | nombre de cartes de la catégorie **dans le fichier** |
+| `category_set` | 4 | idem |
+| `team_set` | 10 | nombre de cartes de l'écurie **dans le fichier** |
+| `teams_owned_count` | 3 | `.every()` sur les cartes **présentes** |
+| `teams_set_count` | 1 | idem |
+| `champion_owned` | 1 | champions **présents** |
+
+Avec 40 cartes sur 101, posséder les 12 pilotes présents débloque
+`pilote_all` — et **le déblocage est irréversible** (« une fois
+débloqué, toujours débloqué », `isAutoBadgeUnlocked` persiste
+immédiatement). Compléter le fichier ensuite ne le reverrouille pas.
+
+**Démontré** : saison 2026 factice (4 pilotes, 2 champions), les 4
+pilotes possédés → `pilote_all` et `champ_all` débloqués et persistés.
+
+**Ce que ça implique pour le chantier des seuils relatifs** : le total
+doit venir d'une **valeur déclarée** dans les données de la saison
+(par ex. `metadata.seasons[].cardCount`), jamais de `CARDS_DB.length`.
+Sinon un fichier partiel produit un dénominateur faux, et la correction
+introduit exactement le bug qu'elle prétend supprimer.
+
+Les métriques à seuil **absolu** (`owned_count >= 101`, `total_qty`,
+`doubles_count`…) ne sont pas concernées : elles restent simplement
+inatteignables tant que le fichier est incomplet, ce qui est honnête.

@@ -45,6 +45,19 @@ These are the rules that, if broken, ship a bug to production or violate the pro
 8. **Serve over HTTP — never `file://`. HARD RULE (for running/testing).** ES-module loading and `fetch()` of `data/*.json` are both blocked over `file://`. Always serve the folder over a local HTTP server before testing.
    🇫🇷 Toujours servir en HTTP local ; `file://` casse les modules ES et le `fetch` des JSON.
 
+9. **Vider le cache AVANT de mesurer quoi que ce soit dans le navigateur. HARD RULE (pour vérifier).** Il y a **deux** caches, et purger le premier ne suffit pas :
+   1. le **service worker** et ses caches (`caches.keys()` → `caches.delete()`, plus `registration.unregister()`) ;
+   2. le **cache HTTP du navigateur**, qui continue de servir l'ancien `app.bundle.js` même après ça.
+
+   La recette qui marche, dans cet ordre :
+   **purge SW + `caches` → rechargement avec une URL MODIFIÉE** (`index.html?v=<n>`). Un simple `location.reload()` ne perce pas le cache HTTP.
+
+   Pourquoi c'est une règle et pas un conseil : plusieurs mesures ont été prises sur du code périmé avant qu'on s'en aperçoive, et des conclusions ont dû être jetées. Une mesure faite sur un bundle obsolète ne se voit pas — elle a l'air juste.
+
+   **Corollaire pour les mesures de mise en page :** `requestAnimationFrame` **ne se déclenche pas** dans un onglet ou un panneau masqué. Toute attente de stabilisation qui repose dessus ne stabilise rien et renvoie des valeurs oscillantes. Utiliser `setTimeout` seul.
+
+   🇫🇷 Deux caches à purger : le SW **et** le cache HTTP. Purge SW + `caches`, puis rechargement avec URL modifiée. Et pas de `requestAnimationFrame` pour attendre la mise en page : il ne tourne pas dans un panneau masqué.
+
 ---
 
 ## 3. Stack & architecture
