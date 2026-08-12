@@ -280,7 +280,16 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .lang-opt{display:flex;align-items:center;gap:var(--space-10px);padding:var(--space-3) var(--space-14px);border-radius:var(--r-md);border:1.5px solid var(--border);background:var(--surface2);cursor:pointer;transition:var(--ease);text-align:left;}
 .lang-opt:hover,.lang-opt:focus-visible{border-color:var(--red);background:var(--surface);transform:translateY(-1px);box-shadow:var(--sh-sm);outline:none;}
 .lang-opt:active{transform:none;}
-.lang-opt:last-child{grid-column:1 / -1;justify-content:center;}
+/* La 7e langue occupe toute la largeur — et reste alignée à GAUCHE
+   comme les six autres. Centrée, elle se lisait comme un orphelin au
+   milieu du vide ; alignée, sa pastille ISO tombe dans la même colonne
+   que les autres et la dernière ligne devient une ligne comme les
+   autres, simplement plus large.
+   Écartées après mesure à 320×568 : une grille à 3 colonnes (la 3e est
+   coupée — .login-box n'offre que 284 px utiles, voir POINTS-SIGNALES)
+   et une liste à 7 lignes (boîte de 640 px pour un écran de 568, donc
+   défilement sur le tout premier écran de l'app). */
+.lang-opt:last-child{grid-column:1 / -1;justify-content:flex-start;}
 .lang-name{font-family:var(--font-b);font-size:14px;font-weight:600;color:var(--tx1);}
 @media (prefers-reduced-motion:reduce){.lang-opt:hover{transform:none;}}
 

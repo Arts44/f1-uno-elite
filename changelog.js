@@ -17,6 +17,33 @@
 
 export const CHANGELOG = [
   {
+    version: '1.52.2',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'On the language screen, the seventh language now spans the full width and stays left-aligned like the other six, instead of sitting centred on its own. The last row reads as a row, not as a leftover.',
+      ],
+      fr: [
+        'Sur l\'écran de choix de la langue, la septième langue occupe maintenant toute la largeur et reste alignée à gauche comme les six autres, au lieu d\'être centrée toute seule. La dernière ligne se lit comme une ligne, plus comme un reste.',
+      ],
+      es: [
+        'En la pantalla de idioma, el séptimo idioma ocupa ahora todo el ancho y sigue alineado a la izquierda como los otros seis, en vez de quedar centrado a solas. La última fila se lee como una fila, no como un sobrante.',
+      ],
+      zh: [
+        '在语言选择界面，第七种语言现在占据整行宽度，并与其余六项一样左对齐，不再单独居中。最后一行读起来是一行，而不是剩下的那个。',
+      ],
+      it: [
+        'Nella schermata della lingua, la settima lingua occupa ora tutta la larghezza e resta allineata a sinistra come le altre sei, invece di stare centrata da sola. L\'ultima riga si legge come una riga, non come un avanzo.',
+      ],
+      nl: [
+        'Op het taalkeuzescherm beslaat de zevende taal nu de volle breedte en blijft links uitgelijnd zoals de andere zes, in plaats van alleen gecentreerd te staan. De laatste regel leest als een regel, niet als een restant.',
+      ],
+      de: [
+        'Im Sprachauswahl-Bildschirm nimmt die siebte Sprache jetzt die volle Breite ein und bleibt wie die anderen sechs linksbündig, statt allein zentriert zu stehen. Die letzte Zeile liest sich als Zeile, nicht als Rest.',
+      ],
+    },
+  },
+  {
     version: '1.52.1',
     date: '2026-08-12',
     changes: {
