@@ -1663,6 +1663,39 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 #dangerWord{padding:var(--space-2) var(--space-3);border-radius:var(--r-md);border:1px solid var(--border);
   background:var(--surface2);color:var(--tx1);font-family:var(--font-b);font-size:14px;letter-spacing:1px;}
 #dangerWord:focus-visible{outline:2px solid var(--red);outline-offset:1px;}
+/* ══════════════════════════════════════════════════════════
+   ZONE DANGER — la dimension SAISON, et le récapitulatif
+   Deux questions indépendantes : QUELLE saison, puis QUELLE
+   portée. La saison vient en premier — c'est la plus lourde de
+   conséquences, et « cette saison — 2026 » nomme l'année, donc
+   aucun doute sur ce qu'on regarde.
+   ══════════════════════════════════════════════════════════ */
+.danger-seasons{display:flex;gap:var(--space-2);margin-bottom:var(--space-3);}
+.danger-season{flex:1;display:flex;align-items:center;gap:var(--space-2);
+  padding:var(--space-10px) var(--space-3);border:1.5px solid var(--border);
+  border-radius:12px;background:var(--surface2);cursor:pointer;font-size:13px;
+  transition:var(--ease);}
+.danger-season input{margin:0;flex:none;}
+.danger-season.sel{border-color:var(--red);background:var(--red-s);
+  color:var(--red-ink,var(--red));font-weight:700;}
+
+.danger-recap{margin-top:var(--space-3);background:var(--surface2);
+  border:1px solid var(--border);border-left:3px solid var(--red);
+  border-radius:10px;padding:var(--space-3) var(--space-14px);}
+.danger-recap-h{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--tx3);margin-bottom:var(--space-2);}
+.danger-recap ul{list-style:none;padding:0;margin:0;display:flex;
+  flex-direction:column;gap:var(--space-1);}
+.danger-recap li{font-size:13px;line-height:1.4;color:var(--tx1);}
+.danger-recap li b{color:var(--red);font-weight:800;}
+/* La ligne « Conservés » est la plus importante de l'écran : c'est elle
+   qui évite la panique après une action destructive. Elle est donc en
+   CORPS DE TEXTE (13 px, couleur de texte principale), séparée par un
+   filet — pas reléguée en petite note grise sous le reste. */
+.danger-keep{font-size:13px;line-height:1.4;color:var(--tx2);
+  margin:var(--space-3) 0 0;padding-top:var(--space-10px);
+  border-top:1px solid var(--border);}
+
 .danger-mo-actions{display:flex;justify-content:flex-end;gap:var(--space-2);}
 /* Confirmation in-app (remplace confirm()) — même boîte que la zone
    danger, sans la liste de portées. */

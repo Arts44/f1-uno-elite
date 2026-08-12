@@ -132,13 +132,20 @@ export function isCloudSignedIn(){
 
 // Danger zone: delete EVERY season row of the signed-in user (RLS keeps
 // this scoped to their own rows server-side).
-export async function cloudDeleteAll(){
+/* `season` : une saison distante, ou null/absent pour toutes.
+   Le serveur le permet sans effort — la clé primaire est
+   (user_id, season), donc filtrer dessus est une clause de plus.
+   RLS garde de toute façon la suppression sur les lignes de
+   l'utilisateur : le filtre `user_id` est une ceinture, pas la
+   protection. */
+export async function cloudDeleteSeason(season = null){
   if(deniedForViewer()) throw new Error('read-only');   // refus même en appel direct
   const cfg = cloudConfig();
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
   const { session, userId } = await _requireSession();
-  const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?user_id=eq.${userId}`, {
+  const filtre = season === null ? '' : `&season=eq.${encodeURIComponent(season)}`;
+  const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?user_id=eq.${userId}${filtre}`, {
     method: 'DELETE',
     cache: 'no-store',
     headers: authHeaders(cfg, session.access_token),
@@ -206,3 +213,7 @@ export async function listCloudSeasons(){
       : [];
   } catch(e){ return []; }
 }
+
+// Nom historique conservé : la zone danger l'appelle encore pour la
+// portée « toutes les saisons ».
+export const cloudDeleteAll = () => cloudDeleteSeason(null);

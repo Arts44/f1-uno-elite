@@ -52,7 +52,7 @@ describe('refus logique, action par action', () => {
     // tête. La table suit les fonctions, elle ne les relâche pas.
     // pushCollection/pullCollection sont devenus des délégués d'une ligne
     // vers pushSeason/pullSeason : c'est là que vit désormais le garde.
-    'cloud-sync.js': ['pushSeason', 'pullSeason', 'cloudDeleteAll'],
+    'cloud-sync.js': ['pushSeason', 'pullSeason', 'cloudDeleteSeason'],
     'cloud-auth.js': ['signOut', 'requestEmailChange', 'sendMagicLink',
                       'verifyOtpCode', 'handleAuthRedirect'],
     'account.js': ['openDeleteModal'],

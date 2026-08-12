@@ -5,15 +5,17 @@
    These sections MOVED here from Réglages (pin.js) — no dupes.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { CARDS_DB, _currentSeason, availableSeasons } from './data.js';
+import { cardOwned } from './storage.js';
 import { deniedForViewer } from './session.js';
-import { t } from './i18n.js';
+import { t, tEsc, setSafeHTML } from './i18n.js';
 import { showToast, renderCollection } from './render.js';
 import { updateStats } from './stats.js';
 import { triggerImport, collectionSnapshot, _showImportDialog, deleteLocalCollectionData } from './storage.js';
 import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg } from './backup.js';
 import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection } from './cloud-ui.js';
-import { isCloudSignedIn, cloudDeleteAll } from './cloud-sync.js';
+import { isCloudSignedIn, cloudDeleteAll, cloudDeleteSeason } from './cloud-sync.js';
 import { feedbackSectionHTML, bindFeedbackSection } from './feedback.js';
 import { showAdminPinScreen } from './pin.js';
 import { icon } from './icons.js';
@@ -31,12 +33,32 @@ export function canConfirmDeletion(input, word){
 
 // What a given scope actually deletes. Cloud deletion requires a live
 // session — without one the cloud part is off, never silently assumed.
-export function deletionPlan(scope, cloudConnected){
+export function deletionPlan(scope, cloudConnected, season = null){
   if(!DELETE_SCOPES.includes(scope)) throw new Error('bad-scope');
   return {
     local: scope === 'local' || scope === 'both',
     cloud: (scope === 'cloud' || scope === 'both') && !!cloudConnected,
+    // null = toutes les saisons. Une valeur = cette saison-là, et
+    // rien d'autre : ni les autres saisons, ni les réglages partagés.
+    season: season === null ? null : Number(season),
   };
+}
+
+/* ── Ce que la suppression va emporter, en clair ──
+   Le récapitulatif est CALCULÉ, jamais rédigé à l'avance : il cite le
+   nombre réel de cartes possédées, la saison nommée, et les portées
+   effectivement retenues. Une action destructive doit dire exactement
+   ce qu'elle fait, pas décrire une catégorie d'actions. */
+export function deletionSummary(plan, stats){
+  const lignes = [];
+  const s = plan.season;
+  lignes.push(s === null
+    ? { cle: 'danger.sum_all_seasons', p: { detail: stats.detail || '' } }
+    : { cle: 'danger.sum_one_season', p: { season: s, cards: stats.cards || 0 } });
+  lignes.push({ cle: plan.local && plan.cloud ? 'danger.sum_both'
+              : plan.cloud ? 'danger.sum_cloud' : 'danger.sum_local',
+              p: { season: s === null ? '' : s } });
+  return lignes;
 }
 
 /* ── Vue verrouillée (mode spectateur) ──
@@ -242,12 +264,18 @@ export function openDeleteModal(){
   overlay.innerHTML = `
     <div class="danger-mo-box">
       <div class="danger-mo-title">${icon('danger')} ${t('danger.modal_title')}</div>
+      <div class="danger-seasons" role="radiogroup" aria-label="${t('danger.season_label')}">
+        <label class="danger-season sel"><input type="radio" name="dangerSeason" value="one" checked>
+          <span>${tEsc('danger.season_one', { season: _currentSeason })}</span></label>
+        <label class="danger-season"><input type="radio" name="dangerSeason" value="all">
+          <span>${t('danger.season_all')}</span></label>
+      </div>
       <div class="danger-scopes" role="radiogroup" aria-label="${t('danger.scope_label')}">
         <label class="danger-scope"><input type="radio" name="dangerScope" value="local" checked> <span>${t('danger.scope_local')}</span></label>
         <label class="danger-scope${signedIn?'':' off'}"><input type="radio" name="dangerScope" value="cloud"${signedIn?'':' disabled'}> <span>${t('danger.scope_cloud')}${signedIn?'':' — '+t('danger.scope_needs_login')}</span></label>
         <label class="danger-scope${signedIn?'':' off'}"><input type="radio" name="dangerScope" value="both"${signedIn?'':' disabled'}> <span>${t('danger.scope_both')}</span></label>
       </div>
-      <div class="danger-warn" id="dangerWarn">${t(SCOPE_WARN_KEYS.local)}</div>
+      <div class="danger-recap" id="dangerRecap"></div>
       <div class="danger-confirm">
         <label for="dangerWord" class="danger-word-hint">${t('danger.type_hint', { word })}</label>
         <input type="text" id="dangerWord" autocomplete="off" autocapitalize="characters" spellcheck="false">
@@ -261,11 +289,32 @@ export function openDeleteModal(){
 
   const wordInput = overlay.querySelector('#dangerWord');
   const confirmBtn = overlay.querySelector('#dangerConfirmBtn');
-  const warnEl = overlay.querySelector('#dangerWarn');
+  const warnEl = overlay.querySelector('#dangerRecap');
   const scope = () => overlay.querySelector('input[name="dangerScope"]:checked')?.value || 'local';
+  const saison = () => overlay.querySelector('input[name="dangerSeason"]:checked')?.value === 'all'
+    ? null : _currentSeason;
 
-  overlay.querySelectorAll('input[name="dangerScope"]').forEach(r =>
-    r.addEventListener('change', () => { warnEl.textContent = t(SCOPE_WARN_KEYS[scope()]); }));
+  const compte = () => CARDS_DB.filter(c => cardOwned(c.id)).length;
+  const redessine = () => {
+    const plan = deletionPlan(scope(), isCloudSignedIn(), saison());
+    const autres = availableSeasons().filter(y => y !== _currentSeason);
+    const lignes = deletionSummary(plan, {
+      cards: compte(),
+      detail: availableSeasons().join(', '),
+    });
+    setSafeHTML(warnEl, `
+      <div class="danger-recap-h">${t('danger.recap_title')}</div>
+      <ul>${lignes.map(l => `<li>${tEsc(l.cle, l.p)}</li>`).join('')}</ul>
+      <p class="danger-keep">${tEsc('danger.keep', {
+        others: (plan.season === null || !autres.length)
+          ? '' : t('danger.keep_seasons', { list: autres.join(', ') }),
+      })}</p>`);
+    overlay.querySelectorAll('.danger-season').forEach(el =>
+      el.classList.toggle('sel', el.querySelector('input').checked));
+  };
+  overlay.querySelectorAll('input[name="dangerScope"],input[name="dangerSeason"]')
+    .forEach(r => r.addEventListener('change', redessine));
+  redessine();
   wordInput.addEventListener('input', () => {
     confirmBtn.disabled = !canConfirmDeletion(wordInput.value, word);
   });
@@ -275,17 +324,17 @@ export function openDeleteModal(){
   confirmBtn.addEventListener('click', async () => {
     if(!canConfirmDeletion(wordInput.value, word)) return; // belt and braces
     confirmBtn.disabled = true;
-    const plan = deletionPlan(scope(), isCloudSignedIn());
+    const plan = deletionPlan(scope(), isCloudSignedIn(), saison());
     try {
-      if(plan.cloud) await cloudDeleteAll();
-      if(plan.local) deleteLocalCollectionData();
+      if(plan.cloud) await cloudDeleteSeason(plan.season);
+      if(plan.local) deleteLocalCollectionData(plan.season);
       closeDeleteModal();
       updateStats(); renderCollection(); renderAccount();
       showToast(t(plan.local && plan.cloud ? 'danger.done_both' : plan.cloud ? 'danger.done_cloud' : 'danger.done_local'));
     } catch(e){
       log('data deletion failed', e);
       confirmBtn.disabled = false;
-      warnEl.textContent = t('danger.error');
+      setSafeHTML(warnEl, `<p class="danger-keep">${t('danger.error')}</p>`);
     }
   });
   wordInput.focus();

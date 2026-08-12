@@ -35,15 +35,23 @@ describe('canConfirmDeletion — typed word gate', () => {
 describe('deletionPlan — scope granularity', () => {
   test('the three scopes are exactly local/cloud/both', () =>
     assert.deepEqual(DELETE_SCOPES, ['local', 'cloud', 'both']));
+  /* `season` a rejoint le plan : null = toutes les saisons, une valeur =
+     celle-là seulement. Le défaut reste null pour que tout appel qui ne
+     précise rien garde le comportement d'avant. */
   test('local: local only, never cloud', () =>
-    assert.deepEqual(deletionPlan('local', true), { local: true, cloud: false }));
+    assert.deepEqual(deletionPlan('local', true), { local: true, cloud: false, season: null }));
   test('cloud: cloud only when signed in', () =>
-    assert.deepEqual(deletionPlan('cloud', true), { local: false, cloud: true }));
+    assert.deepEqual(deletionPlan('cloud', true), { local: false, cloud: true, season: null }));
   test('both: everything when signed in', () =>
-    assert.deepEqual(deletionPlan('both', true), { local: true, cloud: true }));
+    assert.deepEqual(deletionPlan('both', true), { local: true, cloud: true, season: null }));
   test('cloud scope WITHOUT session never plans a cloud delete', () => {
-    assert.deepEqual(deletionPlan('cloud', false), { local: false, cloud: false });
-    assert.deepEqual(deletionPlan('both', false), { local: true, cloud: false });
+    assert.deepEqual(deletionPlan('cloud', false), { local: false, cloud: false, season: null });
+    assert.deepEqual(deletionPlan('both', false), { local: true, cloud: false, season: null });
+  });
+  test('une saison précisée est portée telle quelle, en nombre', () => {
+    assert.deepEqual(deletionPlan('local', false, 2026), { local: true, cloud: false, season: 2026 });
+    assert.deepEqual(deletionPlan('local', false, '2026').season, 2026,
+      'une chaîne venue du DOM doit être normalisée — la comparaison de clés est numérique');
   });
   test('unknown scope throws (nothing is deleted by default)', () =>
     assert.throws(() => deletionPlan('everything', true)));

@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.54.0',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'Deleting your data now lets you pick a season: this one, or all of them. Before, clearing anything cleared every season — tidying up a 2026 trial would have taken your 2025 collection with it.',
+        'The confirmation now spells out exactly what goes: which season, how many cards, and where (device, cloud, or both) — plus a clear line listing what is kept.',
+      ],
+      fr: [
+        'La suppression de tes données permet maintenant de choisir la saison : celle-ci, ou toutes. Avant, tout effacement emportait toutes les saisons — nettoyer un essai 2026 aurait emporté ta collection 2025 avec.',
+        'La confirmation dit désormais exactement ce qui part : quelle saison, combien de cartes, et où (appareil, cloud, ou les deux) — plus une ligne claire de ce qui est conservé.',
+      ],
+      es: [
+        'Al borrar tus datos ahora puedes elegir la temporada: esta, o todas. Antes, cualquier borrado se llevaba todas las temporadas — limpiar una prueba de 2026 se habría llevado tu colección de 2025.',
+        'La confirmación detalla ahora exactamente lo que se va: qué temporada, cuántas cartas y dónde (dispositivo, nube o ambos) — más una línea clara de lo que se conserva.',
+      ],
+      zh: [
+        '删除数据时现在可以选择赛季：当前赛季，或全部。此前任何删除都会清空所有赛季——清理一次 2026 的试用会连 2025 的收藏一起带走。',
+        '确认界面现在会写明具体会删除什么：哪个赛季、多少张卡、删除位置（本机、云端或两者），并附上一行清楚说明保留了什么。',
+      ],
+      it: [
+        'L\'eliminazione dei dati permette ora di scegliere la stagione: questa, o tutte. Prima, qualsiasi cancellazione portava via tutte le stagioni — ripulire una prova del 2026 avrebbe portato via anche la collezione 2025.',
+        'La conferma indica ora esattamente cosa viene rimosso: quale stagione, quante carte e dove (dispositivo, cloud o entrambi) — più una riga chiara su ciò che resta.',
+      ],
+      nl: [
+        'Bij het verwijderen van je gegevens kun je nu het seizoen kiezen: dit seizoen, of alle. Voorheen wiste elke verwijdering alle seizoenen — een test van 2026 opruimen zou je collectie van 2025 hebben meegenomen.',
+        'De bevestiging noemt nu precies wat verdwijnt: welk seizoen, hoeveel kaarten en waar (apparaat, cloud of beide) — plus een duidelijke regel over wat behouden blijft.',
+      ],
+      de: [
+        'Beim Löschen deiner Daten lässt sich jetzt die Saison wählen: diese oder alle. Zuvor löschte jeder Vorgang alle Saisons — das Aufräumen eines 2026-Versuchs hätte die Sammlung von 2025 mitgenommen.',
+        'Die Bestätigung nennt nun genau, was verschwindet: welche Saison, wie viele Karten und wo (Gerät, Cloud oder beides) — dazu eine klare Zeile mit dem, was erhalten bleibt.',
+      ],
+    },
+  },
+  {
     version: '1.53.0',
     date: '2026-08-12',
     changes: {

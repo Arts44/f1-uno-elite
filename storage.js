@@ -146,16 +146,31 @@ export const SEASON_KEY_RE = /^f1uno_(owned|badges|auto_badges|history|title|pin
 // badges auto, historique, titre porté, badge épinglé) + les compteurs
 // de rappel de sauvegarde. Les préférences (thème, langue, police) et
 // le PIN sont volontairement conservés. Recharge l'état mémoire ensuite.
-export function deleteLocalCollectionData(){
+/* `season` : un millésime pour n'effacer QUE cette saison, ou null/absent
+   pour toutes. Le multi-saisons rend la distinction nécessaire — sans
+   elle, nettoyer un essai 2026 emportait la collection 2025.
+
+   Ce qui est ÉPARGNÉ dans les deux cas : thème, langue, police, PIN,
+   mode spectateur, session cloud, version de stockage. C'est le `_\d+$`
+   de SEASON_KEY_RE qui fait le tri — une clé partagée n'a pas d'année,
+   donc elle n'entre jamais dans la sélection.
+   Ce qui est épargné UNIQUEMENT en portée « une saison » : les deux
+   compteurs de rappel de sauvegarde, qui sont GLOBAUX. Les effacer en
+   nettoyant une saison ferait mentir le rappel sur les autres. */
+export function deleteLocalCollectionData(season = null){
   if(deniedForViewer()) return 0;   // lecture seule : refus même en appel direct
   const kill = [];
   for(let i = 0; i < localStorage.length; i++){
     const k = localStorage.key(i);
-    if(SEASON_KEY_RE.test(k)) kill.push(k);
+    if(!SEASON_KEY_RE.test(k)) continue;
+    if(season !== null && k.match(/_(\d+)$/)[1] !== String(season)) continue;
+    kill.push(k);
   }
   kill.forEach(k => localStorage.removeItem(k));
-  localStorage.removeItem('f1uno_changes_since_backup');
-  localStorage.removeItem('f1uno_last_backup');
+  if(season === null){
+    localStorage.removeItem('f1uno_changes_since_backup');
+    localStorage.removeItem('f1uno_last_backup');
+  }
   loadData();
   return kill.length;
 }
