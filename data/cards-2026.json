@@ -1,0 +1,266 @@
+[
+  {
+    "id": "001",
+    "season": 2026,
+    "number": 1,
+    "name": "Ada Placeholder",
+    "team": "Alpha Test Racing Team",
+    "category": "pilote",
+    "nationality": "🇦🇶",
+    "champion": true,
+    "championYears": [
+      2026
+    ],
+    "description": "DONNÉES FACTICES — pilote championne, jeu de types complet hors promo.",
+    "tags": [
+      "champion",
+      "legendary"
+    ],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow",
+      "blue_foil",
+      "green_foil",
+      "red_foil",
+      "yellow_foil",
+      "blue_red_foil",
+      "green_yellow_foil",
+      "wild_foil",
+      "nitro_foil"
+    ],
+    "retired": false,
+    "power": "Skip"
+  },
+  {
+    "id": "002",
+    "season": 2026,
+    "number": 2,
+    "name": "Bruno Échantillon",
+    "team": "Alpha Test Racing Team",
+    "category": "pilote",
+    "nationality": "🇦🇶",
+    "champion": false,
+    "championYears": [],
+    "description": "DONNÉES FACTICES — pilote sans wild ni nitro.",
+    "tags": [
+      "rising_star"
+    ],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow",
+      "blue_foil",
+      "green_foil",
+      "red_foil",
+      "yellow_foil",
+      "blue_red_foil",
+      "green_yellow_foil"
+    ],
+    "retired": false,
+    "power": "Reverse"
+  },
+  {
+    "id": "003",
+    "season": 2026,
+    "number": 3,
+    "name": "Carla Factice",
+    "team": "Beta Sample F1 Team",
+    "category": "pilote",
+    "nationality": "🇦🇶",
+    "champion": false,
+    "championYears": [],
+    "description": "DONNÉES FACTICES — pilote, foils simples seulement.",
+    "tags": [
+      "fan_favorite"
+    ],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow",
+      "blue_foil",
+      "green_foil",
+      "red_foil",
+      "yellow_foil"
+    ],
+    "retired": false,
+    "power": "Draw One"
+  },
+  {
+    "id": "004",
+    "season": 2026,
+    "number": 4,
+    "name": "Dmitri Témoin",
+    "team": "Beta Sample F1 Team",
+    "category": "pilote",
+    "nationality": "🇦🇶",
+    "champion": true,
+    "championYears": [
+      2024,
+      2026
+    ],
+    "description": "DONNÉES FACTICES — pilote champion, TOUS les types y compris promo.",
+    "tags": [
+      "champion",
+      "legend"
+    ],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow",
+      "blue_foil",
+      "green_foil",
+      "red_foil",
+      "yellow_foil",
+      "blue_red_foil",
+      "green_yellow_foil",
+      "wild_foil",
+      "nitro_foil",
+      "promo_blue",
+      "promo_green",
+      "promo_red",
+      "promo_yellow"
+    ],
+    "retired": false,
+    "power": "Play Again",
+    "powerPromo": "Draw Two Target + Skip"
+  },
+  {
+    "id": "005",
+    "season": 2026,
+    "number": 5,
+    "name": "Elena Réserve-Test",
+    "team": "Alpha Test Racing Team",
+    "category": "reserve",
+    "nationality": "",
+    "champion": false,
+    "championYears": [],
+    "description": "DONNÉES FACTICES — pilote de réserve avec wild.",
+    "tags": [],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow",
+      "wild_foil"
+    ],
+    "retired": false,
+    "power": "Substitute"
+  },
+  {
+    "id": "006",
+    "season": 2026,
+    "number": 6,
+    "name": "Farid Substitut",
+    "team": "Beta Sample F1 Team",
+    "category": "reserve",
+    "nationality": "",
+    "champion": false,
+    "championYears": [],
+    "description": "DONNÉES FACTICES — pilote de réserve, types de base seulement.",
+    "tags": [],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow"
+    ],
+    "retired": false,
+    "power": "Refresh"
+  },
+  {
+    "id": "007",
+    "season": 2026,
+    "number": 7,
+    "name": "Gina Directrice-Test",
+    "team": "Alpha Test Racing Team",
+    "category": "directeur",
+    "nationality": "",
+    "champion": false,
+    "championYears": [],
+    "description": "DONNÉES FACTICES — directrice d'écurie.",
+    "tags": [],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow"
+    ],
+    "retired": false,
+    "power": "Peek"
+  },
+  {
+    "id": "008",
+    "season": 2026,
+    "number": 8,
+    "name": "Hugo Patron-Factice",
+    "team": "Beta Sample F1 Team",
+    "category": "directeur",
+    "nationality": "",
+    "champion": false,
+    "championYears": [],
+    "description": "DONNÉES FACTICES — directeur avec foils simples.",
+    "tags": [],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow",
+      "blue_foil",
+      "green_foil",
+      "red_foil",
+      "yellow_foil"
+    ],
+    "retired": false,
+    "power": "Search"
+  },
+  {
+    "id": "009",
+    "season": 2026,
+    "number": 9,
+    "name": "Formula 1 Grand Prix de Nulle Part",
+    "team": "",
+    "category": "gp",
+    "nationality": "",
+    "champion": false,
+    "championYears": [],
+    "description": "DONNÉES FACTICES — Grand Prix, types de base.",
+    "tags": [
+      "night_race"
+    ],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow"
+    ],
+    "retired": false,
+    "power": "Skip Target"
+  },
+  {
+    "id": "010",
+    "season": 2026,
+    "number": 10,
+    "name": "Formula 1 Grand Prix Témoin",
+    "team": "",
+    "category": "gp",
+    "nationality": "",
+    "champion": false,
+    "championYears": [],
+    "description": "DONNÉES FACTICES — Grand Prix avec nitro.",
+    "tags": [],
+    "types": [
+      "blue",
+      "green",
+      "red",
+      "yellow",
+      "nitro_foil"
+    ],
+    "retired": false,
+    "power": "Discard One"
+  }
+]

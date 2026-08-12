@@ -330,6 +330,22 @@
     "Max Verstappen": {
       "n": 1,
       "cls": "dn-ver"
+    },
+    "Ada Placeholder": {
+      "n": 1,
+      "cls": "dn-tst-a"
+    },
+    "Bruno Échantillon": {
+      "n": 2,
+      "cls": "dn-tst-b"
+    },
+    "Carla Factice": {
+      "n": 3,
+      "cls": "dn-tst-c"
+    },
+    "Dmitri Témoin": {
+      "n": 4,
+      "cls": "dn-tst-d"
     }
   },
   "teamColors": {
@@ -342,7 +358,9 @@
     "MoneyGram Haas F1 Team": "#B6BABD",
     "Visa Cash App RB Formula One": "#6692FF",
     "Atlassian Williams Racing": "#64C4FF",
-    "Stake F1 Team KICK Sauber": "#52E252"
+    "Stake F1 Team KICK Sauber": "#52E252",
+    "Alpha Test Racing Team": "#FF00AA",
+    "Beta Sample F1 Team": "#00E5FF"
   },
   "roleBaseRarity": {
     "pilote": "legendary",
@@ -360,7 +378,9 @@
     "MoneyGram Haas F1 Team": "HAA",
     "Visa Cash App RB Formula One": "RB",
     "Atlassian Williams Racing": "WIL",
-    "Stake F1 Team KICK Sauber": "SAU"
+    "Stake F1 Team KICK Sauber": "SAU",
+    "Alpha Test Racing Team": "ATR",
+    "Beta Sample F1 Team": "BSF"
   },
   "teamLiveries": {
     "Oracle Red Bull Racing": {
@@ -412,6 +432,16 @@
       "c1": "#123B1E",
       "c2": "#52E252",
       "g": "eclair"
+    },
+    "Alpha Test Racing Team": {
+      "c1": "#FF00AA",
+      "c2": "#2A0018",
+      "g": "essai-a"
+    },
+    "Beta Sample F1 Team": {
+      "c1": "#00E5FF",
+      "c2": "#00202A",
+      "g": "essai-b"
     }
   }
 }
