@@ -1,10 +1,10 @@
 /* ══════════════════════════════════════════════════════════
    BADGES SYSTEM — v3 : 111 badges (59 auto + 52 manuels) + titres
    ══════════════════════════════════════════════════════════ */
-import { t, getLang } from './i18n.js';
+import { t, tEsc, getLang } from './i18n.js';
 import { icon } from './icons.js';
 import { pageHeadHTML, pageHeadBtn } from './pagehead.js';
-import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES, seasonCatalogueState, seasonCardCount } from './data.js';
+import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES, seasonCatalogueState, seasonCardCount, _currentSeason } from './data.js';
 import {
   _storageKey, getTypeData,
   cardOwned, cardWishlist, cardDoubles, cardFavorite,
@@ -459,6 +459,29 @@ function _descTexte(b, tr){
   return total === null ? t('b.all_cards') : brut.replace('{n}', total);
 }
 
+/* ── Le champ `season` devient LU (1.59.0) ──
+   Il existait dans les données depuis l'origine et le code l'ignorait
+   complètement : un champ que tout lecteur croit actif, et qui ne
+   produit rien. Cinq badges le portaient à tort — « posséder tous les
+   pilotes » a un sens dans n'importe quelle saison — et leur champ a
+   été retiré. Deux le portent à raison : `launch_day` (« j'étais là au
+   lancement ») et `prediction` (« j'ai prédit le champion 2025 ») sont
+   des faits DATÉS.
+
+   Ce qu'on en fait : une étiquette, pas un masquage. Un badge gagné
+   reste visible hors de sa saison — le cacher serait un reverrouillage
+   visuel, contraire à la règle « une fois débloqué, toujours débloqué ».
+   L'étiquette dit simplement pourquoi il ne peut plus être obtenu.
+
+   On ne bloque pas non plus sa validation : ces deux-là sont MANUELS,
+   donc déclaratifs. Quelqu'un qui coche en 2027 « j'étais là au
+   lancement » raconte 2025, il ne triche pas. */
+function _saisonChip(b){
+  const y = b.season;
+  if(!Number.isInteger(y) || y === _currentSeason) return '';
+  return ` <span class="bd-season" title="${tEsc('b.season_only', { y })}">${y}</span>`;
+}
+
 /* ── Détail d'un badge (panneau inline sous la grille de sa famille) ──
    Description, progression, date de déblocage, cartes contributives
    (getBadgeCards inchangé), objectif épinglable (auto verrouillé),
@@ -471,7 +494,7 @@ function _detailHTML(b, fam){
   const unlocked = isManual ? !!manualBadges[b.id] : !!autoBadgeUnlocked[b.id];
   const tr = (window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {});
   const diff = badgeDifficulty(b);
-  let h = `<div class="bd-name">${b.emoji} ${tr.name || b.name}</div>
+  let h = `<div class="bd-name">${b.emoji} ${tr.name || b.name}${_saisonChip(b)}</div>
     <div class="bd-desc">${_descTexte(b, tr)}</div>
     <div class="bd-diff"><span class="bd-diff-lb dl-${difficultyLabelKey(diff).slice(7)}">${t(difficultyLabelKey(diff))}</span><span class="bd-diff-pct">${t('b.difficulty')} ${diff} %</span></div>`;
   if(unlocked){

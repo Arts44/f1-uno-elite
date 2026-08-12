@@ -65,7 +65,6 @@
       "emoji": "🏆",
       "name": "Légende vivante",
       "desc": "Posséder les 101 cartes",
-      "season": 2025,
       "condition": {
         "metric": "owned_count",
         "operator": ">=",
@@ -149,7 +148,6 @@
       "emoji": "🏎️",
       "name": "Pilote collector",
       "desc": "Posséder tous les pilotes",
-      "season": 2025,
       "condition": {
         "metric": "category_owned",
         "operator": "==",
@@ -162,7 +160,6 @@
       "emoji": "🔧",
       "name": "Réserve collector",
       "desc": "Posséder tous les réservistes",
-      "season": 2025,
       "condition": {
         "metric": "category_owned",
         "operator": "==",
@@ -175,7 +172,6 @@
       "emoji": "🎯",
       "name": "Directeur collector",
       "desc": "Posséder tous les directeurs",
-      "season": 2025,
       "condition": {
         "metric": "category_owned",
         "operator": "==",
@@ -188,7 +184,6 @@
       "emoji": "🏁",
       "name": "GP collector",
       "desc": "Posséder tous les Grand Prix",
-      "season": 2025,
       "condition": {
         "metric": "category_owned",
         "operator": "==",

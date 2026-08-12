@@ -17,6 +17,47 @@
 
 export const CHANGELOG = [
   {
+    version: '1.59.0',
+    date: '2026-08-13',
+    changes: {
+      en: [
+        'Badges no longer hard-code the size of a season. "Own all 101 cards" became "own every card of the season", counted from the season\'s declared total — so the badge stays true whatever the next season brings. The same goes for the two team badges that assumed ten teams.',
+        'A badge can no longer be granted on an incomplete card file: owning everything you have entered so far is not owning everything. Badges you already earned are kept, including any granted early — they were not your doing.',
+        'The two badges tied to a specific season now say so, with a small year label instead of quietly looking obtainable.',
+      ],
+      fr: [
+        'Les badges n\'écrivent plus en dur la taille d\'une saison. « Posséder les 101 cartes » devient « posséder toutes les cartes de la saison », comptées sur le total déclaré — le badge reste donc vrai quelle que soit la saison suivante. Idem pour les deux badges d\'écuries qui supposaient dix écuries.',
+        'Un badge ne peut plus être décerné sur un fichier de cartes incomplet : posséder tout ce qui est saisi n\'est pas posséder tout. Les badges déjà obtenus sont conservés, y compris ceux décernés trop tôt — ce n\'était pas de ton fait.',
+        'Les deux badges liés à une saison précise le disent maintenant, avec une petite étiquette d\'année, au lieu de sembler encore accessibles.',
+      ],
+      es: [
+        'Las insignias ya no fijan el tamaño de una temporada. «Tener las 101 cartas» pasa a «tener todas las cartas de la temporada», contadas sobre el total declarado. Lo mismo para las dos insignias de escuderías que suponían diez.',
+        'Una insignia ya no puede concederse sobre un archivo de cartas incompleto: tener todo lo introducido no es tenerlo todo. Las ya obtenidas se conservan, incluidas las concedidas antes de tiempo — no fue culpa tuya.',
+        'Las dos insignias ligadas a una temporada concreta ahora lo indican con una pequeña etiqueta de año.',
+      ],
+      zh: [
+        '徽章不再把赛季规模写死。「拥有全部 101 张卡」变为「拥有本赛季的全部卡牌」，以赛季声明的总数为准。假设有十支车队的两枚车队徽章同理。',
+        '卡牌文件不完整时不再解锁徽章：拥有已录入的全部，不等于拥有全部。已获得的徽章一律保留，包括此前提前发放的——那不是你的问题。',
+        '与特定赛季绑定的两枚徽章现在会标出年份，而不再看起来仍可获得。',
+      ],
+      it: [
+        'I badge non fissano più la dimensione di una stagione. «Possedere tutte le 101 carte» diventa «possedere tutte le carte della stagione», contate sul totale dichiarato. Lo stesso per i due badge di scuderia che presupponevano dieci team.',
+        'Un badge non può più essere assegnato su un file di carte incompleto: possedere tutto ciò che hai inserito non è possedere tutto. I badge già ottenuti restano, compresi quelli assegnati troppo presto — non dipendeva da te.',
+        'I due badge legati a una stagione precisa ora lo dichiarano con una piccola etichetta dell\'anno.',
+      ],
+      nl: [
+        'Badges leggen de omvang van een seizoen niet meer vast. «Alle 101 kaarten bezitten» wordt «alle kaarten van het seizoen bezitten», geteld op het opgegeven totaal. Idem voor de twee teambadges die tien teams veronderstelden.',
+        'Een badge kan niet meer worden toegekend op een onvolledig kaartbestand: alles bezitten wat je hebt ingevoerd is niet alles bezitten. Reeds behaalde badges blijven, ook te vroeg toegekende — dat lag niet aan jou.',
+        'De twee badges die aan één seizoen vastzitten, zeggen dat nu met een klein jaarlabel.',
+      ],
+      de: [
+        'Abzeichen schreiben die Größe einer Saison nicht mehr fest. «Alle 101 Karten besitzen» wird zu «alle Karten der Saison besitzen», gezählt am angegebenen Gesamtwert. Ebenso bei den zwei Team-Abzeichen, die zehn Teams voraussetzten.',
+        'Ein Abzeichen kann nicht mehr auf einer unvollständigen Kartendatei vergeben werden: alles zu besitzen, was erfasst ist, heißt nicht alles zu besitzen. Bereits erhaltene Abzeichen bleiben, auch zu früh vergebene — das war nicht dein Fehler.',
+        'Die zwei an eine bestimmte Saison gebundenen Abzeichen sagen das jetzt mit einem kleinen Jahres-Label.',
+      ],
+    },
+  },
+  {
     version: '1.58.0',
     date: '2026-08-12',
     changes: {

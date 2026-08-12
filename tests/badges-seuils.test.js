@@ -263,3 +263,40 @@ describe('libellés — le chiffre suit la saison, ou disparaît', () => {
     assert.equal(T().fr['title.legend_101'], 'Légende vivante');
   });
 });
+
+/* ── Étape 5 : le champ `season`, enfin lu ─────────────────── */
+describe('champ season — retiré là où il ment, lu là où il dit vrai', () => {
+  const all = [...badgesJson.auto, ...badgesJson.manual];
+  const bid = id => all.find(b => b.id === id);
+
+  test('les cinq badges « tout posséder » ne portent plus de saison', () => {
+    for (const id of ['legend_101', 'pilote_all', 'reserve_all', 'director_all', 'gp_all']){
+      assert.equal(bid(id).season, undefined,
+        `${id} : « tout posséder » a un sens dans n’importe quelle saison`);
+    }
+  });
+
+  test('les deux faits DATÉS gardent la leur', () => {
+    assert.equal(bid('launch_day').season, 2025);
+    assert.equal(bid('prediction').season, 2025);
+  });
+
+  test('data-embedded.js suit le même retrait', () => {
+    const emb = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+    assert.ok(!/"id":"legend_101"[^}]*"season":2025/.test(emb));
+    assert.match(emb, /"id":"launch_day"[^}]*"season":2025/);
+  });
+
+  test('le champ n’est plus inerte : badges.js le lit', () => {
+    const src = readFileSync(new URL('../badges.js', import.meta.url), 'utf8');
+    assert.match(src, /b\.season/, 'le champ doit être lu, sinon il reste décoratif');
+    assert.match(src, /y === _currentSeason/, 'la comparaison se fait avec la saison affichée');
+  });
+
+  test('l’étiquette existe dans les 7 langues et porte {y}', () => {
+    const T = globalThis.window.__T;
+    for (const lg of ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de']){
+      assert.match(T[lg]['b.season_only'], /\{y\}/, `${lg} : {y} manquant`);
+    }
+  });
+});
