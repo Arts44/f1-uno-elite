@@ -51,6 +51,25 @@ const P = {
   settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
   palette: '<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
   pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>',
+  /* ── Catégories de cartes ──
+     Une série de quatre, jugée CÔTE À CÔTE et pas glyphe par glyphe :
+     c'est comme ça qu'on a écarté un panneau de muret qui entrait en
+     collision avec le drapeau, et un volant qui se refermait en masse
+     à 14 px. Deux casques sur quatre, pas trois.
+     Elles remplacent des émojis (🏎️ 🔧 🎯 🏁) qui ne disaient pas leur
+     rôle — une clé à molette pour un pilote de réserve, une cible pour
+     un directeur d'écurie — et qui cassaient la famille au trait. */
+  // Pilote : le casque, qui dit enfin la même chose que le visuel de tuile.
+  helmet: '<path d="M3.7 14.3a8.3 8.3 0 0 1 16.6 0v.8a2.6 2.6 0 0 1-2.6 2.6H6.3a2.6 2.6 0 0 1-2.6-2.6z"/><path d="M8.4 12.1h11.7"/><path d="M8.4 12.1a3 3 0 0 0 0 5.6"/>',
+  // Réserve : les flèches d'échange. Le symbole vit déjà dans le coin
+  // des cartes réserve depuis 1.33.0 — on ne crée pas une convention,
+  // on en révèle une.
+  swap: '<path d="M3.8 9.4a8.4 8.4 0 0 1 14.3-4.3l2.1 2.1"/><path d="M20.2 3.1v4.1h-4.1"/><path d="M20.2 14.6a8.4 8.4 0 0 1-14.3 4.3l-2.1-2.1"/><path d="M3.8 20.9v-4.1h4.1"/>',
+  // Directeur : le casque-micro du muret des stands.
+  headset: '<path d="M4.2 14.5v-2.3a7.8 7.8 0 0 1 15.6 0v2.3"/><path d="M4.2 13.6h1.4a1.6 1.6 0 0 1 1.6 1.6v2.5a1.6 1.6 0 0 1-1.6 1.6H4.2z"/><path d="M19.8 13.6h-1.4a1.6 1.6 0 0 0-1.6 1.6v2.5a1.6 1.6 0 0 0 1.6 1.6h1.4z"/><path d="M17.4 19.3v.6a2.2 2.2 0 0 1-2.2 2.2h-2.6"/>',
+  // Grand Prix : le damier, en SVG pour rejoindre la famille et suivre
+  // les thèmes (l'émoji restait multicolore).
+  chequered: '<path d="M4.6 3.2v17.6"/><path d="M4.6 4.4h15v9.6h-15z"/><path d="M4.6 4.4h5v4.8h-5z" fill="currentColor" stroke="none"/><path d="M14.6 4.4h5v4.8h-5z" fill="currentColor" stroke="none"/><path d="M9.6 9.2h5v4.8h-5z" fill="currentColor" stroke="none"/>',
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
   lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   unlock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',

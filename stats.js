@@ -206,7 +206,7 @@ export function renderStats(){
     const catCards = CARDS_DB.filter(c=>c.category===catId);
     if(catCards.length === 0) return '';
     const catOwned = catCards.filter(c=>cardOwned(c.id)).length;
-    return svRow(cat.emoji, t('cat.'+catId), catOwned, catCards.length, Math.round((catOwned/catCards.length)*100));
+    return svRow(icon(cat.icon||'layers'), t('cat.'+catId), catOwned, catCards.length, Math.round((catOwned/catCards.length)*100));
   });
   const champPct = champions > 0 ? Math.round((champOwned/champions)*100) : 0;
   catRowsArr.push(svRow(icon('trophy'), t('st.champions'), champOwned, champions, champPct));
@@ -297,12 +297,12 @@ export function renderStats(){
     featuredHtml = `<div class="sv-feat">
       <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_rarest')}</div>
-        <div class="sv-feat-name">${CATS[rarest.category]?.emoji||'🃏'} #${rarest.id} ${rarest.name}</div>
+        <div class="sv-feat-name">${icon(CATS[rarest.category]?.icon||'layers')} #${rarest.id} ${rarest.name}</div>
         <div class="sv-feat-sub sv-feat-chip${rarityChipClass(cardRarity(rarest))}" style="${rarityChipStyle(cardRarity(rarest),rr.color)}">${t('rar.'+cardRarity(rarest))} ${'★'.repeat(rr.stars||1)}</div>
       </div>
       <div class="sv-feat-item">
         <div class="sv-feat-label">${t('st.feat_most_copies')}</div>
-        <div class="sv-feat-name">${CATS[most.category]?.emoji||'🃏'} #${most.id} ${most.name}</div>
+        <div class="sv-feat-name">${icon(CATS[most.category]?.icon||'layers')} #${most.id} ${most.name}</div>
         <div class="sv-feat-sub">${icon('box')} ×${cardTotalQty(most.id)}</div>
       </div>
     </div>`;
@@ -508,7 +508,7 @@ export function renderStats(){
 function _toolRow(item, extra = ''){
   const rar = RARITIES[item.rarity] || {};
   return `<div class="sv-tool-row" data-card="${item.id}">
-    <span class="sv-tool-cat" title="${CATS[item.category]?.label||item.category}">${CATS[item.category]?.emoji||'🃏'}</span>
+    <span class="sv-tool-cat" title="${CATS[item.category]?.label||item.category}">${icon(CATS[item.category]?.icon||'layers')}</span>
     <span class="sv-tool-num">#${item.id}</span>
     <span class="sv-tool-name">${item.name}</span>
     <span class="sv-tool-chip${rarityChipClass(item.rarity)}" style="${rarityChipStyle(item.rarity, rar.color)}">${t('rar.'+item.rarity)}</span>
@@ -572,9 +572,16 @@ function _doublesLine(r){
   const types = r.types.map(ty => `${_typeLabel(ty.type)} ×${ty.qty}`).join(', ');
   return `  #${r.id} ${r.name} — ${types}`;
 }
+/* Export TEXTE : plus de pictogramme du tout.
+   Les symboles de catégorie sont devenus des SVG, qu'un bloc-notes ne
+   peut pas afficher — et c'était de toute façon la bonne décision :
+   « Pilote de réserve » écrit en toutes lettres est plus clair qu'un
+   glyphe dans un fichier texte. C'est ce qui a permis de retirer le
+   champ `emoji` des catégories au lieu de le traîner pour ce seul
+   usage. */
 function _groupedBlock(rows, lineFn){
   return _groupByCat(rows).map(g =>
-    `${CATS[g.cat]?.emoji||''} ${_catLabel(g.cat)}\n${g.rows.map(lineFn).join('\n')}`
+    `${_catLabel(g.cat)}\n${g.rows.map(lineFn).join('\n')}`
   ).join('\n\n');
 }
 function _fmtHead(titleKey){ return `F1 UNO Élite — ${t(titleKey)} (${t('tools.season',{season:_currentSeason})})`; }

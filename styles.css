@@ -1531,7 +1531,17 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .sv-tool-row{display:flex;align-items:center;gap:var(--space-2);padding:7px var(--space-2);
   border-radius:var(--r-md);font-size:13px;color:var(--tx1);}
 .sv-tool-row:nth-child(even){background:var(--surface2);}
-.sv-tool-cat{flex:none;font-size:14px;}
+/* Les symboles de catégorie sont des SVG au trait : ils se dimensionnent
+   par width/height, plus par font-size. */
+.sv-tool-cat{flex:none;display:inline-flex;}
+.sv-tool-cat .ic{width:14px;height:14px;}
+.sv-feat-name .ic{width:15px;height:15px;vertical-align:-2px;margin-right:2px;}
+.sv-row-ic .ic,.sv-cat .ic{width:16px;height:16px;}
+/* Sur la tuile et dans la fiche, l'icône remplace un émoji de 40 px. */
+.card-cat-ic{display:flex;align-items:center;justify-content:center;color:var(--tx2);}
+.card-cat-ic .ic{width:40px;height:40px;}
+.mo-cat-ic{display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:var(--tx2);}
+.mo-cat-ic .ic{width:64px;height:64px;}
 .sv-tool-num{flex:none;font-variant-numeric:tabular-nums;color:var(--tx3);font-size:12px;min-width:38px;}
 .sv-tool-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .sv-tool-chip{flex:none;font-size:11px;font-weight:700;padding:2px 8px;border-radius:var(--r-pill);}

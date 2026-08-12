@@ -150,7 +150,11 @@ export function renderCollection(){
 }
 
 /* ══════════════════════════════════════════════════════════ GRID */
-export const catEmoji=id=>CATS[id]?.emoji||'🃏';
+/* Icône de catégorie. `CATS[id].icon` porte le NOM d'une icône de
+   icons.js — plus un émoji : les quatre symboles sont désormais au
+   trait, dans la même famille que le reste, et suivent currentColor
+   donc les deux thèmes. */
+export const catIcon=(id,cls)=>icon(CATS[id]?.icon||'layers',cls);
 
 export function bestOwnedType(card){
   const owned=card.types.filter(t=>{
@@ -384,7 +388,7 @@ function buildCardEl(card){
         ${card.champion?`<span class="crown" aria-hidden="true">${icon('crown')}</span>`:''}
         ${card.category==='reserve'?`<span class="replacement-icon" aria-hidden="true">${icon('refresh')}</span>`:''}
         ${isSet?`<span class="set-flag" role="img" aria-label="${t('set.complete')}" title="${t('set.complete')}">${icon('seal')}</span>`:''}
-        ${card.category==='gp' && circuitSVG(card.id,'card') ? circuitSVG(card.id,'card') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : `<span style="font-size:40px">${catEmoji(card.category)}</span>`}
+        ${card.category==='gp' && circuitSVG(card.id,'card') ? circuitSVG(card.id,'card') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : `<span class="card-cat-ic">${catIcon(card.category)}</span>`}
         <button class="qbtn" type="button" data-action="quickAdd" data-card="${card.id}" aria-label="${t('quick.add')}" title="${t('quick.add')}">+</button>
       </div>
       <div class="card-body">
@@ -470,7 +474,7 @@ export function openModal(id){
   // Pas de directive eslint-disable ici : voir i18n.js, setSafeHTML —
   // les alertes restantes sont des patterns natifs Codacy, hors de
   // portée d'une directive ESLint.
-  document.getElementById('moEmoji').innerHTML = _img ? `<img src="${_img}" alt="${escapeHtml(card.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-xl) var(--r-xl) 0 0;">` : (card.category==='gp' && circuitSVG(card.id,'modal') ? circuitSVG(card.id,'modal') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : catEmoji(card.category));
+  document.getElementById('moEmoji').innerHTML = _img ? `<img src="${_img}" alt="${escapeHtml(card.name)}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r-xl) var(--r-xl) 0 0;">` : (card.category==='gp' && circuitSVG(card.id,'modal') ? circuitSVG(card.id,'modal') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : `<span class="mo-cat-ic">${catIcon(card.category)}</span>`);
   document.getElementById('moNum').textContent=`#${card.id} · ${CATS[card.category]?.label||card.category}`;
   document.getElementById('moName').textContent=card.name + (card.category==='pilote'?` ${card.nationality||''}`:'');
   document.getElementById('moTeam').textContent=card.team||'';

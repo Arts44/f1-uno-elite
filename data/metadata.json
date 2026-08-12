@@ -242,19 +242,19 @@
   "categories": {
     "pilote": {
       "label": "Pilote",
-      "emoji": "🏎️"
+      "icon": "helmet"
     },
     "reserve": {
       "label": "Pilote de réserve",
-      "emoji": "🔧"
+      "icon": "swap"
     },
     "directeur": {
       "label": "Directeur",
-      "emoji": "🎯"
+      "icon": "headset"
     },
     "gp": {
       "label": "Grand Prix",
-      "emoji": "🏁"
+      "icon": "chequered"
     }
   },
   "driverNumbers": {

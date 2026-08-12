@@ -17,6 +17,40 @@
 
 export const CHANGELOG = [
   {
+    version: '1.55.0',
+    date: '2026-08-12',
+    changes: {
+      en: [
+        'The four card categories have real symbols at last: a helmet for drivers, swap arrows for reserve drivers, a pit-wall headset for team principals, and a chequered flag for Grands Prix. A wrench said nothing about a reserve driver, and a target said nothing about a team principal.',
+        'They are drawn line icons now, so they follow the light and dark themes instead of staying multicolour — and the driver helmet finally matches the one already shown on driver tiles.',
+      ],
+      fr: [
+        'Les quatre catégories de cartes ont enfin de vrais symboles : un casque pour les pilotes, des flèches d\'échange pour les pilotes de réserve, un casque-micro du muret pour les directeurs, et un drapeau à damier pour les Grands Prix. Une clé à molette ne disait rien d\'un pilote de réserve, et une cible rien d\'un directeur d\'écurie.',
+        'Ce sont maintenant des icônes au trait : elles suivent les thèmes clair et sombre au lieu de rester multicolores — et le casque des pilotes rejoint enfin celui déjà affiché sur leurs tuiles.',
+      ],
+      es: [
+        'Las cuatro categorías de cartas tienen por fin símbolos reales: un casco para los pilotos, flechas de relevo para los pilotos de reserva, unos auriculares de muro para los directores y una bandera a cuadros para los Grandes Premios. Una llave inglesa no decía nada de un piloto de reserva, ni una diana de un director de equipo.',
+        'Ahora son iconos de trazo: siguen los temas claro y oscuro en vez de quedarse multicolores — y el casco de los pilotos coincide por fin con el que ya aparece en sus casillas.',
+      ],
+      zh: [
+        '四个卡片类别终于有了贴切的符号：车手用头盔，替补车手用交换箭头，领队用围墙耳麦，大奖赛用方格旗。扳手说明不了替补车手，靶心也说明不了车队领队。',
+        '它们现在是线条图标，会跟随浅色和深色主题，不再是固定的彩色——车手头盔也终于与卡片上已有的头盔一致了。',
+      ],
+      it: [
+        'Le quattro categorie di carte hanno finalmente simboli veri: un casco per i piloti, frecce di scambio per i piloti di riserva, una cuffia da muretto per i team principal e una bandiera a scacchi per i Gran Premi. Una chiave inglese non diceva nulla di un pilota di riserva, né un bersaglio di un team principal.',
+        'Ora sono icone a tratto: seguono i temi chiaro e scuro invece di restare multicolori — e il casco dei piloti coincide finalmente con quello già mostrato sulle loro tessere.',
+      ],
+      nl: [
+        'De vier kaartcategorieën hebben eindelijk echte symbolen: een helm voor coureurs, wisselpijlen voor reservecoureurs, een pitmuur-headset voor teambazen en een geblokte vlag voor Grands Prix. Een moersleutel zei niets over een reservecoureur, en een schietschijf niets over een teambaas.',
+        'Het zijn nu lijnpictogrammen: ze volgen het lichte en donkere thema in plaats van veelkleurig te blijven — en de coureurshelm komt eindelijk overeen met die op hun tegels.',
+      ],
+      de: [
+        'Die vier Kartenkategorien haben endlich echte Symbole: einen Helm für Fahrer, Wechselpfeile für Ersatzfahrer, ein Boxenmauer-Headset für Teamchefs und eine Zielflagge für Grands Prix. Ein Schraubenschlüssel sagte nichts über einen Ersatzfahrer, eine Zielscheibe nichts über einen Teamchef.',
+        'Es sind jetzt Strichsymbole: Sie folgen dem hellen und dunklen Design, statt mehrfarbig zu bleiben — und der Fahrerhelm passt endlich zu dem, der schon auf den Kacheln zu sehen ist.',
+      ],
+    },
+  },
+  {
     version: '1.54.0',
     date: '2026-08-12',
     changes: {
