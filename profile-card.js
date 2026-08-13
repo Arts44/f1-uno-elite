@@ -22,12 +22,11 @@
    Son déplacement a donc été vérifié AUTREMENT — le PNG produit a été
    capturé avant et après, et comparé. Résultat dans le commit.
    ══════════════════════════════════════════════════════════ */
-import { t, getLang } from './i18n.js';
+import { t } from './i18n.js';
 import { AUTO_BADGES, MANUAL_BADGES, badgeTr } from './data.js';
 import { showToast } from './render.js';
 import { manualBadges, autoBadgeUnlocked, loadManualBadges } from './badges-store.js';
 import { isAutoBadgeUnlocked, hardestUnlockedBadge, evaluateBadgeCondition } from './badge-rules.js';
-import { getUnlockedTitles } from './badge-titles.js';
 
 /* ── Carte de profil exportable (canvas → PNG) ── */
 export async function shareProfileCard(){

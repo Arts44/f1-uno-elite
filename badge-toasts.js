@@ -24,7 +24,7 @@
    rAF ne tourne pas dans un onglet en arrière-plan, le toast ne serait
    jamais monté à l'écran au retour.
    ══════════════════════════════════════════════════════════ */
-import { t, getLang } from './i18n.js';
+import { t } from './i18n.js';
 import { AUTO_BADGES, badgeTr } from './data.js';
 import { switchView } from './render.js';
 import { autoBadgeUnlocked, saveManualBadges } from './badges-store.js';

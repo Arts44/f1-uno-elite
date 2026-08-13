@@ -4,13 +4,12 @@
 import { t, tEsc, getLang } from './i18n.js';
 import { icon } from './icons.js';
 import { pageHeadHTML, pageHeadBtn } from './pagehead.js';
-import { CARDS_DB, CARD_TYPES, AUTO_BADGES, MANUAL_BADGES, seasonCatalogueState, seasonCardCount, _currentSeason } from './data.js';
+import { CARD_TYPES, AUTO_BADGES, MANUAL_BADGES, seasonCatalogueState, seasonCardCount, _currentSeason } from './data.js';
 import {
-  _storageKey, getTypeData,
-  cardOwned, cardWishlist, cardDoubles, cardFavorite,
-  cardSetComplete, cardRarity
+  _storageKey,
+  cardWishlist, cardDoubles, cardFavorite,
+  cardRarity
 } from './storage.js';
-import { getHistory } from './history.js';
 /* La correspondance badge → cartes vit dans badge-cards.js : elle répond
    à une autre question que ce module, sans DOM ni i18n, ce qui la rend
    réemployable par l'export de liste d'échange. RÉ-EXPORTÉE ici pour que
@@ -46,8 +45,8 @@ import { getUnlockedTitles, selectTitle, updateUserTitle, toggleTitlePicker } fr
 export { getUnlockedTitles, selectTitle, updateUserTitle, toggleTitlePicker };
 import { badgeDifficulty, difficultyLabelKey } from './difficulty.js';
 import { updateStats } from './stats.js';
-import { showToast, switchView } from './render.js';
-import { secureGet, secureSet } from './secure-store.js';
+import { showToast } from './render.js';
+import { secureSet } from './secure-store.js';
 import {
   manualBadges, autoBadgeUnlocked, setManualBadges, setAutoBadgeUnlocked,
   loadManualBadges, saveManualBadges, badgeUnlockDate,

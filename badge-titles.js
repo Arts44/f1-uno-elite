@@ -25,7 +25,6 @@
    changement de comportement déguisé en refactor.
    ══════════════════════════════════════════════════════════ */
 import { t, getLang } from './i18n.js';
-import { icon } from './icons.js';
 import { AUTO_BADGES, MANUAL_BADGES } from './data.js';
 import { _storageKey } from './storage-keys.js';
 import { manualBadges, loadManualBadges } from './badges-store.js';
