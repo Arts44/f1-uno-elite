@@ -1715,6 +1715,32 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    Aucune couleur en dur — le bloc « ce qui n'est jamais en jeu »
    s'appuie sur --green, la teinte de la progression, parce qu'il dit la
    même chose : ça va. */
+/* ── La modale des limites prend la place disponible ──────────
+   Elle PARTAGE son composant avec « Nouveautés » et le dialogue
+   d'import : `.changelog-list{max-height:min(55vh,420px)}` sert aux
+   trois, et Nouveautés en a besoin — son contenu grandit à chaque
+   version. On ne touche donc pas au composant, on cible cette modale.
+
+   MESURÉ AVANT : sur 1280×800, le corps affichait 420 px pour 472 px de
+   contenu — il manquait 52 px alors que 201 px de viewport restaient
+   libres autour du dialogue. Une barre de défilement pour cinq
+   paragraphes qui tenaient presque.
+
+   CE QU'ON CONTRAINT N'EST PAS LE CORPS MAIS LE DIALOGUE. Un plafond en
+   `vh` sur le corps aurait forcé un compromis : assez haut pour que le
+   desktop tienne (il faut > 59 % sur un écran de 800), et le dialogue
+   dépassait alors l'écran en 320×568 — donc bouton Fermer hors champ,
+   ce qui est pire qu'une barre de défilement. En bornant le dialogue et
+   en laissant le corps prendre le reste (`flex:1`, `min-height:0`), la
+   règle s'adapte seule : tout tient sur desktop, le mobile défile comme
+   avant, et le bouton reste visible partout par construction.
+
+   `dvh` et non `vh` : sur mobile, la barre d'URL fait varier la hauteur,
+   et `vh` fige la valeur écran-plein — le bouton passerait sous la
+   barre au premier défilement. ── */
+.limits-overlay .import-dialog{max-height:calc(100dvh - 32px);}
+.limits-overlay .changelog-list{max-height:none;flex:1 1 auto;min-height:0;}
+
 .setv-limits-body p{font-size:12.5px;line-height:1.55;color:var(--tx3);margin:0 0 var(--space-3);}
 .setv-limits-body p:last-child{margin-bottom:0;}
 .setv-limits-body strong{color:var(--tx2);font-weight:600;}

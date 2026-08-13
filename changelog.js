@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.60.3',
+    date: '2026-08-13',
+    changes: {
+      en: ['The “This deployment and its limits” window no longer scrolls on a computer screen: it now uses the space that was sitting empty around it, and everything fits at once. On a phone it still scrolls — there is simply more text than screen — but it shows more than before, and the Close button stays in view either way.'],
+      fr: ['La fenêtre « Ce déploiement et ses limites » ne défile plus sur un écran d’ordinateur : elle occupe la place qui restait vide autour d’elle, et tout tient d’un coup. Sur téléphone elle défile toujours — il y a simplement plus de texte que d’écran — mais elle en montre davantage qu’avant, et le bouton Fermer reste visible dans les deux cas.'],
+      es: ['La ventana «Este despliegue y sus límites» ya no se desplaza en pantalla de ordenador: aprovecha el espacio que quedaba libre a su alrededor y todo entra de una vez. En móvil sigue desplazándose —hay más texto que pantalla— pero muestra más que antes, y el botón Cerrar permanece visible en ambos casos.'],
+      zh: ['“本次部署及其限制”窗口在电脑屏幕上不再需要滚动：它用上了原本闲置的空间，内容一次性显示完整。在手机上仍需滚动——文字确实比屏幕多——但显示的内容比以前更多，而且「关闭」按钮在两种情况下都始终可见。'],
+      it: ['La finestra «Questo deploy e i suoi limiti» non scorre più su schermo di computer: usa lo spazio che restava vuoto attorno e tutto entra in una volta. Su telefono scorre ancora — c’è semplicemente più testo che schermo — ma ne mostra di più di prima, e il pulsante Chiudi resta visibile in entrambi i casi.'],
+      nl: ['Het venster “Deze uitrol en zijn grenzen” scrolt niet meer op een computerscherm: het benut de ruimte die eromheen leeg stond en alles past in één keer. Op een telefoon scrolt het nog steeds — er is nu eenmaal meer tekst dan scherm — maar het toont meer dan voorheen, en de knop Sluiten blijft in beeld.'],
+      de: ['Das Fenster „Dieses Deployment und seine Grenzen“ scrollt am Computerbildschirm nicht mehr: Es nutzt den Platz, der ringsum leer stand, und alles passt auf einmal. Am Telefon scrollt es weiterhin — es ist schlicht mehr Text als Bildschirm — zeigt aber mehr als zuvor, und der Schließen-Knopf bleibt in beiden Fällen sichtbar.'],
+    },
+  },
+  {
     version: '1.60.2',
     date: '2026-08-13',
     changes: {
