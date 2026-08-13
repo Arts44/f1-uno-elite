@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.59.9',
+    date: '2026-08-13',
+    changes: {
+      en: ['Sign-in codes now come from the app’s own verified domain instead of a shared test address. While the new domain earns its reputation, a code may land in your spam folder — check there before asking for another. The limits section in Settings has been updated: the sending cap is now a daily one, so if it is reached the wait can run until tomorrow.'],
+      fr: ['Les codes de connexion partent désormais du domaine vérifié de l’app, au lieu d’une adresse de test partagée. Le temps que le nouveau domaine se fasse une réputation, un code peut atterrir dans tes indésirables — regarde là avant d’en redemander un. La section des limites, dans les Réglages, suit : le plafond d’envoi est maintenant quotidien, donc s’il est atteint l’attente peut aller jusqu’au lendemain.'],
+      es: ['Los códigos de acceso salen ahora del dominio verificado de la app, en vez de una dirección de pruebas compartida. Mientras el nuevo dominio gana reputación, un código puede acabar en spam — míralo ahí antes de pedir otro. La sección de límites, en Ajustes, se ha actualizado: el tope de envío es ahora diario, así que si se alcanza la espera puede llegar hasta mañana.'],
+      zh: ['登录码现在从应用自己的已验证域名发出，不再使用共享的测试地址。在新域名建立信誉期间，验证码可能会进入垃圾邮件——再次索取之前请先去那里看看。设置中的限制说明也已更新：发送额度现在按天计算，若当天用尽，等待可能要到第二天。'],
+      it: ['I codici di accesso partono ora dal dominio verificato dell’app, invece che da un indirizzo di test condiviso. Mentre il nuovo dominio si costruisce una reputazione, un codice può finire nello spam — guarda lì prima di chiederne un altro. La sezione dei limiti, nelle Impostazioni, è aggiornata: il tetto d’invio è ora giornaliero, quindi se viene raggiunto l’attesa può arrivare all’indomani.'],
+      nl: ['Inlogcodes komen voortaan van het eigen geverifieerde domein van de app in plaats van een gedeeld testadres. Terwijl het nieuwe domein reputatie opbouwt, kan een code in je spam belanden — kijk daar voor je een nieuwe aanvraagt. Het blok met beperkingen in Instellingen is bijgewerkt: de verzendlimiet is nu een daglimiet, dus als die bereikt is kan het wachten tot morgen duren.'],
+      de: ['Anmeldecodes kommen jetzt von der eigenen verifizierten Domain der App statt von einer geteilten Testadresse. Während die neue Domain sich einen Ruf erarbeitet, kann ein Code im Spam landen — schau dort nach, bevor du einen neuen anforderst. Der Abschnitt zu den Grenzen in den Einstellungen wurde angepasst: Das Versandlimit gilt jetzt pro Tag, ist es erreicht, kann sich das Warten bis zum nächsten Tag ziehen.'],
+    },
+  },
+  {
     version: '1.59.8',
     date: '2026-08-13',
     changes: {

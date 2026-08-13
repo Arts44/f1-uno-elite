@@ -13,9 +13,10 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Un seul point ouvert : le n°12**, une échéance connue plutôt qu'un
-> défaut. Tous les autres sont corrigés, mesurés ou tranchés, et tous
-> conservés : 1a, 1b, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13.
+> **Aucun point ouvert.** Les treize sont corrigés, mesurés ou tranchés,
+> et tous conservés avec leur diagnostic : 1a, 1b, 2, 3, 4, 5, 6, 7, 8,
+> 9, 10, 11, 12, 13. Reste une hypothèse non mesurée, notée au n°12 §C :
+> ce que voit l'utilisateur quand le quota Resend est atteint.
 
 ---
 
@@ -680,11 +681,56 @@ décalée d'un seul niveau échoue.
 
 ---
 
-## 12. Bascule vers `arts44.dev` — trois textes à revoir le jour venu
+## 12. ~~Bascule vers `arts44.dev`~~ — FAITE le 13/08/2026
 
-**Ce n'est pas un défaut : c'est une échéance connue.** Le domaine
-`arts44.dev` est acquis, et les codes de connexion partiront à terme de
-`noreply@arts44.dev` via Resend, au lieu du SMTP actuel.
+> **Les trois textes ont bougé ensemble**, et c'est le test de couplage
+> qui l'a garanti plutôt que la vigilance : en changeant l'expéditeur
+> dans `db/03-functions.sql`, la suite est passée au ROUGE tant que les
+> sept README décrivaient encore le domaine de test. Première mise en
+> situation réelle du garde ; il a fait exactement ce pour quoi il avait
+> été posé la veille.
+>
+> | Quoi | État |
+> |---|---|
+> | `db/03-functions.sql` — expéditeur | `noreply@arts44.dev`, re-extrait |
+> | 7 README — puce « limites honnêtes » | réécrite : domaine vérifié + réputation mesurée |
+> | `s.limits_mail_d` ×7 — app | plafond QUOTIDIEN, avec sa nuance |
+>
+> **La nuance de nature a été tenue.** Le texte ne dit pas seulement
+> « une centaine par jour » : il dit que si le plafond du jour est
+> atteint, **l'attente peut aller jusqu'au lendemain**. Sans cette
+> phrase, on aurait recopié la formulation horaire en la vidant de son
+> sens — un plafond horaire se recharge en permanence, un plafond
+> quotidien non.
+>
+> **Ce qui reste ouvert** : l'hypothèse du 500 contre 429 (section C
+> ci-dessous), à mesurer le jour où un quota sera réellement atteint.
+
+### Ce que la réputation a coûté le premier jour — mesuré
+
+Deux envois, dans l'heure suivant la vérification du domaine :
+
+| Destinataire | Résultat |
+|---|---|
+| **Proximus** | **rejeté** — `smtp; 554 Your access to this mail system has been rejected due to poor reputation of a domain used in message transfer`, type *Transient* |
+| **Gmail** | **reçu, classé en indésirables** |
+
+C'est le comportement attendu d'un domaine sans historique, et le type
+*Transient* le dit : le rejet n'est pas définitif, il tombera avec la
+réputation. Mais **c'est une régression temporaire par rapport au SMTP
+précédent**, et elle touche précisément les FAI belges — donc les
+premiers utilisateurs réels.
+
+**Consigné dans les sept README** plutôt que dans l'app : c'est une
+observation datée, pas une propriété du produit. Dans la section
+« limites », elle serait devenue fausse en quelques semaines sans que
+rien ne le signale ; dans les notes d'ingénierie, elle reste vraie —
+elle décrit ce qui a été mesuré ce jour-là.
+
+### Diagnostic d'origine
+
+Le domaine `arts44.dev` était acquis, et les codes de connexion
+partaient encore du SMTP précédent.
 
 Ce jour-là, **trois affirmations deviennent fausses en même temps**, et
 aucune ne se signalera d'elle-même :

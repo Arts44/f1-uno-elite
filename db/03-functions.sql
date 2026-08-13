@@ -1,10 +1,16 @@
 -- ══════════════════════════════════════════════════════════
 -- FONCTIONS ET DÉCLENCHEURS
 --
--- Extrait verbatim de pg_get_functiondef et pg_get_triggerdef le
--- 2026-08-13. UNE SEULE substitution : l'adresse du destinataire des
--- notifications, remplacée par <ADRESSE_MAINTENEUR>. Tout le reste est
--- le code réellement exécuté par la base.
+-- Extrait verbatim de pg_get_functiondef et pg_get_triggerdef, re-extrait
+-- le 2026-08-13 après la bascule vers le domaine vérifié `arts44.dev`.
+-- UNE SEULE substitution : l'adresse du DESTINATAIRE des notifications,
+-- remplacée par <ADRESSE_MAINTENEUR>. Tout le reste est le code
+-- réellement exécuté par la base.
+--
+-- L'EXPÉDITEUR, LUI, EST UNE VRAIE VALEUR : `noreply@arts44.dev` est
+-- publique par nature — elle voyage dans l'en-tête de chaque e-mail
+-- envoyé. L'expurger n'aurait rien protégé et aurait rendu le fichier
+-- non rejouable.
 --
 -- LA CLÉ RESEND N'EST PAS ICI, ET NE PEUT PAS Y ÊTRE : la fonction la
 -- lit à l'exécution dans le Vault, par son nom (`resend_api_key`).
@@ -123,7 +129,7 @@ begin
       'Authorization', 'Bearer ' || api_key,
       'Content-Type', 'application/json'),
     body := jsonb_build_object(
-      'from', 'F1 UNO Élite <onboarding@resend.dev>',
+      'from', 'F1 UNO Élite <noreply@arts44.dev>',
       'to', jsonb_build_array('<ADRESSE_MAINTENEUR>'),
       'subject', '[F1 UNO Élite] Nouvel avis — ' || type_label,
       'html',
