@@ -96,7 +96,7 @@ ce qui est pire à repérer. Le tableau dit quoi.
 |---|---|---|---|
 | `teamColors` | nom d'écurie | `"#RRGGBB"` | Le blanc `#fff` est utilisé — la carte perd son identité d'écurie. |
 | `teamMonograms` | nom d'écurie | 2 à 3 lettres (`"ATR"`) | **Le visuel de la carte est vide** : `teamLogoHTML()` renvoie `null`. |
-| `teamLiveries` | nom d'écurie | `{"c1":"#RRGGBB","c2":"#RRGGBB","g":"nom"}` | La bande de livrée disparaît. |
+| `teamLiveries` | nom d'écurie | `{"c1":"#RRGGBB","c2":"#RRGGBB"}` | La bande de livrée disparaît. |
 | `driverNumbers` | **nom du pilote**, identique au champ `name` | `{"n": 1, "cls": "dn-xxx"}` | Le numéro de pilote n'est **pas affiché du tout**. |
 
 ### Deux contraintes que les tests font respecter
@@ -104,15 +104,16 @@ ce qui est pire à repérer. Le tableau dit quoi.
 1. **`teamLiveries` et `teamColors` doivent avoir exactement les mêmes
    clés** (`tests/icons.test.js`). Ajouter une écurie dans l'un sans
    l'autre fait échouer la suite.
-2. **Le champ `g` doit être unique** d'une écurie à l'autre — même test.
-   Les 10 gestes du set 2025 sont : `lame` `coin` `vague` `vee` `coupe`
-   `eclair` `houle` `lisiere` `marche` `traits`. **Il faut en inventer un
-   nouveau pour chaque écurie ajoutée** ; les cartes factices utilisent
-   `essai-a` et `essai-b`.
+2. **Une livrée ne porte que `c1` et `c2`** — même test. Ajouter une
+   écurie ne demande donc que deux couleurs.
 
-> **`g` n'est lu par aucun code.** `liveryHTML()` n'utilise que `c1` et
-> `c2`. Le champ est documentaire — mais il est **gardé par un test**,
-> donc il contraint la saisie. Constat noté, pas corrigé ici.
+> **Le champ `g` a été retiré (point n°1b).** Il nommait un geste
+> géométrique peint sur la tuile jusqu'à l'arbitrage P1 (1.33.0), qui a
+> rendu le fond à la rareté et l'écurie au casque. Le dessin est parti,
+> le champ était resté — et son test obligeait à **inventer un geste par
+> écurie ajoutée**, pour rien : aucun code ne le lisait. L'implémenter
+> n'aurait pas mieux valu ; la bande fait 7 px de large, où dix
+> géométries seraient dix fois la même colonne.
 
 ### `driverNumbers[*].cls` — la dégradation à connaître
 

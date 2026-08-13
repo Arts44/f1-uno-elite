@@ -13,8 +13,8 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Ouverts aujourd'hui : 1b, 5, 7.** Corrigés, mesurés ou tranchés,
-> et conservés : 1a, 2, 3, 4, 6, 8, 9, 10.
+> **Ouverts aujourd'hui : 5, 7.** Corrigés, mesurés ou tranchés,
+> et conservés : 1a, 1b, 2, 3, 4, 6, 8, 9, 10.
 
 ---
 
@@ -22,7 +22,7 @@
 
 Même famille : un champ qui existe dans les données, que tout lecteur
 suppose utilisé, et que le code ignore complètement. **Le premier est
-corrigé, le second reste ouvert.**
+corrigé, le second est tranché — les deux sont clos.**
 
 ### ~~`season` sur les badges — inerte, et dangereux~~ — CORRIGÉ (1.59.0)
 
@@ -61,7 +61,23 @@ progression et le modèle de difficulté.
 est faux si le fichier est partiel. Le total doit être **déclaré**, pas
 déduit.
 
-### `g` sur les livrées d'écurie — inerte, et perpétué par un test
+### ~~`g` sur les livrées d'écurie — inerte, et perpétué par un test~~ — TRANCHÉ : retiré (`c3ac181`)
+
+> **Retiré, avec son test.** L'autre issue — lui donner un usage réel —
+> a été écartée sur une mesure : la bande de livrée fait **7 px de
+> large** (vérifié au navigateur, 78 bandes, toutes 7×120). C'est
+> l'argument déjà retenu pour `swap` et `refresh`, indistinguables à
+> 12-14 px : une géométrie a besoin de surface. À 7 px, dix gestes
+> seraient dix fois la même colonne.
+>
+> Et le champ était un **vestige d'un arbitrage déjà rendu** : les
+> gestes étaient réellement peints jusqu'à P1 (1.33.0), qui a donné le
+> fond à la rareté et l'écurie au casque. Le dessin est parti, le champ
+> est resté.
+>
+> Le test qui le remplace garde l'absence : une livrée ne porte que ses
+> deux couleurs. Ajouter une écurie ne demande plus d'inventer quoi que
+> ce soit.
 
 `data/metadata.json → teamLiveries[*].g` décrit un geste géométrique
 (`lame`, `coin`, `vague`…). **`liveryHTML()` n'utilise que `c1` et

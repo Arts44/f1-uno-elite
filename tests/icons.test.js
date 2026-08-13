@@ -161,9 +161,29 @@ describe('teamLiveries — parité et couverture CSS', () => {
     assert.ok(css.includes('.lvb'), 'colonne de livrée .lvb absente de styles.css');
   });
 
-  test('10 gestes distincts — aucune géométrie partagée entre écuries', () => {
-    const gestures = Object.values(meta.teamLiveries).map(l => l.g);
-    assert.equal(new Set(gestures).size, gestures.length);
+  /* ── Le champ `g` est PARTI, et ce test garde son absence ──
+     `g` nommait un geste géométrique (lame, coin, vague…) peint sur la
+     tuile jusqu'à l'arbitrage P1 (1.33.0), qui a rendu le fond à la
+     rareté et l'écurie au casque. Le dessin est parti ; le champ est
+     resté, avec un test qui exigeait son unicité.
+
+     Ce test-là ne gardait rien : aucun code ne lisait `g`. Il ne
+     produisait qu'une contrainte de saisie — en ajoutant deux écuries
+     factices pour 2026, il a fallu INVENTER deux gestes (`essai-a`,
+     `essai-b`) pour le satisfaire. Un test qui fabrique du travail sans
+     protéger de comportement est un coût net.
+
+     Et l'implémenter n'était pas mieux : la bande fait 7 px de large.
+     C'est le même argument que pour `swap` et `refresh`, deux icônes
+     indistinguables à 12-14 px — une géométrie a besoin de surface. À
+     7 px, dix gestes seraient dix fois la même colonne. L'écurie est
+     d'ailleurs déjà dite trois fois sur la tuile : couleurs de la bande,
+     couleur du casque ou du monogramme, et son nom en toutes lettres. */
+  test('le champ « g » ne revient pas dans les livrées', () => {
+    for (const [team, lv] of Object.entries(meta.teamLiveries)) {
+      assert.deepEqual(Object.keys(lv).sort(), ['c1', 'c2'],
+        `${team} : une livrée ne porte que ses deux couleurs`);
+    }
   });
 });
 

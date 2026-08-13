@@ -396,63 +396,51 @@
   "teamLiveries": {
     "Oracle Red Bull Racing": {
       "c1": "#0A1F5B",
-      "c2": "#DB0A40",
-      "g": "lame"
+      "c2": "#DB0A40"
     },
     "Scuderia Ferrari HP": {
       "c1": "#E8002D",
-      "c2": "#14151A",
-      "g": "coin"
+      "c2": "#14151A"
     },
     "McLaren F1": {
       "c1": "#FF8000",
-      "c2": "#14151A",
-      "g": "vague"
+      "c2": "#14151A"
     },
     "Mercedes-AMG Petronas Formula One Team": {
       "c1": "#0E4F4A",
-      "c2": "#27F4D2",
-      "g": "traits"
+      "c2": "#27F4D2"
     },
     "Aston Martin Aramco Formula One Team": {
       "c1": "#0B4B36",
-      "c2": "#CEDC00",
-      "g": "lisiere"
+      "c2": "#CEDC00"
     },
     "BWT Alpine F1 Team": {
       "c1": "#0A3D91",
-      "c2": "#FF87BC",
-      "g": "coupe"
+      "c2": "#FF87BC"
     },
     "MoneyGram Haas F1 Team": {
       "c1": "#4A4E52",
-      "c2": "#E6002B",
-      "g": "vee"
+      "c2": "#E6002B"
     },
     "Visa Cash App RB Formula One": {
       "c1": "#1B2A63",
-      "c2": "#6692FF",
-      "g": "marche"
+      "c2": "#6692FF"
     },
     "Atlassian Williams Racing": {
       "c1": "#041E42",
-      "c2": "#64C4FF",
-      "g": "houle"
+      "c2": "#64C4FF"
     },
     "Stake F1 Team KICK Sauber": {
       "c1": "#123B1E",
-      "c2": "#52E252",
-      "g": "eclair"
+      "c2": "#52E252"
     },
     "Alpha Test Racing Team": {
       "c1": "#FF00AA",
-      "c2": "#2A0018",
-      "g": "essai-a"
+      "c2": "#2A0018"
     },
     "Beta Sample F1 Team": {
       "c1": "#00E5FF",
-      "c2": "#00202A",
-      "g": "essai-b"
+      "c2": "#00202A"
     }
   }
 }
