@@ -110,14 +110,27 @@ export function _resetSession(){ _vueCetteSession = false; }   // tests
    deux empilés donnaient une pile de notifications illisible où le
    bouton « Donner mon avis » passait sous le bandeau.
 
-   Important : ce refus ne consomme PAS la session. Un bandeau de mise à
-   jour n'est pas un refus de l'utilisateur — la prochaine célébration
-   reposera la question. */
+   ⚠️ LE TUTORIEL COMPTE AUSSI, et c'était un OUBLI, pas un arbitrage.
+   Le contrat disait « jamais pendant une action, un tutoriel ou un
+   écran de déverrouillage » ; les deux premiers cas étaient couverts,
+   le tutoriel non. Le chemin était pourtant complet : la visite guidée
+   ajoute des cartes → des badges tombent → la file de toasts se vide →
+   badge-toasts.js appelle maybeInviteAfterCelebration(). La bande
+   s'affichait par-dessus la visite.
+
+   Ce que ça coûtait : `tutorialKeys()` restaure `f1uno_review`, donc le
+   COMPTEUR revenait — mais l'invitation avait été VUE, une des deux
+   d'une vie, dépensée sur un écran de démonstration.
+
+   Important : ce refus ne consomme PAS la session. Ni un bandeau de
+   mise à jour ni un tutoriel ne sont un refus de l'utilisateur — la
+   prochaine célébration reposera la question. */
 function _zoneOccupee(){
   const b = document.getElementById('updateBanner');
   if(b) return true;
   const inst = document.querySelector('.install-banner');
-  return !!inst;
+  if(inst) return true;
+  return !!document.querySelector('.tut-overlay');
 }
 
 export function peutInviter(maintenant = Date.now()){

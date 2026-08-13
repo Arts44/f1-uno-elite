@@ -166,6 +166,29 @@ describe('les exclusions', () => {
     assert.equal(rv.peutInviter(), true, 'le bandeau parti, la porte se rouvre');
   });
 
+  test('le TUTORIEL repousse l’invitation, SANS consommer la session', () => {
+    /* Le chemin est complet et il a existé en production : le tutoriel
+       ajoute des cartes → des badges tombent → la file de toasts se
+       vide → badge-toasts.js appelle maybeInviteAfterCelebration(). La
+       bande pouvait donc s'afficher PAR-DESSUS la visite guidée.
+
+       Ce que ça coûte : tutorialKeys() restaure bien `f1uno_review`,
+       donc le COMPTEUR revient. Mais l'invitation a été VUE — une des
+       deux d'une vie, dépensée sur un écran de démonstration — et
+       `_vueCetteSession` reste vrai en mémoire, ce que la restauration
+       de localStorage ne rattrape pas.
+
+       Comme pour le bandeau de mise à jour, le refus ne consomme PAS la
+       session : un tutoriel n'est pas un refus de l'utilisateur. */
+    usage(3, 20);
+    const ov = document.createElement('div');
+    ov.className = 'tut-overlay';
+    document.body.appendChild(ov);
+    assert.equal(rv.peutInviter(), false);
+    ov.remove();
+    assert.equal(rv.peutInviter(), true, 'le tutoriel fini, la porte se rouvre');
+  });
+
   test('maybeInviteAfterCelebration n’affiche rien quand les conditions manquent', () => {
     usage(1, 1);
     rv.maybeInviteAfterCelebration();
