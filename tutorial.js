@@ -95,7 +95,13 @@ function restoreState(snap){
   applyLocalStorage(snap.ls);
   // Re-hydrate in-memory data from the restored localStorage
   try { loadData(); } catch(e){ log('tut restore loadData', e); }
-  try { loadManualBadges(); } catch(e){}
+  /* Journalisé comme loadData() ci-dessus, et pas par symétrie
+     cosmétique : ces deux appels sont les seuls du bloc à remettre en
+     MÉMOIRE ce que localStorage contient. Les autres ne font que
+     réafficher — un échec s'y voit à l'écran. Ici, un échec avalé laisse
+     l'utilisateur avec les badges du tutoriel devant un localStorage
+     pourtant correct, et rien ne le dit. */
+  try { loadManualBadges(); } catch(e){ log('tut restore loadManualBadges', e); }
   // Restore theme / font from the restored prefs
   const theme = snap.ls['f1uno_theme'];
   if(theme) document.documentElement.setAttribute('data-theme', theme);

@@ -78,22 +78,31 @@ Deux tests ajoutés, chacun **vu rouge avant d'être vu vert**, et vu rouge
   aussi` ([`tutorial.test.js`](../tests/tutorial.test.js)) — y compris
   une clé **absente avant** le tour, qui doit le rester après.
 
-### 2b — le parcours réel · ~3 h · ~180 lignes
+### 2b — le parcours réel · ~3 h · **FAIT** — [`verify_tutorial.py`](../verify_tutorial.py), 240 lignes
 
-Script séparé, 33 étapes, instantané de tout `localStorage` avant et
-après, **diff clé par clé**. Toute clé qui diffère est un échec **nommé**,
-pas un pourcentage.
+Script séparé, partage `capture_seed.py`. **34 étapes atteintes, 10
+gestes réels, 1 passée** (« Ajouter sans ouvrir », dont la pastille ne se
+laisse pas atteindre par le centre du projecteur — nommée dans la sortie,
+jamais silencieuse).
 
-> **Coût caché** : le seed active le PIN (`data-boot=login`). Le script
-> doit franchir l'écran de déverrouillage comme le fait déjà
-> `capture_screenshots.py` (~20 lignes reprises).
+> **Le « coût caché » du chiffrage était faux, et la correction vaut
+> d'être écrite.** J'avais annoncé ~20 lignes reprises de
+> `capture_screenshots.py` pour franchir l'écran de PIN. **Le seed
+> n'active pas le PIN** : `f1uno_pin_enabled` n'est passé qu'en
+> *surcharge*, pour la capture de cet écran-là. Il n'y a pas d'écran à
+> franchir, donc pas de duplication à arbitrer. Le critère du dépôt
+> n'avait pas à s'appliquer — il n'y avait rien à partager.
 
-**La restauration doit être vérifiée comme AYANT EU LIEU, pas comme ayant
-été TENTÉE.** `restoreState()` enchaîne sept `try/catch` ; le diff clé par
-clé est justement ce qui voit un échec avalé, puisqu'il regarde le
-résultat et non le chemin. C'est la raison pour laquelle le diff porte
-sur `localStorage` **relu après coup**, jamais sur la valeur qu'on
-croyait avoir écrite.
+**La restauration est vérifiée comme AYANT EU LIEU, pas comme ayant été
+TENTÉE** : le diff porte sur `localStorage` **relu depuis le navigateur**
+après coup, jamais sur la valeur qu'on croyait avoir écrite. C'est ce qui
+voit un échec avalé par un `catch`.
+
+**Et le stockage ne suffit pas.** Un `localStorage` correct avec une
+mémoire polluée est exactement ce que produirait `loadManualBadges()` en
+échec — et c'est **ce que l'utilisateur voit**. Le script compare donc
+aussi une **empreinte affichée** : comptes de statuts, signature par
+carte, bandeau de Collection, thème, langue.
 
 <details>
 <summary><b>Ce que l'audit de ces sept <code>try/catch</code> a donné</b></summary>
@@ -128,9 +137,32 @@ pourtant correct.
 **Décision : les `catch` d'affichage restent muets** (un échec de rendu se
 voit, et le tour ne doit pas casser sur un détail cosmétique), et
 `loadManualBadges()` gagne son `log()` pour aligner les deux appels
-mémoire. Une ligne, à faire avec 2b.
+mémoire. **Fait avec 2b.**
 
 </details>
+
+### Deux pièges de méthode payés pendant 2b — et qui resserviront
+
+**① Le contrôle négatif est passé au VERT pour une mauvaise raison.**
+Retirer `f1uno_owned_<saison>` de `tutorialKeys()` aurait dû faire
+échouer le script : il a réussi. La cause n'était pas le garde mais
+**`app.bundle.js` non reconstruit** — `index.html` sert le bundle, et le
+script ne voyait pas la modification. C'est la même famille que le piège
+`--format=iife` : le bundle masque ce qu'on croit avoir changé. **Un
+contrôle négatif qui passe au vert doit être suspecté AVANT le garde.**
+
+**② `innerText` n'est pas déterministe.** Trois exécutions saines
+échouaient sur `72/101 ✓ Possédées` contre `72/101✓ Possédées`, sans
+qu'une donnée ait bougé : `innerText` est le texte **tel que mis en
+page**, et sur une vue en transition après la restauration il perd les
+retours à la ligne. `textContent` ne dépend d'aucune mise en page.
+Même famille : les classes d'animation (`fx-idle`, sur 95 tuiles sur 101)
+qui faisaient varier la signature de grille d'une exécution à l'autre —
+la signature ne prend que les classes de **statut**.
+
+Les deux sont la leçon du n°11 des captures, repayée dans un autre
+décor : **une mesure qui varie sans que rien n'ait changé n'est pas une
+mesure.**
 
 ### 1 — la robustesse du parcours · ~2 h · ~90 lignes de plus
 
