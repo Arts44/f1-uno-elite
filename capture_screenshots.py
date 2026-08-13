@@ -212,8 +212,57 @@ def card(page, num):
     return page.locator('.card').filter(has_text=f'#{num}').first
 
 
+def scroll_stable(page, locator, marge=100):
+    """Amène l'élément à une position de défilement EXACTE et attend l'arrêt.
+
+    `scroll_into_view_if_needed()` garantit la visibilité, pas la position :
+    d'une exécution à l'autre, le même élément se retrouvait à ±6 px, et le
+    `clip` calculé depuis son cadre décalait toute la capture. Trois
+    captures `quick-add.*` sur sept en vivaient — visible seulement en
+    comparant deux exécutions du MÊME code.
+
+    On impose donc la position au lieu de la subir, puis on attend que
+    `scrollY` ne bouge plus (un défilement fluide, une ancre de mise en
+    page ou un rendu tardif peuvent encore la déplacer après coup).
+    """
+    locator.scroll_into_view_if_needed()
+    handle = locator.element_handle()
+    page.evaluate(
+        """([el, marge]) => {
+          const y = Math.round(el.getBoundingClientRect().top + window.scrollY - marge);
+          document.documentElement.style.scrollBehavior = 'auto';
+          window.scrollTo(0, Math.max(0, y));
+        }""",
+        [handle, marge],
+    )
+    page.wait_for_function(
+        """() => {
+          if(window.__lastY === window.scrollY){ window.__stable = (window.__stable||0) + 1; }
+          else { window.__stable = 0; window.__lastY = window.scrollY; }
+          return window.__stable >= 3;
+        }""",
+        timeout=5000,
+    )
+    page.evaluate('() => { window.__stable = 0; window.__lastY = -1; }')
+
+
 def clip_shot(page, box, path, pad, quality=85):
+    """`box` peut être un cadre déjà mesuré OU un locator — préférez le locator.
+
+    LA FAUTE QUE ÇA CORRIGE. On mesurait le cadre, PUIS on figeait, PUIS on
+    déclenchait. Or le gel mène les animations d'entrée à leur fin : il peut
+    donc déplacer la mise en page de quelques pixels ENTRE la mesure et la
+    capture. Le `clip` ne désignait alors plus tout à fait la même région, et
+    l'image entière se retrouvait décalée de ~6 px.
+
+    Trois captures `quick-add.*` sur sept en vivaient, mais pas les mêmes
+    d'une exécution à l'autre : c'est la signature d'une course, pas d'un
+    défaut de rendu. En passant le locator, le cadre est relu APRÈS le gel —
+    la fenêtre entre mesure et déclenchement disparaît.
+    """
     page.evaluate(FREEZE_JS)   # juste avant le déclenchement, pas 120 ms plus tôt
+    if hasattr(box, 'bounding_box'):
+        box = box.bounding_box()
     page.screenshot(path=str(path), quality=quality, type='jpeg', clip={
         'x': max(box['x'] - pad, 0), 'y': max(box['y'] - pad, 0),
         'width': box['width'] + 2 * pad, 'height': box['height'] + 2 * pad,
@@ -279,27 +328,25 @@ with sync_playwright() as p:
         t4 = card(page, '004')
         t4.scroll_into_view_if_needed()
         page.wait_for_timeout(400)
-        clip_shot(page, t4.bounding_box(), I18N / f'eternal-tile.{lang}.jpg', 26)
+        clip_shot(page, t4, I18N / f'eternal-tile.{lang}.jpg', 26)
         c.close()
 
         c = ctx_for(lang, 'light', 1200, 800)
         page = new_page(c, hide_nav=True)
         t5 = card(page, '005')
-        t5.scroll_into_view_if_needed()
-        page.wait_for_timeout(200)
+        scroll_stable(page, t5)
         t5.locator('.qbtn').click()
         page.wait_for_selector('.qadd-pop')
-        clip_shot(page, t5.bounding_box(), I18N / f'quick-add.{lang}.jpg', 16)
+        clip_shot(page, t5, I18N / f'quick-add.{lang}.jpg', 16)
 
         t = card(page, '060')
-        t.scroll_into_view_if_needed()
-        page.wait_for_timeout(200)
+        scroll_stable(page, t)
         t.locator('.qbtn').click()
         page.wait_for_selector('.qadd-pop')
         page.locator('.qadd-pop .qadd-type').first.click()
         page.wait_for_selector('.toast.show')
         page.wait_for_timeout(250)
-        clip_shot(page, page.locator('#toast').bounding_box(), I18N / f'toast.{lang}.jpg', 22)
+        clip_shot(page, page.locator('#toast'), I18N / f'toast.{lang}.jpg', 22)
         page.locator('.toast-action').click()
         page.wait_for_timeout(200)
 
@@ -466,14 +513,40 @@ with sync_playwright() as p:
     page.wait_for_timeout(1800)          # défilement + placement stabilisés
     # Avancer jusqu'à une étape d'observation : la bulle y montre la
     # rangée d'actions complète (Quitter · Précédent · Passer · Suivant).
+    #
+    # CETTE BOUCLE ÉTAIT LA SECONDE SOURCE DE NON-DÉTERMINISME. Elle
+    # attendait 1600 ms après chaque clic et sortait dès que #tutNext
+    # existait : selon la vitesse de la machine, elle s'arrêtait à
+    # l'étape 2 ou à l'étape 3, et le projecteur .tut-spot se retrouvait
+    # sur une autre tuile. Deux exécutions du même code produisaient donc
+    # deux captures différentes — 120 952 pixels d'écart, mesurés.
+    #
+    # On attend maintenant un CHANGEMENT D'ÉTAT observable (le compteur
+    # « n / of » de la bulle), pas une durée. Et l'étape atteinte est
+    # vérifiée : une capture qui montre une autre étape est un échec, pas
+    # une variante acceptable.
+    compteur = lambda: page.locator('.tut-count').inner_text().strip()
     for _ in range(4):
         if page.locator('#tutNext').count():
             break
+        avant = compteur()
         sp = page.locator('.tut-spot').bounding_box()
         if sp:
             page.mouse.click(sp['x'] + sp['width'] / 2, sp['y'] + sp['height'] / 2)
-        page.wait_for_timeout(1600)
-    page.wait_for_timeout(600)
+        try:
+            page.wait_for_function(
+                '([sel, avant]) => {'
+                ' const el = document.querySelector(sel);'
+                ' return el && el.textContent.trim() !== avant; }',
+                arg=['.tut-count', avant], timeout=8000)
+        except Exception:
+            break
+    page.wait_for_selector('#tutNext', timeout=8000)
+    ETAPE_ATTENDUE = '1 / 8'
+    atteinte = compteur()
+    if atteinte != ETAPE_ATTENDUE:
+        FAILS.append(f'tutoriel : capture prise à l\'étape {atteinte}, '
+                     f'attendu {ETAPE_ATTENDUE} — la capture ne serait pas reproductible')
     if not page.locator('.tut-rail').count():
         FAILS.append('tutoriel : le rail de chapitres est absent de la capture')
     shot(page, 'tutorial-chapter.jpg')

@@ -14,7 +14,7 @@
 > autant pour ce qui est résolu que pour ce qui reste.
 >
 > **Ouvert aujourd'hui : 7.** Corrigés, mesurés ou tranchés,
-> et conservés : 1a, 1b, 2, 3, 4, 5, 6, 8, 9, 10.
+> et conservés : 1a, 1b, 2, 3, 4, 5, 6, 8, 9, 10, 11.
 
 ---
 
@@ -429,6 +429,12 @@ survécu jusqu'à ce qu'un script la compte image par image.
 **Deux exécutions du même script donnent désormais 0 fichier différent
 sur 52.** Avant : 42.
 
+> ⚠️ **Ce « 0 » était un échantillon de taille un, et il a menti.** Deux
+> autres sources d'aléa, sans rapport avec les animations, subsistaient —
+> voir le **point n°11**. Le gel décrit ici reste juste ; il n'était pas
+> suffisant.
+
+
 Le gel des animations est passé de partiel (les seules bandes foil de
 la planche de comparaison) à complet, et il a fallu **trois** couches,
 chacune découverte par la mesure suivante :
@@ -466,7 +472,6 @@ jour où une régénération montrera 3 fichiers modifiés, ce sera parce que
 3 écrans ont changé.
 
 ---
-
 ## 9. ~~Le plancher de hauteur de tuile n'a pas été reconfirmé~~ — MESURÉ (sur le CSS de 1.59.4)
 
 > **Refait sur le CSS définitif, et le chiffre de la maquette est
@@ -555,3 +560,42 @@ Corriger demanderait de passer `.login-box` en `max-width` + largeur
 fluide, ce qui touche **tous** les écrans qui l'utilisent (choix de
 langue, installation, PIN). À traiter comme un chantier, pas comme un
 ajustement.
+
+
+---
+
+## 11. ~~Le « 0 fichier différent » du gel était vrai une fois, pas toujours~~ — CORRIGÉ
+
+**Trouvé en régénérant les captures après un autre chantier**, et c'est le
+réflexe du dépôt qui l'a attrapé : *avant d'attribuer une différence à un
+changement, vérifier que la mesure est reproductible SANS changement*.
+Six fichiers différaient ; le contrôle — deux exécutions du même code —
+en a montré **4 variables**, mais **pas les mêmes d'une fois sur l'autre**.
+Signature d'une course, pas d'un défaut de rendu.
+
+Le gel des animations (n°8) avait bien supprimé sa cause à lui. Il en
+restait deux, indépendantes, qu'aucune animation ne concernait :
+
+**1. `clip_shot()` mesurait le cadre avant de figer.** L'ordre était :
+mesurer, figer, déclencher. Or le gel mène les animations d'entrée à leur
+**fin** — il peut donc déplacer la mise en page entre la mesure et la
+capture. Le `clip` ne désignait alors plus la même région : image entière
+décalée de ~6 px. Trois `quick-add.*` sur sept en vivaient à chaque
+exécution, tirées au sort.
+
+**2. La boucle du tutoriel sortait sur une durée, pas sur un état.**
+1 600 ms par étape, sortie dès que `#tutNext` existait : selon la vitesse
+de la machine, l'étape atteinte variait, et le projecteur se retrouvait
+ailleurs — 120 952 pixels d'écart, mesurés.
+
+**Corrigé** : le cadre est relu après le gel (on passe le locator, plus le
+cadre) ; le défilement est imposé puis attendu jusqu'à stabilité ; la
+boucle attend un **changement d'état observable** (le compteur « n / of »)
+et l'étape atteinte est **vérifiée** — une capture prise ailleurs est un
+échec, pas une variante.
+
+**Vérifié par quatre exécutions consécutives, trois comparaisons, zéro
+différence.** C'est le vrai enseignement : le « 0/52 » précédent n'était
+pas un mensonge, c'était un échantillon de taille un. Un aléa qui frappe
+3 fichiers sur 52 avec une probabilité modérée passe inaperçu une fois
+sur deux.

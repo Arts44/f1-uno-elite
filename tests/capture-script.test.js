@@ -85,3 +85,56 @@ describe('scripts de capture — pas d’exec, pas de shell', () => {
       'un except qui avale sans rien dire est la même faute que le rapport muet');
   });
 });
+
+/* ══════════════════════════════════════════════════════════
+   DÉTERMINISME — la seconde couche, celle que le gel des
+   animations ne couvrait pas.
+
+   Après le gel, deux exécutions du même script donnaient 0
+   fichier différent sur 52. C'était vrai — et incomplet. Une
+   régénération ultérieure a montré 4 fichiers variables, mais
+   PAS LES MÊMES d'une fois sur l'autre : signature d'une course,
+   pas d'un défaut de rendu. Deux causes, indépendantes :
+
+   1. `clip_shot()` mesurait le cadre, PUIS figeait, PUIS
+      déclenchait. Le gel mène les animations d'entrée à leur fin :
+      il peut donc déplacer la mise en page entre la mesure et la
+      capture. Résultat, une image entière décalée de ~6 px.
+
+   2. La boucle du tutoriel attendait 1600 ms par étape et
+      sortait dès que #tutNext existait. Selon la machine, elle
+      s'arrêtait à une étape ou à une autre — 120 952 pixels
+      d'écart entre deux exécutions.
+
+   Ce que ça enseigne, et qui vaut au-delà des captures : un « 0 »
+   obtenu une fois ne prouve pas l'absence d'aléa. Il a fallu
+   quatre exécutions consécutives pour l'affirmer.
+   ══════════════════════════════════════════════════════════ */
+describe('capture_screenshots.py — déterminisme', () => {
+  test('le cadre du clip est relu APRÈS le gel, pas avant', () => {
+    const corps = py.slice(py.indexOf('def clip_shot'), py.indexOf('def check_overlaps'));
+    const iFreeze = corps.indexOf('page.evaluate(FREEZE_JS)');
+    const iBox = corps.indexOf('box = box.bounding_box()');
+    assert.ok(iBox > iFreeze && iBox !== -1,
+      'mesurer avant de figer rouvre la fenêtre de course : le gel peut déplacer la mise en page');
+  });
+
+  test('aucun appel ne mesure le cadre avant d’appeler clip_shot', () => {
+    const mauvais = [...py.matchAll(/clip_shot\(page, [a-z0-9_]+\.bounding_box\(\)/g)];
+    assert.equal(mauvais.length, 0,
+      'passer un cadre déjà mesuré rétablit exactement le défaut corrigé — passez le locator');
+  });
+
+  test('la capture du tutoriel vérifie l’étape atteinte', () => {
+    assert.match(py, /ETAPE_ATTENDUE/,
+      'sans contrôle, une capture prise à une autre étape passe pour une variante acceptable');
+    assert.match(py, /wait_for_function/,
+      'attendre une durée plutôt qu’un changement d’état, c’est parier sur la vitesse de la machine');
+  });
+
+  test('le défilement est imposé, pas subi', () => {
+    assert.match(py, /def scroll_stable/);
+    assert.match(py, /window\.__stable >= 3/,
+      'un seul relevé de scrollY ne prouve pas que le défilement est terminé');
+  });
+});
