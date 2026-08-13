@@ -76,6 +76,40 @@ describe('tutorial — state snapshot / restore (data safety)', () => {
     assert.equal(coll.P2.blue.wishlist, true);
     assert.ok(!coll.G1);                          // the tutorial's G1 wishlist is gone
   });
+
+  /* Le round-trip ci-dessus ne regarde que la collection. Celui-ci
+     regarde les clés d'APPAREIL — celles qui ne portent pas d'année et
+     que le test des familles de saison ne pouvait pas voir.
+
+     `f1uno_review` est le cas qui compte : la visite guidée ajoute des
+     cartes, débloque des badges, et pouvait donc faire apparaître
+     l'invitation à laisser un avis. Deux gardes la protègent
+     désormais — `_zoneOccupee()` refuse tant que `.tut-overlay` est à
+     l'écran, et cette clé est restaurée si quelque chose passait quand
+     même. Ce test tient le second. */
+  test('round-trip : les clés d’APPAREIL touchées par le tour reviennent aussi', () => {
+    localStorage.setItem('f1uno_review', JSON.stringify({ n: 0, t: 0, off: false }));
+    localStorage.setItem('f1uno_theme', 'dark');
+    localStorage.setItem('f1uno_font', 'sport');
+    localStorage.removeItem('f1uno_lang');        // absente exprès : doit le rester
+    const before = captureLocalStorage(tutorialKeys(2025));
+
+    // Ce que le tour peut faire : consommer une invitation, changer les
+    // préférences depuis le chapitre Réglages.
+    localStorage.setItem('f1uno_review', JSON.stringify({ n: 1, t: 999, off: false }));
+    localStorage.setItem('f1uno_theme', 'light');
+    localStorage.setItem('f1uno_font', 'system');
+    localStorage.setItem('f1uno_lang', 'es');
+
+    applyLocalStorage(before);
+
+    assert.deepEqual(JSON.parse(localStorage.getItem('f1uno_review')),
+      { n: 0, t: 0, off: false }, 'une invitation brûlée pendant le tour est irrécupérable');
+    assert.equal(localStorage.getItem('f1uno_theme'), 'dark');
+    assert.equal(localStorage.getItem('f1uno_font'), 'sport');
+    assert.equal(localStorage.getItem('f1uno_lang'), null,
+      'une clé ABSENTE avant le tour doit être retirée, pas laissée à la valeur du tour');
+  });
 });
 
 describe('tutorial — parcours en 5 chapitres (1.47.0)', () => {

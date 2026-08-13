@@ -103,6 +103,44 @@ describe('registres de clés — périmètres', () => {
         `le tutoriel ne restaurerait pas f1uno_${f}_${SEASON}`);
     });
   });
+
+  /* ⚠️ CE TEST COMBLE UN TROU QUI A DURÉ, et la façon dont il a duré
+     mérite d'être écrite : le test ci-dessus ne regarde que les
+     familles de SAISON. Or le tutoriel touche aussi des clés
+     d'APPAREIL — `f1uno_review` la première. Une clé d'appareil ajoutée
+     à tutorialKeys() n'était donc dans le périmètre d'AUCUNE assertion.
+
+     Le garde posé avec `f1uno_review` (« ne pas brûler une invitation
+     pendant une visite guidée ») n'avait par conséquent jamais été vu
+     échouer — donc jamais vérifié, seulement espéré.
+
+     Chaque entrée porte ce que le tutoriel lui fait. Une clé qu'il peut
+     écrire et qui manque ici est une donnée réelle abîmée chez un
+     utilisateur, silencieusement. */
+  const DEVICE_KEYS_TOUCHEES = [
+    ['f1uno_review',
+     'la visite guidée ajoute des cartes → débloque des badges → peut '
+     + 'déclencher l’invitation à laisser un avis. Non restaurée, elle '
+     + 'brûle une des DEUX qu’un utilisateur verra dans sa vie.'],
+    ['f1uno_theme',
+     'le chapitre Réglages fait basculer le thème'],
+    ['f1uno_lang',
+     'le chapitre Réglages fait changer de langue'],
+    ['f1uno_font',
+     'le chapitre Réglages fait changer de police'],
+    ['f1uno_changes_since_backup',
+     'toute écriture de collection incrémente le compteur de rappel ; '
+     + 'non restauré, le rappel de sauvegarde ment après un tutoriel'],
+    ['f1uno_last_backup',
+     'même famille que le compteur — les deux vont ensemble'],
+  ];
+
+  test('tutorialKeys() couvre les clés d’APPAREIL que le tutoriel touche', () => {
+    const keys = tutorialKeys(SEASON);
+    DEVICE_KEYS_TOUCHEES.forEach(([k, pourquoi]) => {
+      assert.ok(keys.includes(k), `${k} manque à tutorialKeys() — ${pourquoi}`);
+    });
+  });
 });
 
 /* ── Inventaire : aucune clé du code hors des deux catégories ──

@@ -1025,3 +1025,35 @@ n'est pas une intention : c'est tenu.
 vit le bouton, ce qu'on exporte (texte ? image ?), et si la liste
 s'échange par lien ou par fichier. Le refactor n'a pas codé la
 fonctionnalité — il a enlevé la raison de ne pas la coder.
+
+---
+
+## 16. Les débordements de bulle du tutoriel ne sont vérifiés qu'en français — trou identifié
+
+**Ce n'est pas une limite de méthode, c'est un trou.** La distinction
+compte : une limite de méthode se documente et on passe ; un trou se
+comble un jour, et tant qu'il ne l'est pas il doit rester visible.
+
+Un test unitaire vérifie déjà que **chaque étape a son titre et son
+texte dans les 7 langues**
+([`tests/tutorial.test.js`](../tests/tutorial.test.js)), et qu'ils
+**tiennent dans la bulle sur deux lignes à 375 px**. Mais cette dernière
+vérification est faite sur une **estimation de longueur**, pas sur un
+rendu : rien ne mesure la bulle réelle.
+
+Le parcours Playwright prévu au chantier de test
+([`docs/TUTORIEL-TESTS.md`](TUTORIEL-TESTS.md)) ne comblera pas ce trou
+non plus, et c'est un choix chiffré : les 7 langues × les tailles d'écran
+multiplieraient le temps d'exécution par 14, pour une suite qui doit
+rester lançable à chaque commit. **Le parcours tournera en français, à
+une taille.**
+
+**Ce qui reste donc non couvert, nommément** : un texte allemand ou
+néerlandais — les deux langues les plus longues du dépôt — qui déborde
+de la bulle, la pousse hors écran, ou recouvre le bouton « Suivant ». La
+panne serait invisible ici et bien réelle chez l'utilisateur, sur le
+**premier parcours qu'il verra de l'app**.
+
+**Parade possible, non chiffrée** : une passe de captures dédiée, hors
+suite de tests, sur les deux langues les plus longues et la plus étroite
+des tailles — à instruire séparément si ce trou se met à coûter.
