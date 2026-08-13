@@ -344,3 +344,27 @@ describe('README — les affirmations qui engagent un artefact', () => {
     });
   }
 });
+
+/* ── Le relais CLAUDE.md ────────────────────────────────────────
+   CONVENTIONS.md a quitté la racine pour docs/, ce qui lui a fait
+   perdre le chargement automatique en contexte. Le relais le rend :
+   il doit rester COURT (sinon on retrouve le pavé qu'on a déplacé)
+   et pointer un chemin qui existe (sinon il ne relaie rien). */
+describe('CLAUDE.md — relais vers docs/CONVENTIONS.md', () => {
+  const relais = lire('CLAUDE.md');
+
+  test('le fichier pointe docs/CONVENTIONS.md', () => {
+    assert.match(relais, /docs\/CONVENTIONS\.md/);
+  });
+
+  test('la cible existe', () => {
+    assert.ok(lire('docs/CONVENTIONS.md').length > 0);
+  });
+
+  test('le relais reste un relais — pas un second manuel', () => {
+    const lignes = relais.split('\n').filter(l => l.trim()).length;
+    assert.ok(lignes <= 8,
+      `${lignes} lignes : le relais recommence à porter des règles. `
+      + 'Elles vont dans docs/CONVENTIONS.md, qui fait autorité.');
+  });
+});
