@@ -73,13 +73,17 @@ end $function$;
 --     JAMAIS bloquer l'insertion. C'est la ligne qui garantit qu'un
 --     problème chez Resend ne fait pas perdre l'avis d'un utilisateur.
 --
--- ⚠️ new.app_version et new.lang entrent dans le HTML SANS échappement,
--- contrairement au message. Les contraintes CHECK les bornent à 20 et 5
--- caractères, ce qui limite la portée sans la supprimer : `<b>x</b>`
--- tient en 8 caractères. Voir le point n°13 de docs/POINTS-SIGNALES.md —
--- signalé, non corrigé ici, parce que ce fichier est un EXTRAIT et que
--- le corriger dans le dépôt sans le corriger dans la base produirait
--- exactement le mensonge que ce dossier existe pour empêcher.
+-- LES QUATRE CHAMPS QUI VIENNENT DU CLIENT SONT ÉCHAPPÉS, et il a fallu
+-- versionner ce fichier pour s'en apercevoir : `app_version` et `lang`
+-- entraient dans le HTML tels quels, contrairement au message et à
+-- l'adresse. Les CHECK les bornent à 20 et 5 caractères — de quoi
+-- exclure un script, pas du balisage : `<b>x</b>` tient en 8. Corrigé
+-- dans la base d'abord, puis re-extrait ici (point n°13).
+--
+-- Un test refuse désormais qu'un seul des quatre entre dans le corps
+-- HTML sans passer par un replace. Il ne cherche pas le mot
+-- « échappement » : il vérifie que chaque safe_* est bien construit par
+-- replace() ET qu'aucune source brute n'apparaît dans le HTML.
 CREATE OR REPLACE FUNCTION public.notify_feedback_email()
  RETURNS trigger
  LANGUAGE plpgsql
@@ -91,6 +95,8 @@ declare
   user_email text;
   safe_msg text;
   safe_mail text;
+  safe_ver text;
+  safe_lang text;
   type_label text;
 begin
   select decrypted_secret into api_key
@@ -99,11 +105,12 @@ begin
 
   select email into user_email from auth.users where id = new.user_id limit 1;
 
-  -- échappement HTML : le message (et l'e-mail) sont des saisies utilisateur
+  -- échappement HTML : tout ce qui vient du client
   safe_msg  := replace(replace(replace(new.message, '&','&amp;'), '<','&lt;'), '>','&gt;');
   safe_mail := replace(replace(replace(coalesce(user_email,'?'), '&','&amp;'), '<','&lt;'), '>','&gt;');
+  safe_ver  := replace(replace(replace(coalesce(new.app_version,'?'), '&','&amp;'), '<','&lt;'), '>','&gt;');
+  safe_lang := replace(replace(replace(coalesce(new.lang,'?'), '&','&amp;'), '<','&lt;'), '>','&gt;');
 
-  -- type lisible (mêmes libellés que dans l'app)
   type_label := case new.type
     when 'suggestion' then '💡 Suggestion'
     when 'bug'        then '🐞 Bug'
@@ -127,8 +134,8 @@ begin
         || '<table style="width:100%;font-size:13px;color:#666;border-top:1px solid #eee;padding-top:12px">'
         || '<tr><td style="padding:3px 0;font-weight:600">Type</td><td>' || type_label || '</td></tr>'
         || '<tr><td style="padding:3px 0;font-weight:600">De</td><td>' || safe_mail || '</td></tr>'
-        || '<tr><td style="padding:3px 0;font-weight:600">Version</td><td>' || coalesce(new.app_version, '?') || '</td></tr>'
-        || '<tr><td style="padding:3px 0;font-weight:600">Langue</td><td>' || coalesce(new.lang, '?') || '</td></tr>'
+        || '<tr><td style="padding:3px 0;font-weight:600">Version</td><td>' || safe_ver || '</td></tr>'
+        || '<tr><td style="padding:3px 0;font-weight:600">Langue</td><td>' || safe_lang || '</td></tr>'
         || '<tr><td style="padding:3px 0;font-weight:600">Date</td><td>' || to_char(new.created_at, 'DD/MM/YYYY HH24:MI') || '</td></tr>'
         || '<tr><td style="padding:3px 0;font-weight:600">ID</td><td style="font-family:monospace;font-size:11px">' || new.id || '</td></tr>'
         || '</table></div></div>')

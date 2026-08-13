@@ -85,6 +85,28 @@ describe('db/ — les politiques RLS restent en place', () => {
       + 'pas rejouable tel quel.');
   });
 
+  /* ── Un déclencheur sans sa fonction ────────────────────────────
+     Ce test a été écrit, puis RETIRÉ pendant deux commits, et c'est
+     volontaire : le corps des fonctions manquait, il aurait laissé la
+     suite rouge en permanence — et une suite qui échoue par conception
+     ne veut plus rien dire. Le fichier des fonctions étant arrivé
+     complet, le test revient avec lui.
+
+     Ce qu'il garde : db/ doit rester REJOUABLE. Un CREATE TRIGGER dont
+     la fonction n'est pas définie ici produirait un dossier qui a l'air
+     complet et qui échoue à la première exécution sur un projet neuf. */
+  test('chaque déclencheur a sa fonction DÉFINIE dans le même fichier', () => {
+    const f = lire('03-functions.sql');
+    const appelees = [...f.matchAll(/EXECUTE FUNCTION\s+(\w+)\s*\(/gi)].map(m => m[1]);
+    assert.equal(appelees.length, 3, 'les trois déclencheurs doivent être là');
+    const definies = [...f.matchAll(/create (?:or replace )?function\s+(?:public\.)?(\w+)/gi)]
+      .map(m => m[1]);
+    const manquantes = appelees.filter(n => !definies.includes(n));
+    assert.deepEqual(manquantes, [],
+      `déclencheur(s) sans fonction : ${manquantes.join(', ')} — le fichier n'est `
+      + 'pas rejouable tel quel sur un projet neuf.');
+  });
+
   /* ── Les trois lignes de notify_feedback_email() qui comptent ───────
      Elles ne se devinent pas à la lecture rapide, et chacune protège
      quelque chose de différent. Les perdre lors d'une modification ne
@@ -104,10 +126,54 @@ describe('db/ — les politiques RLS restent en place', () => {
       'pas de clé ne doit pas vouloir dire pas d’avis');
   });
 
-  test('le message de l’utilisateur est échappé avant d’entrer dans le HTML', () => {
-    const f = lire('03-functions.sql');
-    assert.match(f, /safe_msg\s*:=\s*replace\(replace\(replace\(new\.message/,
-      'le message part dans un corps HTML : sans échappement, un avis injecte du balisage');
+  /* ── LES QUATRE CHAMPS QUI VIENNENT DU CLIENT ───────────────────
+     Le point n°13 : `app_version` et `lang` entraient dans le corps
+     HTML sans échappement, contrairement au message et à l'adresse.
+     Les CHECK les bornent à 20 et 5 caractères — assez pour exclure un
+     script, pas pour exclure du balisage : `<b>x</b>` tient en 8.
+
+     CE TEST NE CHERCHE PAS LE MOT « ÉCHAPPEMENT ». Il vérifie deux
+     choses qui, ensemble, ne peuvent pas être satisfaites par de la
+     prose : que chaque variable safe_* est CONSTRUITE par un replace
+     sur sa source, et qu'AUCUNE source brute n'apparaît dans le corps
+     HTML. Un champ ajouté demain sans échappement échoue sur la
+     seconde même si personne ne pense à étendre la première.
+
+     Les commentaires sont retirés avant analyse — un garde satisfait
+     par la documentation qui le décrit ne garde rien (CONVENTIONS §9). */
+  // [variable sûre, source telle qu'elle s'écrit] — la source sert à la
+  // fois de littéral (messages, recherche dans le HTML) et de motif ; le
+  // point de `new.message` est échappé au moment de construire l'expression,
+  // pas dans la table, sinon il fuit dans le nom des tests.
+  const CHAMPS_CLIENT = [
+    ['safe_msg', 'new.message'],
+    ['safe_mail', 'user_email'],
+    ['safe_ver', 'new.app_version'],
+    ['safe_lang', 'new.lang'],
+  ];
+  const motif = src => src.replace(/\./g, '\\.');
+
+  const codeSql = () => lire('03-functions.sql')
+    .split('\n').filter(l => !l.trimStart().startsWith('--')).join('\n');
+
+  for(const [variable, source] of CHAMPS_CLIENT){
+    test(`${variable} est construit par un replace sur ${source}`, () => {
+      const re = new RegExp(`${variable}\\s*:=\\s*replace\\(replace\\(replace\\([^;]*${motif(source)}`);
+      assert.match(codeSql(), re,
+        `${variable} n'échappe plus sa source — le champ entre tel quel dans un corps HTML`);
+    });
+  }
+
+  test('aucune source brute n’entre dans le corps HTML', () => {
+    const code = codeSql();
+    const html = code.slice(code.indexOf("'html',"), code.lastIndexOf('</div></div>'));
+    assert.ok(html.length > 200, 'repère perdu : le corps HTML a changé de forme');
+    for(const [variable, source] of CHAMPS_CLIENT){
+      assert.ok(!new RegExp(motif(source)).test(html),
+        `${source} apparaît dans le HTML sans passer par ${variable}`);
+      assert.ok(html.includes(variable),
+        `${variable} n'est plus utilisé dans le HTML — l'échappement calculé ne sert à rien`);
+    }
   });
 
   test('le throttle refuse AVANT l’écriture, pas après', () => {

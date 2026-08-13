@@ -13,10 +13,9 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Deux points ouverts : le n°12** (échéance connue, pas un défaut) et
-> le **n°13** (échappement manquant, à corriger dans la base avant le
-> dépôt). Les autres sont corrigés, mesurés ou tranchés, et tous
-> conservés : 1a, 1b, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11.
+> **Un seul point ouvert : le n°12**, une échéance connue plutôt qu'un
+> défaut. Tous les autres sont corrigés, mesurés ou tranchés, et tous
+> conservés : 1a, 1b, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13.
 
 ---
 
@@ -710,7 +709,37 @@ en indésirables » du rapport cloud n'aura plus la même réponse.
 
 ---
 
-## 13. `app_version` et `lang` entrent dans l'e-mail de notification sans échappement
+## 13. ~~`app_version` et `lang` entrent dans l'e-mail de notification sans échappement~~ — CORRIGÉ
+
+> **Corrigé dans la base d'abord, puis re-extrait dans `db/`** — l'ordre
+> compte : corriger le fichier sans corriger le serveur aurait produit un
+> schéma versionné qui ne décrit plus rien.
+>
+> Les quatre champs qui viennent du client passent maintenant par un
+> `replace` : `safe_msg`, `safe_mail`, `safe_ver`, `safe_lang`.
+>
+> **Le garde ne cherche pas le mot « échappement ».** Il vérifie deux
+> choses qui ne peuvent pas être satisfaites par de la prose : que chaque
+> variable `safe_*` est **construite** par un `replace` sur sa source, et
+> qu'**aucune source brute** n'apparaît dans le corps HTML. Un champ
+> ajouté demain sans échappement échouera sur la seconde condition même
+> si personne ne pense à étendre la première.
+>
+> Vérifié en fabriquant les **huit** fautes possibles — pour chacun des
+> quatre champs, l'assignation privée de son `replace`, puis le HTML
+> utilisant la source brute. Les huit rougissent.
+>
+> **CE QUI COMPTE ICI N'EST PAS LE DÉFAUT, C'EST COMMENT IL A ÉTÉ VU.**
+> Il existait depuis l'écriture de la fonction. Il n'était visible nulle
+> part : le code vivait dans un dashboard, où personne ne relit. Il a été
+> trouvé à la **première relecture rendue possible par le
+> versionnement** — pas par un test, pas par un incident, pas par un
+> utilisateur. C'est l'argument du dossier `db/` en un exemple, et il est
+> arrivé le jour même de sa création.
+
+### Diagnostic d'origine
+
+
 
 **Trouvé en versionnant le SQL** — c'est-à-dire trouvé parce qu'on l'a
 versionné : le code vivait dans un dashboard, où personne ne le relit.
