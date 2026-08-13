@@ -47,13 +47,60 @@ dossier peut être public.
 > ne jamais coller sa sortie où que ce soit. Si ça arrive, la clé est à
 > considérer comme exposée et à faire tourner.
 
+## Ce qui manque encore — et pourquoi ce n'est pas versionné
+
+**`03-functions.sql` n'existe pas encore.** Les trois déclencheurs ont
+été extraits verbatim, mais le **corps** des fonctions qu'ils appellent
+ne l'a pas été : ce qui en a été transmis était un résumé du
+comportement, pas la sortie de `pg_get_functiondef`.
+
+Recoller une reconstruction fidèle à ce résumé produirait un fichier qui
+*ressemble* au schéma sans en être un — la confiance sans la
+vérification, exactement ce que ce dossier existe pour supprimer. Le
+fichier arrivera d'un bloc, complet, ou n'arrivera pas.
+
+Les trois déclencheurs, en attendant qu'ils aient leurs fonctions :
+
+```sql
+-- BEFORE INSERT OR UPDATE : la date est posée aussi à la création,
+-- sinon une ligne jamais modifiée n'en aurait pas.
+CREATE TRIGGER collections_set_updated_at
+  BEFORE INSERT OR UPDATE ON public.collections
+  FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- BEFORE INSERT : la limite doit refuser AVANT l'écriture, sinon elle
+-- compterait des lignes déjà insérées.
+CREATE TRIGGER feedback_throttle
+  BEFORE INSERT ON public.feedback
+  FOR EACH ROW EXECUTE FUNCTION feedback_throttle();
+
+-- AFTER INSERT : la notification part une fois la ligne sûre. L'ordre
+-- entre les deux n'est pas un détail — le throttle refuse d'abord.
+CREATE TRIGGER feedback_email
+  AFTER INSERT ON public.feedback
+  FOR EACH ROW EXECUTE FUNCTION notify_feedback_email();
+```
+
+La requête qui manque :
+
+```sql
+select p.proname, pg_get_functiondef(p.oid)
+from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public' order by p.proname;
+```
+
+Deux choses à ne pas perdre en recollant `notify_feedback_email()` :
+l'**échappement `& < >`** (le message d'un utilisateur entre dans un
+corps HTML) et le **`return new` du bloc `exception`** (c'est lui qui
+garantit qu'un e-mail raté ne bloque jamais l'enregistrement du retour).
+
 ## Rejouer sur un projet neuf
 
 Dans l'ordre, depuis le SQL Editor :
 
 1. `01-tables.sql` — les deux tables et leurs contraintes
 2. `02-rls.sql` — activation de RLS **et** les six politiques
-3. `03-functions.sql` — les trois fonctions et leurs déclencheurs
+3. `03-functions.sql` — les trois fonctions et leurs déclencheurs *(à venir)*
 
 Puis, hors SQL : créer le secret `resend_api_key` dans le Vault, et
 remplacer `<ADRESSE_MAINTENEUR>` dans `notify_feedback_email()`.
