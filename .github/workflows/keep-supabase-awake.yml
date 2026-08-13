@@ -1,0 +1,66 @@
+# ══════════════════════════════════════════════════════════
+#  GARDER LE PROJET SUPABASE ÉVEILLÉ
+#
+#  Un projet Supabase en formule gratuite est mis en pause après
+#  sept jours SANS AUCUNE ACTIVITÉ. Avec deux utilisateurs, c'est le
+#  risque le plus probable : la synchronisation ne tombe pas en panne
+#  par surcharge, elle tombe par calme.
+#
+#  Ce workflow appelle un endpoint public une fois par jour. C'est du
+#  bricolage assumé, et c'est pour ça qu'il vit ici plutôt que chez un
+#  service tiers de ping : quinze lignes lisibles dans le dépôt valent
+#  mieux qu'une dépendance invisible chez quelqu'un d'autre.
+#
+#  AUCUN SECRET N'EST STOCKÉ. La clé anon est publique par conception —
+#  elle est déjà dans cloud-config.js, lisible par quiconque ouvre
+#  l'app — et l'appel est en LECTURE PURE : /auth/v1/settings ne
+#  renvoie que la configuration d'authentification, la même que celle
+#  qu'un navigateur reçoit au chargement. Rien n'est écrit, aucune
+#  donnée utilisateur n'est touchée.
+#
+#  POURQUOI PAS UN APPEL À /rest/v1/… : ça marcherait aussi, mais ça
+#  interrogerait une table de données. Un réveil n'a pas à toucher aux
+#  collections des gens.
+#
+#  QUAND LE RETIRER. Le jour où le trafic réel suffit à garder le
+#  projet éveillé, ce fichier n'a plus de raison d'être — et il faudra
+#  aussi retirer le paragraphe « mise en veille » de la section
+#  « limites » des Réglages (clés s.limits_sleep_*), sinon l'app
+#  annoncera un risque qui n'existe plus.
+# ══════════════════════════════════════════════════════════
+name: Garder Supabase éveillé
+
+on:
+  schedule:
+    # 04:17 UTC : une heure creuse, et un horaire décalé plutôt que
+    # pile — GitHub retarde les crons lancés en début d'heure ronde.
+    - cron: '17 4 * * *'
+  workflow_dispatch:        # déclenchement manuel, pour vérifier
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lire la configuration d'authentification (lecture pure)
+        env:
+          URL: https://pwyfgnanvgwuznayspot.supabase.co
+          # Clé « anon public » — publique par conception, déjà présente
+          # dans cloud-config.js. Ce n'est PAS un secret, et la mettre
+          # dans les secrets du dépôt donnerait l'illusion inverse.
+          ANON: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB3eWZnbmFudmd3dXpuYXlzcG90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjMwMjYsImV4cCI6MjA5OTIzOTAyNn0.hp9gaNojDVZWuIFwVuN9QusLioa4_xrn5JpopHynHxg
+        run: |
+          code=$(curl -s -o /tmp/reponse.json -w '%{http_code}' \
+                   --max-time 30 --retry 2 --retry-delay 10 \
+                   "$URL/auth/v1/settings" -H "apikey: $ANON")
+          echo "HTTP $code"
+          # Un échec doit se VOIR : un workflow vert sur un projet en
+          # panne serait exactement le contraire du but recherché.
+          if [ "$code" != "200" ]; then
+            echo "::error::Supabase a répondu $code — le projet est peut-être en pause."
+            head -c 400 /tmp/reponse.json
+            exit 1
+          fi
+          echo "Projet éveillé."
