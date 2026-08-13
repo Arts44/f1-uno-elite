@@ -8,7 +8,7 @@
    sauvegarde) comptent autant que les écritures.
    ══════════════════════════════════════════════════════════ */
 import './_setup.js';
-import { test, describe, beforeEach, afterEach } from 'node:test';
+import { test, describe, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resetStorage } from './_setup.js';

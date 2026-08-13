@@ -14,9 +14,8 @@ import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
 import { loadData } from '../storage.js';
 import {
-  FAMILIES, familyBadges, pickNextBadge, hardestUnlockedBadge,
+  FAMILIES, pickNextBadge, hardestUnlockedBadge,
   badgeUnlockDate, groupBadgeToastLabel, setPinnedBadge, getPinnedBadge,
-  setAutoBadgeUnlocked, setManualBadges,
 } from '../badges.js';
 import { readFileSync } from 'node:fs';
 

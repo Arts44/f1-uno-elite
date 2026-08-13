@@ -12,7 +12,7 @@ import { setTypeData, txBatch } from '../storage.js';
 import {
   evaluateBadgeCondition, seedNewAutoBadges, autoBadgeUnlocked, setAutoBadgeUnlocked,
 } from '../badges.js';
-import { badgeEffort, badgeDifficulty, difficultyLabelKey, _resetDifficultyCache } from '../difficulty.js';
+import { badgeDifficulty, difficultyLabelKey, _resetDifficultyCache } from '../difficulty.js';
 
 const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
 const cardsFile = JSON.parse(readFileSync(new URL('../data/cards-2025.json', import.meta.url), 'utf8'));

@@ -7,7 +7,7 @@ import {
   gatherSettings, applySettings, backupIncludes, setBackupIncludes,
   PREF_KEYS, SECURITY_KEYS, titleStorageKey,
 } from '../settings-sync.js';
-import { collectionSnapshot, loadData, _showImportDialog } from '../storage.js';
+import { collectionSnapshot, loadData } from '../storage.js';
 
 function seedDeviceSettings(){
   localStorage.setItem('f1uno_lang', 'fr');

@@ -3,7 +3,7 @@ import { test, describe, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import {
-  FEEDBACK_MIN, FEEDBACK_MAX, FEEDBACK_TYPES, FEEDBACK_COOLDOWN_MS,
+  FEEDBACK_MAX, FEEDBACK_TYPES, FEEDBACK_COOLDOWN_MS,
   validateFeedbackMessage, buildFeedbackPayload, feedbackCooldownRemaining,
   sendFeedback, fetchMyFeedback,
 } from '../feedback.js';

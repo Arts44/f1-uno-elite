@@ -171,10 +171,52 @@ exclude_paths:
 #     Les trois détecteurs restent ARMÉS : ils doivent continuer de
 #     crier si un vrai secret est commité un jour.
 #
-#   · cloud.js:25 — « Avoid Hardcoded Passwords » sur
+#   · .github/workflows/keep-supabase-awake.yml:53 — LA MÊME clé anon,
+#     en clair dans le workflow qui réveille Supabase. Elle y déclenche
+#     les trois mêmes détecteurs. Elle est en clair DÉLIBÉRÉMENT : la
+#     ranger dans les secrets du dépôt donnerait l'illusion qu'elle en
+#     est un. La justification est écrite dans le workflow lui-même,
+#     juste au-dessus de la ligne.
+#
+#   · cloud-auth.js:34 — « Avoid Hardcoded Passwords » sur
 #     export const SESSION_KEY = 'f1uno_cloud_session';
 #     C'est le NOM d'une clé localStorage, pas un mot de passe.
 #     Le pattern reste ACTIF, pour la même raison.
+#     ⚠️ CETTE LIGNE VIVAIT EN cloud.js:25 et son marquage y était fait.
+#     Le découpage de cloud.js l'a déplacée, ce qui a ROUVERT l'issue —
+#     un marquage est attaché à un emplacement, pas à une décision.
+#     À reprendre après tout découpage qui déplace une ligne marquée.
+#
+#   · capture_seed.py:143 — « Possible hardcoded password:
+#     'demo.access.token' ». Jeton FICTIF d'une session cloud inventée,
+#     dans un script de capture qui ne tourne jamais chez un
+#     utilisateur ; sa raison d'être est écrite deux lignes au-dessus
+#     (empêcher getValidSession d'appeler le réseau pendant la capture).
+#
+#   · compare_captures.py:92 — « Detected subprocess function 'run'
+#     without a static string ». shell=False et arguments en LISTE :
+#     rien n'est interprété par un shell, et les deux éléments sont
+#     sys.executable et un chemin construit depuis ROOT. Aucune donnée
+#     externe n'entre dans la commande. Marqué NotExploitable, pas
+#     FalsePositive : la règle a raison de regarder, c'est ce cas-ci
+#     qui est sûr.
+#
+#   · db/01-tables.sql:1 et db/02-rls.sql:1 —
+#     TSQLLint_set-quoted-identifier, « Expected SET QUOTED_IDENTIFIER
+#     ON near top of file ». TSQLLint est un linter SQL SERVER ; db/
+#     est du PostgreSQL pour Supabase, où cette instruction n'existe
+#     pas — l'écrire casserait le script. Règle inapplicable par
+#     construction.
+#     CE QU'ON AURAIT PRÉFÉRÉ FAIRE, et pourquoi on ne l'a pas fait :
+#     décocher le pattern, ou désactiver TSQLLint pour ce dépôt. Les
+#     deux sont refusés par le service (« Pattern enforced by Default
+#     coding standard, can't be modified » / Conflict), comme tous les
+#     patterns du standard d'organisation. Le marquage occurrence par
+#     occurrence est donc le SEUL levier disponible : il faudra le
+#     refaire à chaque nouveau fichier .sql. C'est une dette connue,
+#     pas un choix.
+#     SQLint et SQLFluff restent ACTIFS sur db/ : c'est du SQL de
+#     sécurité (RLS), on ne le sort pas du périmètre d'analyse.
 #
 # ── C. CE QU'ON NE DÉSACTIVE JAMAIS ─────────────────────────────
 # eval, les fonctions construites depuis une chaîne, les URL

@@ -36,17 +36,27 @@ jobs:
 
       # DEUX étapes de lint, et la différence entre elles est le sujet.
       #
-      # BLOQUANTE — les symboles non déclarés. Cette classe de défaut est
-      # INVISIBLE partout ailleurs : `npm run build` passe, `npm test`
-      # passe, parce qu'esbuild en --format=iife met tout dans une portée
-      # unique où un symbole manquant reste visible. Seuls les modules
-      # bruts (index-dev.html) lèvent un ReferenceError. Le découpage de
-      # badges.js (v2) a laissé CINQ symboles derrière de cette façon, dont
-      # deux qu'aucune vérification manuelle n'a vus.
+      # BLOQUANTE — les DEUX erreurs qu'un découpage de module produit,
+      # symétriques l'une de l'autre :
       #
-      # Le dépôt étant à zéro sur cette règle, l'étape peut être rouge =
-      # échec, sans jamais l'être pour du bruit hérité.
-      - name: Symboles non déclarés (bloquant)
+      #   · symbole UTILISÉ SANS ÊTRE IMPORTÉ (noUndeclaredVariables).
+      #     Invisible partout ailleurs : `npm run build` passe, `npm test`
+      #     passe, parce qu'esbuild en --format=iife met tout dans une
+      #     portée unique où un symbole manquant reste visible. Seuls les
+      #     modules bruts (index-dev.html) lèvent un ReferenceError. Le
+      #     découpage de badges.js a laissé CINQ symboles ainsi, dont deux
+      #     qu'aucune vérification manuelle n'a vus.
+      #
+      #   · symbole IMPORTÉ SANS ÊTRE UTILISÉ (noUnusedImports). Le même
+      #     découpage en a laissé DIX-NEUF, et le premier garde ne pouvait
+      #     pas les voir — il regardait dans l'autre sens. Codacy en a
+      #     signalé onze ; Biome a trouvé les huit autres.
+      #
+      # Pourquoi noUnusedImports et pas noUnusedVariables : cette dernière
+      # compte 56 constats, dont 54 sont des `catch(e)` muets — du bruit
+      # hérité qui rendrait l'étape rouge en permanence. Les imports, eux,
+      # sont à ZÉRO : l'étape peut être bloquante sans jamais mentir.
+      - name: Symboles non déclarés et imports morts (bloquant)
         run: npm run lint
 
       # NON BLOQUANTE — tout le reste. ~99 constats hérités de ~40

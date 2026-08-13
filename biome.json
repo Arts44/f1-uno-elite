@@ -38,7 +38,8 @@
         "useOptionalChain": "off"
       },
       "correctness": {
-        "noUndeclaredVariables": "error"
+        "noUndeclaredVariables": "error",
+        "noUnusedImports": "error"
       }
     }
   }
