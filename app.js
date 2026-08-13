@@ -23,7 +23,7 @@ import {
   pinKey, pinDel, pinClear, showAdminPinScreen, showSetupScreen,
   needsLanguageChoice, showLanguageScreen,
   _bindViewerBrowseBtn, isViewerModeAllowed, isSetupDone, isPinEnabled,
-  setAuthenticated, applySavedFont
+  setAuthenticated, applySavedFont, applyLoginI18n
 } from './pin.js';
 import { maybeHandleBackupHash } from './backup.js';
 import { isTutorialSeen, markTutorialSeen } from './tutorial.js';
@@ -381,6 +381,10 @@ if(!isSetupDone()){
   initApp();
 } else {
   log('PIN enabled - login screen should be visible');
+  // initApp() ne tournera qu'après le déverrouillage, et c'est elle qui
+  // appelle applyLanguage() : sans cette ligne, l'écran de verrouillage
+  // reste dans la langue écrite en dur dans le HTML, pour tout le monde.
+  applyLoginI18n();
 }
 // else: PIN enabled — login screen already visible in HTML, user enters PIN normally
 

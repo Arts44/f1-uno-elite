@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.59.4',
+    date: '2026-08-13',
+    changes: {
+      en: ['The lock screen is now in your language. Until now it was translated only after you unlocked, so its title, its keypad labels and its Browse button stayed in English whatever you had chosen. That Browse button also gets a drawn eye in place of the last emoji left in the interface.'],
+      fr: ['L\'écran de verrouillage est enfin dans votre langue. Jusqu\'ici il n\'était traduit qu\'une fois déverrouillé : son titre, les libellés du pavé et le bouton Parcourir restaient en anglais quel que soit votre choix. Ce bouton reçoit au passage un œil dessiné à la place du dernier émoji de l\'interface.'],
+      es: ['La pantalla de bloqueo ya está en tu idioma. Hasta ahora solo se traducía tras desbloquear: su título, las etiquetas del teclado y el botón Navegar seguían en inglés eligieras lo que eligieras. Ese botón estrena además un ojo dibujado en lugar del último emoji de la interfaz.'],
+      zh: ['锁屏现在会使用你的语言。此前它只在解锁之后才被翻译：无论你选择哪种语言，标题、键盘标签和“浏览”按钮都停留在英文。该按钮同时用绘制的眼睛替换了界面里最后一个表情符号。'],
+      it: ['La schermata di blocco è finalmente nella tua lingua. Finora veniva tradotta solo dopo lo sblocco: titolo, etichette del tastierino e pulsante Sfoglia restavano in inglese qualunque fosse la scelta. Quel pulsante riceve anche un occhio disegnato al posto dell\'ultima emoji dell\'interfaccia.'],
+      nl: ['Het vergrendelscherm staat nu in jouw taal. Tot nu toe werd het pas na ontgrendelen vertaald: de titel, de labels van het toetsenblok en de knop Bladeren bleven Engels, wat je ook had gekozen. Die knop krijgt meteen een getekend oog in plaats van de laatste emoji in de interface.'],
+      de: ['Der Sperrbildschirm erscheint jetzt in Ihrer Sprache. Bisher wurde er erst nach dem Entsperren übersetzt: Titel, Tastenfeld-Beschriftungen und die Schaltfläche „Durchsuchen“ blieben englisch, unabhängig von der Wahl. Diese Schaltfläche bekommt zugleich ein gezeichnetes Auge statt des letzten Emojis der Oberfläche.'],
+    },
+  },
+  {
     version: '1.59.3',
     date: '2026-08-13',
     changes: {

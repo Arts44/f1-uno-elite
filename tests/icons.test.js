@@ -166,3 +166,37 @@ describe('teamLiveries — parité et couverture CSS', () => {
     assert.equal(new Set(gestures).size, gestures.length);
   });
 });
+
+/* ── Le dernier émoji d'interface ───────────────────────────────
+   `👁 Parcourir` a survécu à la passe de 1.31.0 qui a remplacé tous
+   les émojis par des SVG. Il portait deux fautes à la fois, et la
+   seconde explique pourquoi personne ne l'a vu : le bouton avait
+   `data-i18n="login.browse"`, or applyLanguage() écrit dans
+   textContent — l'émoji était donc effacé au premier rendu, et ne
+   restait visible qu'en français, par accident.
+
+   D'où la forme retenue : l'icône est un enfant du bouton, et le
+   libellé vit dans un <span data-i18n>. Toute régression qui
+   remettrait data-i18n sur le bouton effacerait l'icône en silence
+   — ce test est là pour que ce silence fasse du bruit. */
+describe('écran de verrouillage — le bouton Parcourir', () => {
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const dev = readFileSync(new URL('../index-dev.html', import.meta.url), 'utf8');
+
+  for (const [nom, src] of [['index.html', html], ['index-dev.html', dev]]) {
+    const ligne = src.split('\n').find(l => l.includes('viewerBrowseBtn'));
+
+    test(`${nom} — aucun émoji dans le bouton`, () => {
+      assert.ok(ligne, 'bouton introuvable');
+      assert.ok(!/\p{Extended_Pictographic}/u.test(ligne), `${nom} : émoji résiduel`);
+    });
+
+    test(`${nom} — le libellé est traduit SANS effacer l’icône`, () => {
+      assert.match(ligne, /<svg class="ic"/, `${nom} : l’icône a disparu`);
+      assert.ok(!/id="viewerBrowseBtn"[^>]*data-i18n=/.test(ligne),
+        `${nom} : data-i18n est revenu sur le bouton — textContent effacera l’icône`);
+      assert.match(ligne, /<span data-i18n="login\.browse">/,
+        `${nom} : le libellé n’est plus traduit`);
+    });
+  }
+});

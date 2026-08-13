@@ -13,8 +13,8 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Ouverts aujourd'hui : 1b, 4, 5, 6, 7, 9.** Corrigés et conservés :
-> 1a, 2, 3, 8, 10.
+> **Ouverts aujourd'hui : 1b, 5, 6, 7, 9.** Corrigés et conservés :
+> 1a, 2, 3, 4, 8, 10.
 
 ---
 
@@ -190,7 +190,31 @@ inatteignables tant que le fichier est incomplet, ce qui est honnête.
 
 ---
 
-## 4. Un émoji oublié par la passe de 1.31.0
+## 4. ~~Un émoji oublié par la passe de 1.31.0~~ — CORRIGÉ (1.59.4)
+
+> **Le diagnostic ci-dessous était faux sur son point le plus précis, et
+> la mesure l'a montré.** Il affirmait que l'émoji « n'apparaît qu'en
+> français, par accident », parce que `data-i18n` l'écrasait au premier
+> `applyLanguage()`. Vérification au navigateur : `applyLanguage()`
+> **n'est jamais appelée** quand un PIN est actif — elle vit dans
+> `initApp()`, qui ne tourne qu'après le déverrouillage.
+>
+> Conséquence réelle, plus large que le point signalé : **tout l'écran
+> de verrouillage restait dans la langue écrite en dur**. En chinois
+> comme en français, `document.documentElement.lang` valait `en` et le
+> titre affichait « PIN Code ». L'émoji, lui, était visible partout —
+> pas seulement en français.
+>
+> Corrigé aux deux niveaux : `applyLoginI18n()` traduit l'écran visible
+> au démarrage (sans toucher aux rendus de données, qui ne sont pas
+> chargées à ce moment), et le bouton porte `icon('eye')` avec son
+> libellé dans un `<span data-i18n>` — l'icône ne peut plus être effacée
+> par une écriture dans `textContent`.
+>
+> **Ce que ça enseigne** : le point disait vrai sur le symptôme et faux
+> sur la cause, et la cause fausse était la plus rassurante des deux
+> (« un cas limite en français » plutôt que « tout le monde, tout le
+> temps »). Le diagnostic d'origine est conservé tel quel ci-dessous.
 
 `index.html` (et `index-dev.html`) : le bouton du mode spectateur porte
 encore `👁 Parcourir` en dur.

@@ -178,4 +178,40 @@ describe('pavé PIN — touche « tout effacer » et marche arrière', () => {
     assert.match(css, /\.pin-keypad\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/,
       'sans minmax(0,…), un libellé large déforme les colonnes (mesuré : 70/70/86)');
   });
+
+  /* ── L'écran de verrouillage parle enfin la bonne langue ──
+     Encore un défaut trouvé au NAVIGATEUR, pas ici, et qui contredisait
+     le diagnostic écrit : on croyait que seul l'émoji du bouton
+     Parcourir ne survivait pas à la traduction. Mesure faite, c'était
+     pire — quand un PIN est actif, le démarrage n'appelle jamais
+     applyLanguage() (elle vit dans initApp(), qui ne tourne qu'après le
+     déverrouillage). L'écran entier restait dans la langue du HTML :
+     `document.documentElement.lang` valait « en » en chinois comme en
+     français, et le titre affichait « PIN Code ».
+
+     Ce qu'on ne peut PAS faire : appeler applyLanguage() au démarrage.
+     Elle re-rend collection, stats et badges, dont les données ne sont
+     pas chargées à ce moment. D'où une fonction qui ne traduit que
+     l'écran visible. */
+  test('l’écran de verrouillage est traduit AVANT le déverrouillage', () => {
+    const app = read('app.js');
+    const pin = read('pin.js');
+    assert.match(pin, /export function applyLoginI18n\(\)/,
+      'la traduction ciblée de l’écran de verrouillage a disparu');
+    assert.match(pin, /document\.documentElement\.lang = getLang\(\)/,
+      'sans lang, un lecteur d’écran annonce l’écran dans la mauvaise langue');
+    const branche = app.slice(app.indexOf('PIN enabled - login screen should be visible'));
+    assert.match(branche.slice(0, 400), /applyLoginI18n\(\)/,
+      'la branche « PIN actif » du démarrage ne traduit plus l’écran');
+  });
+
+  test('applyLoginI18n ne déclenche AUCUN re-rendu de données', () => {
+    const pin = read('pin.js');
+    const corps = pin.slice(pin.indexOf('export function applyLoginI18n'));
+    const fin = corps.indexOf('\n}');
+    for (const interdit of ['renderCollection', 'updateStats', 'renderBadges', 'applyLanguage(']) {
+      assert.ok(!corps.slice(0, fin).includes(interdit),
+        `applyLoginI18n appelle ${interdit} — les données ne sont pas chargées à ce stade`);
+    }
+  });
 });

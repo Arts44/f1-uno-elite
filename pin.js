@@ -479,6 +479,31 @@ export function lockApp() {
 }
 
 /* ══════════════════════════════════════════════════════════
+   TRADUCTION DE L'ÉCRAN DE VERROUILLAGE
+
+   MESURÉ, et contraire à ce qu'on croyait : quand un PIN est actif,
+   le démarrage ne fait RIEN — applyLanguage() n'est appelée que dans
+   initApp(), qui ne tourne qu'après le déverrouillage. L'écran de
+   verrouillage restait donc dans la langue écrite en dur dans le
+   HTML, pour tout le monde. Vérifié au navigateur : en chinois comme
+   en français, `document.documentElement.lang` valait « en » et le
+   titre affichait « PIN Code ».
+
+   On ne peut pas appeler applyLanguage() ici : elle re-rend la
+   collection, les stats et les badges, dont les données ne sont pas
+   encore chargées. On traduit donc le seul écran visible — la même
+   opération que lockApp() fait déjà sur la boîte restaurée.
+   ══════════════════════════════════════════════════════════ */
+export function applyLoginI18n(){
+  const ls = document.getElementById('login-screen');
+  if(!ls) return;
+  document.documentElement.lang = getLang();
+  ls.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  ls.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.getAttribute('data-i18n-aria'))); });
+  ls.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-placeholder')); });
+}
+
+/* ══════════════════════════════════════════════════════════
    VIEWER BROWSE BUTTON BINDING
    ══════════════════════════════════════════════════════════ */
 export function _bindViewerBrowseBtn(){
