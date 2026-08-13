@@ -81,6 +81,101 @@ quelque chose.
 
 ---
 
+## Le chantier 3 a été MESURÉ avant d'être fait — et refusé sur mesure
+
+Le plan ci-dessus désignait `data.js → render.js, stats.js` comme « la
+racine de l'enchevêtrement ». **Simulée sur le graphe avant d'écrire une
+ligne, la coupe ne donne rien** :
+
+| coupe simulée | nœuds | arêtes | part du dépôt | modules libérés |
+|---|---|---|---|---|
+| — (état actuel) | 27 | 128 | 63 % | — |
+| `data.js → render, stats` | **27** | **126** | **63 %** | **aucun** |
+
+Deux arêtes sur 128, zéro module libéré. La raison tient en une ligne :
+sans l'arête directe, la boucle repasse par `data.js → i18n.js →
+render.js`.
+
+**C'est `i18n.js` le vrai carrefour**, pas `data.js` : importé par 20
+modules, il en importe cinq — `render`, `badges`, `stats`, `pin`,
+`badge-titles` — pour tout redessiner au changement de langue
+(`applyLanguage()`). Un module qui a l'air d'une feuille de chaînes et
+qui rappelle toute l'interface.
+
+### Sur `i18n.js`, le gain est réel — mais indivisible
+
+| coupe simulée | nœuds | arêtes | part | libérés |
+|---|---|---|---|---|
+| 1, 2, 3 ou 4 des 5 sortantes | **27** | 127→124 | 63 % | **aucun** |
+| **les 5 ensemble** | **23** | **95** | **53 %** | `i18n`, `install`, `pagehead`, `update` |
+
+**Aucun sous-ensemble ne paie.** Tant qu'une seule des cinq subsiste,
+`i18n.js` reste dans la composante et n'entraîne personne. C'est
+tout ou rien : 33 arêtes et 4 modules, ou zéro.
+
+### L'arête la plus rentable du dépôt, et elle n'était dans aucun plan
+
+```
+render.js → account.js     27 → 24 nœuds,  128 → 109 arêtes
+                           libère account.js, cloud-sync.js, cloud-ui.js
+```
+
+**Aucune autre arête, coupée seule, ne fait mieux que −1 nœud.**
+`account.js` n'est importé que par `render.js` — et le réimporte. Cette
+paire à elle seule tient trois modules cloud dans l'enchevêtrement.
+
+Cumulée avec les cinq d'`i18n.js` : **27 → 20 nœuds, 128 → 79 arêtes,
+63 % → 47 %, 16 → 23 feuilles.**
+
+### La revue d'architecture, conservée pour le jour où le chantier reprend
+
+Trois façons de sortir les appels d'interface d'un module de données
+(`switchSeason()` servait de cas d'école) :
+
+**(a) Le descripteur retourné** — la fonction renvoie son résultat,
+l'appelant redessine. Le plus simple à lire et à tester. **Coût réel** :
+les trois appelants recopient la même séquence de redessin, et au critère
+du dépôt (« changeraient-ils toujours ensemble ? ») la réponse est *oui*
+— c'est de la duplication qu'on refuse ailleurs.
+
+**(b) L'émetteur d'événements** — le seul qui inverse vraiment la
+dépendance. **Coût réel** : il faut un bus que le dépôt n'a pas, et on
+perd l'ordre garanti *et la promesse*. Or la promesse existe pour une
+raison écrite dans le code : l'import de sauvegarde doit l'attendre,
+sinon il écrit la collection de l'ancienne saison sous la clé de la
+nouvelle. Un événement ne s'attend pas. Et le carrefour changerait
+seulement de nom : tout le monde importerait le bus.
+
+**(c) Les callbacks injectés au démarrage** — `app.js` câble, le module
+de données appelle ce qu'on lui a donné. **Coût réel** : un état
+d'initialisation de plus, donc une panne silencieuse si l'ordre dérape —
+à couvrir par un défaut explicite, pas par un `if`.
+
+> **Recommandation : (c)**, et sans enthousiasme. C'est la seule qui
+> retire les imports **sans** sacrifier l'ordre et la promesse qui
+> protègent déjà d'un bug connu. Mais sur `data.js` elle rapporte 2
+> arêtes sur 128 : correcte sur le principe, invisible en pratique.
+
+### Décision
+
+**Ni `data.js`, ni `i18n.js` pour l'instant.** Le gain sur `i18n.js` est
+réel (−33 arêtes, −10 points de part piégée) mais il coûte la réécriture
+d'`applyLanguage()`, qui touche les sept langues et cinq surfaces de
+rendu — pour une propriété que l'utilisateur ne voit pas. L'app a des
+besoins plus proches d'elle.
+
+**Ce qui est acté, en revanche** : si le chantier reprend un jour, il
+commence par `render.js → account.js` — meilleur rapport mesuré du dépôt,
+une seule arête, trois modules libérés — puis les cinq d'`i18n.js`
+ensemble, jamais par sous-ensembles.
+
+> **La leçon de méthode, et c'est la vraie valeur de ce passage** : la
+> coupe a été *simulée sur le graphe* avant d'écrire du code. Deux heures
+> de refactor pour zéro module libéré ont été évitées par cinq minutes de
+> mesure. `repo_map.py`, à la racine, existe pour ça.
+
+---
+
 ## La mesure qui a tranché
 
 Codacy signale 13 des 30 fichiers sources au-dessus du seuil de complexité,
