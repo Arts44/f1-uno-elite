@@ -148,13 +148,41 @@ export async function cloudDeleteSeason(season = null){
   const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?user_id=eq.${userId}${filtre}`, {
     method: 'DELETE',
     cache: 'no-store',
-    headers: authHeaders(cfg, session.access_token),
+    headers: {
+      ...authHeaders(cfg, session.access_token),
+      // Sans cet en-tête, PostgREST répond 204 QUE la clause ait touché une
+      // ligne ou zéro : la réponse ne distingue pas « supprimé » de « il n'y
+      // avait rien ». Avec lui, il renvoie les lignes supprimées — donc leur
+      // nombre. C'est le même en-tête que pushSeason() utilise déjà.
+      'Prefer': 'return=representation',
+    },
   });
   if(!resp.ok){
     await logFailure('cloud: delete failed', resp);
     throw new Error('delete-failed');
   }
-  return true;
+  return await _lignesSupprimees(resp);
+}
+
+/* Combien de lignes ont réellement disparu.
+
+   TROIS RÉSULTATS, PAS DEUX. `0` et `null` ne disent pas la même chose :
+   `0` est une certitude (le serveur a répondu, la liste était vide, il n'y
+   avait rien à supprimer) ; `null` est une ignorance (le serveur n'a pas
+   renvoyé les lignes — en-tête ignoré, corps vide, JSON illisible). La
+   suppression a réussi dans les deux cas, sinon on aurait déjà lancé.
+
+   Renvoyer `true` pour tout, c'était appeler « supprimé » ce qui pouvait
+   n'avoir jamais existé. Renvoyer `false` en cas d'ignorance serait pire :
+   ce serait affirmer un échec qui n'a pas eu lieu. */
+async function _lignesSupprimees(resp){
+  if(resp.status === 204) return null;          // le serveur a ignoré Prefer
+  try {
+    const rows = await resp.json();
+    return Array.isArray(rows) ? rows.length : null;
+  } catch(e){
+    return null;                                 // corps vide ou illisible
+  }
 }
 
 // Lightweight metadata read for the "last cloud backup" line.

@@ -13,8 +13,8 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Ouverts aujourd'hui : 1b, 5, 6, 7.** Corrigés, mesurés ou tranchés,
-> et conservés : 1a, 2, 3, 4, 8, 9, 10.
+> **Ouverts aujourd'hui : 1b, 5, 7.** Corrigés, mesurés ou tranchés,
+> et conservés : 1a, 2, 3, 4, 6, 8, 9, 10.
 
 ---
 
@@ -268,7 +268,34 @@ ajout discret au coin d'un autre commit.
 
 ---
 
-## 6. `cloudDeleteSeason()` renvoie `true` même quand rien n'a été supprimé
+## 6. ~~`cloudDeleteSeason()` renvoie `true` même quand rien n'a été supprimé~~ — CORRIGÉ
+
+> **`Prefer: return=representation`**, le même en-tête que `pushSeason()`
+> utilise déjà : PostgREST renvoie alors les lignes supprimées, donc leur
+> nombre. La fonction renvoie ce nombre.
+>
+> **Trois résultats, pas deux** — et c'est là que se joue l'honnêteté :
+>
+> | Retour | Signification |
+> |---|---|
+> | `2` | deux lignes ont réellement disparu |
+> | `0` | **certitude** : il n'y avait rien à supprimer |
+> | `null` | **ignorance** : le serveur n'a pas renvoyé les lignes (204, corps vide, JSON illisible) |
+>
+> `null` n'est pas `false`. Un échec aurait déjà levé `delete-failed` avant
+> d'arriver là ; renvoyer `false` sur une ignorance affirmerait un échec
+> qui n'a pas eu lieu — la faute symétrique de celle qu'on corrige.
+>
+> **Un test de caractérisation a été modifié volontairement.** Il figeait
+> le `true` constant. Ce n'était pas une observation neutre à préserver :
+> c'était la photographie d'une valeur qui ne portait aucune information.
+> Les quatre nouveaux tests échouent tous sur l'ancien code.
+>
+> **Ce qui reste ouvert, et qui appartient à l'utilisateur** : la zone
+> danger affiche toujours « Copie dans le nuage supprimée » même quand
+> zéro ligne est partie. L'information existe désormais ; l'afficher
+> demande une clé i18n ×7 (« il n'y avait rien à supprimer »), donc son
+> propre passage — c'est précisément le scénario que ce point annonçait.
 
 `cloud-sync.js → cloudDeleteSeason(season)` renvoie `true` dès que la
 réponse HTTP est `ok`. PostgREST répond `204` **que la clause ait touché

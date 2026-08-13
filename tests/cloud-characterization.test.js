@@ -639,13 +639,64 @@ describe('G · lien magique et actions de compte', () => {
       'une session périmée compte encore comme « connecté » ici — les actions revérifient');
   });
 
+  /* CONTRAT MODIFIÉ VOLONTAIREMENT (point n°6). Ce test caractérisait un
+     `true` constant. Ce n'était pas une observation neutre : c'était la
+     photographie d'une valeur qui ne portait aucune information, puisque
+     PostgREST répond 204 que la clause ait touché une ligne ou zéro.
+     La caractérisation suit le changement de contrat — le reste du test
+     (cible du DELETE, absence de filtre saison) est inchangé. */
   test('suppression cloud : DELETE ciblé sur l’utilisateur, pas sur la saison', async () => {
     saveSession(SESSION());
     route('/rest/v1/collections?user_id=eq.', resp(204, ''));
-    assert.equal(await cloud.cloudDeleteAll(), true);
+    assert.equal(await cloud.cloudDeleteAll(), null,
+      '204 sans corps : la suppression a réussi, le nombre reste inconnu');
     const del = calls.find(c => c.method === 'DELETE');
     assert.match(del.url, /user_id=eq\.u1/);
     assert.equal(/season=/.test(del.url), false, 'toutes les saisons partent d’un coup');
+  });
+
+  /* ── Le retour aveugle du point n°6 ────────────────────────────
+     `cloudDeleteSeason()` renvoyait `true` dès que la réponse HTTP était
+     ok. PostgREST répond 204 QUE la clause ait touché une ligne ou zéro :
+     la valeur ne distinguait pas « supprimé » de « il n'y avait rien ».
+     Sans conséquence tant que personne ne la lit — et c'est exactement le
+     genre de valeur qu'on branche un jour sur un message de confirmation.
+
+     Trois résultats désormais, et la nuance porte : un nombre (certitude),
+     `0` (certitude qu'il n'y avait rien), `null` (le serveur n'a pas dit). */
+  test('suppression : le nombre de lignes réellement supprimées', async () => {
+    saveSession(SESSION());
+    route('/rest/v1/collections?user_id=eq.', resp(200, [{ season: 2025 }, { season: 2026 }]));
+    assert.equal(await cloud.cloudDeleteAll(), 2);
+    const del = calls.find(c => c.method === 'DELETE');
+    assert.match(del.opts.headers.Prefer, /return=representation/,
+      'sans cet en-tête, le serveur ne renvoie jamais les lignes supprimées');
+  });
+
+  test('suppression d’une saison absente : 0, et surtout pas « supprimé »', async () => {
+    saveSession(SESSION());
+    route('/rest/v1/collections?user_id=eq.', resp(200, []));
+    assert.equal(await cloud.cloudDeleteSeason(2031), 0,
+      'la ligne n’existait pas — le dire est le tout l’objet du correctif');
+  });
+
+  test('serveur qui ignore Prefer : null, pas false', async () => {
+    saveSession(SESSION());
+    route('/rest/v1/collections?user_id=eq.', resp(204, ''));
+    const r = await cloud.cloudDeleteSeason(2025);
+    assert.equal(r, null);
+    assert.notEqual(r, false,
+      'ignorer n’est pas échouer : un échec aurait déjà levé delete-failed');
+  });
+
+  test('corps illisible : null, sans lever', async () => {
+    saveSession(SESSION());
+    route('/rest/v1/collections?user_id=eq.', {
+      ok: true, status: 200,
+      json: async () => { throw new SyntaxError('Unexpected end of JSON input'); },
+      text: async () => '',
+    });
+    assert.equal(await cloud.cloudDeleteSeason(2025), null);
   });
 
   test('suppression refusée : code typé, session conservée', async () => {
