@@ -102,7 +102,7 @@ Een complete **F1 UNO Élite**-ruilkaartencollectie bijhouden — 101 kaarten vo
 | Crypto | Native **Web Crypto** — SHA-256 (pincode), PBKDF2 + AES-GCM (optionele versleuteling in rust) |
 | QR-codes | Gevendorde single-file-encoder ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Lettertypen | Zelf gehoste WOFF2 (SIL OFL) — geen Google Fonts-verzoek, 5 thema's naar keuze |
-| Tests | **Ingebouwde testrunner van Node** (`node --test`) — 854 tests, geen testframework |
+| Tests | **Ingebouwde testrunner van Node** (`node --test`) — 862 tests, geen testframework |
 | CI | GitHub Actions — tests + build + versheidscontrole van de gecommitte bundle bij elke push/PR |
 
 **Nul runtime-afhankelijkheden is een ontwerpregel, geen toeval.** Alles wat een framework of SDK normaal levert — rendering, navigatie tussen weergaven, i18n, offline caching, auth via REST, versleuteling, QR-generatie — is rechtstreeks op de webplatform-API's gebouwd. De app die je installeert is exact de code in deze repository. Sindsdien: `cloud.js` (726 regels) is achter 61 nooit gewijzigde karakteriseringstests in vier modules gesplitst, wat `pushSeason(s)` / `listCloudSeasons()` ontgrendelde — geverifieerd tegen de echte Supabase-database; en twee XSS-gaten zijn bij de bron gedicht, in `tEsc()` en bij de data-invoerpunten.
@@ -180,13 +180,13 @@ Honderden hardgecodeerde spatiëringswaarden migreren naar tokens, met „het zi
 
 ### Een browserapp testen zonder browser
 De belofte van nul afhankelijkheden sluit Jest, Vitest en headless-browsertuigages uit.
-**Oplossing:** de logica is zo gefactoriseerd dat ze browservrij is en wordt gedekt door **854 tests op de ingebouwde runner van Node** — geen testafhankelijkheden, geen echt netwerk. De CI herbouwt bovendien de bundle en faalt als het gecommitte artefact verouderd is.
+**Oplossing:** de logica is zo gefactoriseerd dat ze browservrij is en wordt gedekt door **862 tests op de ingebouwde runner van Node** — geen testafhankelijkheden, geen echt netwerk. De CI herbouwt bovendien de bundle en faalt als het gecommitte artefact verouderd is.
 
 ---
 
 ### Wat de tests dekken — en wat niet
 
-854 tests op Node's ingebouwde runner, zonder framework. Precies zijn over de grens telt zwaarder dan het aantal:
+862 tests op Node's ingebouwde runner, zonder framework. Precies zijn over de grens telt zwaarder dan het aantal:
 
 - **Gedekt:** opslagmigraties en het sleutelschema per seizoen; de zeldzaamheidsladder van zeven niveaus inclusief promotie door een complete set; alle badgevoorwaarden en het moeilijkheidsmodel; de verzamelaarslijsten (ontbrekend, dubbel, ruil); de codeerrondes van back-upcodes; de cloudhulpjes tegen een nagebootste `fetch`, faalpaden inbegrepen; gelijkheid van i18n-sleutels over de 7 talen en detectie van dubbele sleutels; de precache van de service worker tegen de echte importgraaf; de markupcontracten van toetsenbordtoegang; de herkomst van elke van buitenaf gevoede `innerHTML`; contrast met de hand gecontroleerd in beide thema's.
 - **Niet gedekt:** het echte renderen (geen DOM-asserties voorbij markupstrings), het gedrag van de service worker tijdens uitvoering, echte netwerkoproepen, IndexedDB, installatieprompts, en alles wat een browserengine vereist — die worden met de hand en door de deterministische screenshotronde geverifieerd, niet door de suite. Het hierboven genoemde percentage meet alleen deze browservrije snede — lees het als zodanig, niet als een maat voor de app.
@@ -205,7 +205,7 @@ npm install     # installeert esbuild, de enige devDependency
 npm run build   # app.js → app.bundle.js (geminificeerd + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 854 tests, node --test, zonder framework
+npm test        # 862 tests, node --test, zonder framework
 ```
 
 **Deployment.** De repository deployt as-is naar GitHub Pages: elke URL is relatief, dus de app draait identiek op een domeinroot, onder een subpad en op localhost. Releaseroutine: een changelog-vermelding toevoegen (dat *is* de versiebump) → `SW_VERSION` ophogen → builden → pushen.
@@ -224,7 +224,7 @@ npm test        # 854 tests, node --test, zonder framework
 
 ## 🔩 Engineering-notities
 
-Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); typografische ondergrens van 11 px geverifieerd over 5 lettertypethema's × 2 kleurthema's × 320/375/desktop (één uitzondering, de « ÉLITE » in het woordmerk op 8 px, dat is branding); layoutverschuiving gemeten, en nu werkelijk nul: de tegelhoogte ligt VAST (voorheen 13 verschillende hoogtes, van 246,69 tot 292,69 px), het skelet leest dezelfde CSS-variabele en sluit dus exact aan — tegen +19,4 % meer scrollen, de prijs van overal het slechtste geval reserveren; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon, eenmalige meting, niet herhaald in CI); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo, de drie geanimeerde demo's gescript en reproduceerbaar; 854 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
+Nul runtime-afhankelijkheden (alleen esbuild, bij het bouwen); typografische ondergrens van 11 px geverifieerd over 5 lettertypethema's × 2 kleurthema's × 320/375/desktop (één uitzondering, de « ÉLITE » in het woordmerk op 8 px, dat is branding); layoutverschuiving gemeten, en nu werkelijk nul: de tegelhoogte ligt VAST (voorheen 13 verschillende hoogtes, van 246,69 tot 292,69 px), het skelet leest dezelfde CSS-variabele en sluit dus exact aan — tegen +19,4 % meer scrollen, de prijs van overal het slechtste geval reserveren; snel toevoegen geprofileerd en geoptimaliseerd (~300 ms → ~45 ms op een middenklasse-telefoon, eenmalige meting, niet herhaald in CI); optionele lokale versleuteling gekoppeld aan de pincode (PBKDF2 + AES-GCM); kijkersmodus vergrendeld in de logica, niet in CSS; schermafbeeldingen geregenereerd door een determinstisch script in de repo, de drie geanimeerde demo's gescript en reproduceerbaar; 862 tests in vanilla JS met Node's ingebouwde runner. Volledige details in de [Engelse README](README.md).
 
 ---
 

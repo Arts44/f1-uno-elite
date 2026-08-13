@@ -335,6 +335,45 @@ export function observeFoils(){
 /* Construit LA tuile d'une carte — extrait de renderGrid pour que
    l'ajout rapide puisse remplacer une seule tuile au lieu de
    reconstruire les 101 (le +1 coûtait ~300 ms en classe mobile). */
+/* ══════════════════════════════════════════════════════════
+   LE NOM DE LA TUILE — pourquoi il porte TOUT
+
+   MESURÉ AU NAVIGATEUR (CDP, Accessibility.getPartialAXTree), et
+   contraire à la correction qu'on avait prescrite : la tuile est un
+   `role="button"` avec un `aria-label`. Or le nom accessible d'un
+   bouton REMPLACE son contenu — l'écurie, l'année, la rareté, les
+   exemplaires et jusqu'à l'`aria-label` du sceau « set complet » ne
+   sont **jamais annoncés**. Relevé avant correction :
+
+     Stoffel Vandoorne — #070      (réserve)
+     James Vowles — #076           (directeur)
+
+   Deux catégories, deux visuels identiques (le monogramme d'écurie),
+   et deux noms qui ne les distinguent pas. Poser `role="img"` +
+   `aria-label` sur les marqueurs de coin n'y aurait rien changé :
+   l'étiquette aurait été avalée comme celle du sceau l'est déjà.
+
+   Le marqueur reste donc décoratif (`aria-hidden`) — ce qu'il est —
+   et l'information passe par le seul endroit qui est lu.
+
+   ORDRE : ce qui identifie d'abord (numéro, nom), puis ce qui
+   qualifie (catégorie, écurie), puis l'état de collection. Sur une
+   grille de 101 tuiles parcourues à la voix, chaque mot coûte ; on
+   ne dit donc l'année que si elle n'est pas celle de la saison
+   affichée, et le champion ou le set complet que s'ils sont vrais.
+   ══════════════════════════════════════════════════════════ */
+export function cardAriaLabel(card, { isOwned, isSet } = {}){
+  const parts = [`${card.name} — #${card.id}`];
+  const cat = t('cat.' + card.category);
+  if(cat && cat !== 'cat.' + card.category) parts.push(cat);
+  if(card.team) parts.push(card.team);
+  parts.push(t(isOwned ? 'a11y.owned' : 'a11y.missing'));
+  if(isSet) parts.push(t('a11y.set'));
+  if(card.champion) parts.push(t('a11y.champion'));
+  if(card.retired) parts.push(t('m.retired'));
+  return parts.join(', ');
+}
+
 function buildCardEl(card){
     const isOwned=cardOwned(card.id);
     const isWish=cardWishlist(card.id);
@@ -372,7 +411,7 @@ function buildCardEl(card){
     // bouton de plein droit : focusable, nommé, activable Entrée/Espace.
     el.setAttribute('role', 'button');
     el.setAttribute('tabindex', '0');
-    el.setAttribute('aria-label', `${card.name} — #${card.id}`);
+    el.setAttribute('aria-label', cardAriaLabel(card, { isOwned, isSet }));
     const openThis = e => {
       if(e.target.closest('.schip') || e.target.closest('.qbtn') || e.target.closest('.qadd-pop')) return;
       openModal(card.id);
@@ -427,7 +466,12 @@ function buildCardEl(card){
         ${card.champion?`<span class="crown" aria-hidden="true">${icon('crown')}</span>`:''}
         ${card.category==='reserve'?`<span class="replacement-icon" aria-hidden="true">${icon('swap')}</span>`:''}
         ${card.category==='directeur'?`<span class="director-icon" aria-hidden="true">${icon('headset')}</span>`:''}
-        ${isSet?`<span class="set-flag" role="img" aria-label="${t('set.complete')}" title="${t('set.complete')}">${icon('seal')}</span>`:''}
+        ${/* Le sceau garde son `title` — l'infobulle sert la souris — mais
+              perd `role="img"`/`aria-label` : à l'intérieur d'un bouton
+              nommé, cette étiquette n'était JAMAIS annoncée. Elle donnait
+              l'apparence d'une accessibilité qui n'existait pas. Le set
+              complet est désormais dit par le nom de la tuile. */''}
+        ${isSet?`<span class="set-flag" aria-hidden="true" title="${t('set.complete')}">${icon('seal')}</span>`:''}
         ${card.category==='gp' && circuitSVG(card.id,'card') ? circuitSVG(card.id,'card') : card.category==='pilote' && driverNumberHTML(card) ? driverNumberHTML(card) : (card.category==='directeur' || card.category==='reserve') && teamLogoHTML(card.team) ? teamLogoHTML(card.team) : `<span class="card-cat-ic">${catIcon(card.category)}</span>`}
         <button class="qbtn" type="button" data-action="quickAdd" data-card="${card.id}" aria-label="${t('quick.add')}" title="${t('quick.add')}">+</button>
       </div>

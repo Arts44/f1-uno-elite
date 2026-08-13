@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.59.5',
+    date: '2026-08-13',
+    changes: {
+      en: ['Screen readers now hear what a card actually is. A tile used to announce only its name and number — so a reserve driver and a team principal, which share the same team-monogram artwork, were indistinguishable without sight. Each tile now says its category, its team, whether you own it, and whether the set is complete.'],
+      fr: ['Les lecteurs d\'écran disent enfin ce qu\'est une carte. Une tuile n\'annonçait que son nom et son numéro — un pilote de réserve et un directeur, qui partagent le même monogramme d\'écurie, étaient donc impossibles à distinguer sans la vue. Chaque tuile dit maintenant sa catégorie, son écurie, si tu la possèdes et si le set est complet.'],
+      es: ['Los lectores de pantalla ya dicen qué es cada carta. Una ficha solo anunciaba su nombre y su número, así que un piloto reserva y un jefe de equipo — que comparten el mismo monograma — eran indistinguibles sin la vista. Ahora cada ficha dice su categoría, su escudería, si la posees y si la serie está completa.'],
+      zh: ['屏幕阅读器现在会说明一张卡究竟是什么。此前卡片只报出姓名和编号——替补车手与领队共用同一个车队字母图案，因此在看不见的情况下无法区分。现在每张卡片都会说明其类别、车队、你是否拥有，以及整套是否收齐。'],
+      it: ['I lettori di schermo dicono finalmente che cos\'è una carta. Una tessera annunciava solo nome e numero: un pilota di riserva e un team principal, che condividono lo stesso monogramma, erano indistinguibili senza la vista. Ora ogni tessera dice categoria, scuderia, se la possiedi e se il set è completo.'],
+      nl: ['Schermlezers vertellen nu wat een kaart is. Een tegel noemde alleen naam en nummer — een reserverijder en een teambaas, die hetzelfde teammonogram delen, waren zonder zicht niet te onderscheiden. Elke tegel noemt nu categorie, team, of je hem bezit en of de set compleet is.'],
+      de: ['Screenreader sagen jetzt, was eine Karte ist. Eine Kachel nannte nur Name und Nummer — ein Ersatzfahrer und ein Teamchef, die dasselbe Team-Monogramm tragen, waren ohne Sicht nicht zu unterscheiden. Jede Kachel nennt nun Kategorie, Team, ob du sie besitzt und ob das Set komplett ist.'],
+    },
+  },
+  {
     version: '1.59.4',
     date: '2026-08-13',
     changes: {

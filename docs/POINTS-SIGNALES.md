@@ -13,8 +13,8 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Ouverts aujourd'hui : 5, 7.** Corrigés, mesurés ou tranchés,
-> et conservés : 1a, 1b, 2, 3, 4, 6, 8, 9, 10.
+> **Ouvert aujourd'hui : 7.** Corrigés, mesurés ou tranchés,
+> et conservés : 1a, 1b, 2, 3, 4, 5, 6, 8, 9, 10.
 
 ---
 
@@ -254,7 +254,53 @@ pas emporté avec lui.
 
 ---
 
-## 5. Les marqueurs de coin sont muets pour un lecteur d'écran
+## 5. ~~Les marqueurs de coin sont muets pour un lecteur d'écran~~ — CORRIGÉ (1.59.5)
+
+> **Le correctif prescrit ici n'aurait rien corrigé, et la mesure l'a
+> montré avant qu'une ligne soit écrite.** Le point demandait deux clés
+> i18n et `role="img"` + `aria-label` sur les marqueurs, « sur le modèle
+> du sceau ». Or la tuile est un `role="button"` porteur d'un
+> `aria-label` : le nom accessible d'un bouton **remplace** son contenu.
+> L'étiquette des marqueurs aurait été avalée — exactement comme
+> **celle du sceau l'était déjà**, ce que le point citait pourtant en
+> exemple à suivre.
+>
+> Relevé au navigateur (CDP, `Accessibility.getPartialAXTree`), avant :
+>
+> ```
+> Stoffel Vandoorne — #070      (réserve)
+> James Vowles — #076           (directeur)
+> ```
+>
+> Après :
+>
+> ```
+> Stoffel Vandoorne — #070, Pilote de réserve, Aston Martin…, possédée
+> James Vowles — #076, Directeur, Atlassian Williams Racing, possédée
+> Fernando Alonso — #004, Pilote, Aston Martin…, possédée, set complet,
+>   champion du monde
+> ```
+>
+> **L'information passe par le seul endroit qui est lu** : le nom de la
+> tuile, composé par `cardAriaLabel()`. Les marqueurs restent
+> `aria-hidden` — ils sont décoratifs, et le dire est honnête. Le sceau
+> de la tuile perd son `aria-label` inerte et garde son `title`, utile à
+> la souris.
+>
+> **Quatre clés ×7, pas deux** : `cat.*` existait déjà et dit la
+> catégorie mieux qu'une clé neuve (même vocabulaire que le reste de
+> l'app) ; les quatre ajoutées disent l'état de collection, qu'aucune
+> clé ne portait sans glyphe — `a11y.owned`, `a11y.missing`, `a11y.set`,
+> `a11y.champion`.
+>
+> **Ce que la mesure a appris en plus** : la catégorie d'une carte
+> n'apparaît **nulle part** en texte, ni sur la tuile ni dans la fiche —
+> seulement dans les agrégats de Stats. Un utilisateur voyant la déduit
+> du visuel ; sans la vue, elle n'existait pas du tout.
+
+### Diagnostic d'origine
+
+
 
 `render.js` pose trois marqueurs sur `.card-visual`. Deux sont
 `aria-hidden="true"` :
