@@ -156,6 +156,21 @@ def compteur(page):
     return el.inner_text().strip() if el.count() else ''
 
 
+def attendre(page, condition, timeout_ms):
+    """True si la condition arrive à temps, False sinon.
+
+    L'appelant DÉCIDE de ce qu'un False veut dire — un timeout n'est pas
+    toujours un échec (un toast qui traîne se contourne, une étape qui ne
+    progresse pas se diagnostique). Un try/except/pass inline dirait
+    « on s'en moque » ; ce helper dit « on a regardé, et voilà quoi ».
+    """
+    try:
+        page.wait_for_function(condition, timeout=timeout_ms)
+        return True
+    except Exception:
+        return False
+
+
 # Fragment stable du message « cible absente » (tut.missing, fr). S'il
 # apparaît dans une bulle, une cible du parcours a DISPARU — c'est LA
 # panne qu'un refactor d'interface produit et qu'aucun test unitaire ne
@@ -235,11 +250,10 @@ def parcourir(page):
             # célébration retombe ; le script fait pareil. (Le fond du
             # problème — le projecteur désigne une cible momentanément
             # recouverte — est au n°17 de POINTS-SIGNALES.)
-            try:
-                page.wait_for_function(
-                    '() => !document.querySelector(".toast.show")', timeout=8000)
-            except Exception:
-                pass
+            # Un toast qui traîne au-delà de 8 s n'est pas bloquant :
+            # on tente le geste quand même, et si le clic tombe sur le
+            # toast, l'assertion de progression le dira en face.
+            attendre(page, '() => !document.querySelector(".toast.show")', 8000)
             sp = page.locator('.tut-spot').bounding_box()
             if sp:
                 page.mouse.click(sp['x'] + sp['width'] / 2, sp['y'] + sp['height'] / 2)
