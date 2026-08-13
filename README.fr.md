@@ -34,7 +34,7 @@ C'est une **PWA** : installez-la depuis votre navigateur et elle fonctionne comm
 |---|---|---|---|
 | ![Démo ajout rapide](screenshots/demo-quick-add.gif) | ![Démo navigation](screenshots/demo-nav.gif) | ![Démo badges](screenshots/demo-badges.gif) | ![Seasons demo](screenshots/demo-seasons.gif) |
 
-Chaque démo est produite par `capture_demos.py`, à partir du même seed déterministe que les captures fixes — plus aucun enregistrement à la main. Les GIF tournent à 33,3 images/s, le pas régulier le plus rapide que le format autorise ; la version 60 images/s est à côté : [ajout rapide](screenshots/demo-quick-add.mp4) · [navigation](screenshots/demo-nav.mp4) · [badges](screenshots/demo-badges.mp4) · [saisons](screenshots/demo-seasons.mp4).
+Chaque démo est produite par `capture_demos.py`, à partir du même seed déterministe que les captures fixes (le seed l'est ; les pixels non — les animations non figées tombent sur une image légèrement différente d'une exécution à l'autre, SSIM 0,999988) — plus aucun enregistrement à la main. Les GIF tournent à 33,3 images/s, le pas régulier le plus rapide que le format autorise ; la version 60 images/s est à côté : [ajout rapide](screenshots/demo-quick-add.mp4) · [navigation](screenshots/demo-nav.mp4) · [badges](screenshots/demo-badges.mp4) · [saisons](screenshots/demo-seasons.mp4).
 
 
 ### Nouveautés 1.29 — la passe v2

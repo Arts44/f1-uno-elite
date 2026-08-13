@@ -249,7 +249,56 @@ survécu jusqu'à ce qu'un script la compte image par image.
 
 ---
 
-## 8. Le plancher de hauteur de tuile n'a pas été reconfirmé
+## 8. Les captures sont reproductibles à l'œil, pas à l'octet
+
+Le seed est déterministe — c'est prouvé : l'ancien et le nouveau
+mécanisme produisent un `init_script` identique au caractère près.
+**Les images, elles, ne le sont pas.**
+
+Deux exécutions du MÊME script, sans rien changer entre les deux :
+
+```
+42 des 52 fichiers diffèrent
+```
+
+Ce n'est pas une instabilité de rendu. Comparaison de deux
+générations du même écran :
+
+| Mesure | Valeur |
+|---|---|
+| SSIM | **0,999988** |
+| Écart de taille | 17 octets sur 145 003 (**0,01 %**) |
+
+Les images sont **visuellement identiques**. Ce qui bouge, ce sont les
+pixels des animations non figées — balayages foil, lueur Éternel,
+barres de progression — saisis à une phase légèrement différente.
+`FOIL_FREEZE_JS` fige déjà les bandes foil de la planche de comparaison ;
+rien ne fige les autres.
+
+**Conséquence pratique, et c'est la vraie gêne** : toute régénération
+produit **~40 fichiers binaires modifiés dans git**, que quoi que ce soit
+ait changé ou non. Un diff de captures ne dit donc rien — impossible de
+distinguer « le rendu a évolué » de « le script a retourné ».
+
+C'est ce qui a failli me faire conclure qu'un refactor du seed avait
+changé le rendu : 41 fichiers différaient entre l'ancien et le nouveau
+script. Le contrôle — deux exécutions du même script — a montré 42. Le
+refactor n'y était pour rien.
+
+**Deux issues possibles**, aucune urgente :
+- figer toutes les animations avant capture (étendre `FOIL_FREEZE_JS` à
+  `document.getAnimations()` en entier), ce qui rendrait le gel
+  reproductible à l'octet et le diff git enfin lisible ;
+- ou l'assumer, et ne comparer les captures qu'à l'œil.
+
+⚠️ **Le README dit « deterministic in-repo script ».** C'est vrai du
+*seed* et du contrôle d'honnêteté, pas des octets produits. Formulation
+nuancée depuis (« deterministic seed »), parce que la nuance est
+exactement ce que ce fichier existe pour tenir.
+
+---
+
+## 9. Le plancher de hauteur de tuile n'a pas été reconfirmé
 
 `--card-h` vaut 320. Le **plancher** — la plus petite valeur qui ne
 comprime aucun bloc — a été mesuré à **300** sur la MAQUETTE (feuille de
@@ -266,7 +315,7 @@ chiffre de départ est à remesurer, pas à reprendre ici.
 
 ---
 
-## 9. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
+## 10. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
 
 Passée en `width:min(380px, 100vw - 24px)` avec un remplissage
 `clamp(20px, 6vw, 48px)`. Mesuré après : à 320 px la boîte fait 287 et

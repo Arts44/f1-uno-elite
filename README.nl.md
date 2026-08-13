@@ -34,7 +34,7 @@ Het is een **PWA**: installeer haar vanuit je browser en ze draait als een nativ
 |---|---|---|---|
 | ![Demo snel toevoegen](screenshots/demo-quick-add.gif) | ![Demo navigatie](screenshots/demo-nav.gif) | ![Demo badges](screenshots/demo-badges.gif) | ![Seasons demo](screenshots/demo-seasons.gif) |
 
-Elke demo komt uit `capture_demos.py`, met dezelfde deterministische seed als de stilstaande beelden. De GIF's draaien op 33,3 fps; de 60 fps-versie staat ernaast: [snel toevoegen](screenshots/demo-quick-add.mp4) · [navigatie](screenshots/demo-nav.mp4) · [badges](screenshots/demo-badges.mp4) · [seizoenen](screenshots/demo-seasons.mp4).
+Elke demo komt uit `capture_demos.py`, met dezelfde deterministische seed als de stilstaande beelden (de seed wel; de pixels niet — SSIM 0,999988 tussen twee runs). De GIF's draaien op 33,3 fps; de 60 fps-versie staat ernaast: [snel toevoegen](screenshots/demo-quick-add.mp4) · [navigatie](screenshots/demo-nav.mp4) · [badges](screenshots/demo-badges.mp4) · [seizoenen](screenshots/demo-seasons.mp4).
 
 
 ### Nieuw in 1.29 — de v2-ronde

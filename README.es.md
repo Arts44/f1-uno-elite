@@ -34,7 +34,7 @@ Es una **PWA**: instálala desde tu navegador y funciona como una app nativa, to
 |---|---|---|---|
 | ![Demo añadido rápido](screenshots/demo-quick-add.gif) | ![Demo navegación](screenshots/demo-nav.gif) | ![Demo insignias](screenshots/demo-badges.gif) | ![Seasons demo](screenshots/demo-seasons.gif) |
 
-Cada demo la genera `capture_demos.py` con el mismo seed determinista que las capturas fijas. Los GIF van a 33,3 fps; la versión a 60 fps está al lado: [añadido rápido](screenshots/demo-quick-add.mp4) · [navegación](screenshots/demo-nav.mp4) · [insignias](screenshots/demo-badges.mp4) · [temporadas](screenshots/demo-seasons.mp4).
+Cada demo la genera `capture_demos.py` con el mismo seed determinista que las capturas fijas (el seed lo es; los píxeles no — SSIM 0,999988 entre dos ejecuciones). Los GIF van a 33,3 fps; la versión a 60 fps está al lado: [añadido rápido](screenshots/demo-quick-add.mp4) · [navegación](screenshots/demo-nav.mp4) · [insignias](screenshots/demo-badges.mp4) · [temporadas](screenshots/demo-seasons.mp4).
 
 
 ### Novedades 1.29 — la pasada v2
