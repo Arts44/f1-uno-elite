@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.59.2',
+    date: '2026-08-13',
+    changes: {
+      en: ['The README now reports the real Codacy figures, re-measured on the published commit: grade A, 6 % duplication, 69 % coverage, 44 % of files above the complexity threshold, and 11 open issues — eight of them in the capture scripts, not in the app.'],
+      fr: ['Le README rapporte désormais les vrais chiffres Codacy, remesurés sur le commit publié : note A, 6 % de duplication, 69 % de couverture, 44 % des fichiers au-dessus du seuil de complexité, et 11 issues ouvertes — dont huit dans les scripts de capture, pas dans l\'application.'],
+      es: ['El README ya recoge las cifras reales de Codacy, medidas de nuevo sobre el commit publicado: nota A, 6 % de duplicación, 69 % de cobertura, 44 % de archivos por encima del umbral de complejidad y 11 issues abiertas — ocho de ellas en los scripts de captura.'],
+      zh: ['README 现在给出重新测量的真实 Codacy 数据（基于已发布的提交）：评级 A、重复率 6 %、覆盖率 69 %、44 % 的文件超过复杂度阈值，以及 11 个未处理问题——其中八个位于截图脚本中，而非应用本身。'],
+      it: ['Il README riporta ora i dati Codacy reali, rimisurati sul commit pubblicato: voto A, 6 % di duplicazione, 69 % di copertura, 44 % dei file sopra la soglia di complessità e 11 issue aperte — otto delle quali negli script di cattura.'],
+      nl: ['De README geeft nu de echte Codacy-cijfers, opnieuw gemeten op de gepubliceerde commit: cijfer A, 6 % duplicatie, 69 % dekking, 44 % van de bestanden boven de complexiteitsdrempel en 11 open issues — acht daarvan in de opnamescripts.'],
+      de: ['Die README nennt jetzt die echten Codacy-Zahlen, neu gemessen am veröffentlichten Commit: Note A, 6 % Duplikation, 69 % Abdeckung, 44 % der Dateien über der Komplexitätsschwelle und 11 offene Issues — acht davon in den Aufnahmeskripten.'],
+    },
+  },
+  {
     version: '1.59.1',
     date: '2026-08-13',
     changes: {

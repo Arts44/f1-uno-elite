@@ -207,7 +207,49 @@ distinction.
 
 ---
 
-## 7. Le plancher de hauteur de tuile n'a pas été reconfirmé
+## 7. La grille se reconstruit entièrement au retour sur Collection — et l'animation le paie
+
+**Mesuré, reproductible, et ce n'est pas un artefact de capture.**
+
+En scriptant les démos animées (`capture_demos.py`), le glissement de
+280 ms de la pastille de navigation est échantillonné à chaque
+exécution. Relevé selon la vue d'arrivée :
+
+| Transition vers | Images sur 280 ms | Cadence |
+|---|---|---|
+| Compte | 17 | **61 fps** |
+| Stats | 16 | 57 fps |
+| Badges | 11 | 39 fps |
+| **Collection** | **5 à 8** | **~25 fps** |
+
+La capture n'est pas en cause : elle tient 60 à 75 fps sur les trois
+autres vues, dans la même exécution, avec le même code. Ce qui change
+est la **reconstruction des 101 tuiles**, qui occupe le fil principal
+pendant que la pastille glisse. L'utilisateur voit donc une animation
+qui décroche **à chaque retour sur la grille** — c'est-à-dire au geste
+le plus fréquent de l'app.
+
+**Même signature que le défaut d'ajout rapide déjà corrigé** (~300 ms →
+~45 ms, profilé au CDP) : un re-rendu complet là où un rendu ciblé
+suffirait. Là, c'était une coche qui reconstruisait 101 tuiles ; ici,
+c'est un changement de vue. La correction avait consisté à écrire par
+lots et à ne toucher que les tuiles concernées — la même piste vaut
+probablement ici (réutiliser le DOM existant plutôt que réécrire
+`innerHTML`, ou différer la reconstruction après la transition).
+
+**Priorité : basse, mais c'est le seul défaut de performance identifié
+depuis ce profilage.** Rien n'est cassé ; une animation à 25 fps se
+remarque sans se dénoncer, ce qui est précisément pourquoi elle a
+survécu jusqu'à ce qu'un script la compte image par image.
+
+> La démo de navigation évite désormais ce retour — non pour cacher le
+> défaut, mais parce qu'une démo doit montrer l'animation, pas la
+> concurrence entre deux travaux. Le garde-fou du script, lui, continue
+> de mesurer et d'échouer sous 30 fps.
+
+---
+
+## 8. Le plancher de hauteur de tuile n'a pas été reconfirmé
 
 `--card-h` vaut 320. Le **plancher** — la plus petite valeur qui ne
 comprime aucun bloc — a été mesuré à **300** sur la MAQUETTE (feuille de
@@ -224,7 +266,7 @@ chiffre de départ est à remesurer, pas à reprendre ici.
 
 ---
 
-## 8. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
+## 9. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
 
 Passée en `width:min(380px, 100vw - 24px)` avec un remplissage
 `clamp(20px, 6vw, 48px)`. Mesuré après : à 320 px la boîte fait 287 et
