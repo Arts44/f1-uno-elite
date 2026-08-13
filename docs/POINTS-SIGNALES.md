@@ -13,8 +13,8 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Ouverts aujourd'hui : 1b, 5, 6, 7, 9.** Corrigés et conservés :
-> 1a, 2, 3, 4, 8, 10.
+> **Ouverts aujourd'hui : 1b, 5, 6, 7.** Corrigés, mesurés ou tranchés,
+> et conservés : 1a, 2, 3, 4, 8, 9, 10.
 
 ---
 
@@ -378,20 +378,48 @@ jour où une régénération montrera 3 fichiers modifiés, ce sera parce que
 
 ---
 
-## 9. Le plancher de hauteur de tuile n'a pas été reconfirmé
+## 9. ~~Le plancher de hauteur de tuile n'a pas été reconfirmé~~ — MESURÉ (sur le CSS de 1.59.4)
 
-`--card-h` vaut 320. Le **plancher** — la plus petite valeur qui ne
-comprime aucun bloc — a été mesuré à **300** sur la MAQUETTE (feuille de
-style injectée), pas sur le CSS définitif.
-
-Sur le code final, toutes les valeurs testées ont renvoyé la même
-hauteur de grille (17 052 px), signe que les surcharges de `--card-h`
-n'étaient pas reprises par le rendu. Le plancher n'a donc pas pu être
-re-dérivé.
-
-**Sans conséquence connue** : la marge choisie (320) couvre largement le
-300 mesuré. Mais si quelqu'un veut un jour resserrer la hauteur, le
-chiffre de départ est à remesurer, pas à reprendre ici.
+> **Refait sur le CSS définitif, et le chiffre de la maquette est
+> réfuté.** La mesure d'origine avait échoué faute de méthode : on
+> surchargeait `--card-h` et on lisait la hauteur de la GRILLE, qui ne
+> bouge pas — les rangées s'alignent sur une hauteur fixe, c'est tout
+> l'objet du chantier. On mesurait donc l'invariant qu'on venait de
+> poser.
+>
+> **La bonne mesure ne surcharge rien** : on relâche la contrainte tuile
+> par tuile (`height:auto`), on lit la hauteur NATURELLE du contenu, on
+> remet. Le plancher est le maximum sur les 101 tuiles.
+>
+> | Largeur | Plancher mesuré | `--card-h` = 320 |
+> |---|---|---|
+> | 1280 px | **281,89** | 38 px de marge |
+> | 375 px | **314,48** | **5,5 px de marge** |
+> | 320 px | **347,08** | **27 px de trop peu** |
+>
+> Trois conclusions, dont deux n'étaient pas attendues :
+>
+> **1. Le 300 de la maquette était optimiste de 15 px.** Le vrai
+> plancher à 375 est 315, pas 300. La marge réelle n'est pas « large » :
+> elle est de 5,5 px. Un nom d'écurie plus long en 2026 la mange.
+>
+> **2. À 320 px, la hauteur fixe comprime réellement du contenu.**
+> Mesuré sur la pire tuile (Fernando Alonso — nom long, drapeau, écurie
+> en trois lignes, trois variantes possédées) : `.card-name` passe de 31
+> à 23 px et `.card-owned-summary` de 33 à 24. Rien ne déborde de la
+> tuile, rien ne disparaît, mais les blocs sont tassés.
+>
+> **3. Le geste correcteur a un prix qui n'est pas à moi.** Passer
+> `--card-h` à 348 supprime la compression à 320 px, au prix de **+8,75 %
+> de défilement pour tout le monde**, y compris sur les écrans où 320
+> suffit largement. L'alternative — un `--card-h` par palier de largeur —
+> réintroduit la variabilité de hauteur que le chantier d'origine avait
+> justement supprimée, mais entre paliers, pas à l'intérieur d'une
+> rangée. **Arbitrage laissé ouvert** : les deux options coûtent quelque
+> chose de réel, et aucune ne corrige un défaut visible à l'usage.
+>
+> Ce qui est acquis : le chiffre existe, il est reproductible, et la
+> méthode qui le produit est écrite ci-dessus. C'était la demande.
 
 ---
 

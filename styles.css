@@ -509,8 +509,18 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 
    --card-h est la hauteur de CONTENU (box-sizing content-box) :
    320 déclaré rend ~332 avec bordures et remplissage.
-   320 et non le plancher mesuré de 300 : les noms de 2026 sont
-   inconnus, et refaire ce chantier coûte plus cher que la marge.
+
+   LE PLANCHER, REMESURÉ SUR CE CSS (août 2026) — la valeur de 300 venait
+   d'une maquette et était optimiste de 15 px. En relâchant la contrainte
+   tuile par tuile (height:auto) et en lisant la hauteur naturelle, le
+   maximum sur 101 tuiles vaut 281,89 à 1280 px, 314,48 à 375, et 347,08
+   à 320. Donc : 5,5 px de marge à 375, et une compression réelle à
+   320 px (nom et résumé des exemplaires tassés de 8 à 9 px).
+
+   On garde 320 quand même. Monter à 348 coûterait +8,75 % de défilement
+   à tout le monde pour un tassement que personne n'a signalé, et un
+   --card-h par palier réintroduirait la variabilité de hauteur que ce
+   bloc existe pour supprimer. Détail et arbitrage : docs/POINTS-SIGNALES.md n°9.
    ══════════════════════════════════════════════════════════ */
 :root{--card-h:320px;}
 .card{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);transition:var(--ease);cursor:pointer;position:relative;border:1.5px solid var(--border);display:flex;flex-direction:column;height:var(--card-h);}
