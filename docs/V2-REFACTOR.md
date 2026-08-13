@@ -176,6 +176,83 @@ ensemble, jamais par sous-ensembles.
 
 ---
 
+## `storage.js` : simulé aussi, et **refusé** — il aggrave le graphe
+
+Même méthode, appliquée avant d'écrire une ligne. Découpe simulée en
+trois : `collection-store.js` (état, migration, `txBatch`),
+`card-predicates.js` (`cardOwned`…`cardSetComplete`), `transfer.js`
+(instantané, export, dialogue d'import).
+
+| | modules | nœuds | arêtes | part | feuilles |
+|---|---|---|---|---|---|
+| Avant | 43 | 27 | 128 | 63 % | 16 |
+| **Après la découpe en 3** | 45 | **29** | **149** | **64 %** | **16** |
+| Variante « sans `updateStats` » | 45 | 29 | 148 | 64 % | 16 |
+| Variante `transfer.js` découplé au maximum | 45 | 29 | **144** | 64 % | 16 |
+
+**Les trois morceaux extraits atterrissent DANS la composante**, et pas
+une feuille de plus. C'est exactement le piège des pas 1-2 de `badges.js`
+(22 → 24 avant correction) — **sauf qu'ici il n'est pas corrigeable de la
+même façon.** À l'époque, la cause tenait à une seule donnée qu'on a pu
+isoler dans `season.js`, quinze lignes sans dépendance. Ici la cause est
+la nature même du module : l'état de la collection, le catalogue et la
+vue se tiennent mutuellement, et aucun des trois n'est extractible.
+
+**La variante la plus optimiste reste pire que l'existant** : 144 arêtes
+contre 128. Découper `storage.js` ne redistribue pas les dépendances, il
+les *duplique* — chaque importateur qui prenait une arête vers
+`storage.js` en prend maintenant deux ou trois.
+
+### Même la rareté, seule pièce que ce plan justifiait, ne paie pas
+
+| | modules | nœuds | arêtes | `card-rarity.js` |
+|---|---|---|---|---|
+| `card-rarity.js` extrait tel quel | 44 | 28 | 137 | **dedans** |
+| `card-rarity.js` **pur** (état injecté) | 44 | 28 | 137 | **dedans** |
+
+Même privée de l'état de la collection, la rareté doit connaître le
+catalogue — donc `data.js`, donc la composante. Sept modules gagnent une
+arête, personne ne sort.
+
+### La raison hors-graphe : il n'y en a pas
+
+C'est le critère qui a tranché les deux chantiers précédents, et il est
+décisif ici :
+
+| module | ce que le découpage débloquait |
+|---|---|
+| `cloud.js` | le multi-saisons |
+| `badges.js` | l'export de liste d'échange |
+| **`storage.js`** | **rien** |
+
+Ce document lui-même ne lui donnait qu'un argument, et il ne survit pas à
+la mesure : *« sortir la rareté est un découpage évident et sans
+risque »*. Évident, oui ; **sans effet**, aussi.
+
+Pas de famille de bug non plus. Les deux défauts réels passés par
+`storage.js` — l'import inter-saisons et la XSS du dialogue d'import —
+sont des défauts d'**échappement et d'ordre d'appel**, déjà corrigés et
+désormais tenus par `tEsc`/`setSafeHTML`, par le lint des symboles non
+déclarés et par leurs tests. Aucun n'aurait été évité par un découpage,
+et aucun ne peut revenir par la structure.
+
+### Décision
+
+**Chantier 3 refusé, et pas reporté.** Contrairement à `i18n.js`, où le
+gain existait mais coûtait trop cher, ici **il n'y a pas de gain** : la
+mesure est négative sur les trois compteurs, et il n'y a aucune feature
+ni aucun bug derrière. Le seul argument restant serait la métrique de
+complexité — et ce document a maintenant établi **trois fois** qu'elle ne
+suffit pas à elle seule.
+
+Ce qui reste vrai et qu'on garde en note : `storage.js` fait 409 lignes
+et mélange quatre responsabilités. Si un jour une feature a besoin de
+l'une d'elles sans les autres — c'est ce qui a rendu `badges.js`
+découpable — la découpe se fera à ce moment-là, guidée par ce besoin
+plutôt que par le compteur.
+
+---
+
 ## La mesure qui a tranché
 
 Codacy signale 13 des 30 fichiers sources au-dessus du seuil de complexité,
@@ -337,7 +414,10 @@ qu'en 1.47.0.
 
 1. `cloud.js` — il bloque le multi-saisons, qui est la v2 elle-même.
 2. `badges.js` — il bloque l'export de liste d'échange.
-3. `storage.js` — sortir la rareté est un découpage évident et sans risque.
+3. ~~`storage.js` — sortir la rareté est un découpage évident et sans
+   risque.~~ **REFUSÉ après simulation** : 27 → 29 nœuds, 128 → 149
+   arêtes, zéro feuille gagnée, et aucune feature derrière. Voir
+   « `storage.js` : simulé aussi, et refusé » plus haut.
 4. `tutorial.js` — le moins urgent : il fonctionne et personne n'y touche.
 
 ## Garde-fou
