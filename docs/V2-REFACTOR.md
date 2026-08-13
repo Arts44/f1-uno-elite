@@ -253,6 +253,88 @@ plutôt que par le compteur.
 
 ---
 
+## `tutorial.js` : simulé — et le vrai sujet n'est pas le découpage
+
+Quatrième et dernier module du backlog. Même méthode, pour que les quatre
+soient clos avec la même rigueur.
+
+Découpe simulée : `tutorial-data.js` (28 étapes, 5 chapitres),
+`tutorial-snapshot.js` (instantané / restauration localStorage),
+`tutorial.js` (moteur de positionnement).
+
+| | modules | nœuds | arêtes | part | feuilles |
+|---|---|---|---|---|---|
+| Avant | 43 | 27 | 125 | 63 % | 16 |
+| Découpe en 3, telle quelle | 45 | **29** | **130** | 64 % | 16 |
+| **Seule la partie pure extraite** | 44 | **27** | **125** | 61 % | **17** |
+
+**Contrairement à `storage.js`, quelque chose est extractible.** La partie
+« sûreté des données » — `isTutorialSeen`, `markTutorialSeen`,
+`tutorialKeys`, `captureLocalStorage`, `applyLocalStorage`, ~75 lignes —
+ne dépend de **rien** : `tutorialKeys()` est une liste en dur, pas un
+appel à `SEASON_KEY_RE`. Elle sortirait en **feuille**.
+
+**Mais la découpe en trois, elle, aggrave** : 27 → 29 nœuds, 125 → 130
+arêtes. `TUTORIAL_STEPS` n'est pas de la donnée — chaque étape porte des
+fermetures `ensure`/`target` qui appellent `switchView()`, `closeMo()` et
+les sélecteurs du moteur. Les « données » du tutoriel sont du
+comportement ; les séparer du moteur crée une arête au lieu d'en retirer.
+
+> ⚠️ **Et le « 61 % » ne vaut rien.** La composante reste à **27 nœuds** ;
+> la part baisse seulement parce que le dénominateur passe de 43 à 44.
+> C'est exactement l'artefact contre lequel ce document met en garde
+> depuis la première mesure. Le gain réel de l'extraction pure tient en
+> un chiffre : **+1 feuille, 0 arête**.
+
+### La raison hors-graphe : elle existe, et ce n'est pas le découpage
+
+Le tableau qui a tranché les trois autres :
+
+| module | ce que le découpage débloquait |
+|---|---|
+| `cloud.js` | le multi-saisons |
+| `badges.js` | l'export de liste d'échange |
+| `storage.js` | rien |
+| **`tutorial.js`** | **rien — mais voir ci-dessous** |
+
+Pas de feature bloquée, pas de famille de bug. En revanche la mesure
+d'audit tient toujours, et elle est sévère :
+
+```
+tutorial.js   44,91 % de lignes   ·   11,27 % de FONCTIONS
+              non couvert : 84-746  (tout le moteur)
+```
+
+**11,27 %, la pire couverture de fonctions du dépôt** — confirmée, pas
+citée de mémoire. Et le détail dit où : les lignes 1 à 83 sont couvertes,
+tout le reste ne l'est pas. **Ce qui est testé, c'est exactement la
+partie qu'on extrairait.**
+
+Conséquence à écrire avant de s'en réjouir : extraire
+`tutorial-snapshot.js` ne **crée aucun test**. Ça déplace les 20 tests
+existants vers un module de 75 lignes qui affichera ~100 %, et laisse un
+`tutorial.js` de 670 lignes à ~0 %. Le nombre deviendrait **honnête** au
+lieu d'être dilué — ce n'est pas rien, mais ce n'est pas un progrès de
+sûreté.
+
+### Décision
+
+**Découpe refusée. Le sujet réel est la couverture du moteur.**
+
+Le moteur est de la géométrie et du DOM : halo, bulle, pastille
+directionnelle, attente de cible, défilement. Le tester demande un DOM,
+pas un découpage — et c'est un chantier de **test**, à instruire pour
+lui-même, avec son propre chiffrage. Il n'appartient pas à ce plan.
+
+**Ce qui reste acté si ce chantier de test s'ouvre un jour** : commencer
+par extraire `tutorial-snapshot.js`. Pas pour le graphe (+1 feuille,
+0 arête), mais parce que `app.js` importe aujourd'hui 746 lignes et neuf
+dépendances pour deux getters `localStorage`, et parce qu'un moteur
+mesuré à 0 % se laisse instrumenter plus franchement qu'un module dont
+la moyenne est adoucie par la seule partie déjà sûre.
+
+---
+
 ## La mesure qui a tranché
 
 Codacy signale 13 des 30 fichiers sources au-dessus du seuil de complexité,
@@ -418,7 +500,13 @@ qu'en 1.47.0.
    risque.~~ **REFUSÉ après simulation** : 27 → 29 nœuds, 128 → 149
    arêtes, zéro feuille gagnée, et aucune feature derrière. Voir
    « `storage.js` : simulé aussi, et refusé » plus haut.
-4. `tutorial.js` — le moins urgent : il fonctionne et personne n'y touche.
+4. ~~`tutorial.js` — le moins urgent : il fonctionne et personne n'y
+   touche.~~ **REFUSÉ après simulation** : découpe en trois → 27 → 29
+   nœuds, 125 → 130 arêtes ; extraction de la seule partie pure → +1
+   feuille, 0 arête. Aucune feature derrière. Le vrai sujet est sa
+   couverture de fonctions — **11,27 %**, la pire du dépôt, tout le
+   moteur (lignes 84-746) non testé. Voir « `tutorial.js` : simulé — et
+   le vrai sujet n'est pas le découpage » plus haut.
 
 ## Garde-fou
 

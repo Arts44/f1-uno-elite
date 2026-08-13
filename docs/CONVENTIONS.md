@@ -143,6 +143,29 @@ node --check render.js
 
 🇫🇷 Commits en Conventional Commits : `type(scope): sujet` en minuscules, à l'impératif, tiret cadratin `—` pour préciser. Types : `feat, fix, docs, style, refactor, test, chore, build`.
 
+### VÉRIFICATION CODACY APRÈS PUSH
+
+**Après chaque push, lancer l'analyse Codacy et rapporter le résultat.** Ne pas se contenter du dashboard, qui analyse en différé : utiliser la **CLI locale**, qui donne le résultat immédiatement sur le code qui vient de partir.
+
+```bash
+codacy repository gh Arts44 f1-uno-elite --reanalyze
+codacy issues -o json          # le compte, après
+```
+
+**Trois issues de conduite :**
+
+- **Nouvelle issue introduite par le commit** → la corriger dans un commit de suivi, **sans attendre qu'on le demande**.
+- **Faux positif** → le marquer avec sa justification écrite (`codacy issue … -I -R FalsePositive -m "…"`), **jamais désactiver le pattern**. Doctrine établie : un pattern éteint cache aussi les vrais cas ; une issue marquée documente une décision. Reporter la même justification dans `.codacy.yml`, qui doit rester lisible sans accès au service.
+- **Issue préexistante sans rapport avec le commit** → la **signaler**, ne pas la traiter dans la foulée.
+
+**Rapporter systématiquement le nombre d'issues AVANT et APRÈS.** Un push qui augmente le compte sans que ce soit dit est un push qui **dégrade en silence**.
+
+> ⚠️ **Si l'authentification CLI a expiré, LE DIRE** — ne pas sauter l'étape en silence. Une convention qu'on saute sans le dire est pire qu'une convention absente : elle fait croire à une vérification qui n'a pas eu lieu. C'est exactement le motif de `check_seed_honesty()`, qui plantait **avant** son rapport et laissait supposer un contrôle passé. Formulation attendue : « analyse Codacy NON faite — authentification CLI expirée », suivie de `codacy login`.
+
+> **Deux pièges déjà payés.** ① Un marquage est attaché à un **emplacement**, pas à une décision : `SESSION_KEY` a rouvert en passant de `cloud.js:25` à `cloud-auth.js:34`. Après tout découpage qui déplace une ligne marquée, revérifier. ② Les patterns imposés par le **coding standard de l'organisation** ne peuvent être ni décochés ni désactivés au niveau du dépôt (`Pattern enforced by Default coding standard, can't be modified`) — le marquage occurrence par occurrence est alors le seul levier, et c'est une dette à écrire, pas un choix.
+
+🇫🇷 Après chaque push : relancer l'analyse via la **CLI** (pas le dashboard), rapporter le compte **avant/après**. Nouvelle issue du commit → commit de suivi immédiat. Faux positif → marquer avec justification, jamais éteindre le pattern. Issue préexistante → signaler seulement. **Auth expirée → le dire, ne jamais sauter en silence.**
+
 ---
 
 ## 6. File map / Carte des fichiers
