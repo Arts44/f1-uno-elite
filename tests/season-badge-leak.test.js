@@ -99,7 +99,12 @@ describe('le même motif ailleurs — vérifié, pas supposé', () => {
   test('history.js et le badge épinglé relisent le stockage à chaque appel', () => {
     assert.match(src('history.js'), /export function getHistory\(\)\{[\s\S]{0,200}secureGet\(_storageKey\('history'\)\)/,
       'aucun cache de module : rien à faire fuir');
-    assert.match(src('badges.js'), /export function getPinnedBadge\(\)\{ return localStorage\.getItem/,
+    // Le badge épinglé a déménagé dans badges-store.js (v2, pas 2 du
+    // découpage) : SEUL le nom de fichier change ici, la propriété
+    // vérifiée est la même — aucun cache de module, relecture à chaque
+    // appel. Le code est déplacé au caractère près, exprès pour que
+    // cette ligne reste la seule à bouger.
+    assert.match(src('badges-store.js'), /export function getPinnedBadge\(\)\{ return localStorage\.getItem/,
       'idem pour le badge épinglé');
   });
 });

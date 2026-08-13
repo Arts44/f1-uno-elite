@@ -15,15 +15,24 @@ import { badgeDifficulty, difficultyLabelKey } from './difficulty.js';
 import { updateStats } from './stats.js';
 import { showToast, switchView } from './render.js';
 import { secureGet, secureSet } from './secure-store.js';
+import {
+  manualBadges, autoBadgeUnlocked, setManualBadges, setAutoBadgeUnlocked,
+  loadManualBadges, saveManualBadges, badgeUnlockDate,
+  getPinnedBadge, setPinnedBadge,
+} from './badges-store.js';
 
-export let manualBadges = {};        // { badgeId: true/false }
-export let autoBadgeUnlocked = {};   // { badgeId: true } — persists once unlocked
 const _seenAutoBadges = new Set();    // auto badge IDs already displayed with shimmer
 const DAY_MS = 86400000;              // 24 h en millisecondes
 
-// Setters for cross-module writes (import "replace" mode)
-export function setManualBadges(v){ manualBadges = v; }
-export function setAutoBadgeUnlocked(v){ autoBadgeUnlocked = v; }
+/* L'état persistant vit dans badges-store.js — voir son en-tête pour la
+   raison (l'arête storage → badges, famille du bug de fuite 1.52.1).
+   RÉ-EXPORTÉ ici : ce pas est un déplacement, pas un changement d'API,
+   et les consommateurs (app, stats, data, tutorial) ne bougent pas. */
+export {
+  manualBadges, autoBadgeUnlocked, setManualBadges, setAutoBadgeUnlocked,
+  loadManualBadges, saveManualBadges, badgeUnlockDate,
+  getPinnedBadge, setPinnedBadge,
+};
 
 // Evaluate badge progress from JSON condition config
 /* ── Les métriques dont le MAXIMUM vient du fichier chargé ──
@@ -236,17 +245,6 @@ export function seedNewAutoBadges(){
    Démontré avant correction : 4 cartes possédées en 2026, et 9 badges
    automatiques dans la clé 2026, dont 7 hérités de 2025.
    Même famille que la fuite de titre corrigée en 1.47.4. */
-export function loadManualBadges(){
-  try {
-    const s = secureGet(_storageKey('badges'));
-    manualBadges = s ? JSON.parse(s) : {};
-  } catch(e){ manualBadges = {}; }
-  try {
-    const a = secureGet(_storageKey('auto_badges'));
-    autoBadgeUnlocked = a ? JSON.parse(a) : {};
-  } catch(e){ autoBadgeUnlocked = {}; }
-}
-export function saveManualBadges(){ secureSet(_storageKey('badges'), JSON.stringify(manualBadges)); secureSet(_storageKey('auto_badges'), JSON.stringify(autoBadgeUnlocked)); }
 
 // Check if auto badge is unlocked (current condition OR previously unlocked)
 // La valeur persistée est le TIMESTAMP de déblocage (Date.now()) ; les
@@ -266,10 +264,6 @@ export function isAutoBadgeUnlocked(badge){
 }
 
 // Date de déblocage lisible, ou null (badge hérité sans date / verrouillé)
-export function badgeUnlockDate(store, id){
-  const v = store[id];
-  return (typeof v === 'number' && v > 0) ? new Date(v) : null;
-}
 
 /* ══════════════════════════════════════════════════════════
    FAMILLES — le regroupement éditorial de la page. Un badge auto
@@ -347,11 +341,6 @@ export function hardestUnlockedBadge(badges, evalFn, unlockedFn, scoreFn = badge
 }
 
 /* ── Objectif épinglé (préférence locale, par saison) ── */
-export function getPinnedBadge(){ return localStorage.getItem(_storageKey('pinned_badge')) || null; }
-export function setPinnedBadge(id){
-  if(id) localStorage.setItem(_storageKey('pinned_badge'), id);
-  else localStorage.removeItem(_storageKey('pinned_badge'));
-}
 
 export function removeAutoBadge(badgeId){
   if(autoBadgeUnlocked[badgeId]){

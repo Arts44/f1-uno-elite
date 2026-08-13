@@ -12,15 +12,19 @@ import {
 } from './data.js';
 import { updateStats } from './stats.js';
 import { renderCollection, showToast } from './render.js';
+/* Le store, PAS la vue : storage.js n'a besoin que de l'état persistant
+   des badges pour la sauvegarde et sa restauration. Passer par
+   badges.js le ferait dépendre d'un module qui dépend de lui. */
 import {
   manualBadges, autoBadgeUnlocked,
   setManualBadges, setAutoBadgeUnlocked, saveManualBadges
-} from './badges.js';
+} from './badges-store.js';
 import { noteChange, markBackupDone } from './backup.js';
 import { recordHistoryPoint } from './history.js';
 import { gatherSettings, applySettings, backupIncludes } from './settings-sync.js';
 import { secureGet, secureSet } from './secure-store.js';
 import { icon } from './icons.js';
+import { _storageKey } from './storage-keys.js';
 
 /* ── Versioning & season-scoped keys ── */
 const STORAGE_VERSION = 3;
@@ -31,11 +35,11 @@ const STORAGE_VERSION = 3;
    année. Le titre a été rescoppé en v3 (voir _migrateStorage) : il se
    gagne avec les badges d'une saison, il ne se porte donc pas dans une
    autre. */
-export function _storageKey(name){
-  return (name==='theme'||name==='version')
-    ? `f1uno_${name}`
-    : `f1uno_${name}_${_currentSeason}`;
-}
+/* _storageKey vit désormais dans storage-keys.js — voir l'en-tête de ce
+   fichier pour la raison (l'arête storage → badges). Il est RÉ-EXPORTÉ
+   ici pour que le déplacement ne casse aucun appelant : c'est un pas de
+   refactor, pas un changement d'API. */
+export { _storageKey };
 
 function _migrateStorage(){
   const ver = parseInt(localStorage.getItem('f1uno_version')||'0', 10);

@@ -22,6 +22,65 @@ Le refactor poursuit donc **un seul but** :
 La jauge s'améliorera en chemin — de 43 % à ~18,8 %, chiffrage ci-dessous —
 sans atteindre les 10 %. Ce n'est pas un échec : ce n'était pas l'objectif.
 
+## Ce que Tarjan a mesuré — et qui corrige ce document
+
+**Ce document a longtemps dit que `badges.js` était pris dans « trois
+cycles d'import ». C'est faux, et la mesure vaut mieux que l'intention.**
+
+Le graphe complet, passé à Tarjan (`tests/import-cycles.test.js`), donne
+**une seule composante fortement connexe de 22 modules** : depuis
+n'importe lequel on revient à n'importe lequel. Parler DES cycles de
+`badges.js` n'avait pas de sens — il n'y en a qu'un, et tout le monde est
+dedans.
+
+**Conséquence sur ce qu'on peut promettre.** À la maille des composantes,
+« le découpage casse un cycle » est intenable : la composante reste une.
+Ce qui se vérifie, ce sont des **arêtes nommées** et deux compteurs :
+
+| | avant | après les pas 1-2 |
+|---|---|---|
+| Composante enchevêtrée | 22 modules | **22 — inchangée** |
+| Feuilles hors composante | 13 | **16** |
+| Arête `storage.js → badges.js` | présente | **supprimée** |
+
+**La composante ne maigrit pas, et il ne faut pas prétendre le
+contraire.** Ce qui change : l'arête qui a coûté un bug réel disparaît,
+et les trois modules extraits restent DEHORS.
+
+Ce dernier point n'était pas acquis. Mesurés juste après leur création,
+`storage-keys.js` et `badges-store.js` étaient **dedans** — la composante
+était passée de 22 à **24**. La cause tenait à une seule donnée : la
+saison courante vivait dans `data.js`, qui importe `render.js` et
+`stats.js`, si bien que « connaître l'année » revenait à hériter de la
+moitié de l'app. D'où `season.js`, quinze lignes sans aucune dépendance.
+
+> **Le réflexe à garder** : mesurer APRÈS CHAQUE PAS, pas seulement à la
+> fin. Un découpage qui fait ENTRER un module dans la composante est une
+> régression structurelle, et elle ne se voit pas à la lecture du diff.
+
+### L'arête qui comptait
+
+`storage.js → badges.js` n'est pas une arête comme une autre : elle est
+de la **même famille que la fuite inter-saisons corrigée en 1.52.1** —
+un module qui lit l'état d'un autre pendant que celui-ci l'initialise. Le
+bug d'alors venait d'un `else` manquant ; il aurait pu venir de l'ordre
+d'initialisation, et personne n'aurait su où regarder.
+
+### Le cycle qui reste, assumé
+
+`badges.js ⇄ render.js ⇄ stats.js` : `stats.js` appelle `renderBadges()`
+quand la collection change, la vue appelle `updateStats()` après une
+mutation de badge.
+
+**La parade est identifiée** — sortir les deux actions mutantes dans un
+`badge-actions.js`, le chemin d'écriture distinct du chemin de lecture —
+et elle a été **écartée** : sa justification (« muter n'est pas
+afficher ») est vraie mais générale, elle vaudrait pour une dizaine
+d'autres découpes du dépôt. On la reverra si ce cycle gêne réellement
+quelque chose.
+
+---
+
 ## La mesure qui a tranché
 
 Codacy signale 13 des 30 fichiers sources au-dessus du seuil de complexité,

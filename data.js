@@ -3,14 +3,22 @@
    loaded from JSON files at runtime, with embedded fallback.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { _currentSeason, setCurrentSeason } from './season.js';
 import { loadData } from './storage.js';
-import { loadManualBadges } from './badges.js';
+/* Le STORE, pas la vue : data.js recharge l'état des badges après un
+   changement de saison, il n'a aucun besoin du rendu. Cette arête vers
+   badges.js était celle qui ramenait tout le graphe dans un seul
+   enchevêtrement — voir tests/import-cycles.test.js. */
+import { loadManualBadges } from './badges-store.js';
 import { renderCollection } from './render.js';
 import { updateStats } from './stats.js';
 
 // Current season — reassigned via setCurrentSeason() from other modules
-export let _currentSeason = 2025;
-export function setCurrentSeason(season){ _currentSeason = season; }
+/* La saison courante vit dans season.js — un module sans aucune
+   dépendance. Elle est RÉ-EXPORTÉE ici : les douze modules qui la
+   lisent depuis data.js ne changent pas, et la liaison `let` reste
+   vivante. Voir l'en-tête de season.js pour la raison. */
+export { _currentSeason, setCurrentSeason } from './season.js';
 
 let SEASONS = [];
 
@@ -306,7 +314,7 @@ export async function loadAppData(){
 // sous la clé de la nouvelle.
 export function switchSeason(season){
   if(season === _currentSeason) return Promise.resolve();
-  _currentSeason = season;
+  setCurrentSeason(season);
   return loadAppData().then(() => {
     loadData();
     loadManualBadges();
