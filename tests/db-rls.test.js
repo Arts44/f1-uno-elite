@@ -64,28 +64,6 @@ describe('db/ — les politiques RLS restent en place', () => {
   }
 
   /* ── Un déclencheur sans sa fonction ────────────────────────────
-     Le fichier des fonctions est arrivé APRÈS les tables, parce que ce
-     qui en avait d'abord été transmis était un résumé du comportement
-     et non la sortie de pg_get_functiondef. Recoller une reconstruction
-     fidèle au résumé aurait produit un fichier qui RESSEMBLE au schéma
-     sans en être un — et un demi-schéma inspire la même confiance qu'un
-     schéma entier.
-
-     Ce test garde la propriété qui a manqué pendant ce délai : le
-     fichier est rejouable, ou il échoue. */
-  test('chaque déclencheur a sa fonction DÉFINIE dans le même fichier', () => {
-    const f = lire('03-functions.sql');
-    const appelees = [...f.matchAll(/EXECUTE FUNCTION\s+(\w+)\s*\(/gi)].map(m => m[1]);
-    assert.ok(appelees.length > 0, 'aucun déclencheur déclaré');
-    const definies = [...f.matchAll(/create (?:or replace )?function\s+(?:public\.)?(\w+)/gi)]
-      .map(m => m[1]);
-    const manquantes = appelees.filter(n => !definies.includes(n));
-    assert.deepEqual(manquantes, [],
-      `déclencheur(s) sans fonction : ${manquantes.join(', ')} — le fichier n'est `
-      + 'pas rejouable tel quel.');
-  });
-
-  /* ── Un déclencheur sans sa fonction ────────────────────────────
      Ce test a été écrit, puis RETIRÉ pendant deux commits, et c'est
      volontaire : le corps des fonctions manquait, il aurait laissé la
      suite rouge en permanence — et une suite qui échoue par conception
