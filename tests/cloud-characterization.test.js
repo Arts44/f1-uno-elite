@@ -632,6 +632,85 @@ describe('G · lien magique et actions de compte', () => {
     assert.equal(calls.length, 0);
   });
 
+  /* ── Le cool-down survit au rechargement ────────────────────────
+     Il vivait dans une variable de module : F5 le remettait à zéro et
+     l'utilisateur pouvait redemander un code autant de fois qu'il
+     rechargeait. Un garde-fou que F5 désarme ne protège que les gens
+     qui n'essaient pas.
+
+     Ce compteur N'EST PAS la sécurité — GoTrue refuse en 429, et c'est
+     lui qui protège. Il évite ce refus à l'utilisateur en lui montrant
+     l'attente au lieu de la lui faire découvrir. Une information qui
+     disparaît au rechargement est pire qu'absente : elle est trompeuse.
+
+     La DURÉE est stockée avec l'instant, parce qu'elle n'est pas
+     toujours la nôtre : sur un 429, c'est le délai du serveur qui fait
+     foi. Ne garder que l'instant rejouerait 60 s et afficherait faux. */
+  test('instant ET durée sont relus depuis le stockage', () => {
+    const t = Date.now() - 10000;
+    cloud.saveOtpCooldown(t, 90000);
+    assert.deepEqual(cloud.loadOtpCooldown(t + 10000), { t, ms: 90000 });
+  });
+
+  test('un entier nu — la forme d’avant — reste lisible', () => {
+    // Sans cette compatibilité, la première mise à jour laisserait un
+    // bouton bloqué par une valeur devenue illisible.
+    const t = Date.now() - 5000;
+    localStorage.setItem('f1uno_otp_sent_at', String(t));
+    assert.deepEqual(cloud.loadOtpCooldown(t + 5000), { t, ms: SEND_COOLDOWN_MS });
+  });
+
+  test('une attente écoulée n’est pas relue', () => {
+    const t = 1000;
+    cloud.saveOtpCooldown(t, SEND_COOLDOWN_MS);
+    assert.equal(cloud.loadOtpCooldown(t + SEND_COOLDOWN_MS), null);
+  });
+
+  test('un instant du FUTUR ne verrouille pas le bouton pour toujours', () => {
+    // Horloge reculée, appareil partagé : sans ce filtre, la valeur
+    // aberrante bloque l'envoi sans aucune issue.
+    const now = 1000000;
+    cloud.saveOtpCooldown(now + 9e9, SEND_COOLDOWN_MS);
+    assert.equal(cloud.loadOtpCooldown(now), null);
+  });
+
+  test('une durée aberrante retombe sur la nôtre', () => {
+    const t = Date.now();
+    cloud.saveOtpCooldown(t, 99 * 3600000);
+    assert.equal(cloud.loadOtpCooldown(t + 1).ms, SEND_COOLDOWN_MS);
+  });
+
+  test('une valeur illisible est ignorée sans lever', () => {
+    localStorage.setItem('f1uno_otp_sent_at', '{bientôt');
+    assert.equal(cloud.loadOtpCooldown(Date.now()), null);
+  });
+
+  /* ── Le délai réel du 429 ──────────────────────────────────────
+     « patiente quelques minutes » était vague ET muet sur le fait que
+     ça se débloque tout seul : l'utilisateur rechargeait, réessayait,
+     et reprenait un 429. Le message fabriquait le comportement qu'il
+     aurait dû éviter. */
+  test('le délai est lu dans le message de GoTrue', () => {
+    assert.equal(cloud.retryAfterSeconds(
+      'For security purposes, you can only request this after 51 seconds.'), 51);
+  });
+
+  test('l’en-tête Retry-After prime sur le message', () => {
+    const h = { get: k => (k === 'Retry-After' ? '17' : null) };
+    assert.equal(cloud.retryAfterSeconds('after 51 seconds', h), 17);
+  });
+
+  test('sans indication, null — on ne devine pas', () => {
+    assert.equal(cloud.retryAfterSeconds('Too many requests'), null,
+      'un décompte inventé serait pire que pas de décompte');
+  });
+
+  test('une valeur aberrante est refusée, pas affichée', () => {
+    assert.equal(cloud.retryAfterSeconds('after 99999 seconds'), null,
+      'un décompte de plusieurs heures bloquerait le bouton d’autant');
+    assert.equal(cloud.retryAfterSeconds('after 0 seconds'), null);
+  });
+
   test('isCloudSignedIn suit le stockage local, pas la fraîcheur du jeton', () => {
     assert.equal(cloud.isCloudSignedIn(), false);
     saveSession({ ...SESSION(), expires_at: nowSec() - 99999 });

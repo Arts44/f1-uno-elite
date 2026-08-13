@@ -125,7 +125,12 @@ export async function sendMagicLink(email){
   if(!resp.ok){
     const body = await resp.text().catch(() => '');
     log('cloud: otp failed', resp.status, body);
-    throw new Error(classifyOtpError(resp.status, body));
+    const err = new Error(classifyOtpError(resp.status, body));
+    // Le délai voyage AVEC l'erreur : l'UI n'a pas à relire la réponse,
+    // et le classement reste une fonction pure d'un statut et d'un corps
+    // — c'est ce qui le rend testable sans réseau.
+    err.retryAfter = retryAfterSeconds(body, resp.headers);
+    throw err;
   }
   return true;
 }
@@ -146,6 +151,36 @@ export function classifyOtpError(status, body){
   if(b.includes('signup_disabled') || b.includes('otp_disabled')) return 'signups-closed';
   if(status >= 500 || b.includes('error_sending')) return 'mail-down';
   return 'otp-failed';
+}
+
+/* ── COMBIEN DE TEMPS, exactement ──────────────────────────────
+   Le 429 de GoTrue porte le délai dans son message — « For security
+   purposes, you can only request this after 51 seconds. » — et parfois
+   dans l'en-tête `Retry-After`.
+
+   Sans lui, l'app disait « patiente quelques minutes » : vague, et
+   surtout MUET sur le fait que ça se débloque tout seul. Un utilisateur
+   qui ignore combien de temps attendre recharge et réessaie — donc
+   reprend un 429. Le message vague fabrique le comportement qu'il
+   devrait éviter.
+
+   Renvoie des secondes, ou `null` si le serveur n'a rien dit : dans ce
+   cas l'appelant garde le message générique. On ne devine pas — un
+   décompte inventé serait pire que pas de décompte.
+
+   Le plafond d'une heure n'est pas cosmétique : une valeur aberrante
+   afficherait un décompte de plusieurs heures ET bloquerait le bouton
+   d'autant. Au-delà, on préfère l'aveu d'ignorance. */
+export function retryAfterSeconds(body, headers){
+  const entete = headers && typeof headers.get === 'function' ? headers.get('Retry-After') : null;
+  const n = Number(entete);
+  if(Number.isFinite(n) && n > 0 && n <= 3600) return Math.ceil(n);
+  const m = String(body || '').match(/after (\d+) seconds?/i);
+  if(m){
+    const s = Number(m[1]);
+    if(Number.isFinite(s) && s > 0 && s <= 3600) return s;
+  }
+  return null;
 }
 
 // Verify the emailed code (GoTrue /verify). NOT six digits: Supabase's
@@ -198,6 +233,64 @@ let _lastOtpSentAt = 0;
 export function sendCooldownRemaining(lastSentAt, now, cooldownMs = SEND_COOLDOWN_MS){
   if(!lastSentAt) return 0;
   return Math.max(0, Math.ceil((lastSentAt + cooldownMs - now) / 1000));
+}
+
+/* ══════════════════════════════════════════════════════════
+   LE COOL-DOWN SURVIT AU RECHARGEMENT
+
+   Il vivait dans une variable de module : F5 le remettait à zéro, et
+   l'utilisateur pouvait redemander un code autant de fois qu'il
+   rechargeait. Un garde-fou que la touche F5 désarme ne protège que
+   les gens qui n'essaient pas.
+
+   Ce compteur N'EST PAS la sécurité — GoTrue refuse en 429, et c'est
+   lui qui protège. Son rôle est d'ÉVITER ce refus à l'utilisateur en
+   lui montrant l'attente au lieu de la lui faire découvrir. Une
+   information qui disparaît au rechargement est pire qu'absente : elle
+   est trompeuse.
+
+   ON STOCKE L'INSTANT ET LA DURÉE, parce que la durée n'est pas
+   toujours la nôtre : quand le serveur répond 429 en annonçant « after
+   51 seconds », c'est SON délai qui fait foi. Ne garder que l'instant
+   rejouerait 60 s au rechargement et afficherait un décompte faux.
+
+   Trois valeurs sont refusées à la lecture, et chacune pour une raison
+   vécue ailleurs : l'instant du futur (horloge reculée, appareil
+   partagé), la durée aberrante (> 1 h), et la valeur périmée. Sans ces
+   filtres, une donnée bancale verrouille le bouton sans aucune issue —
+   le pire des deux mondes.
+   ══════════════════════════════════════════════════════════ */
+export const OTP_SENT_KEY = 'f1uno_otp_sent_at';
+
+export function loadOtpCooldown(now = Date.now()){
+  try {
+    const brut = localStorage.getItem(OTP_SENT_KEY);
+    if(!brut) return null;
+    let t, ms;
+    if(brut.charAt(0) === '{'){
+      const o = JSON.parse(brut);
+      t = Number(o.t); ms = Number(o.ms);
+    } else {
+      // Entier nu : la forme écrite avant que la durée soit stockée.
+      // Sans cette branche, la première mise à jour laisserait un
+      // bouton bloqué par une valeur devenue illisible.
+      t = Number(brut); ms = SEND_COOLDOWN_MS;
+    }
+    if(!Number.isFinite(t) || t <= 0) return null;
+    if(!Number.isFinite(ms) || ms <= 0 || ms > 3600000) ms = SEND_COOLDOWN_MS;
+    if(t > now) return null;
+    if(now - t >= ms) return null;
+    return { t, ms };
+  } catch(e){ return null; }
+}
+
+export function saveOtpCooldown(t = Date.now(), ms = SEND_COOLDOWN_MS){
+  try { localStorage.setItem(OTP_SENT_KEY, JSON.stringify({ t, ms })); }
+  catch(e){ /* quota, navigation privée : le compteur mémoire suffit */ }
+}
+
+export function clearOtpCooldown(){
+  try { localStorage.removeItem(OTP_SENT_KEY); } catch(e){ /* idem */ }
 }
 
 // Fetch the user profile (id + email) for a fresh token.

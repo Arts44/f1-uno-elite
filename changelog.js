@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.59.7',
+    date: '2026-08-13',
+    changes: {
+      en: ['When the server asks you to wait before sending another sign-in code, the app now tells you exactly how long — “try again in 47 s, it unlocks on its own” — instead of a vague “a few minutes”. And the countdown survives a page reload: refreshing no longer pretends you can send again when the server would refuse.'],
+      fr: ['Quand le serveur demande d\'attendre avant un nouveau code de connexion, l\'app dit maintenant combien de temps exactement — « réessaie dans 47 s, ça se débloque tout seul » — au lieu d\'un vague « quelques minutes ». Et le décompte survit à un rechargement : actualiser ne fait plus croire qu\'on peut renvoyer alors que le serveur refuserait.'],
+      es: ['Cuando el servidor pide esperar antes de otro código de acceso, la app dice ahora cuánto exactamente — «reinténtalo en 47 s, se desbloquea solo»— en vez de un vago «unos minutos». Y la cuenta atrás sobrevive a una recarga: actualizar ya no hace creer que puedes reenviar cuando el servidor lo rechazaría.'],
+      zh: ['当服务器要求你稍候再获取新的登录码时，应用现在会说明具体还要等多久——“请在 47 秒后重试，届时会自动解锁”——而不是含糊的“几分钟”。倒计时也不会因刷新页面而消失：刷新不再让你误以为可以立即重发。'],
+      it: ['Quando il server chiede di attendere prima di un nuovo codice di accesso, l\'app dice ora quanto esattamente — «riprova tra 47 s, si sblocca da solo» — invece di un vago «qualche minuto». E il conto alla rovescia sopravvive a un ricaricamento: aggiornare non fa più credere di poter rinviare quando il server rifiuterebbe.'],
+      nl: ['Wanneer de server vraagt te wachten voor een nieuwe inlogcode, zegt de app nu precies hoelang — “probeer het over 47 s opnieuw, het gaat vanzelf weer open” — in plaats van een vaag “een paar minuten”. En de aftelling overleeft een herlaadbeurt: verversen doet niet langer alsof je opnieuw kunt verzenden terwijl de server zou weigeren.'],
+      de: ['Wenn der Server bittet, vor einem neuen Anmeldecode zu warten, nennt die App jetzt die genaue Dauer — „in 47 s erneut versuchen, es entsperrt sich von selbst“ — statt eines vagen „einige Minuten“. Und der Countdown überlebt ein Neuladen: Aktualisieren gaukelt nicht mehr vor, man könne erneut senden, obwohl der Server ablehnen würde.'],
+    },
+  },
+  {
     version: '1.59.6',
     date: '2026-08-13',
     changes: {

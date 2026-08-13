@@ -47,6 +47,11 @@ const DEVICE_KEYS = [
   'f1uno_backup_inc_prefs', 'f1uno_backup_inc_sec',
   // session cloud (jeton — ne doit JAMAIS voyager dans une sauvegarde)
   'f1uno_cloud_session',
+  // horodatage du dernier code envoyé : il PERSISTE exprès, sinon un F5
+  // remet le cool-down à zéro et l'utilisateur se fait refuser par le
+  // serveur au lieu d'être averti par l'app. Aucune donnée personnelle —
+  // un entier — et rien à chiffrer.
+  'f1uno_otp_sent_at',
   // schéma de stockage
   'f1uno_version',
   // clés héritées, uniquement LUES par la migration puis effacées

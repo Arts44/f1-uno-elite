@@ -19,6 +19,7 @@ import { log } from './logger.js';
 import { isCloudConfigured } from './cloud-http.js';
 import {
   loadSession, sendCooldownRemaining, isValidOtpFormat,
+  loadOtpCooldown, saveOtpCooldown, clearOtpCooldown, SEND_COOLDOWN_MS,
   sendMagicLink, verifyOtpCode, signOut, requestEmailChange,
 } from './cloud-auth.js';
 import { pushCollection, pullCollection, fetchCloudMeta } from './cloud-sync.js';
@@ -30,7 +31,30 @@ import { createSegmentedInput } from './otp-input.js';
 // le bouton. `sendCooldownRemaining` reste PUR, dans cloud-auth.js —
 // feedback.js l'utilise avec SON propre horodatage. Helper partagé, état
 // local à chaque consommateur : c'est déjà le motif du dépôt.
+// L'attente vit désormais AUSSI dans le stockage : un rechargement ne
+// doit pas remettre le compteur à zéro (voir loadOtpCooldown). La
+// mémoire n'est qu'un cache ; le stockage est la source.
 let _lastOtpSentAt = 0;
+let _otpCooldownMs = SEND_COOLDOWN_MS;
+
+/** Attente courante : la mémoire si elle est armée, sinon le stockage. */
+function _sentAt(){
+  if(!_lastOtpSentAt){
+    const c = loadOtpCooldown();
+    if(c){ _lastOtpSentAt = c.t; _otpCooldownMs = c.ms; }
+  }
+  return _lastOtpSentAt;
+}
+
+/** Arme l'attente des deux côtés — un seul point d'écriture.
+    `secondes` vient du serveur quand il l'a dit ; sinon, la nôtre. */
+function _armerCooldown(secondes){
+  const ms = Number.isFinite(secondes) && secondes > 0
+    ? Math.min(secondes * 1000, 3600000) : SEND_COOLDOWN_MS;
+  _lastOtpSentAt = Date.now();
+  _otpCooldownMs = ms;
+  saveOtpCooldown(_lastOtpSentAt, ms);
+}
 
 /* ── Remise à zéro du cool-down — pour les TESTS uniquement ──
    L'état vit dans ce module et rien ne le rendait joignable de
@@ -45,7 +69,11 @@ let _lastOtpSentAt = 0;
 
    Rien en production n'appelle cette fonction : le cool-down y est armé
    par un envoi réussi ou par un 429, et par rien d'autre. ── */
-export function _resetCooldown(at = 0){ _lastOtpSentAt = at; }
+export function _resetCooldown(at = 0){
+  _lastOtpSentAt = at;
+  _otpCooldownMs = SEND_COOLDOWN_MS;
+  if(at) saveOtpCooldown(at, SEND_COOLDOWN_MS); else clearOtpCooldown();
+}
 
 /* ── Factorisation n°4 : la règle de validation d'adresse ──
    Elle existait en deux copies (connexion et changement d'e-mail). Une
@@ -61,10 +89,12 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
    troisième faisait proprement : une seule décision, trois écritures.
    Le style ('ok' / 'err' / rien) reste au site d'appel : c'est lui qui
    sait si l'opération a réussi. ── */
-const msgSetter = id => (key, cls) => {
+// `vars` alimente les {jetons} du libellé — textContent, donc aucun
+// risque d'injection : la valeur n'est jamais interprétée comme du HTML.
+const msgSetter = id => (key, cls, vars) => {
   const m = document.getElementById(id);
   if(!m) return;
-  m.textContent = t(key);
+  m.textContent = t(key, vars || {});
   m.className = cls ? 'cloud-msg ' + cls : 'cloud-msg';
 };
 
@@ -134,7 +164,7 @@ function _startCooldownUi(sendBtn){
   const tick = () => {
     const btn = document.getElementById('cloudSendBtn');
     if(!btn){ clearInterval(iv); return; }
-    const left = sendCooldownRemaining(_lastOtpSentAt, Date.now());
+    const left = sendCooldownRemaining(_sentAt(), Date.now(), _otpCooldownMs);
     if(left <= 0){
       btn.disabled = false;
       btn.textContent = t('cloud.send_link');
@@ -152,7 +182,7 @@ export function bindCloudSection(){
   const sendBtn = document.getElementById('cloudSendBtn');
   if(sendBtn){
     // A cool-down may still be running from before a re-render
-    if(sendCooldownRemaining(_lastOtpSentAt, Date.now()) > 0) _startCooldownUi(sendBtn);
+    if(sendCooldownRemaining(_sentAt(), Date.now(), _otpCooldownMs) > 0) _startCooldownUi(sendBtn);
     sendBtn.addEventListener('click', async () => {
       const input = document.getElementById('cloudEmail');
       const setMsg = msgSetter('cloudAuthMsg');
@@ -165,12 +195,12 @@ export function bindCloudSection(){
         setMsg('cloud.offline', 'err');
         return;
       }
-      if(sendCooldownRemaining(_lastOtpSentAt, Date.now()) > 0) return; // guard
+      if(sendCooldownRemaining(_sentAt(), Date.now(), _otpCooldownMs) > 0) return; // guard
       sendBtn.disabled = true;
       setMsg('cloud.sending');
       try {
         await sendMagicLink(email);
-        _lastOtpSentAt = Date.now();
+        _armerCooldown();
         _startCooldownUi(sendBtn);
         const codeRow = document.getElementById('cloudCodeRow');
         if(codeRow){ codeRow.style.display = ''; }
@@ -180,9 +210,17 @@ export function bindCloudSection(){
       } catch(e){
         log('cloud: send failed', e);
         if(e.message === 'rate-limited'){
-          _lastOtpSentAt = Date.now(); // server said stop: hold the button too
+          // Le serveur dit stop, et parfois COMBIEN DE TEMPS. Quand il le
+          // dit, on l'affiche : « réessaie dans 47 s » apprend deux choses
+          // que « patiente quelques minutes » taisait — la durée, et le
+          // fait que ça se débloque tout seul.
+          _armerCooldown(e.retryAfter);
           _startCooldownUi(sendBtn);
-          setMsg('cloud.rate_limited', 'err');
+          if(Number.isFinite(e.retryAfter) && e.retryAfter > 0){
+            setMsg('cloud.rate_limited_in', 'err', { s: e.retryAfter });
+          } else {
+            setMsg('cloud.rate_limited', 'err');
+          }
         } else {
           const KEY = {
             'offline':          'cloud.offline',
