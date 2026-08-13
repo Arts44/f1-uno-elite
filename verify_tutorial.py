@@ -156,14 +156,67 @@ def compteur(page):
     return el.inner_text().strip() if el.count() else ''
 
 
+# Fragment stable du message « cible absente » (tut.missing, fr). S'il
+# apparaît dans une bulle, une cible du parcours a DISPARU — c'est LA
+# panne qu'un refactor d'interface produit et qu'aucun test unitaire ne
+# voit, puisque le faux DOM ne trouve jamais rien.
+#
+# ⚠️ Fragment choisi SANS apostrophe : le gabarit écrit « l'écran » avec
+# l'apostrophe ASCII, et la version typographique « l’écran » ne le
+# matche pas. Payé une fois — le contrôle négatif tombait dans la
+# mauvaise branche à cause d'un caractère invisible à l'œil.
+MSG_CIBLE_ABSENTE = 'écran pour l'
+
+
+def verifier_etape(page, etat):
+    """Les trois assertions de robustesse, à CHAQUE étape.
+
+    `etat` retient les étapes déjà signalées : une étape au long cours
+    (l'utilisateur simulé y passe plusieurs tours de boucle) ne doit
+    produire qu'UN échec, pas un par tour.
+    """
+    cle = compteur(page) + ' · ' + (page.locator('.tut-title').inner_text().strip()
+                                    if page.locator('.tut-title').count() else '?')
+    if cle in etat:
+        return
+    etat.add(cle)
+
+    # 1. La cible existe. Le moteur a sa propre sortie de secours (texte
+    #    tut.missing + Suivant forcé) : le tour CONTINUE, mais l'étape
+    #    n'a rien montré — pour nous c'est un échec, pas une variante.
+    texte = page.locator('.tut-text').inner_text() if page.locator('.tut-text').count() else ''
+    if MSG_CIBLE_ABSENTE in texte:
+        ECHECS.append(f'cible ABSENTE à l’étape « {cle} » : la bulle affiche '
+                      'le message de secours — un refactor a perdu cette cible')
+        return
+
+    # 2. Le projecteur (ou l'indicateur « plus haut/bas ») est là. Une
+    #    étape d'action sans halo ni flèche grise l'écran sans rien
+    #    désigner : l'utilisateur ne sait pas quoi faire.
+    spot = page.locator('.tut-spot').bounding_box()
+    away = page.locator('.tut-away').count() > 0
+    if not spot and not away and not page.locator('#tutNext').count():
+        ECHECS.append(f'étape d’action sans halo ni indicateur à « {cle} » : '
+                      'rien ne désigne le geste attendu')
+
+    # 3. Le halo reste dans l'écran.
+    if spot:
+        vp = page.viewport_size
+        if spot['x'] + spot['width'] < 0 or spot['x'] > vp['width'] \
+           or spot['y'] + spot['height'] < 0 or spot['y'] > vp['height']:
+            ECHECS.append(f'projecteur hors écran à « {cle} » : {spot}')
+
+
 def parcourir(page):
     """Avance jusqu'à la fin du tour. Renvoie (etapes, actions, sautees)."""
     etapes = actions = surplace = 0
     sautees = []
+    vues = set()
     for _ in range(MAX_TOURS):
         if not page.locator('.tut-bubble').count():
             break                                  # le tour est terminé
         etapes += 1
+        verifier_etape(page, vues)
         avant = compteur(page)
 
         suivant = page.locator('#tutNext').count() > 0
@@ -173,10 +226,37 @@ def parcourir(page):
             # Étape d'ACTION : on fait le geste pour de vrai. C'est tout
             # l'intérêt — un tour qui n'écrit rien n'a rien à restaurer,
             # et le test passerait pour de mauvaises raisons.
+            #
+            # Mais d'abord : laisser passer les toasts. Mesuré à l'étape
+            # « Direction les stats » : le toast d'annulation de l'ajout
+            # rapide couvre la barre de nav EXACTEMENT là où le tour dit
+            # d'appuyer — elementFromPoint(centre du projecteur) rendait
+            # `toast show`, pas l'onglet. Un utilisateur attend que la
+            # célébration retombe ; le script fait pareil. (Le fond du
+            # problème — le projecteur désigne une cible momentanément
+            # recouverte — est au n°17 de POINTS-SIGNALES.)
+            try:
+                page.wait_for_function(
+                    '() => !document.querySelector(".toast.show")', timeout=8000)
+            except Exception:
+                pass
             sp = page.locator('.tut-spot').bounding_box()
             if sp:
                 page.mouse.click(sp['x'] + sp['width'] / 2, sp['y'] + sp['height'] / 2)
                 actions += 1
+                # L'ajout rapide est un geste en DEUX temps : le « + »
+                # ouvre un menu de variantes, et l'étape ne valide que
+                # sur le choix d'une variante. On fait le second geste
+                # comme un utilisateur le ferait. (Le projecteur, lui,
+                # reste sur le « + » — c'est le n°17 de POINTS-SIGNALES.)
+                page.wait_for_timeout(400)
+                menu = page.locator('.qadd-type').first
+                if menu.count():
+                    m = menu.bounding_box()
+                    if m:
+                        page.mouse.click(m['x'] + m['width'] / 2,
+                                         m['y'] + m['height'] / 2)
+                        actions += 1
 
         # On attend un CHANGEMENT D'ÉTAT observable, jamais une durée :
         # c'est la leçon du non-déterminisme des captures (n°11).
@@ -205,6 +285,23 @@ def parcourir(page):
                     break
                 continue
 
+            # La cible a DISPARU pendant qu'on attendait ? Le moteur
+            # affiche alors son message de secours avec un « Suivant »
+            # forcé — et PAS de « Passer l'étape » (l'étape n'est plus
+            # une action). On produit le diagnostic précis, puis on
+            # avance par ce Suivant pour que la restauration finale
+            # tourne quand même et que le diff reste lisible.
+            texte = page.locator('.tut-text').inner_text() \
+                if page.locator('.tut-text').count() else ''
+            if MSG_CIBLE_ABSENTE in texte:
+                ECHECS.append(f'cible ABSENTE à l’étape « {avant} · {titre} » : '
+                              'la bulle affiche le message de secours — un '
+                              'refactor a perdu cette cible')
+                if page.locator('#tutNext').count():
+                    page.locator('#tutNext').click()
+                    page.wait_for_timeout(500)
+                continue
+
             # Étape d'action dont le geste n'a pas pris : sortie de
             # secours de l'app. On la NOMME — un saut silencieux ferait
             # passer un tour bloqué pour un tour réussi.
@@ -224,18 +321,6 @@ def parcourir(page):
         ECHECS.append(f'le tour n’est pas terminé après {MAX_TOURS} gestes — '
                       'une étape ne progresse pas')
     return etapes, actions, sautees
-
-
-def verifier_projecteur(page):
-    """Le halo doit rester dans l'écran. Hors cadre = l'utilisateur ne
-    voit pas ce qu'on lui montre, et rien ne le lui dit."""
-    b = page.locator('.tut-spot').bounding_box()
-    if not b:
-        return
-    vp = page.viewport_size
-    if b['x'] + b['width'] < 0 or b['x'] > vp['width'] \
-       or b['y'] + b['height'] < 0 or b['y'] > vp['height']:
-        ECHECS.append(f'projecteur hors écran à l’étape « {compteur(page)} » : {b}')
 
 
 with sync_playwright() as p:
@@ -262,7 +347,6 @@ with sync_playwright() as p:
     page.evaluate('document.getElementById("replayTutBtn").click()')
     page.wait_for_selector('.tut-bubble', timeout=8000)
     page.wait_for_timeout(1200)
-    verifier_projecteur(page)
 
     etapes, actions, sautees = parcourir(page)
 

@@ -164,10 +164,36 @@ Les deux sont la leçon du n°11 des captures, repayée dans un autre
 décor : **une mesure qui varie sans que rien n'ait changé n'est pas une
 mesure.**
 
-### 1 — la robustesse du parcours · ~2 h · ~90 lignes de plus
+### 1 — la robustesse du parcours · ~2 h · **FAIT**
 
-Même boucle, trois assertions ajoutées par étape : la cible existe, le
-projecteur reste dans l'écran, l'étape progresse.
+Trois assertions à chaque étape, chacune **vue échouer** avant d'être
+crue :
+
+- **la cible existe** — détectée par le message de secours du moteur
+  (`tut.missing`) dans la bulle. Contrôle négatif : cible renommée en
+  `.qbtn-DISPARU` → `cible ABSENTE à l'étape « 8 / 8 · Ajouter sans
+  ouvrir »`, et le tour **continue** par le Suivant forcé pour que la
+  restauration finale tourne quand même ;
+- **quelque chose désigne le geste** — ni halo, ni indicateur
+  « plus haut/bas », sur une étape d'action = échec ;
+- **le halo reste dans l'écran**.
+
+Le parcours fait désormais le geste d'ajout rapide **en entier** (le `+`
+puis la variante du menu) et attend la retombée des toasts avant de
+cliquer : **34 étapes, 11 gestes réels, 0 passée**, stable sur trois
+exécutions.
+
+Ce que la pièce a sorti comme constats produit — mesurés, chiffrés,
+consignés au **n°17 de POINTS-SIGNALES** : le projecteur n'éclaire pas le
+second temps du geste d'ajout (le menu), et le toast d'annulation couvre
+l'onglet que l'étape suivante désigne. Coût du correctif moteur : ~10
+lignes — refusé tant que le moteur n'a pas de filet, c'est l'objet même
+de ce chantier.
+
+Un piège de plus payé et versé à CONVENTIONS.md : le fragment `tut.missing`
+cherché avec une apostrophe typographique (`’`) ne matchait pas le gabarit
+(apostrophe ASCII) — le contrôle négatif tombait dans la mauvaise branche
+sans erreur.
 
 ### 3 — extraire `tutorial-snapshot.js` · ~1 h 30
 

@@ -1057,3 +1057,48 @@ panne serait invisible ici et bien réelle chez l'utilisateur, sur le
 **Parade possible, non chiffrée** : une passe de captures dédiée, hors
 suite de tests, sur les deux langues les plus longues et la plus étroite
 des tailles — à instruire séparément si ce trou se met à coûter.
+
+---
+
+## 17. Le projecteur du tutoriel n'éclaire que la moitié du geste d'ajout rapide — mesuré, coût chiffré
+
+**Le diagnostic d'origine était faux, et la mesure l'a corrigé.** Première
+lecture : « la pastille `+` est excentrée, le script n'y arrive pas au
+centre du projecteur ». Mesuré : le centre du projecteur (46 px) **tombe
+bien sur la pastille** (34 px) — `elementFromPoint` le confirme. La visée
+n'est pas le problème.
+
+**Le vrai problème : le geste est en DEUX temps, et le second n'est
+jamais éclairé.** Le `+` ouvre un menu de 12 variantes, et l'étape ne
+valide que sur le choix d'une variante (`quickAddType`). Pendant ce
+second temps, le projecteur **reste sur le `+`** : l'utilisateur voit un
+menu apparaître à l'autre bout de la tuile (première variante mesurée à
+~105 px du halo) pendant que le halo continue de désigner le bouton déjà
+pressé.
+
+**Seconde observation, même étape, mesurée aussi** : le toast
+d'annulation de l'ajout couvre la barre de nav **exactement là où l'étape
+suivante dit d'appuyer** — `elementFromPoint(centre du projecteur)`
+rendait `toast show`, pas l'onglet Stats. Pendant ~3 s, un utilisateur
+obéissant au projecteur appuie sur le toast (dont le bouton « Annuler »),
+pas sur l'onglet. Ça se résout tout seul quand le toast retombe, mais
+pendant ce temps le tour désigne une cible inatteignable.
+
+**Le coût du correctif, chiffré** : ce n'est pas une ligne. Il faut une
+notion de « cible de suite de geste » dans le moteur — le `repos()` de
+`_bindAdvance()` repositionne le halo sur l'élément **capturé au début de
+l'étape** et ne ré-résout jamais la cible ; suivre le menu demande ~10
+lignes dans le moteur (ré-résolution après clic + nettoyage) plus une
+ligne par étape concernée. Le moteur est à 0 % de couverture : le
+modifier sans son filet, pendant un chantier dont l'objet est justement
+de construire ce filet, serait faire les choses dans le mauvais ordre.
+
+**Ce qui tient la place en attendant** : `verify_tutorial.py` fait le
+geste complet (les deux temps, et l'attente du toast) — le parcours passe
+à 34/34 sans étape sautée, donc une régression sur ce chemin se verra.
+La sortie de secours de l'app (« Passer l'étape ») garantit qu'aucun
+utilisateur ne reste coincé.
+
+**À faire si le moteur gagne son filet** : la « cible de suite de geste »
+ci-dessus, et le halo qui suit le menu. Les mesures de ce point sont le
+cahier des charges.
