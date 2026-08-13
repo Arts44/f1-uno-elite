@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.59.3',
+    date: '2026-08-13',
+    changes: {
+      en: ['Nothing changes in the app itself: the capture script now freezes every animation at a chosen phase, so two regenerations of an unchanged app produce identical files. A screenshot diff finally means something.'],
+      fr: ['Rien ne change dans l\'app elle-même : le script de captures fige désormais chaque animation à une phase choisie, si bien que deux régénérations d\'une app inchangée produisent des fichiers identiques. Un diff de captures veut enfin dire quelque chose.'],
+      es: ['Nada cambia en la app: el script de capturas ahora congela cada animación en una fase elegida, de modo que dos regeneraciones de una app sin cambios producen archivos idénticos.'],
+      zh: ['应用本身没有变化：截图脚本现在会把每个动画冻结在选定的相位，因此对未改动的应用两次重新生成会得到完全相同的文件。'],
+      it: ['Nulla cambia nell\'app: lo script di cattura congela ora ogni animazione a una fase scelta, così due rigenerazioni di un\'app invariata producono file identici.'],
+      nl: ['Er verandert niets in de app zelf: het opnamescript bevriest nu elke animatie op een gekozen fase, zodat twee regeneraties van een ongewijzigde app identieke bestanden opleveren.'],
+      de: ['In der App selbst ändert sich nichts: Das Aufnahmeskript friert jetzt jede Animation auf einer gewählten Phase ein, sodass zwei Neuerzeugungen einer unveränderten App identische Dateien liefern.'],
+    },
+  },
+  {
     version: '1.59.2',
     date: '2026-08-13',
     changes: {

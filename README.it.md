@@ -34,7 +34,7 @@
 |---|---|---|---|
 | ![Demo aggiunta rapida](screenshots/demo-quick-add.gif) | ![Demo navigazione](screenshots/demo-nav.gif) | ![Demo badge](screenshots/demo-badges.gif) | ![Seasons demo](screenshots/demo-seasons.gif) |
 
-Ogni demo è generata da `capture_demos.py` con lo stesso seed deterministico delle catture fisse (il seed lo è; i pixel no — SSIM 0,999988 tra due esecuzioni). I GIF girano a 33,3 fps; la versione a 60 fps è accanto: [aggiunta rapida](screenshots/demo-quick-add.mp4) · [navigazione](screenshots/demo-nav.mp4) · [badge](screenshots/demo-badges.mp4) · [stagioni](screenshots/demo-seasons.mp4).
+Ogni demo è generata da `capture_demos.py` con lo stesso seed deterministico delle catture fisse, **identiche byte per byte tra due esecuzioni**: ogni animazione è congelata a una fase scelta prima di ogni scatto. I GIF girano a 33,3 fps; la versione a 60 fps è accanto: [aggiunta rapida](screenshots/demo-quick-add.mp4) · [navigazione](screenshots/demo-nav.mp4) · [badge](screenshots/demo-badges.mp4) · [stagioni](screenshots/demo-seasons.mp4).
 
 
 ### Novità 1.29 — la revisione v2

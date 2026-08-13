@@ -249,7 +249,7 @@ describe('README — les chiffres ne dérivent pas', () => {
    et deux affirmations fausses sont passées au travers :
 
      · « A WCAG-AA contrast scan runs against both themes »
-       alors qu'aucun scan n'est commité (CLAUDE.md le dit :
+       alors qu'aucun scan n'est commité (docs/CONVENTIONS.md le dit :
        « there is no such script committed in this repo ») ;
      · « Coverage percentage is deliberately not published »
        en même temps qu'un pourcentage publié deux sections plus

@@ -110,15 +110,83 @@ FOIL_STRIP_JS = """() => {
   return true;
 }"""
 
-# Fige toutes les bandes au même instant du cycle (passage centré sur la
-# tuile) et les faisceaux au même angle : deux gels successifs produisent
-# la même image.
-FOIL_FREEZE_JS = """() => {
-  document.getAnimations().forEach(a => {
-    const d = a.effect.getTiming().duration;
-    if(a.animationName === 'foil-pass'){ a.currentTime = d * 0.225; a.pause(); }
-    else if(a.animationName === 'wild-spin'){ a.currentTime = d * 0.30; a.pause(); }
+# ══════════════════════════════════════════════════════════
+#   GEL DES ANIMATIONS — pour que deux gels soient IDENTIQUES
+#
+#   Avant : seules les bandes foil de la planche de comparaison
+#   étaient figées. Résultat mesuré — deux exécutions du même script
+#   produisaient 42 fichiers différents sur 52, avec un SSIM de
+#   0,999988 : visuellement identiques, jamais identiques à l'octet.
+#   Un diff de captures ne disait donc rien, et c'est exactement ce
+#   qui a failli faire attribuer 41 fichiers modifiés à un refactor
+#   qui n'y était pour rien.
+#
+#   LA PHASE EST CHOISIE, PAS SUBIE. Figer à l'image 0 rendrait les
+#   effets invisibles — un balayage foil hors champ, un halo éteint,
+#   des étoiles à 25 % d'opacité. Chaque animation est donc arrêtée
+#   là où elle se MONTRE, et le choix est écrit ici :
+#
+#     foil-pass        0.225  la bande traverse le centre de la tuile
+#     wild-spin        0.30   les faisceaux en diagonale, pas alignés
+#     eternalSweep     0.14   le rai à mi-course (la traversée dure 28 %)
+#     eternalGlow      0.50   le halo à son maximum
+#     eternalTwinkle   0.50   étoiles pleine opacité, taille max
+#     divineShift      0.50   dégradé au point le plus contrasté
+#     sv-foil-dot      0.50   pastille à saturation maximale
+#     prog-full-shine  0.35   le reflet SUR la barre, pas au-delà
+#     skShimmer        0.50   lueur du squelette au milieu de sa course
+#
+#   Les animations d'ENTRÉE (vues, modales, toasts, cases PIN) et
+#   toutes les transitions CSS sont au contraire menées à leur FIN :
+#   les figer à mi-course montrerait un élément à moitié arrivé, ce
+#   qui serait stable et faux. finish() les place à leur état final.
+#
+#   Le gel se réarme en continu : chaque changement de vue recrée des
+#   éléments, donc de nouvelles animations. Un intervalle les rattrape.
+# ══════════════════════════════════════════════════════════
+FREEZE_JS = """() => {
+  const PHASES = {
+    'foil-pass': 0.225, 'wild-spin': 0.30, 'eternalSweep': 0.14,
+    'eternalGlow': 0.50, 'eternalTwinkle': 0.50, 'divineShift': 0.50,
+    'sv-foil-dot': 0.50, 'prog-full-shine': 0.35, 'skShimmer': 0.50,
+    'eternalStars': 0.50,
+  };
+  const gel = () => {
+    for(const a of document.getAnimations()){
+      try {
+        const nom = a.animationName || (a.transitionProperty ? '__transition' : '');
+        const t = a.effect.getComputedTiming();
+        const d = typeof t.duration === 'number' ? t.duration : 0;
+        /* PIÈGE : finish() sur une animation INFINIE lève
+           InvalidStateError — on ne peut pas terminer ce qui ne finit
+           pas. L'exception était avalée, donc `eternalStars`, absente de
+           la table, continuait de tourner et suffisait à faire varier
+           20 captures sur 52. Toute animation infinie est donc mise en
+           pause, à sa phase si elle en a une, à 0,5 sinon. */
+        const infinie = t.iterations === Infinity;
+        const phase = PHASES[nom] !== undefined ? PHASES[nom] : (infinie ? 0.5 : undefined);
+        if(phase === undefined || !d){ if(!infinie) a.finish(); continue; }
+        a.currentTime = d * phase;
+        a.pause();
+      } catch(e){ /* une animation déjà terminée refuse finish() : sans effet */ }
+    }
+  };
+  /* SMIL — le dernier tiers du problème, et le plus discret.
+     Les dégradés Divin et Éternel du donut tournent par
+     <animateTransform>, une animation SVG qui n'apparaît PAS dans
+     document.getAnimations() : elle vit dans une autre horloge. Elle
+     seule faisait varier les 7 captures stats-rarity.
+     Phase 2,25 s sur les 9 s du tour complet = un quart de tour : le
+     dégradé se lit en diagonale, pas à son orientation de départ. */
+  document.querySelectorAll('svg').forEach(svg => {
+    if(typeof svg.pauseAnimations === 'function'){
+      try { svg.setCurrentTime(2.25); svg.pauseAnimations(); } catch(e){}
+    }
   });
+  gel();
+  clearInterval(window.__gelTimer);
+  window.__gelTimer = setInterval(gel, 40);
+  return document.getAnimations().length;
 }"""
 
 # ══════════════════════════════════════════════════════════
@@ -135,6 +203,8 @@ def new_page(ctx, hide_nav=False, wait='.card'):
     # bandeau de mise à jour : hors sujet sur une capture de gel
     page.add_style_tag(content='#updateBanner,.update-banner{display:none!important}')
     page.wait_for_timeout(600)
+    page.evaluate(FREEZE_JS)      # phases choisies, puis réarmement continu
+    page.wait_for_timeout(150)
     return page
 
 
@@ -143,6 +213,7 @@ def card(page, num):
 
 
 def clip_shot(page, box, path, pad, quality=85):
+    page.evaluate(FREEZE_JS)   # juste avant le déclenchement, pas 120 ms plus tôt
     page.screenshot(path=str(path), quality=quality, type='jpeg', clip={
         'x': max(box['x'] - pad, 0), 'y': max(box['y'] - pad, 0),
         'width': box['width'] + 2 * pad, 'height': box['height'] + 2 * pad,
@@ -190,8 +261,10 @@ with sync_playwright() as p:
 
     def shot(page, name, png=False):
         if png:
+            page.evaluate(FREEZE_JS)
             page.screenshot(path=str(SHOTS / name))
         else:
+            page.evaluate(FREEZE_JS)
             page.screenshot(path=str(SHOTS / name), type='jpeg', quality=85)
 
     # ── 1. i18n ×7 : les 4 états qui portent du texte traduit ──
@@ -413,7 +486,7 @@ with sync_playwright() as p:
     page = new_page(c, hide_nav=True)
     page.evaluate(FOIL_STRIP_JS)
     page.wait_for_timeout(500)
-    page.evaluate(FOIL_FREEZE_JS)
+    page.evaluate(FREEZE_JS)
     page.wait_for_timeout(300)
     shot(page, 'foil-family.jpg')
     c.close()

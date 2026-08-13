@@ -150,7 +150,7 @@ Deux pièges à vérifier plutôt qu'à supposer :
   « 拥有全部 {n} 张卡牌 » reste valide quel que soit `n` ;
 - les **15 occurrences** de « 101 » dans `translations.js` ne sont pas
   toutes celles de `legend_101` — et il y en a **hors** de ce fichier
-  (README ×7, `docs/`, `CLAUDE.md`, la description GitHub). Chacune est à
+  (README ×7, `docs/` (dont `CONVENTIONS.md`), la description GitHub). Chacune est à
   relire, pas seulement celle du badge.
 
 ### 4.4 Le champ `season`

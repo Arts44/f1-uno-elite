@@ -249,52 +249,46 @@ survécu jusqu'à ce qu'un script la compte image par image.
 
 ---
 
-## 8. Les captures sont reproductibles à l'œil, pas à l'octet
+## 8. ~~Les captures ne sont reproductibles qu'à l'œil~~ — CORRIGÉ
 
-Le seed est déterministe — c'est prouvé : l'ancien et le nouveau
-mécanisme produisent un `init_script` identique au caractère près.
-**Les images, elles, ne le sont pas.**
+**Deux exécutions du même script donnent désormais 0 fichier différent
+sur 52.** Avant : 42.
 
-Deux exécutions du MÊME script, sans rien changer entre les deux :
+Le gel des animations est passé de partiel (les seules bandes foil de
+la planche de comparaison) à complet, et il a fallu **trois** couches,
+chacune découverte par la mesure suivante :
 
-```
-42 des 52 fichiers diffèrent
-```
-
-Ce n'est pas une instabilité de rendu. Comparaison de deux
-générations du même écran :
-
-| Mesure | Valeur |
+| Étape | Restait |
 |---|---|
-| SSIM | **0,999988** |
-| Écart de taille | 17 octets sur 145 003 (**0,01 %**) |
+| `document.getAnimations()` figé, phases choisies | 42 → 22 |
+| Gel **synchrone** juste avant chaque déclenchement | 22 → 20 |
+| Animations **infinies** mises en pause au lieu de `finish()` | 20 → 8 |
+| **SMIL** (`<animateTransform>`) figé via `pauseAnimations()` | 8 → **0** |
 
-Les images sont **visuellement identiques**. Ce qui bouge, ce sont les
-pixels des animations non figées — balayages foil, lueur Éternel,
-barres de progression — saisis à une phase légèrement différente.
-`FOIL_FREEZE_JS` fige déjà les bandes foil de la planche de comparaison ;
-rien ne fige les autres.
+Trois pièges qui valent d'être retenus :
 
-**Conséquence pratique, et c'est la vraie gêne** : toute régénération
-produit **~40 fichiers binaires modifiés dans git**, que quoi que ce soit
-ait changé ou non. Un diff de captures ne dit donc rien — impossible de
-distinguer « le rendu a évolué » de « le script a retourné ».
+1. **`finish()` sur une animation infinie lève `InvalidStateError`** —
+   on ne termine pas ce qui ne finit pas. L'exception était avalée, donc
+   `eternalStars`, absente de la table des phases, continuait de tourner
+   et suffisait à faire varier 20 captures.
+2. **Le gel par intervalle laisse une fenêtre.** Un changement de vue
+   crée de nouvelles animations ; une capture peut tomber avant le
+   prochain tic. Le gel se fait maintenant juste avant chaque
+   déclenchement, pas 120 ms plus tôt.
+3. **SMIL n'est pas dans `document.getAnimations()`.** Les dégradés
+   Divin et Éternel du donut tournent par `<animateTransform>`, sur une
+   autre horloge : `svg.pauseAnimations()`. Eux seuls faisaient varier
+   les 7 captures `stats-rarity`.
 
-C'est ce qui a failli me faire conclure qu'un refactor du seed avait
-changé le rendu : 41 fichiers différaient entre l'ancien et le nouveau
-script. Le contrôle — deux exécutions du même script — a montré 42. Le
-refactor n'y était pour rien.
+**La phase est choisie, pas subie.** Figer à l'image 0 rendrait les
+effets invisibles. Chaque animation est arrêtée là où elle se montre —
+la bande foil au centre de la tuile, le halo Éternel à son maximum, les
+étoiles à pleine opacité, le dégradé du donut à un quart de tour. Les
+choix sont écrits dans `capture_screenshots.py`, au-dessus de la table.
 
-**Deux issues possibles**, aucune urgente :
-- figer toutes les animations avant capture (étendre `FOIL_FREEZE_JS` à
-  `document.getAnimations()` en entier), ce qui rendrait le gel
-  reproductible à l'octet et le diff git enfin lisible ;
-- ou l'assumer, et ne comparer les captures qu'à l'œil.
-
-⚠️ **Le README dit « deterministic in-repo script ».** C'est vrai du
-*seed* et du contrôle d'honnêteté, pas des octets produits. Formulation
-nuancée depuis (« deterministic seed »), parce que la nuance est
-exactement ce que ce fichier existe pour tenir.
+**Ce que ça débloque** : un diff de captures redevient un signal. Le
+jour où une régénération montrera 3 fichiers modifiés, ce sera parce que
+3 écrans ont changé.
 
 ---
 

@@ -34,7 +34,7 @@
 |---|---|---|---|
 | ![快速添加演示](screenshots/demo-quick-add.gif) | ![导航演示](screenshots/demo-nav.gif) | ![徽章演示](screenshots/demo-badges.gif) | ![Seasons demo](screenshots/demo-seasons.gif) |
 
-每段演示都由 `capture_demos.py` 生成，与静态截图使用同一个确定性种子（种子是确定的，像素不是——两次运行之间 SSIM 为 0.999988）。GIF 为 33.3 fps；60 fps 版本在旁边：[快速添加](screenshots/demo-quick-add.mp4) · [导航](screenshots/demo-nav.mp4) · [徽章](screenshots/demo-badges.mp4) · [赛季](screenshots/demo-seasons.mp4)。
+每段演示都由 `capture_demos.py` 生成，与静态截图使用同一个确定性种子；静态截图在两次运行之间**逐字节一致**——每个动画都会在拍摄前被冻结到选定的相位。GIF 为 33.3 fps；60 fps 版本在旁边：[快速添加](screenshots/demo-quick-add.mp4) · [导航](screenshots/demo-nav.mp4) · [徽章](screenshots/demo-badges.mp4) · [赛季](screenshots/demo-seasons.mp4)。
 
 
 ### 1.29 新功能 — v2 大改版
