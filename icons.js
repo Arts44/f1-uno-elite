@@ -82,6 +82,7 @@ const P = {
   // les thèmes (l'émoji restait multicolore).
   chequered: '<path d="M4.6 3.2v17.6"/><path d="M4.6 4.4h15v9.6h-15z"/><path d="M4.6 4.4h5v4.8h-5z" fill="currentColor" stroke="none"/><path d="M14.6 4.4h5v4.8h-5z" fill="currentColor" stroke="none"/><path d="M9.6 9.2h5v4.8h-5z" fill="currentColor" stroke="none"/>',
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  chevron: '<path d="m6 9 6 6 6-6"/>',
   lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   unlock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
   globe: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',

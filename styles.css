@@ -1666,6 +1666,31 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .setv-row-left{display:flex;flex-direction:column;gap:2px;}
 .setv-row-label{font-size:14px;font-weight:500;color:var(--tx1);}
 .setv-row-sub{font-size:11px;color:var(--tx3);}
+/* ── « Ce déploiement et ses limites » — replié par défaut ──
+   Le résumé emprunte .setv-row pour ne rien inventer : c'est une
+   rangée de réglage comme les autres, elle doit se lire comme telle.
+   Le chevron tourne à l'ouverture ; c'est le seul mouvement, et il
+   respecte prefers-reduced-motion comme le reste du dépôt.
+
+   Le corps est du TEXTE, pas des rangées : on y lit des phrases, donc
+   il prend la mesure de ligne d'un paragraphe (1.55) et non celle,
+   serrée, des libellés de réglage. Aucune couleur en dur — le bloc
+   « ce qui n'est jamais en jeu » s'appuie sur --green, la même teinte
+   que la progression, parce qu'il dit la même chose : ça va. */
+.setv-limits summary{cursor:pointer;list-style:none;}
+.setv-limits summary::-webkit-details-marker{display:none;}
+.setv-limits-chevron{color:var(--tx3);display:flex;transition:transform .18s ease;}
+.setv-limits[open] .setv-limits-chevron{transform:rotate(180deg);}
+.setv-limits-body{padding:0 var(--space-5) var(--space-5);
+  border-bottom:1px solid var(--border);}
+.setv-limits-body p{font-size:12px;line-height:1.55;color:var(--tx3);margin:0 0 var(--space-3);}
+.setv-limits-body p:last-child{margin-bottom:0;}
+.setv-limits-body strong{color:var(--tx2);font-weight:600;}
+.setv-limits-lead{color:var(--tx2)!important;}
+.setv-limits-safe{border-left:2px solid var(--green);padding-left:var(--space-3);}
+@media (prefers-reduced-motion: reduce){
+  .setv-limits-chevron{transition:none;}
+}
 .setv-btn{padding:var(--space-2) var(--space-5);border-radius:var(--r-pill);border:1.5px solid var(--border);background:var(--surface2);font-family:var(--font-b);font-size:13px;font-weight:600;color:var(--tx2);cursor:pointer;transition:var(--ease);white-space:nowrap;}
 .setv-btn:hover{background:var(--surface3);border-color:var(--red);color:var(--red);}
 .setv-btn.danger{border-color:var(--red-m);color:var(--red);}

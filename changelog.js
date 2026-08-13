@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.59.8',
+    date: '2026-08-13',
+    changes: {
+      en: ['Settings → About now carries a folded section that says plainly what running this app on free services implies: sign-in codes can be delayed, and the sync project sleeps after a quiet week. Your collection is never at stake — it lives on your device.'],
+      fr: ['Réglages → À propos porte désormais une section repliée qui dit franchement ce qu’implique un hébergement gratuit : les codes de connexion peuvent tarder, et le projet de synchronisation se met en veille après une semaine sans activité. Ta collection n’est jamais en jeu — elle vit sur ton appareil.'],
+      es: ['Ajustes → Acerca de incluye ahora una sección plegada que dice con franqueza lo que implica un alojamiento gratuito: los códigos de acceso pueden tardar y el proyecto de sincronización se duerme tras una semana sin actividad. Tu colección nunca está en juego: vive en tu dispositivo.'],
+      zh: ['设置 → 关于 新增一个折叠区块，坦率说明免费托管意味着什么：登录码可能延迟，同步项目在一周无活动后会休眠。你的收藏始终不受影响——它保存在你的设备上。'],
+      it: ['Impostazioni → Informazioni ha ora una sezione richiudibile che dice con franchezza cosa comporta un hosting gratuito: i codici di accesso possono tardare e il progetto di sincronizzazione va in pausa dopo una settimana di inattività. La tua collezione non è mai in gioco: vive sul tuo dispositivo.'],
+      nl: ['Instellingen → Over bevat nu een inklapbaar blok dat eerlijk zegt wat gratis hosting betekent: inlogcodes kunnen op zich laten wachten en het synchronisatieproject gaat slapen na een week zonder activiteit. Je verzameling staat nooit op het spel — die staat op je apparaat.'],
+      de: ['Einstellungen → Über enthält jetzt einen eingeklappten Abschnitt, der offen sagt, was kostenloses Hosting bedeutet: Anmeldecodes können sich verzögern, und das Sync-Projekt schläft nach einer ruhigen Woche ein. Deine Sammlung steht nie auf dem Spiel — sie liegt auf deinem Gerät.'],
+    },
+  },
+  {
     version: '1.59.7',
     date: '2026-08-13',
     changes: {

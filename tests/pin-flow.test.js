@@ -215,3 +215,56 @@ describe('pavé PIN — touche « tout effacer » et marche arrière', () => {
     }
   });
 });
+
+/* ══════════════════════════════════════════════════════════
+   « CE DÉPLOIEMENT ET SES LIMITES »
+
+   Une section d'honnêteté qui vieillit mal serait pire que pas de
+   section : elle donnerait une garantie fausse avec l'autorité d'un
+   texte officiel. Deux règles la protègent, et les voici en tests.
+   ══════════════════════════════════════════════════════════ */
+describe('réglages — la section des limites', () => {
+  const pin = read('pin.js');
+  const bloc = pin.slice(pin.indexOf('<details class="setv-limits">'),
+                         pin.indexOf('</details>'));
+
+  test('elle est REPLIÉE par défaut', () => {
+    assert.ok(bloc.startsWith('<details class="setv-limits">'),
+      'un `open` ici annoncerait un problème à quelqu’un qui n’en a pas');
+    assert.ok(!/<details[^>]*\bopen\b/.test(bloc));
+  });
+
+  test('aucun chiffre exact n’est écrit en dur dans le texte', () => {
+    // Le quota vit dans un dashboard : il peut changer sans que ce
+    // texte suive. « Une trentaine par heure » reste vrai plus
+    // longtemps que « 30 », et c'est exactement la dérive qu'on a
+    // passé une session à traquer dans les README.
+    const T = JSON.parse(JSON.stringify(globalThis.window.__T || {}));
+    for(const lg of Object.keys(T)){
+      const txt = [T[lg]['s.limits_mail_d'], T[lg]['s.limits_sleep_d']].join(' ');
+      assert.ok(txt, `${lg} : texte des limites absent`);
+      assert.ok(!/\b\d{2,}\b/.test(txt),
+        `${lg} : un nombre en dur (${txt.match(/\b\d{2,}\b/)}) — il périmera sans prévenir`);
+    }
+  });
+
+  test('les neuf clés existent dans les sept langues', () => {
+    const K = ['s.limits', 's.limits_sub', 's.limits_intro',
+               's.limits_mail_t', 's.limits_mail_d',
+               's.limits_sleep_t', 's.limits_sleep_d',
+               's.limits_safe_t', 's.limits_safe_d'];
+    for(const lg of ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de']){
+      for(const k of K){
+        assert.ok((globalThis.window.__T[lg] || {})[k], `${lg} : ${k} manquante`);
+      }
+    }
+  });
+
+  test('la zone de clic du résumé reste une cible tactile', () => {
+    const css = read('styles.css');
+    assert.match(css, /\.setv-limits summary\{[^}]*cursor:pointer/);
+    // Le résumé emprunte .setv-row : c'est elle qui porte le rembourrage
+    // vertical, donc la hauteur de cible. Mesuré au navigateur : 62 px.
+    assert.match(bloc, /<summary class="setv-row">/);
+  });
+});
