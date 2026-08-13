@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.59.6',
+    date: '2026-08-13',
+    changes: {
+      en: ['Coming back to your collection is smooth again. The grid was repainting all 101 tiles at once, and the navigation bead stuttered on the gesture you make most: 32 fps, now 61. The other pages gained from it too.'],
+      fr: ['Le retour sur ta collection est de nouveau fluide. La grille repeignait ses 101 tuiles d\'un coup et la pastille de navigation saccadait sur le geste le plus fréquent : 32 images/s, désormais 61. Les autres pages y gagnent aussi.'],
+      es: ['Volver a tu colección vuelve a ser fluido. La cuadrícula repintaba sus 101 fichas de golpe y el indicador de navegación se entrecortaba en el gesto más frecuente: 32 fps, ahora 61. Las demás páginas también salen ganando.'],
+      zh: ['返回收藏页重新变得顺滑。此前网格会一次性重绘全部 101 张卡片，导航滑块在最常用的手势上卡顿：32 帧/秒，现在是 61。其他页面也一并受益。'],
+      it: ['Tornare alla collezione è di nuovo fluido. La griglia ridisegnava tutte le 101 tessere in una volta e l\'indicatore di navigazione scattava proprio sul gesto più frequente: 32 fps, ora 61. Ne guadagnano anche le altre pagine.'],
+      nl: ['Terugkeren naar je collectie is weer vloeiend. Het raster tekende alle 101 tegels in één keer opnieuw en de navigatiestip haperde bij het gebaar dat je het vaakst maakt: 32 fps, nu 61. De andere pagina\'s profiteren mee.'],
+      de: ['Die Rückkehr zur Sammlung läuft wieder flüssig. Das Raster zeichnete alle 101 Kacheln auf einmal neu, und der Navigationspunkt ruckelte ausgerechnet bei der häufigsten Geste: 32 fps, jetzt 61. Die anderen Seiten profitieren mit.'],
+    },
+  },
+  {
     version: '1.59.5',
     date: '2026-08-13',
     changes: {

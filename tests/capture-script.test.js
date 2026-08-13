@@ -138,3 +138,69 @@ describe('capture_screenshots.py — déterminisme', () => {
       'un seul relevé de scrollY ne prouve pas que le défilement est terminé');
   });
 });
+
+/* ══════════════════════════════════════════════════════════
+   COMPARE_CAPTURES.PY — le seuil remplace la promesse
+
+   « Identique à l'octet » a été affirmé trois fois et réfuté trois
+   fois. À chaque fois la correction précédente était réelle, et la
+   mesure qui suivait était propre — trop courte, simplement. Ce qui
+   subsiste est un bruit d'anti-crénelage de quelques dizaines de
+   pixels à 10 niveaux sur 255, présent même avec les drapeaux de
+   rendu déterministe de Chromium.
+
+   Une propriété qui dépend d'un aléa intermittent ne se prouve pas
+   en répétant la mesure jusqu'à obtenir zéro. Elle se prouve en
+   bornant ce qu'on tolère — d'où deux seuils, et un outil qui les
+   applique.
+   ══════════════════════════════════════════════════════════ */
+describe('compare_captures.py — la propriété vérifiable', () => {
+  const cmp = readFileSync(new URL('../compare_captures.py', import.meta.url), 'utf8');
+
+  test('deux seuils, pas un', () => {
+    // Un seul seuil d'amplitude laisserait passer une image entière
+    // décalée d'un niveau ; un seul seuil de proportion laisserait
+    // passer trois pixels devenus noirs.
+    assert.match(cmp, /^MAX_NIVEAU = (\d+)/m);
+    assert.match(cmp, /^MAX_PROPORTION = /m);
+    const niveau = Number(cmp.match(/^MAX_NIVEAU = (\d+)/m)[1]);
+    assert.ok(niveau > 10 && niveau <= 20,
+      `${niveau}/255 : sous 10 le bruit mesuré échoue, au-delà de 20 un vrai `
+      + 'changement passe (trois pixels noirs valent 24)');
+  });
+
+  test('les deux seuils sont exigés ensemble, pas au choix', () => {
+    assert.match(cmp, /ampli > MAX_NIVEAU or prop > MAX_PROPORTION/,
+      'un OU sur les dépassements = un ET sur les tolérances ; l’inverse laisserait tout passer');
+  });
+
+  test('l’outil sort en échec, il ne se contente pas d’afficher', () => {
+    assert.match(cmp, /sys\.exit\(main\(\)\)/);
+    assert.match(cmp, /return 1/,
+      'sans code de sortie non nul, le contrôle ne peut pas être automatisé');
+  });
+
+  test('ni shell, ni exec', () => {
+    assert.ok(!/shell\s*=\s*True/.test(cmp));
+    assert.ok(!/\bexec\s*\(/.test(cmp));
+  });
+});
+
+/* La règle CSS qui accélère le retour sur Collection saute le rendu des
+   tuiles hors écran — donc leurs animations, donc le gel. Le script de
+   capture DOIT la neutraliser chez lui, sinon les captures redeviennent
+   variables (mesuré : pin-screen, desktop-collection). */
+describe('content-visibility — l’optimisation et sa contrepartie', () => {
+  const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+
+  test('la règle existe, avec sa taille intrinsèque', () => {
+    assert.match(css, /content-visibility:\s*auto/);
+    assert.match(css, /contain-intrinsic-size:\s*auto var\(--card-h\)/,
+      'sans taille réservée, la hauteur de grille varierait au défilement');
+  });
+
+  test('le script de capture la neutralise', () => {
+    assert.match(py, /content-visibility:\s*visible!important/,
+      'une tuile non rendue n’a pas d’animation à figer — le gel devient partiel');
+  });
+});

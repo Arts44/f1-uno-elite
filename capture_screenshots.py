@@ -202,6 +202,13 @@ def new_page(ctx, hide_nav=False, wait='.card'):
         page.add_style_tag(content='.bottom-nav{display:none!important}')
     # bandeau de mise à jour : hors sujet sur une capture de gel
     page.add_style_tag(content='#updateBanner,.update-banner{display:none!important}')
+    # `content-visibility:auto` (styles.css) laisse le navigateur SAUTER le
+    # rendu des tuiles hors écran : excellent à l'usage, incompatible avec
+    # un gel. Une tuile non rendue n'a pas d'animation à figer, et reprend
+    # à une phase quelconque en entrant dans le cadre. On rend donc tout,
+    # pendant la capture seulement — c'est le seul endroit où la lenteur
+    # ne coûte rien et où le déterminisme coûte tout.
+    page.add_style_tag(content='.card{content-visibility:visible!important}')
     page.wait_for_timeout(600)
     page.evaluate(FREEZE_JS)      # phases choisies, puis réarmement continu
     page.wait_for_timeout(150)
@@ -301,11 +308,28 @@ def go(page, view):
 
 # ══════════════════════════════════════════════════════════
 with sync_playwright() as p:
-    browser = p.chromium.launch(headless=True)
+    # Drapeaux de rendu DÉTERMINISTE. Sans eux, il restait un bruit
+    # d'anti-crénelage : une poignée de pixels à 3/255 sur un contour SVG,
+    # invisible à l'œil mais suffisant pour qu'un diff mente.
+    browser = p.chromium.launch(headless=True, args=[
+        '--disable-gpu', '--force-color-profile=srgb', '--disable-lcd-text',
+        '--disable-font-subpixel-positioning', '--disable-partial-raster',
+        '--disable-skia-runtime-opts', '--run-all-compositor-stages-before-draw',
+    ])
 
     def ctx_for(lang='en', theme='dark', w=800, h=500, scale=2, **over):
         c = browser.new_context(viewport={'width': w, 'height': h}, device_scale_factor=scale)
         c.add_init_script(init_script(lang, theme, **over))
+        # LE SEED PORTE UNE SESSION CLOUD FICTIVE, et la page Compte lit la
+        # date de dernière sauvegarde en réseau. La requête partait donc
+        # VRAIMENT vers Supabase, échouait au bout d'un temps variable, et
+        # la capture attrapait tantôt le « … » d'attente, tantôt le « none
+        # yet » résolu. Mesuré : 131 niveaux d'écart entre deux exécutions
+        # sur account-dark et account-light.
+        #
+        # Un gel visuel n'a rien à faire sur le réseau : on coupe l'origine
+        # à la racine. L'échec devient immédiat et identique à chaque fois.
+        c.route('**://*.supabase.co/**', lambda r: r.abort())
         return c
 
     def shot(page, name, png=False):
@@ -435,7 +459,13 @@ with sync_playwright() as p:
     def open_account(pg):
         go(pg, 'account')
         pg.wait_for_selector('#cloudArea')
-        pg.wait_for_timeout(700)
+        # La ligne « dernière sauvegarde » se remplit en asynchrone : on
+        # attend l'état RÉSOLU, pas une durée. Attendre 700 ms, c'était
+        # parier sur la latence.
+        pg.wait_for_function(
+            '() => { const e = document.getElementById("cloudLastBackup");'
+            ' return !e || e.textContent.trim() !== "\u2026"; }', timeout=8000)
+        pg.wait_for_timeout(300)
     mobile('dark', 'account-dark.jpg', open_account)
     mobile('light', 'account-light.jpg', open_account)
 

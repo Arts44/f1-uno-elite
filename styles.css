@@ -523,6 +523,35 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    bloc existe pour supprimer. Détail et arbitrage : docs/POINTS-SIGNALES.md n°9.
    ══════════════════════════════════════════════════════════ */
 :root{--card-h:320px;}
+/* ══════════════════════════════════════════════════════════
+   LE RETOUR SUR COLLECTION — ce que la mesure a corrigé
+
+   Le défaut signalé disait : « la grille se reconstruit entièrement au
+   retour sur Collection ». MESURÉ, c'est faux. Les 101 tuiles sont
+   marquées avant le changement de vue et retrouvées intactes après —
+   101 marques sur 101, zéro nœud ajouté, aucune tâche longue. Le DOM
+   n'est pas touché.
+
+   Ce qui coûte est ailleurs : la vue passe de `display:none` à visible,
+   donc le navigateur doit REPEINDRE 101 tuiles d'un coup, avec leurs
+   couches foil. C'est un coût de peinture, pas de construction — et
+   c'est pour ça qu'aucune tâche longue n'apparaissait : le travail est
+   dans le compositeur, pas dans le fil JS.
+
+   `content-visibility:auto` laisse le navigateur sauter le rendu des
+   tuiles hors écran. `contain-intrinsic-size` lui donne la taille à
+   réserver en attendant — et ici elle est EXACTE, puisque la hauteur de
+   tuile est fixe : hauteur de grille inchangée, 17 052 px à 320 et
+   390 px, 7 032 à 1280, avec ou sans la règle. Le zéro-décalage tient.
+
+   Mesuré sur les 280 ms du glissement de la pastille, retour sur
+   Collection : 32-36 fps → 61 fps, pire écart entre images 83 → 17 ms.
+
+   CONTREPARTIE, ET ELLE EST RÉELLE : une tuile dont le rendu est sauté
+   n'a pas d'animation à figer. Le script de captures désactive donc
+   cette règle chez lui — voir capture_screenshots.py, `new_page()`.
+   ══════════════════════════════════════════════════════════ */
+.card{content-visibility:auto;contain-intrinsic-size:auto var(--card-h);}
 .card{background:var(--surface);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-sm);transition:var(--ease);cursor:pointer;position:relative;border:1.5px solid var(--border);display:flex;flex-direction:column;height:var(--card-h);}
 .card:hover{transform:translateY(-3px);box-shadow:var(--sh-lg);border-color:var(--red-m);}
 

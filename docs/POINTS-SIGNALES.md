@@ -13,8 +13,8 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Ouvert aujourd'hui : 7.** Corrigés, mesurés ou tranchés,
-> et conservés : 1a, 1b, 2, 3, 4, 5, 6, 8, 9, 10, 11.
+> **Aucun point ouvert.** Corrigés, mesurés ou tranchés, et tous
+> conservés : 1a, 1b, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11.
 
 ---
 
@@ -382,7 +382,45 @@ distinction.
 
 ---
 
-## 7. La grille se reconstruit entièrement au retour sur Collection — et l'animation le paie
+## 7. ~~La grille se reconstruit entièrement au retour sur Collection~~ — CORRIGÉ (1.59.6), diagnostic redressé
+
+> **La prémisse était fausse, et c'est la mesure qui l'a dit.** Les 101
+> tuiles sont marquées avant le changement de vue et retrouvées intactes
+> après : **101 marques sur 101, zéro nœud ajouté, aucune tâche longue**
+> (`PerformanceObserver`, entryType `longtask`). Le DOM n'est pas touché.
+> La comparaison avec le défaut d'ajout rapide — « même signature » —
+> était donc trompeuse : là, un re-rendu JS ; ici, rien du tout.
+>
+> **Le coût est dans la PEINTURE.** La vue passe de `display:none` à
+> visible : le navigateur repeint 101 tuiles d'un coup, avec leurs
+> couches foil. D'où l'absence de tâche longue — le travail est dans le
+> compositeur, pas dans le fil JS. C'est aussi pourquoi le profilage par
+> tâches longues ne voyait rien, alors que l'œil, lui, voyait.
+>
+> **Corrigé par deux lignes de CSS** : `content-visibility:auto` laisse
+> le navigateur sauter le rendu des tuiles hors écran ;
+> `contain-intrinsic-size:auto var(--card-h)` lui donne la taille exacte
+> à réserver — elle l'est, puisque la hauteur de tuile est fixe.
+>
+> | | avant | après |
+> |---|---|---|
+> | Images sur les 280 ms du glissement | 9-11 | **17** |
+> | Cadence | 32-36 fps | **61 fps** |
+> | Pire écart entre deux images | 83 ms | **17 ms** |
+> | Hauteur de grille (320/390/1280 px) | 17 052 / 17 052 / 7 032 | **inchangée** |
+>
+> Les trois autres vues en profitent aussi : Badges passe de 32-46 à
+> 57 fps.
+>
+> **La contrepartie est réelle et documentée** : une tuile dont le rendu
+> est sauté n'a pas d'animation à figer. Le script de captures désactive
+> donc la règle chez lui. C'est la seule dette de ce correctif, elle est
+> écrite aux deux endroits, et elle a coûté une demi-journée de mesures
+> — voir le n°11, qui a doublé de volume à cette occasion.
+
+### Diagnostic d'origine — conservé, et faux sur sa cause
+
+
 
 **Mesuré, reproductible, et ce n'est pas un artefact de capture.**
 
@@ -429,10 +467,12 @@ survécu jusqu'à ce qu'un script la compte image par image.
 **Deux exécutions du même script donnent désormais 0 fichier différent
 sur 52.** Avant : 42.
 
-> ⚠️ **Ce « 0 » était un échantillon de taille un, et il a menti.** Deux
-> autres sources d'aléa, sans rapport avec les animations, subsistaient —
-> voir le **point n°11**. Le gel décrit ici reste juste ; il n'était pas
-> suffisant.
+> ⚠️ **Ce « 0 » était un échantillon de taille un, et il a menti — trois
+> fois.** D'autres sources d'aléa subsistaient, sans rapport avec les
+> animations, et la dernière n'est pas corrigeable : voir le **point
+> n°11**. Le gel décrit ici reste juste ; il n'a jamais été suffisant, et
+> l'objectif lui-même — l'octet — a fini par être abandonné au profit
+> d'un seuil vérifiable.
 
 
 Le gel des animations est passé de partiel (les seules bandes foil de
@@ -595,7 +635,44 @@ et l'étape atteinte est **vérifiée** — une capture prise ailleurs est un
 échec, pas une variante.
 
 **Vérifié par quatre exécutions consécutives, trois comparaisons, zéro
-différence.** C'est le vrai enseignement : le « 0/52 » précédent n'était
-pas un mensonge, c'était un échantillon de taille un. Un aléa qui frappe
-3 fichiers sur 52 avec une probabilité modérée passe inaperçu une fois
-sur deux.
+différence** — et ce « zéro » a menti à son tour.
+
+---
+
+### La quatrième mesure : l'octet n'est pas tenable, et c'est acté
+
+Trois exécutions de plus, faites en préparant le correctif du n°7, ont
+montré **1 à 3 fichiers variables** — encore d'autres causes :
+
+**3. La page Compte lisait le réseau.** Le seed porte une session cloud
+fictive, et la ligne « dernière sauvegarde » part vraiment interroger
+Supabase, échoue au bout d'un temps variable, et la capture attrape
+tantôt le `…` d'attente, tantôt le « none yet » résolu. **131 niveaux
+d'écart** — la seule des quatre causes qui se VOYAIT. Corrigé en coupant
+l'origine `*.supabase.co` à la racine du contexte de capture (un gel
+visuel n'a rien à faire sur le réseau) et en attendant l'état résolu.
+
+**4. Le reste est du bruit d'anti-crénelage, et il ne partira pas.**
+Après les trois corrections, il subsiste par intermittence quelques
+dizaines de pixels à **3 à 10 niveaux sur 255**, sur un halo de PIN ou un
+contour SVG. Testé avec les drapeaux de rendu déterministe de Chromium
+(`--disable-gpu`, `--force-color-profile=srgb`, `--disable-lcd-text`,
+`--disable-partial-raster`…) : le bruit diminue, il ne disparaît pas. En
+isolation, la même capture est pourtant identique 3 fois sur 3 — c'est
+donc l'exécution complète qui le produit, pas la page.
+
+**Ce qui remplace la promesse.** `compare_captures.py` régénère et compare
+avec **deux seuils chiffrés** : amplitude ≤ 16/255 **et** ≤ 0,4 % des
+pixels touchés. Vérifié sur quatre cas fabriqués à la taille réelle des
+captures : le bruit mesuré passe, un texte qui change (178 niveaux)
+échoue, trois pixels devenus noirs (24 niveaux) échouent, une image
+décalée d'un seul niveau échoue.
+
+> **La leçon, écrite une bonne fois.** « Identique à l'octet » a été
+> affirmé trois fois et réfuté trois fois. Ce n'était pas de la
+> malhonnêteté : à chaque fois, la correction précédente était réelle et
+> la mesure qui suivait était propre — trop courte, simplement. Une
+> propriété qui dépend d'un aléa intermittent ne se prouve pas en
+> répétant la mesure jusqu'à obtenir zéro ; elle se prouve en bornant ce
+> qu'on tolère. Le seuil vaut mieux que le zéro, parce qu'il est
+> vérifiable en une commande et qu'il ne peut pas mentir par chance.
