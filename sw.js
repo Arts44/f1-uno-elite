@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v145';
+const SW_VERSION = 'v146';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -57,7 +57,7 @@ const SHELL_ASSETS = [
   'update.js',
   'changelog.js',
   'secure-store.js',
-  'feedback.js',
+  'feedback.js', 'review-invite.js',
   'otp-input.js',
   'session.js',
   'account.js',

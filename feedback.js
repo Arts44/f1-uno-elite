@@ -14,6 +14,7 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
+import { switchView } from './render.js';
 import { t, escapeHtml, setSafeHTML } from './i18n.js';
 import { APP_VERSION } from './changelog.js';
 // feedback.js n'a rien à voir avec la synchronisation d'une collection :
@@ -93,6 +94,11 @@ export async function sendFeedback(type, message){
   if(res.status === 201){
     _lastSentAt = Date.now();
     log('feedback sent:', payload.type, payload.message.length, 'chars');
+    // Le premier avis envoyé ÉTEINT l'invitation, définitivement. C'est
+    // la première règle du contrat : elle ne s'adresse qu'à qui n'a
+    // jamais écrit. Import différé — feedback.js ne doit pas dépendre de
+    // l'invitation, c'est l'inverse qui est vrai.
+    import('./review-invite.js').then(m => m.reviewOff()).catch(() => {});
     return true;
   }
   if(res.status === 401) throw new Error('session-expired');
@@ -154,6 +160,39 @@ export function feedbackSectionHTML(){
         </div>
       </div>`}
     </div>`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   OUVRIR LE FORMULAIRE — directement, sans faire chercher
+
+   L'invitation à laisser un avis ouvre CE formulaire, pas la page qui
+   le contient : une invitation qui demande un effort supplémentaire ne
+   convertit pas.
+
+   Ce qui est fait ici : aller sur Compte, faire défiler la section
+   jusqu'au champ, et lui donner le FOCUS. L'utilisateur arrive le
+   curseur dans la zone de saisie — il n'a rien à trouver.
+
+   CE QUI N'EST PAS FAIT, et c'est délibéré : une copie du formulaire
+   dans une modale. Ce serait deux formulaires à faire évoluer
+   ensemble — validation, compteur, cool-down, messages d'erreur — donc
+   deux endroits qui changeraient TOUJOURS en même temps. Le critère du
+   dépôt dit de ne pas dupliquer ça.
+
+   Le `setTimeout` attend le rendu de la vue : `switchView` repeint la
+   page Compte, et un focus posé avant trouverait un champ qui n'existe
+   pas encore. ══════════════════════════════════════════════════════ */
+export function openFeedbackForm(){
+  if(deniedForViewer()) return false;
+  switchView('account');
+  setTimeout(() => {
+    const zone = document.getElementById('fbMsg');
+    const section = document.querySelector('.acc-feedback');
+    if(section) section.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    if(zone) zone.focus({ preventScroll: true });
+    log('feedback: formulaire ouvert depuis l’invitation', zone ? 'ok' : '(non connecté)');
+  }, 260);
+  return true;
 }
 
 export function bindFeedbackSection(){

@@ -52,6 +52,10 @@ const DEVICE_KEYS = [
   // serveur au lieu d'être averti par l'app. Aucune donnée personnelle —
   // un entier — et rien à chiffrer.
   'f1uno_otp_sent_at',
+  // invitation à laisser un avis : GLOBALE, pas par saison — elle
+  // concerne la personne, pas la collection. Quelqu'un qui bascule de
+  // saison est le même qui a répondu « non merci » l'année d'avant.
+  'f1uno_review',
   // schéma de stockage
   'f1uno_version',
   // clés héritées, uniquement LUES par la migration puis effacées

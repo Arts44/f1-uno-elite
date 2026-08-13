@@ -1389,6 +1389,43 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 /* toast badge — même anatomie que le toast standard, au-dessus de la nav */
 .badge-toast{position:fixed;left:50%;transform:translate(-50%,16px);bottom:calc(var(--nav-clear) + 6px);z-index:300;display:flex;align-items:center;gap:var(--space-10px);background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-md);padding:var(--space-10px) var(--space-4);box-shadow:var(--sh-lg);opacity:0;pointer-events:none;transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.22,0.9,0.36,1);cursor:pointer;}
 .badge-toast.show{opacity:1;transform:translate(-50%,0);pointer-events:all;}
+/* ── Invitation à laisser un avis ──────────────────────────────
+   Même grammaire que .badge-toast : elle se pose là où la célébration
+   vient de disparaître, avec la même carte et la même ombre. Plus haute,
+   parce qu'elle porte trois actions — et chacune fait 44 px, le plancher
+   tactile imposé à tout le dépôt depuis la phase C.
+
+   Rien n'est bloquant : aucun voile, aucun piège de focus, l'app
+   continue de fonctionner dessous. Une invitation qui empêche
+   d'utiliser l'app ne mérite pas de réponse honnête. */
+.rv-invite{position:fixed;left:50%;transform:translate(-50%,16px);
+  bottom:calc(var(--nav-clear) + 6px);z-index:300;
+  width:min(420px, calc(100vw - 28px));box-sizing:border-box;
+  display:flex;align-items:flex-start;gap:var(--space-3);
+  background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-md);
+  padding:var(--space-3) var(--space-10px);box-shadow:var(--sh-lg);
+  opacity:0;pointer-events:none;
+  transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.22,0.9,0.36,1);}
+.rv-invite.show{opacity:1;transform:translate(-50%,0);pointer-events:all;}
+.rv-ic{flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:var(--red-s);
+  display:flex;align-items:center;justify-content:center;color:var(--red);}
+.rv-ic .ic{width:17px;height:17px;}
+.rv-body{flex:1;min-width:0;}
+.rv-k{font-size:10px;font-weight:800;letter-spacing:0.09em;text-transform:uppercase;color:var(--red);}
+.rv-t{font-size:12.5px;line-height:1.45;color:var(--tx1);margin:2px 0 8px;}
+.rv-acts{display:flex;gap:6px;flex-wrap:wrap;}
+.rv-btn{min-height:44px;padding:0 14px;border-radius:var(--r-pill);border:1.5px solid var(--border);
+  background:var(--surface2);color:var(--tx2);font-family:var(--font-b);font-size:12px;font-weight:600;
+  cursor:pointer;display:inline-flex;align-items:center;transition:var(--ease-fast);}
+.rv-btn:hover{background:var(--surface3);}
+.rv-btn.primary{border-color:var(--red);color:var(--red);}
+.rv-x{flex:0 0 auto;width:44px;height:44px;margin:-9px -9px 0 0;border-radius:50%;
+  border:none;background:none;color:var(--tx3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;}
+.rv-x .ic{width:14px;height:14px;}
+@media (prefers-reduced-motion: reduce){
+  .rv-invite{transition:opacity 0.2s ease;}
+}
 .bgt-med{width:36px;height:36px;border-radius:50%;background:var(--red-s);display:flex;align-items:center;justify-content:center;font-size:18px;}
 .bgt-k{font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:var(--red);}
 .bgt-n{font-family:var(--font-d);font-weight:700;font-size:13px;color:var(--tx1);}

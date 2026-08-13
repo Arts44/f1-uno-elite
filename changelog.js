@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.60.0',
+    date: '2026-08-13',
+    changes: {
+      en: ['Once you’ve been collecting for a while, a small band may appear after a badge unlock, asking whether you’d like to leave a word about the app. It opens the feedback form directly, and it plays fair: it never shows to anyone who has already written, at most twice ever, and “No thanks” means never again.'],
+      fr: ['Quand tu collectionnes depuis un moment, une petite bande peut apparaître après un déblocage de badge pour te demander si tu veux laisser un mot sur l’app. Elle ouvre le formulaire directement, et elle joue franc jeu : jamais pour qui a déjà écrit, deux fois maximum dans toute la vie de l’app, et « Non merci » veut dire plus jamais.'],
+      es: ['Cuando llevas un tiempo coleccionando, puede aparecer una pequeña banda tras desbloquear una insignia para preguntarte si quieres dejar unas palabras sobre la app. Abre el formulario directamente y juega limpio: nunca a quien ya ha escrito, dos veces como máximo en toda la vida de la app, y «No, gracias» significa nunca más.'],
+      zh: ['当你收藏了一段时间后，解锁徽章之后可能会出现一个小横幅，问你愿不愿意留几句话。它会直接打开反馈表单，而且规矩很清楚：已经写过的人永远不会看到，一生最多出现两次，点了“不用了”就再也不会出现。'],
+      it: ['Quando collezioni da un po’, dopo lo sblocco di un badge può comparire una piccola banda che ti chiede se vuoi lasciare una parola sull’app. Apre il modulo direttamente e gioca pulito: mai a chi ha già scritto, al massimo due volte in tutta la vita dell’app, e «No, grazie» vuol dire mai più.'],
+      nl: ['Verzamel je al een tijdje, dan kan na het vrijspelen van een badge een klein balkje verschijnen dat vraagt of je iets over de app wilt zeggen. Het opent het formulier meteen en speelt eerlijk: nooit bij wie al geschreven heeft, hooguit twee keer in het hele bestaan van de app, en “Nee, bedankt” betekent nooit meer.'],
+      de: ['Wenn du schon eine Weile sammelst, kann nach einem freigeschalteten Abzeichen ein kleines Band erscheinen und fragen, ob du ein Wort zur App loswerden willst. Es öffnet das Formular direkt und spielt fair: nie bei jemandem, der schon geschrieben hat, höchstens zweimal im ganzen Leben der App, und „Nein danke“ heißt nie wieder.'],
+    },
+  },
+  {
     version: '1.59.9',
     date: '2026-08-13',
     changes: {

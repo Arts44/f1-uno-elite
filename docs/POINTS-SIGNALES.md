@@ -13,9 +13,9 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Aucun point ouvert.** Les treize sont corrigés, mesurés ou tranchés,
+> **Aucun point ouvert.** Les quatorze sont corrigés, mesurés ou tranchés,
 > et tous conservés avec leur diagnostic : 1a, 1b, 2, 3, 4, 5, 6, 7, 8,
-> 9, 10, 11, 12, 13. Reste une hypothèse non mesurée, notée au n°12 §C :
+> 9, 10, 11, 12, 13, 14. Reste une hypothèse non mesurée, notée au n°12 §C :
 > ce que voit l'utilisateur quand le quota Resend est atteint.
 
 ---
@@ -962,3 +962,36 @@ safe_lang := replace(replace(replace(coalesce(new.lang,'?'), '&','&amp;'), '<','
 > avant d'être versionné, il n'était visible nulle part, et il a été vu
 > à la première relecture rendue possible. Le versionnement n'a pas
 > créé le défaut : il a créé la relecture.
+
+---
+
+## 14. L'invitation peut s'afficher une fois à quelqu'un qui a DÉJÀ écrit — décision assumée
+
+**Le contrat dit** : l'invitation ne s'adresse qu'à qui n'a jamais envoyé
+d'avis. **L'implémentation tient ça pour l'avenir** — le premier envoi
+réussi appelle `reviewOff()` et éteint tout, définitivement.
+
+**Ce qu'elle ne peut pas savoir** : qu'un avis a été envoyé *avant* que
+cette version existe, ou depuis un autre appareil. L'état vit dans le
+`localStorage` de l'appareil ; la table `feedback`, elle, est côté
+serveur.
+
+**La vérification serveur a été envisagée et REFUSÉE**, sur un rapport
+coût/bénéfice explicite :
+
+| | |
+|---|---|
+| Ce que ça éviterait | **une** invitation, **une** fois, à quelqu'un ayant déjà écrit |
+| Ce que ça coûterait | un appel réseau à **chaque** affichage potentiel, une dépendance de l'invitation au cloud, un chemin d'échec de plus (hors-ligne, session expirée) |
+| Population concernée à la décision | **deux personnes** |
+
+Le calcul ne tient pas. Et le pire cas est bénin : quelqu'un qui a déjà
+donné son avis voit une bande discrète, clique « Non merci », et ne la
+revoit jamais.
+
+> **Ce point est ici pour que la décision soit TRACÉE, pas pour qu'elle
+> soit refaite.** Si un jour l'app compte des centaines d'utilisateurs
+> et que plusieurs signalent avoir été relancés après avoir écrit, c'est
+> le moment de rouvrir — pas avant. La donnée qui déclencherait la
+> réouverture est nommée : des retours d'utilisateurs disant « on me l'a
+> redemandé ».

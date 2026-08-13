@@ -768,7 +768,21 @@ function _drainToastQueue(){
   try { if(navigator.vibrate) navigator.vibrate(30); } catch(e){ /* iOS: pas d'API */ }
   setTimeout(() => {
     el.classList.remove('show');
-    setTimeout(() => { _toastShowing = false; _drainToastQueue(); }, 400);
+    setTimeout(() => {
+      _toastShowing = false;
+      _drainToastQueue();
+      // LA FILE EST VIDE = la célébration vient de retomber. C'est le
+      // seul moment où l'invitation à laisser un avis a le droit
+      // d'apparaître : jamais pendant une action, jamais par-dessus un
+      // autre toast — cette file garantit déjà les deux.
+      // Import différé : badges.js ne doit pas charger l'invitation au
+      // démarrage, elle ne sert qu'ici et rarement.
+      if(!_toastQueue.length){
+        import('./review-invite.js')
+          .then(m => m.maybeInviteAfterCelebration())
+          .catch(() => {});
+      }
+    }, 400);
   }, 2800);
 }
 
