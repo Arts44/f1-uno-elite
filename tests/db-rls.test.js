@@ -192,15 +192,59 @@ describe('db/ — les politiques RLS restent en place', () => {
     }
   });
 
-  test('aucune adresse e-mail en clair dans db/', () => {
-    // Le destinataire des notifications est un marqueur documenté, pas
-    // une valeur. Une adresse dans un dépôt public, c'est du spam
-    // garanti et une donnée personnelle publiée.
+  /* ── L'EXPÉDITEUR ET LES README NE PEUVENT PLUS BOUGER SÉPARÉMENT ──
+     Point n°12 : le jour de la bascule vers un domaine vérifié, deux
+     choses changent en même temps — l'expéditeur dans la fonction, et
+     la puce « limites honnêtes » des sept README qui explique que le
+     domaine de TEST ne délivre qu'au propriétaire du compte.
+
+     Rien ne force ces deux gestes à se suivre, et c'est exactement la
+     forme de dérive qu'on a passé une session à traquer : un README
+     resté vrai la veille, faux le lendemain, sans que rien ne le dise.
+     Ce test les attache l'un à l'autre. Il passe aujourd'hui (les deux
+     côtés décrivent le domaine de test) et passera après (aucun des
+     deux ne le mentionnera) — mais échoue entre les deux. */
+  test('le domaine de test disparaît des DEUX côtés, ou d’aucun', () => {
+    const TEST_DOMAIN = 'onboarding@resend.dev';
+    const sql = lire('03-functions.sql');
+    const READMES = ['README.md', 'README.fr.md', 'README.es.md', 'README.zh.md',
+                     'README.it.md', 'README.nl.md', 'README.de.md'];
+    const citants = READMES.filter(f =>
+      readFileSync(new URL(`../${f}`, import.meta.url), 'utf8').includes(TEST_DOMAIN));
+
+    if(sql.includes(TEST_DOMAIN)){
+      assert.equal(citants.length, READMES.length,
+        `l'expéditeur est encore ${TEST_DOMAIN}, mais ${READMES.length - citants.length} `
+        + 'README ne le disent plus — la doc a bougé avant le code');
+    } else {
+      assert.deepEqual(citants, [],
+        `l'expéditeur a changé, mais ces README décrivent encore le domaine de test : `
+        + `${citants.join(', ')}. Voir le point n°12, section B.`);
+    }
+  });
+
+  test('aucune adresse PERSONNELLE en clair dans db/', () => {
+    /* Ce qu'on interdit : l'adresse du mainteneur, remplacée par un
+       marqueur documenté. Une adresse personnelle dans un dépôt public,
+       c'est du spam garanti et une donnée publiée.
+
+       Ce qu'on autorise, et pourquoi la liste est explicite plutôt que
+       « tout ce qui finit par arts44.dev » : une adresse de RÔLE sur le
+       domaine du projet est publique par nature — elle voyage dans
+       l'en-tête de chaque e-mail envoyé. `herve@arts44.dev` resterait
+       refusée, `noreply@arts44.dev` non.
+
+       Cette liste anticipe le point n°12. Sans elle, la bascule vers le
+       domaine vérifié ferait rougir la suite au moment précis où on a
+       besoin qu'elle dise la vérité sur autre chose. */
+    const ROLES = ['noreply', 'no-reply', 'avis', 'feedback', 'contact'];
+    const AUTORISEES = new RegExp(
+      `^(?:${ROLES.join('|')})@arts44\\.dev$|@(?:resend\\.dev|example\\.(?:com|org))$`);
     for(const f of ['README.md', '02-rls.sql', '01-tables.sql', '03-functions.sql']){
       if(!existsSync(new URL(`../db/${f}`, import.meta.url))) continue;
       const s = lire(f);
       const trouve = s.match(/[\w.+-]+@[\w-]+\.[\w.]+/g) || [];
-      const suspects = trouve.filter(a => !/@(resend\.dev|example\.(com|org))$/.test(a));
+      const suspects = trouve.filter(a => !AUTORISEES.test(a));
       assert.deepEqual(suspects, [],
         `adresse en clair dans db/${f} — utiliser <ADRESSE_MAINTENEUR>`);
     }

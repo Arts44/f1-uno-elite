@@ -709,6 +709,143 @@ en indésirables » du rapport cloud n'aura plus la même réponse.
 
 ---
 
+### A. Le SQL, prêt à coller
+
+**Dans la base D'ABORD, le dépôt ensuite** — l'ordre du n°13, pour la
+même raison : corriger `db/` sans corriger le serveur produirait un
+schéma versionné qui ne décrit plus rien.
+
+Une seule ligne change dans `notify_feedback_email()`. Le reste de la
+fonction — les quatre échappements, le garde de clé nulle, le bloc
+`exception` — **ne doit pas bouger** :
+
+```sql
+-- Remplacer UNIQUEMENT la ligne 'from' du corps de la requête :
+--
+--   'from', 'F1 UNO Élite <onboarding@resend.dev>',
+--
+-- par :
+      'from', 'F1 UNO Élite <NOREPLY@arts44.dev>',
+```
+
+`<NOREPLY@arts44.dev>` est le marqueur : mettre l'adresse réellement
+vérifiée chez Resend (`noreply@`, `avis@`, peu importe — **elle doit
+appartenir au domaine vérifié**, sinon Resend refuse l'envoi avec un 403
+et le trigger l'avalera en silence, puisqu'il avale tout).
+
+La façon la moins risquée de l'appliquer est de **re-exécuter la
+fonction entière** depuis `db/03-functions.sql` avec cette seule ligne
+modifiée, plutôt que d'éditer dans le dashboard : le fichier est la
+référence, il évite d'introduire une différence en même temps.
+
+**Puis re-extraire**, comme pour le n°13 :
+
+```sql
+select pg_get_functiondef(p.oid) from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public' and p.proname = 'notify_feedback_email';
+```
+
+⚠️ **Remplacer l'adresse du destinataire par `<ADRESSE_MAINTENEUR>`
+avant de coller** — elle est passée en clair les deux fois précédentes.
+
+**Vérification** : envoyer un avis depuis l'app et confirmer que
+l'e-mail arrive **avec le nouvel expéditeur**. Le trigger avalant ses
+propres erreurs, un envoi raté ne se signale nulle part : l'absence
+d'e-mail est le seul symptôme, et il ressemble à « personne n'a écrit ».
+
+---
+
+### B. Les textes utilisateur, et le piège de formulation
+
+**Deux plafonds de natures différentes**, et c'est le point à ne pas
+rater en réécrivant :
+
+| | Aujourd'hui (SMTP) | Après (Resend gratuit) |
+|---|---|---|
+| Plafond | ~30 par **heure** | 100 par **jour**, 3 000 par mois |
+| Ce qui se passe quand il est atteint | l'attente se compte en **minutes** | l'attente se compte en **heures** |
+| Formule qui reste vraie | « ça se débloque tout seul » | ⚠️ vraie, mais **jusqu'au lendemain** |
+
+Un plafond horaire se recharge en permanence : attendre suffit toujours,
+et « patiente » est un conseil honnête. Un plafond quotidien, une fois
+épuisé, ne se recharge qu'au jour suivant. **Écrire « une centaine par
+jour » sans dire ce que ça implique reprendrait la formulation actuelle
+en la vidant de son sens.**
+
+**À réécrire, dans cet ordre :**
+
+1. **`s.limits_mail_d` ×7** (Réglages → limites). La formule « une
+   trentaine par heure » devient fausse. Garder la règle du n°4 : **pas
+   de chiffre exact**, parce qu'il vit chez un prestataire et changera
+   sans prévenir. Une piste : « L'envoi d'e-mails est plafonné à environ
+   une centaine par jour pour l'ensemble des utilisateurs. En cas
+   d'affluence, ton code peut attendre — et si le plafond du jour est
+   atteint, l'attente peut aller jusqu'au lendemain. »
+
+2. **Les 7 README**, puce « limites honnêtes » — une seule occurrence par
+   fichier, `grep -n "onboarding@resend.dev" README*.md` les trouve
+   toutes. Le paragraphe entier tombe : il explique que le domaine de
+   test ne délivre qu'au propriétaire du compte, ce qui cesse d'être le
+   cas. Ce qui le remplace n'est pas une limite mais une **amélioration**
+   — domaine vérifié, SPF/DKIM/DMARC, délivrabilité réelle — donc la
+   puce change de section autant que de contenu.
+
+3. **Le README anglais**, si le chiffre des quotas y apparaît ailleurs :
+   `grep -n "thirty\|30 per hour\|trentaine" README*.md`.
+
+---
+
+### C. Un effet de bord à vérifier, que personne n'a mesuré
+
+**Quand le quota Resend est épuisé, que voit l'utilisateur ?**
+
+Aujourd'hui, un dépassement de quota SMTP remonte en `429` → l'app
+affiche « Trop de demandes — réessaie dans N s » avec le délai réel.
+C'est juste.
+
+Rien ne garantit qu'un dépassement de quota **Resend** remonte de la
+même façon. S'il arrive en `500`/`error_sending`, `classifyOtpError()`
+le classe en `mail-down` et l'app affiche « Le service d'e-mail ne
+répond pas — ton adresse n'est pas en cause. **Réessaie dans quelques
+minutes.** »
+
+Le début reste vrai, la fin devient un mauvais conseil : réessayer dans
+quelques minutes ne servira à rien avant le lendemain.
+
+**À faire au moment de la bascule** : provoquer ou simuler le
+dépassement, lire le statut et le corps réellement renvoyés, et — si
+c'est bien un 500 — ajouter une branche à `classifyOtpError()`. Tant que
+ce n'est pas mesuré, ça reste une hypothèse, et elle est notée comme
+telle.
+
+---
+
+### D. Ce qui est déjà en place pour que la bascule ne se fasse pas à moitié
+
+Deux garde-fous ont été posés **avant** la bascule, pendant qu'on avait
+le sujet en tête plutôt qu'au milieu du geste :
+
+**Le couplage code ↔ documentation.** `tests/db-rls.test.js` échoue si
+`onboarding@resend.dev` disparaît de `db/03-functions.sql` sans
+disparaître des sept README, **et l'inverse**. Le test passe aujourd'hui
+(les deux côtés décrivent le domaine de test), passera après (aucun des
+deux ne le mentionnera), et rougit entre les deux. Vérifié dans les
+trois configurations.
+
+**L'adresse de rôle sur le domaine du projet est autorisée d'avance.**
+Le garde qui refuse toute adresse en clair dans `db/` aurait refusé
+`noreply@arts44.dev` — une adresse publique par nature, qui voyage dans
+l'en-tête de chaque e-mail. La liste des locaux autorisés (`noreply`,
+`no-reply`, `avis`, `feedback`, `contact`) est explicite plutôt que
+« tout `@arts44.dev` » : `herve@arts44.dev` reste refusée, et c'est
+vérifié.
+
+> Sans ces deux ajustements, la bascule aurait fait rougir la suite au
+> moment précis où on a besoin qu'elle dise la vérité sur autre chose.
+
+---
+
 ## 13. ~~`app_version` et `lang` entrent dans l'e-mail de notification sans échappement~~ — CORRIGÉ
 
 > **Corrigé dans la base d'abord, puis re-extrait dans `db/`** — l'ordre
