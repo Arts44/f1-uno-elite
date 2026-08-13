@@ -1,4 +1,4 @@
-# Points signalés, non corrigés
+# Points signalés
 
 > Trouvés en chemin pendant un autre chantier, et **délibérément laissés
 > tels quels** pour ne pas mélanger un déplacement avec un changement de
@@ -6,17 +6,42 @@
 > propre décision.
 >
 > Un point n'entre ici que s'il est **démontré**, pas soupçonné.
+>
+> **Rien n'est supprimé de cette liste.** Un point corrigé passe en
+> ~~barré~~ avec son commit, et garde son diagnostic : c'est lui qui dit
+> comment le défaut a été prouvé, donc comment vérifier qu'il n'est pas
+> revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
+> autant pour ce qui est résolu que pour ce qui reste.
+>
+> **Ouverts aujourd'hui : 1b, 4, 5, 6, 7, 9.** Corrigés et conservés :
+> 1a, 2, 3, 8, 10.
 
 ---
 
 ## 1. Deux champs de données inertes
 
 Même famille : un champ qui existe dans les données, que tout lecteur
-suppose utilisé, et que le code ignore complètement.
+suppose utilisé, et que le code ignore complètement. **Le premier est
+corrigé, le second reste ouvert.**
 
-### `season` sur les badges — inerte, et dangereux
+### ~~`season` sur les badges — inerte, et dangereux~~ — CORRIGÉ (1.59.0)
 
-7 badges de `data/badges.json` portent `"season": 2025`
+> **Traité par le chantier des seuils relatifs**, en cinq commits
+> révocables séparément : `4a475f4` (le total vient d'une valeur
+> déclarée), `271e981` (`legend_101` cesse d'encoder 101), `671386d`
+> (« toutes les écuries » compte les écuries), `ca2dc33` (les libellés
+> cessent d'affirmer 101), `a0256bf` (le champ `season` est **retiré**
+> des badges où il mentait, et **lu** sur ceux où il dit vrai —
+> `launch_day` et `prediction`, qui sont réellement datés).
+>
+> Le plan complet, ses trois arbitrages et la règle qui prime sur tout
+> — *un badge débloqué reste débloqué, y compris s'il a été gagné sur
+> un dénominateur faux* — sont dans [`PLAN-SEUILS-RELATIFS.md`](PLAN-SEUILS-RELATIFS.md).
+>
+> Le diagnostic ci-dessous est conservé : c'est lui qui a produit le
+> plan, et il dit encore pourquoi le champ était dangereux.
+
+7 badges de `data/badges.json` portaient `"season": 2025`
 (`legend_101`, `pilote_all`, `reserve_all`, `director_all`, `gp_all`,
 `launch_day`, `prediction`). **`badges.js` ne lit jamais ce champ** —
 `grep -n "season" badges.js` ne renvoie rien.
@@ -56,9 +81,23 @@ gestes** (`essai-a`, `essai-b`) uniquement pour le satisfaire.
 
 ---
 
-## 2. Fuite inter-saisons des badges — bug ACTUEL, pas un risque futur
+## 2. ~~Fuite inter-saisons des badges~~ — CORRIGÉ (`662b505`, 1.52.1)
 
-`badges.js → loadManualBadges()` :
+> **Les deux `else` sont en place** ([`badges.js`](../badges.js) →
+> `loadManualBadges()`), avec un commentaire qui dit pourquoi ils ne
+> sont pas cosmétiques — c'est exactement le genre de ligne qu'un
+> nettoyage « simplifie » en la supprimant.
+>
+> ```js
+> manualBadges      = s ? JSON.parse(s) : {};
+> autoBadgeUnlocked = a ? JSON.parse(a) : {};
+> ```
+>
+> Le diagnostic est conservé tel quel : la démonstration ci-dessous est
+> le scénario à rejouer si la fuite réapparaît — et elle l'est, en
+> automatique, dans [`tests/season-badge-leak.test.js`](../tests/season-badge-leak.test.js).
+
+`badges.js → loadManualBadges()` s'écrivait :
 
 ```js
 const a = secureGet(_storageKey('auto_badges'));
@@ -91,7 +130,30 @@ bascule de saison, indépendamment du multi-saisons.
 
 ---
 
-## 3. Fichier de cartes partiel — 23 badges se débloquent trop tôt
+## 3. ~~Fichier de cartes partiel — 23 badges se débloquent trop tôt~~ — CORRIGÉ
+
+> **Deux verrous, pas un.** Le total ne vient plus du fichier chargé
+> mais de `metadata.seasons[].cardCount`, une valeur **déclarée** ; et
+> [`badges.js`](../badges.js) refuse le déblocage tant que le résultat
+> porte la marque `partiel` :
+>
+> ```js
+> const currently = p.cur >= p.max && !p.partiel;
+> ```
+>
+> Le second verrou est le vrai : un total déclaré ne protège que les
+> métriques qui l'utilisent, alors que `partiel` couvre aussi celles qui
+> comptent par catégorie ou par écurie — dont le total, lui, n'est
+> déclaré nulle part.
+>
+> **Ce que la correction ne fait PAS, et c'est délibéré** : les badges
+> déjà débloqués sur un dénominateur faux **le restent**. Reverrouiller
+> aurait repris à un collectionneur quelque chose qu'il avait vu
+> acquis ; un faux positif conservé coûte moins qu'une régression vécue.
+> La règle est écrite au §0 de [`PLAN-SEUILS-RELATIFS.md`](PLAN-SEUILS-RELATIFS.md).
+>
+> Le diagnostic est conservé : il explique pourquoi le total doit être
+> déclaré, ce qui reste vrai pour toute métrique future.
 
 Scénario réel : saisir les cartes **au fil de l'eau** (elles arrivent par
 boosters), donc un `cards-2026.json` incomplet pendant des semaines.

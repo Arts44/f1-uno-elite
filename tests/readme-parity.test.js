@@ -133,6 +133,21 @@ describe('README — invariants communs aux 7 langues', () => {
         `${f} : badge lié sans son crochet ouvrant — le lien s'affichera en texte brut`);
     });
 
+    test(`${f} — aucune ligne de tableau ne commence par un crochet`, () => {
+      /* Vécu, et invisible pendant douze versions : un tableau entier
+         s'était glissé ENTRE le crochet ouvrant du badge « tests » et le
+         badge lui-même, dans les six traductions à la fois. Le test des
+         badges orphelins ne l'a pas vu — le badge, lui, restait bien
+         formé. Ce qui trahissait la faute était plus bête : une ligne de
+         tableau qui commence par « [ ». La parité entre traductions ne
+         l'a pas vu non plus, et pour cause : les six étaient cassées
+         de la même façon. Deux fichiers d'accord peuvent avoir tort
+         ensemble. */
+      const m = [...s.matchAll(/^\[\|/gm)];
+      assert.equal(m.length, 0,
+        `${f} : un tableau commence par « [ » — un lien s'est ouvert avant lui`);
+    });
+
     test(`${f} — mêmes liens externes`, () => {
       assert.deepEqual(liensExternes(s), refLiens,
         `${f} : un lien externe manque ou a été ajouté`);
@@ -205,8 +220,17 @@ describe('README — les chiffres ne dérivent pas', () => {
     ['519 tests', 'compte de tests d\'avant la parité README'],
     ['623 tests', 'compte de tests d\'avant les affirmations vérifiables'],
     ['651 tests', 'compte de tests d\'avant le chantier des seuils relatifs'],
+    ['816 tests', 'compte de tests d\'avant la clôture du backlog'],
     ['62,72', 'couverture d\'avant la passe vitrine'],
     ['62.72', 'couverture d\'avant la passe vitrine'],
+    ['69,10', 'couverture d\'avant la clôture du backlog'],
+    ['69.10', 'couverture d\'avant la clôture du backlog'],
+    /* Les chiffres Codacy sont datés par le commit sur lequel ils ont été
+       mesurés. Laisser survivre l'ancien commit, c'est publier des valeurs
+       vraies AILLEURS — la même faute qu'un chiffre périmé, en plus discret. */
+    ['e19d1fa', 'commit de mesure Codacy périmé'],
+    ['9 741', 'nombre de lignes mesuré par Codacy sur e19d1fa'],
+    ['11 issues', 'compte d\'issues d\'avant la correction des scripts de capture'],
     ['enregistrées à la main', 'les démos sont scriptées depuis la passe vitrine'],
     ['recorded by hand', 'les démos sont scriptées depuis la passe vitrine'],
     ['111 badges', 'nombre de badges d\'avant la v3'],
@@ -225,10 +249,13 @@ describe('README — les chiffres ne dérivent pas', () => {
   // valeur. Le séparateur décimal est laissé libre : 62,72 en
   // français et 62.72 en anglais sont la même mesure.
   const FAITS = [
-    { nom: 'compte de tests', motif: /\b816\b/ },
+    { nom: 'compte de tests', motif: /\b844\b/ },
     { nom: 'nombre de cartes', motif: /\b101\b/ },
     { nom: 'nombre de badges', motif: /\b120\b/ },
-    { nom: 'couverture', motif: /\b69[.,]10\b/ },
+    { nom: 'couverture', motif: /\b69[.,]21\b/ },
+    // Un chiffre Codacy sans son commit de mesure n'est pas vérifiable :
+    // il dit « A » sans dire « quand ».
+    { nom: 'commit de mesure Codacy', motif: /b680aed/ },
   ];
 
   for(const f of TOUS){
