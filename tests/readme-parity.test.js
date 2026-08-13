@@ -249,7 +249,7 @@ describe('README — les chiffres ne dérivent pas', () => {
   // valeur. Le séparateur décimal est laissé libre : 62,72 en
   // français et 62.72 en anglais sont la même mesure.
   const FAITS = [
-    { nom: 'compte de tests', motif: /\b895\b/ },
+    { nom: 'compte de tests', motif: /\b900\b/ },
     { nom: 'nombre de cartes', motif: /\b101\b/ },
     { nom: 'nombre de badges', motif: /\b120\b/ },
     { nom: 'couverture', motif: /\b69[.,]21\b/ },

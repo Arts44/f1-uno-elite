@@ -13,8 +13,9 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Un point en attente : le n°12**, une échéance connue plutôt qu'un
-> défaut. Les autres sont corrigés, mesurés ou tranchés, et tous
+> **Deux points ouverts : le n°12** (échéance connue, pas un défaut) et
+> le **n°13** (échappement manquant, à corriger dans la base avant le
+> dépôt). Les autres sont corrigés, mesurés ou tranchés, et tous
 > conservés : 1a, 1b, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11.
 
 ---
@@ -706,3 +707,46 @@ en indésirables » du rapport cloud n'aura plus la même réponse.
 > à traquer : une affirmation qui décrit précisément le travail qui l'a
 > rendue fausse. Elle est notée ici pour que la bascule emporte sa
 > correction avec elle.
+
+---
+
+## 13. `app_version` et `lang` entrent dans l'e-mail de notification sans échappement
+
+**Trouvé en versionnant le SQL** — c'est-à-dire trouvé parce qu'on l'a
+versionné : le code vivait dans un dashboard, où personne ne le relit.
+
+`notify_feedback_email()` échappe soigneusement `& < >` sur le message et
+sur l'adresse de l'auteur, qui sont des saisies utilisateur. Deux autres
+champs arrivent pourtant du même client et entrent dans le corps HTML
+**tels quels** :
+
+```sql
+|| coalesce(new.app_version, '?') ||
+|| coalesce(new.lang, '?') ||
+```
+
+**Portée réelle, sans dramatiser.** Les contraintes CHECK bornent ces
+champs à 20 et 5 caractères, ce qui exclut un script complet mais pas du
+balisage : `<b>x</b>` tient en 8 caractères, `<img src=x>` en 11. Le
+destinataire est le mainteneur, seul, dans un client mail — pas un
+navigateur avec une session. Le pire cas réaliste est donc un e-mail de
+notification défiguré, pas une compromission.
+
+**Pourquoi ce n'est pas corrigé dans le même commit.** `db/` est un
+EXTRAIT de ce que la base exécute. Corriger le fichier sans corriger la
+base produirait exactement le mensonge que ce dossier existe pour
+supprimer : un schéma versionné qui ne décrit plus le serveur. La
+correction se fait dans le dashboard d'abord, puis se re-extrait ici.
+
+**Le correctif**, quand il se fera — deux variables de plus, sur le
+modèle des deux existantes :
+
+```sql
+safe_ver  := replace(replace(replace(coalesce(new.app_version,'?'), '&','&amp;'), '<','&lt;'), '>','&gt;');
+safe_lang := replace(replace(replace(coalesce(new.lang,'?'), '&','&amp;'), '<','&lt;'), '>','&gt;');
+```
+
+> **Ce point est l'argument du dossier `db/` en une ligne.** Il existait
+> avant d'être versionné, il n'était visible nulle part, et il a été vu
+> à la première relecture rendue possible. Le versionnement n'a pas
+> créé le défaut : il a créé la relecture.

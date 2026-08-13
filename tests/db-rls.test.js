@@ -63,6 +63,69 @@ describe('db/ — les politiques RLS restent en place', () => {
     });
   }
 
+  /* ── Un déclencheur sans sa fonction ────────────────────────────
+     Le fichier des fonctions est arrivé APRÈS les tables, parce que ce
+     qui en avait d'abord été transmis était un résumé du comportement
+     et non la sortie de pg_get_functiondef. Recoller une reconstruction
+     fidèle au résumé aurait produit un fichier qui RESSEMBLE au schéma
+     sans en être un — et un demi-schéma inspire la même confiance qu'un
+     schéma entier.
+
+     Ce test garde la propriété qui a manqué pendant ce délai : le
+     fichier est rejouable, ou il échoue. */
+  test('chaque déclencheur a sa fonction DÉFINIE dans le même fichier', () => {
+    const f = lire('03-functions.sql');
+    const appelees = [...f.matchAll(/EXECUTE FUNCTION\s+(\w+)\s*\(/gi)].map(m => m[1]);
+    assert.ok(appelees.length > 0, 'aucun déclencheur déclaré');
+    const definies = [...f.matchAll(/create (?:or replace )?function\s+(?:public\.)?(\w+)/gi)]
+      .map(m => m[1]);
+    const manquantes = appelees.filter(n => !definies.includes(n));
+    assert.deepEqual(manquantes, [],
+      `déclencheur(s) sans fonction : ${manquantes.join(', ')} — le fichier n'est `
+      + 'pas rejouable tel quel.');
+  });
+
+  /* ── Les trois lignes de notify_feedback_email() qui comptent ───────
+     Elles ne se devinent pas à la lecture rapide, et chacune protège
+     quelque chose de différent. Les perdre lors d'une modification ne
+     casserait rien de visible — c'est bien le problème. */
+  test('la notification ne peut pas bloquer l’enregistrement d’un avis', () => {
+    /* ANCRÉ EN DÉBUT DE LIGNE, et ce détail a une histoire : la première
+       version de ce test cherchait la formule n'importe où dans le
+       fichier — et passait au vert grâce au COMMENTAIRE qui la décrit,
+       même après avoir supprimé le code. Un garde-fou satisfait par sa
+       propre documentation ne garde rien. Vérifié en retirant le bloc :
+       rouge maintenant, vert avant. */
+    const code = lire('03-functions.sql')
+      .split('\n').filter(l => !l.trimStart().startsWith('--')).join('\n');
+    assert.match(code, /^exception when others then\s*\n\s*return new;/m,
+      'sans ce bloc, une panne chez Resend ferait perdre l’avis de l’utilisateur');
+    assert.match(code, /^\s*if api_key is null then return new; end if;/m,
+      'pas de clé ne doit pas vouloir dire pas d’avis');
+  });
+
+  test('le message de l’utilisateur est échappé avant d’entrer dans le HTML', () => {
+    const f = lire('03-functions.sql');
+    assert.match(f, /safe_msg\s*:=\s*replace\(replace\(replace\(new\.message/,
+      'le message part dans un corps HTML : sans échappement, un avis injecte du balisage');
+  });
+
+  test('le throttle refuse AVANT l’écriture, pas après', () => {
+    const f = lire('03-functions.sql');
+    assert.match(f, /CREATE TRIGGER feedback_throttle\s+BEFORE INSERT/i,
+      'en AFTER, la limite compterait des lignes déjà insérées');
+  });
+
+  test('les deux fonctions SECURITY DEFINER fixent leur search_path', () => {
+    const f = lire('03-functions.sql');
+    for(const m of f.matchAll(/CREATE OR REPLACE FUNCTION public\.(\w+)[\s\S]*?AS \$function\$/g)){
+      if(!/SECURITY DEFINER/.test(m[0])) continue;
+      assert.match(m[0], /SET search_path TO/,
+        `${m[1]} : SECURITY DEFINER sans search_path fixé — détournement de `
+        + 'résolution de noms possible');
+    }
+  });
+
   test('aucune adresse e-mail en clair dans db/', () => {
     // Le destinataire des notifications est un marqueur documenté, pas
     // une valeur. Une adresse dans un dépôt public, c'est du spam
