@@ -222,24 +222,44 @@ describe('pavé PIN — touche « tout effacer » et marche arrière', () => {
    Une section d'honnêteté qui vieillit mal serait pire que pas de
    section : elle donnerait une garantie fausse avec l'autorité d'un
    texte officiel. Deux règles la protègent, et les voici en tests.
-   ══════════════════════════════════════════════════════════ */
-describe('réglages — la section des limites', () => {
+   ══════════════════════════════════════════════════════════ */describe('réglages — la section des limites', () => {
   const pin = read('pin.js');
-  const bloc = pin.slice(pin.indexOf('<details class="setv-limits">'),
-                         pin.indexOf('</details>'));
 
-  test('elle est REPLIÉE par défaut', () => {
-    assert.ok(bloc.startsWith('<details class="setv-limits">'),
-      'un `open` ici annoncerait un problème à quelqu’un qui n’en a pas');
-    assert.ok(!/<details[^>]*\bopen\b/.test(bloc));
+  /* La première version dépliait cinq paragraphes AU MILIEU de la carte
+     À propos. Deux défauts : elle cassait le motif « titre + sous-titre
+     | bouton » des autres rangées, et surtout — MESURÉ — le texte
+     atteignait 159 caractères par ligne sur un écran de 1280, contre 47
+     dans la modale. La plage lisible s'arrête vers 75, et au-delà de 90
+     l'œil perd la ligne suivante en revenant à gauche. C'était
+     précisément le texte qu'on veut voir lu. */
+  test('la rangée suit le motif de la carte : un bouton, pas un pavé', () => {
+    assert.ok(!/<details/.test(pin),
+      'plus aucun dépliant dans les réglages — le contenu vit en modale');
+    assert.match(pin, /<button class="setv-btn" id="limitsBtn">/);
+  });
+
+  test('le bouton RECYCLE le libellé de Nouveautés', () => {
+    // Deux clés au même contenu changeraient toujours ensemble : le
+    // critère de duplication du dépôt dit de n'en avoir qu'une.
+    assert.match(pin, /id="limitsBtn">\$\{t\('s\.changelog_btn'\)\}/);
+  });
+
+  test('la modale réutilise le composant de Nouveautés', () => {
+    // Même cas d'usage — du texte long qu'on lit puis qu'on ferme —
+    // donc même cadre, même défilement interne, même bouton primaire.
+    assert.match(pin, /'import-dialog-overlay limits-overlay'/);
+    assert.match(pin, /import-dialog changelog-dialog/);
+    assert.match(pin, /icon\('info'\)/,
+      'l’icône rattache la modale à la section d’où on l’ouvre');
+  });
+
+  test('elle ne s’ouvre pas toute seule et ne se dédouble pas', () => {
+    const corps = pin.slice(pin.indexOf('export function openLimits'));
+    assert.match(corps, /if\(document\.querySelector\('\.limits-overlay'\)\) return;/);
   });
 
   test('aucun chiffre exact n’est écrit en dur dans le texte', () => {
-    // Le quota vit dans un dashboard : il peut changer sans que ce
-    // texte suive. « Une trentaine par heure » reste vrai plus
-    // longtemps que « 30 », et c'est exactement la dérive qu'on a
-    // passé une session à traquer dans les README.
-    const T = JSON.parse(JSON.stringify(globalThis.window.__T || {}));
+    const T = globalThis.window.__T || {};
     for(const lg of Object.keys(T)){
       const txt = [T[lg]['s.limits_mail_d'], T[lg]['s.limits_sleep_d']].join(' ');
       assert.ok(txt, `${lg} : texte des limites absent`);
@@ -258,13 +278,5 @@ describe('réglages — la section des limites', () => {
         assert.ok((globalThis.window.__T[lg] || {})[k], `${lg} : ${k} manquante`);
       }
     }
-  });
-
-  test('la zone de clic du résumé reste une cible tactile', () => {
-    const css = read('styles.css');
-    assert.match(css, /\.setv-limits summary\{[^}]*cursor:pointer/);
-    // Le résumé emprunte .setv-row : c'est elle qui porte le rembourrage
-    // vertical, donc la hauteur de cible. Mesuré au navigateur : 62 px.
-    assert.match(bloc, /<summary class="setv-row">/);
   });
 });

@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.60.1',
+    date: '2026-08-13',
+    changes: {
+      en: ['The “This deployment and its limits” section no longer unfolds in the middle of the About card: it opens in a window, like What’s new. Same words, easier to read — on a wide screen the text was running to 159 characters a line.'],
+      fr: ['La section « Ce déploiement et ses limites » ne se déplie plus au milieu de la carte À propos : elle s’ouvre dans une fenêtre, comme Nouveautés. Mêmes mots, plus lisibles — sur grand écran, le texte s’étalait sur 159 caractères par ligne.'],
+      es: ['La sección «Este despliegue y sus límites» ya no se despliega en medio de la tarjeta Acerca de: se abre en una ventana, como Novedades. Las mismas palabras, más legibles — en pantalla ancha el texto llegaba a 159 caracteres por línea.'],
+      zh: ['“本次部署及其限制”不再在「关于」卡片中间展开，而是像「新变化」一样在窗口中打开。文字未变，但更好读了——在宽屏上，原先每行长达 159 个字符。'],
+      it: ['La sezione «Questo deploy e i suoi limiti» non si apre più in mezzo alla scheda Informazioni: si apre in una finestra, come Novità. Stesse parole, più leggibili — su schermo largo il testo arrivava a 159 caratteri per riga.'],
+      nl: ['Het blok “Deze uitrol en zijn grenzen” klapt niet meer open midden in de kaart Over: het opent in een venster, net als Wat is er nieuw. Dezelfde woorden, beter leesbaar — op een breed scherm liep de tekst tot 159 tekens per regel.'],
+      de: ['Der Abschnitt „Dieses Deployment und seine Grenzen“ klappt nicht mehr mitten in der Über-Karte auf, sondern öffnet sich in einem Fenster wie „Neuigkeiten“. Gleiche Worte, besser lesbar — auf breitem Bildschirm lief der Text auf 159 Zeichen pro Zeile.'],
+    },
+  },
+  {
     version: '1.60.0',
     date: '2026-08-13',
     changes: {

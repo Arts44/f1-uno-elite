@@ -758,6 +758,42 @@ function _ensureFontLoaded(id){
 }
 
 
+/* ══════════════════════════════════════════════════════════
+   LA MODALE DES LIMITES
+
+   Même composant que « Nouveautés » (`.import-dialog-overlay`), et
+   c'est délibéré : même cas d'usage — du texte long qu'on lit puis
+   qu'on ferme. Réutiliser le composant, c'est hériter de son
+   défilement interne, de sa fermeture au clic sur le fond, et de son
+   bouton primaire, sans les réécrire.
+
+   L'icône est `info`, la même que le titre de la section « À propos » :
+   la modale doit se rattacher visuellement à l'endroit d'où on l'ouvre.
+
+   Le contenu est celui qui a été validé, au mot près. Ce qui a changé
+   est le CONTENANT — mesuré : 159 caractères par ligne quand le texte
+   s'étalait dans la carte sur un écran de 1280, contre 47 ici.
+   ══════════════════════════════════════════════════════════ */
+export function openLimits(){
+  if(document.querySelector('.limits-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.className = 'import-dialog-overlay limits-overlay';
+  overlay.innerHTML = `
+    <div class="import-dialog changelog-dialog">
+      <div class="import-dialog-title">${icon('info')} ${t('s.limits')}</div>
+      <div class="changelog-list setv-limits-body">
+        <p class="setv-limits-lead">${t('s.limits_intro')}</p>
+        <p><strong>${t('s.limits_mail_t')}</strong> ${t('s.limits_mail_d')}</p>
+        <p><strong>${t('s.limits_sleep_t')}</strong> ${t('s.limits_sleep_d')}</p>
+        <p class="setv-limits-safe"><strong>${t('s.limits_safe_t')}</strong> ${t('s.limits_safe_d')}</p>
+      </div>
+      <button class="import-dialog-btn primary" id="limitsCloseBtn" type="button">${t('upd.close')}</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
+  overlay.querySelector('#limitsCloseBtn').addEventListener('click', () => overlay.remove());
+}
+
 export function renderSettings(){
   const el = document.getElementById('settingsView');
   if(!el) return;
@@ -878,36 +914,34 @@ export function renderSettings(){
         <button class="setv-btn" id="changelogBtn">${t('s.changelog_btn')}</button>
       </div>
       ${/* ══ CE DÉPLOIEMENT ET SES LIMITES ══
-            Replié par défaut, et c'est le point du dessin : la contrainte
-            doit être TROUVABLE sans être anxiogène. Un encart déplié
-            annoncerait un problème à quelqu'un qui n'en a pas.
+            Une RANGÉE comme les autres — titre, sous-titre, bouton — et
+            le contenu part en modale. La première version dépliait cinq
+            paragraphes AU MILIEU de la carte, entre deux actions : elle
+            cassait le motif, et surtout elle devenait illisible en grand.
 
-            Pourquoi ici et pas dans la section cloud : celle-ci vit sur la
-            page Compte, où l'on vient pour se connecter — au moment
-            précis où lire « les codes peuvent tarder » décourage. « À
-            propos » est l'endroit où l'on va quand on se demande comment
-            ça marche.
+            MESURÉ, parce que l'argument de motif ne suffisait pas :
+            dépliée dans la carte, une ligne de texte fait 159 caractères
+            sur un écran de 1280. La plage lisible s'arrête vers 75, et
+            au-delà de 90 l'œil perd la ligne suivante en revenant à
+            gauche. Dans la modale, dont la largeur est contrainte par le
+            composant : 47. C'est précisément le texte qu'on veut voir lu.
 
-            AUCUN CHIFFRE EXACT DANS CE TEXTE. « Une trentaine par heure »
-            plutôt que « 30 » : la valeur vit dans un dashboard, elle peut
-            changer sans que ce texte suive, et une valeur périmée dans
-            l'app est exactement le défaut qu'on passe son temps à
-            traquer dans les README. ══ */''}
-      <details class="setv-limits">
-        <summary class="setv-row">
-          <div class="setv-row-left">
-            <div class="setv-row-label">${t('s.limits')}</div>
-            <div class="setv-row-sub">${t('s.limits_sub')}</div>
-          </div>
-          <span class="setv-limits-chevron" aria-hidden="true">${icon('chevron')}</span>
-        </summary>
-        <div class="setv-limits-body">
-          <p class="setv-limits-lead">${t('s.limits_intro')}</p>
-          <p><strong>${t('s.limits_mail_t')}</strong> ${t('s.limits_mail_d')}</p>
-          <p><strong>${t('s.limits_sleep_t')}</strong> ${t('s.limits_sleep_d')}</p>
-          <p class="setv-limits-safe"><strong>${t('s.limits_safe_t')}</strong> ${t('s.limits_safe_d')}</p>
+            Le composant est celui de « Nouveautés » — même cas d'usage,
+            du texte long qu'on lit puis qu'on ferme. Le libellé du bouton
+            REPREND s.changelog_btn (« Voir ») au lieu d'une clé nouvelle
+            au même contenu : deux clés qui changeraient toujours
+            ensemble n'ont pas à être deux.
+
+            AUCUN CHIFFRE EXACT DANS LE TEXTE. « Environ une centaine par
+            jour » plutôt qu'un nombre : la valeur vit chez un
+            prestataire, elle changera sans que ce texte suive. ══ */''}
+      <div class="setv-row">
+        <div class="setv-row-left">
+          <div class="setv-row-label">${t('s.limits')}</div>
+          <div class="setv-row-sub">${t('s.limits_sub')}</div>
         </div>
-      </details>
+        <button class="setv-btn" id="limitsBtn">${t('s.changelog_btn')}</button>
+      </div>
       ${isUpdateCheckSupported() ? `
       <div class="setv-row">
         <div class="setv-row-left">
@@ -1038,6 +1072,7 @@ export function renderSettings(){
 
   el.querySelector('#settingsLockBtn')?.addEventListener('click', lockApp);
   el.querySelector('#changelogBtn')?.addEventListener('click', () => openChangelog());
+  el.querySelector('#limitsBtn')?.addEventListener('click', () => openLimits());
 
   /* Hors ligne : un lien externe qui ne mène nulle part vaut moins
      qu'un lien qui le dit. On le désactive et on l'explique, plutôt
