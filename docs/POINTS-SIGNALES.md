@@ -13,7 +13,8 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Aucun point ouvert.** Corrigés, mesurés ou tranchés, et tous
+> **Un point en attente : le n°12**, une échéance connue plutôt qu'un
+> défaut. Les autres sont corrigés, mesurés ou tranchés, et tous
 > conservés : 1a, 1b, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11.
 
 ---
@@ -676,3 +677,32 @@ décalée d'un seul niveau échoue.
 > répétant la mesure jusqu'à obtenir zéro ; elle se prouve en bornant ce
 > qu'on tolère. Le seuil vaut mieux que le zéro, parce qu'il est
 > vérifiable en une commande et qu'il ne peut pas mentir par chance.
+
+---
+
+## 12. Bascule vers `arts44.dev` — trois textes à revoir le jour venu
+
+**Ce n'est pas un défaut : c'est une échéance connue.** Le domaine
+`arts44.dev` est acquis, et les codes de connexion partiront à terme de
+`noreply@arts44.dev` via Resend, au lieu du SMTP actuel.
+
+Ce jour-là, **trois affirmations deviennent fausses en même temps**, et
+aucune ne se signalera d'elle-même :
+
+| Où | Ce qui devient faux |
+|---|---|
+| Réglages → limites, clé `s.limits_mail_d` ×7 | « une trentaine par heure » — Resend gratuit plafonne à **100/jour et 3 000/mois**, ce qui est une contrainte de forme différente : un plafond quotidien, pas horaire |
+| README ×7 | « les notifications partent du domaine de test de Resend (`onboarding@resend.dev`), qui ne délivre qu'au propriétaire du compte » — plus vrai avec un domaine vérifié |
+| `db/03-functions.sql` | l'expéditeur `F1 UNO Élite <onboarding@resend.dev>` dans `notify_feedback_email()` |
+
+**Ce qui s'améliore au passage**, et mérite d'être dit quand ce sera
+fait : un domaine vérifié (SPF, DKIM, DMARC) change la délivrabilité de
+façon décisive. Le « faut-il s'attendre à ce que certains codes finissent
+en indésirables » du rapport cloud n'aura plus la même réponse.
+
+> **La leçon des sept README s'applique d'avance.** Ces trois textes sont
+> vrais aujourd'hui et le resteront après la bascule — sans rien
+> signaler. C'est exactement la forme de dérive qu'on a passé une session
+> à traquer : une affirmation qui décrit précisément le travail qui l'a
+> rendue fausse. Elle est notée ici pour que la bascule emporte sa
+> correction avec elle.
