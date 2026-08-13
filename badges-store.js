@@ -70,3 +70,16 @@ export function setPinnedBadge(id){
   if(id) localStorage.setItem(_storageKey('pinned_badge'), id);
   else localStorage.removeItem(_storageKey('pinned_badge'));
 }
+
+/* ── L'ensemble des badges auto DÉJÀ VUS, le temps d'une session ──
+   Écrit par `seedNewAutoBadges()` (badge-rules.js) et par
+   `renderBadges()` (badges.js) : deux modules le partagent, donc il vit
+   ici plutôt que chez l'un des deux.
+
+   ⚠️ CONSTAT, PAS CORRECTION : plus rien ne le LIT. Il servait à ne pas
+   rejouer le scintillement d'un badge déjà affiché ; l'appel de lecture
+   a disparu à un moment sans que l'écriture suive. Il est déplacé TEL
+   QUEL — un découpage n'est pas l'endroit où l'on supprime du code
+   mort, sinon on ne sait plus ce qui a changé le comportement. À
+   trancher séparément : soit rebrancher la lecture, soit le retirer. */
+export const _seenAutoBadges = new Set();

@@ -34,7 +34,9 @@ describe('familles — le regroupement couvre tout, une seule fois', () => {
   });
 
   test('un badge auto inconnu (future saison) tombe en famille passion, pas dans le vide', () => {
-    const src = read('badges.js');
+    // Déménagé dans badge-rules.js (v2, pas 5 du découpage) : seul le
+    // nom de fichier change, le code est déplacé au caractère près.
+    const src = read('badge-rules.js');
     assert.match(src, /passion[\s\S]{0,200}known\.has|known\.has[\s\S]{0,200}passion/);
   });
 });
@@ -124,10 +126,11 @@ describe('détection en cours d’usage & contrats de source', () => {
     assert.match(read('stats.js'), /checkNewAutoBadges\(\)/);
   });
   test('l’haptique se dégrade en silence (vibrate gardé par un if)', () => {
-    assert.match(read('badges.js'), /if\(navigator\.vibrate\)/);
+    // Déménagé dans badge-toasts.js (v2, pas 6) : nom de fichier seul.
+    assert.match(read('badge-toasts.js'), /if\(navigator\.vibrate\)/);
   });
   test('le toast badge attend le toast standard (Annuler prioritaire)', () => {
-    const src = read('badges.js');
+    const src = read('badge-toasts.js');   // v2, pas 6 : nom de fichier seul
     assert.match(src, /getElementById\('toast'\)[\s\S]{0,120}classList\.contains\('show'\)/);
   });
   test('épingler/retirer l’objectif est bloqué en mode spectateur', () => {

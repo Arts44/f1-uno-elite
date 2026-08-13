@@ -3,6 +3,7 @@
    loaded from JSON files at runtime, with embedded fallback.
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
+import { getLang } from './i18n.js';
 import { _currentSeason, setCurrentSeason } from './season.js';
 import { loadData } from './storage.js';
 /* Le STORE, pas la vue : data.js recharge l'état des badges après un
@@ -171,6 +172,15 @@ export function isDevBuild(){
 export function isTestSeason(year = _currentSeason){
   const s = SEASONS.find(x => x.year === year);
   return !!(s && s.test);
+}
+
+/* ── Le libellé traduit d'un badge ────────────────────────────────
+   `window.__BADGE_T` est rempli par ce module : la recherche de la
+   traduction d'un badge lui appartient donc. Elle vit ici plutôt que
+   recopiée dans badge-toasts.js et profile-card.js, qui en ont tous
+   deux besoin — deux endroits qui changeraient toujours ensemble. */
+export function badgeTr(b){
+  return (window.__BADGE_T?.[b.id]?.[getLang()] || window.__BADGE_T?.[b.id]?.en || {});
 }
 
 export function seasonCardCount(year = _currentSeason){

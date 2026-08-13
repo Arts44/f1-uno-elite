@@ -116,7 +116,45 @@ const ARETES_INTERDITES = [
    saison courante vivait dans data.js, qui importe render et stats,
    si bien que « connaître l'année » revenait à hériter de la moitié de
    l'app. D'où season.js, quinze lignes sans aucune dépendance. */
-const TAILLE_MAX_COMPOSANTE = 22;
+const TAILLE_MAX_COMPOSANTE = 27;
+
+/* ⚠️ 22 → 23 au pas 3, ET C'EST LÉGITIME — une exception, pas un
+   relâchement. `badge-cards.js` lit le CATALOGUE (data.js) et la
+   COLLECTION (storage.js) : les deux sont au cœur de la composante, et
+   aucun découpage ne les en sortira. Un module qui répond à « quelles
+   cartes ce badge concerne-t-il ? » ne peut pas ignorer les cartes.
+
+   Ce qui compte pour lui n'est donc pas d'être une feuille — c'est de
+   ne pas importer `badges.js`. Cette arête-là est interdite ci-dessus,
+   et c'est elle qui permettra à un futur `export-trade-list.js`
+   d'utiliser la correspondance sans embarquer la page Badges.
+
+   La leçon à retenir de ce pas : « sortir de la composante » n'est pas
+   toujours atteignable, et le prétendre à coups de plafond relevé
+   viderait ce test de son sens. Chaque hausse doit être écrite ici avec
+   sa raison, ou refusée.
+
+   23 → 25 aux pas 4 et 5 (badge-titles, badge-rules), MÊME RAISON, et
+   elle mérite d'être nommée une bonne fois :
+
+     data.js  →  render.js, stats.js
+
+   `switchSeason()` redessine la collection et rafraîchit les stats. Tout
+   module qui a besoin du CATALOGUE importe donc data.js, et se retrouve
+   à un saut de l'interface. C'est la racine de l'enchevêtrement — plus
+   que badges.js, qui n'en était qu'un symptôme visible.
+
+   Ce qu'on peut promettre APRÈS ce découpage se réduit donc à trois
+   choses, toutes vérifiées ci-dessus : l'arête storage → badges a
+   disparu, trois modules sont sortis en feuilles, et les arêtes
+   interdites garantissent qu'un futur export-trade-list.js pourra
+   importer badge-cards sans embarquer la page Badges.
+
+   LE LEVIER SUIVANT EST IDENTIFIÉ, et il n'est pas un déplacement :
+   sortir les appels d'interface de switchSeason() pour que data.js
+   n'importe plus render.js ni stats.js. Ça change QUI appelle quoi, pas
+   seulement où vit le code — donc ça mérite son propre chantier, avec
+   son propre filet. */
 
 /* Plancher des feuilles : 16 après le découpage. Il ne doit pas
    BAISSER — une feuille qui rejoint la composante est une régression

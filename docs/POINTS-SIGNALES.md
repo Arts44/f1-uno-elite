@@ -15,7 +15,8 @@
 >
 > **Aucun point ouvert.** Les quatorze sont corrigés, mesurés ou tranchés,
 > et tous conservés avec leur diagnostic : 1a, 1b, 2, 3, 4, 5, 6, 7, 8,
-> 9, 10, 11, 12, 13, 14. Reste une hypothèse non mesurée, notée au n°12 §C :
+> 9, 10, 11, 12, 13, 14, plus le n°15 qui est une piste ouverte, pas un
+> défaut. Reste une hypothèse non mesurée, notée au n°12 §C :
 > ce que voit l'utilisateur quand le quota Resend est atteint.
 
 ---
@@ -995,3 +996,32 @@ revoit jamais.
 > le moment de rouvrir — pas avant. La donnée qui déclencherait la
 > réouverture est nommée : des retours d'utilisateurs disant « on me l'a
 > redemandé ».
+
+---
+
+## 15. L'export de liste d'échange devient faisable — piste identifiée
+
+**Ce n'est pas un défaut, c'est une porte qui vient de s'ouvrir.**
+
+`fmtMissing()`, `fmtDoubles()` et `fmtTrade()` existent dans `stats.js`
+depuis la v2.x, produisent du texte, et n'ont **aucun appelant**. Ce qui
+leur manquait n'était pas la logique : c'était la **plomberie de
+sortie** — `toBlob`, `File`, `navigator.share`, repli sur téléchargement,
+toast de confirmation.
+
+Cette plomberie vivait dans `shareProfileCard()`, au milieu de mille
+lignes de page Badges. L'atteindre voulait dire importer le DOM, l'i18n,
+les minuteurs et 120 badges — ou la recopier.
+
+**Depuis le pas 7 du découpage v2, elle est dans
+[`profile-card.js`](../profile-card.js), 94 lignes.** Un
+`export-trade-list.js` peut désormais importer ce module seul, et
+`badge-cards.js` pour la forme `{id, name, owned}` — sans embarquer la
+vue. Les deux arêtes correspondantes sont interdites par
+[`tests/import-cycles.test.js`](../tests/import-cycles.test.js), donc ce
+n'est pas une intention : c'est tenu.
+
+**Ce qui reste à faire** est du produit, pas de la structure : décider où
+vit le bouton, ce qu'on exporte (texte ? image ?), et si la liste
+s'échange par lien ou par fichier. Le refactor n'a pas codé la
+fonctionnalité — il a enlevé la raison de ne pas la coder.

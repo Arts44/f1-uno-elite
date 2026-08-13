@@ -3,7 +3,10 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { renderCollection, openModal, currentView, currentCardId } from './render.js';
-import { renderBadges, updateUserTitle } from './badges.js';
+import { renderBadges } from './badges.js';
+/* Le titre vient de son propre module : i18n n'a besoin QUE de le
+   redessiner au changement de langue, pas de la page Badges. */
+import { updateUserTitle } from './badge-titles.js';
 import { updateStats, renderStats } from './stats.js';
 import { renderSettings } from './pin.js';
 

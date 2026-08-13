@@ -91,8 +91,10 @@ describe('le même motif ailleurs — vérifié, pas supposé', () => {
       'la collection doit être remise à zéro quand la clé de saison est absente');
   });
 
-  test('badges.js loadSelectedTitle() remet à zéro AVANT de lire', () => {
-    assert.match(src('badges.js'), /function loadSelectedTitle\(\)\{\s*\n\s*selectedTitleId = null;/,
+  test('loadSelectedTitle() remet à zéro AVANT de lire', () => {
+    // Déménagé dans badge-titles.js (v2, pas 4 du découpage) : seul le
+    // nom de fichier change, le code est déplacé au caractère près.
+    assert.match(src('badge-titles.js'), /function loadSelectedTitle\(\)\{\s*\n\s*selectedTitleId = null;/,
       'le titre est réinitialisé en tête de fonction — pas d’héritage possible');
   });
 
