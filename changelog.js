@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.60.2',
+    date: '2026-08-13',
+    changes: {
+      en: ['Fixed: opening the title picker could fail after a recent internal reorganisation. A new automated check now catches this whole class of mistake before it ships.'],
+      fr: ['Correction : l’ouverture du sélecteur de titres pouvait échouer depuis une réorganisation interne récente. Un contrôle automatique attrape désormais toute cette famille d’erreurs avant la mise en ligne.'],
+      es: ['Corregido: abrir el selector de títulos podía fallar tras una reorganización interna reciente. Una comprobación automática detecta ahora toda esa familia de errores antes de publicar.'],
+      zh: ['修复：在最近一次内部重构后，打开称号选择器可能会失败。现在有一项自动检查会在发布前捕获这一整类错误。'],
+      it: ['Corretto: l’apertura del selettore di titoli poteva fallire dopo una recente riorganizzazione interna. Un controllo automatico intercetta ora l’intera famiglia di questi errori prima della pubblicazione.'],
+      nl: ['Opgelost: het openen van de titelkiezer kon mislukken na een recente interne herschikking. Een automatische controle vangt deze hele klasse fouten nu op vóór publicatie.'],
+      de: ['Behoben: Das Öffnen der Titelauswahl konnte nach einer kürzlichen internen Umstrukturierung fehlschlagen. Eine automatische Prüfung fängt diese ganze Fehlerklasse jetzt vor der Veröffentlichung ab.'],
+    },
+  },
+  {
     version: '1.60.1',
     date: '2026-08-13',
     changes: {

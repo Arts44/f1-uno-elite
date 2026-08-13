@@ -5,8 +5,7 @@
     "dev": "esbuild app.js --bundle --format=iife --outfile=app.bundle.js --global-name=F1App --sourcemap --watch",
     "test": "node --test \"tests/*.test.js\"",
     "test:watch": "node --test --watch \"tests/*.test.js\"",
-    "lint": "biome lint .",
-    "lint:fix": "biome lint --write .",
+    "lint": "biome check --only=correctness/noUndeclaredVariables .",
     "test:cov": "mkdir -p coverage && node --test --experimental-test-coverage --test-coverage-exclude='tests/**' --test-coverage-exclude='app.bundle.js' --test-coverage-exclude='*.mjs' --test-coverage-exclude='translations.js' --test-coverage-exclude='data-embedded.js' --test-coverage-exclude='card-descriptions.js' --test-coverage-exclude='cloud-config.js' --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-reporter=spec --test-reporter-destination=stdout \"tests/*.test.js\""
   },
   "devDependencies": {

@@ -30,6 +30,10 @@ import { AUTO_BADGES, MANUAL_BADGES } from './data.js';
 import { _storageKey } from './storage-keys.js';
 import { manualBadges, loadManualBadges } from './badges-store.js';
 import { isAutoBadgeUnlocked } from './badge-rules.js';
+/* Oubliés au pas 4 du découpage v2 : toggleTitlePicker() les utilise, et
+   ni les tests ni la vérification navigateur ne passaient par ce chemin.
+   Trouvés par noUndeclaredVariables, dès sa première exécution. */
+import { badgeDifficulty, difficultyLabelKey } from './difficulty.js';
 
 const BADGE_TITLES = {
   // Auto badges

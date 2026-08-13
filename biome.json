@@ -14,14 +14,17 @@
       "!data-embedded.js",
       "!screenshots/**",
       "!icons/**",
-      "!fonts/**"
+      "!fonts/**",
+      "!docs/email-templates/**"
     ]
   },
-  "formatter": { "enabled": false },
+  "formatter": {
+    "enabled": false
+  },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "style": {
         "noParameterAssign": "off",
         "useTemplate": "off",
@@ -33,6 +36,9 @@
       },
       "complexity": {
         "useOptionalChain": "off"
+      },
+      "correctness": {
+        "noUndeclaredVariables": "error"
       }
     }
   }

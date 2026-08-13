@@ -34,14 +34,28 @@ jobs:
       - name: Unit tests (node --test)
         run: npm test
 
-      # Biome is a LINTER here, not a formatter (see biome.json). It reports
-      # ~99 real findings inherited from ~40 versions — dead locals, silent
-      # catches, CSS specificity. Non-blocking ON PURPOSE while that backlog
-      # is worked down: a step that is permanently red teaches everyone to
-      # ignore CI. Flip continue-on-error to false once the count reaches 0.
-      - name: Lint (Biome — non-blocking for now)
+      # DEUX étapes de lint, et la différence entre elles est le sujet.
+      #
+      # BLOQUANTE — les symboles non déclarés. Cette classe de défaut est
+      # INVISIBLE partout ailleurs : `npm run build` passe, `npm test`
+      # passe, parce qu'esbuild en --format=iife met tout dans une portée
+      # unique où un symbole manquant reste visible. Seuls les modules
+      # bruts (index-dev.html) lèvent un ReferenceError. Le découpage de
+      # badges.js (v2) a laissé CINQ symboles derrière de cette façon, dont
+      # deux qu'aucune vérification manuelle n'a vus.
+      #
+      # Le dépôt étant à zéro sur cette règle, l'étape peut être rouge =
+      # échec, sans jamais l'être pour du bruit hérité.
+      - name: Symboles non déclarés (bloquant)
+        run: npm run lint
+
+      # NON BLOQUANTE — tout le reste. ~99 constats hérités de ~40
+      # versions : locals morts, catch muets, spécificité CSS. Une étape
+      # rouge en permanence apprend à ignorer le CI ; celle-ci informe,
+      # l'autre garde. Basculer en bloquant le jour où le compte atteint 0.
+      - name: Lint complet (Biome — informatif)
         run: |
-          npm run lint || echo "::notice title=Biome::backlog connu et assumé (dead locals, catch muets, spécificité CSS) — non bloquant, voir le commentaire ci-dessus"
+          npx biome check . || echo "::notice title=Biome::backlog connu et assumé (dead locals, catch muets, spécificité CSS) — non bloquant"
         continue-on-error: true
 
       # ── Couverture → Codacy ─────────────────────────────────────
