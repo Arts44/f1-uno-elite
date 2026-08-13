@@ -48,3 +48,40 @@ describe('capture_screenshots.py — échec bruyant', () => {
     }
   });
 });
+
+/* ── Le SEED est un module, plus un script qu'on exécute ────────
+   capture_demos.py récupérait le seed en exécutant la moitié de
+   capture_screenshots.py (`exec(compile(...))` sur un découpage par
+   commentaire). Ça marchait ; c'était fragile — le découpage tenait à
+   une chaîne de commentaire — illisible, et signalé à juste titre par
+   trois analyseurs (Bandit B102, PyLint W0122, Semgrep exec-detected). */
+describe('scripts de capture — pas d’exec, pas de shell', () => {
+  const demos = readFileSync(new URL('../capture_demos.py', import.meta.url), 'utf8');
+  const seed = readFileSync(new URL('../capture_seed.py', import.meta.url), 'utf8');
+
+  test('aucun exec() dans les scripts de capture', () => {
+    for (const [nom, src] of [['capture_demos.py', demos], ['capture_screenshots.py', py]]) {
+      assert.ok(!/\bexec\s*\(/.test(src), `${nom} : exec() est revenu`);
+    }
+  });
+
+  test('le seed est importé, pas rejoué', () => {
+    assert.match(demos, /^from capture_seed import /m);
+    assert.match(py, /^from capture_seed import /m);
+  });
+
+  test('capture_seed.py ne fait QUE des données — rien à l’import', () => {
+    assert.ok(!/sync_playwright|\.screenshot\(|subprocess/.test(seed),
+      'importer le seed ne doit ouvrir aucun navigateur et n’écrire aucun fichier');
+  });
+
+  test('ffmpeg est appelé sans shell, avec une liste d’arguments', () => {
+    assert.match(demos, /shell=False/);
+    assert.ok(!/shell\s*=\s*True/.test(demos), 'jamais de shell=True');
+  });
+
+  test('aucun except silencieux', () => {
+    assert.ok(!/except[^\n]*:\s*\n\s*pass\b/.test(demos),
+      'un except qui avale sans rien dire est la même faute que le rapport muet');
+  });
+});

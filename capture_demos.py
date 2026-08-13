@@ -35,8 +35,30 @@ par image, avant de rééchantillonner à cadence constante. Les pauses
 reprennent leur longueur, et les 280 ms de la pastille de navigation
 sont bien couvertes par ~20 images au lieu de deux.
 """
-import base64, json, pathlib, shutil, subprocess, sys, time
-from playwright.sync_api import sync_playwright
+import base64
+import json
+import pathlib
+import shutil
+import subprocess  # nosec B404 - ffmpeg, arguments littéraux, jamais de shell
+import sys
+import time
+
+from playwright.sync_api import Error, sync_playwright
+
+
+def log(msg):
+    print('   ·', msg)
+
+
+# ── Appel à ffmpeg ──────────────────────────────────────────────────
+# `shell=False` (le défaut), une LISTE d'arguments, et aucune valeur
+# venue de l'extérieur : les seuls éléments variables sont des noms de
+# fichiers que ce script vient d'écrire lui-même. C'est la forme sûre de
+# subprocess ; l'annotation dit à l'analyseur que la question a été
+# posée, pas qu'on la fait taire.
+def ffmpeg(args, cwd):
+    subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', *args],
+                   cwd=cwd, check=True, shell=False)  # nosec B603
 
 ROOT = pathlib.Path(__file__).resolve().parent
 SHOTS = ROOT / 'screenshots'
@@ -50,11 +72,11 @@ FAILS = []
 
 # Le SEED déterministe est celui des captures fixes : même entrée, même
 # sortie, et la même vérification d'honnêteté des badges.
-_src = (ROOT / 'capture_screenshots.py').read_text(encoding='utf-8')
-_ns = {'__file__': str(ROOT / 'capture_screenshots.py'), '__name__': '_seed'}
-exec(compile(_src.split('# ── Bande de comparaison')[0], 'capture_prefix', 'exec'), _ns)
-init_script = _ns['init_script']
-SEASON = _ns['SEASON']
+# Il vivait dans capture_screenshots.py et était récupéré en exécutant la
+# moitié de ce fichier (exec + compile sur un découpage par commentaire).
+# Ça marchait, c'était fragile et illisible — et Codacy avait raison de
+# le signaler. Un module partagé dit ce qu'il fait.
+from capture_seed import init_script, SEASON
 
 # ── Curseur de démonstration ────────────────────────────────────────
 # Le vrai pointeur n'est pas capturé par un screencast. On en dessine un,
@@ -105,8 +127,12 @@ class Enregistreur:
         self.frames.append((time.perf_counter(), p['data']))
         try:
             self.cdp.send('Page.screencastFrameAck', {'sessionId': p['sessionId']})
-        except Exception:
-            pass
+        except Error as e:
+            # La session CDP se ferme entre la dernière image et le stop :
+            # l'accusé de réception arrive après coup et n'a plus de
+            # destinataire. Sans conséquence — l'image est déjà collectée —
+            # mais on le DIT, plutôt que d'avaler l'exception en silence.
+            log(f'ack ignoré (session fermée) : {e}')
 
     def start(self):
         self.t0 = time.perf_counter()
@@ -140,18 +166,18 @@ class Enregistreur:
         lignes.append(f"file '{self.frames[-1] and f'{len(self.frames)-1:05d}.jpg'}'")
         (dossier / 'liste.txt').write_text('\n'.join(lignes) + '\n', encoding='utf-8')
 
-        base = ['ffmpeg', '-y', '-loglevel', 'error', '-f', 'concat', '-i', 'liste.txt']
+        base = ['-f', 'concat', '-i', 'liste.txt']
         mp4 = SHOTS / f'demo-{nom}.mp4'
-        subprocess.run(base + [
+        ffmpeg(base + [
             '-vf', f'fps={MP4_FPS},scale={LARGEUR}:-2:flags=lanczos',
             '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '22', '-movflags', '+faststart',
-            str(mp4)], cwd=dossier, check=True)
+            str(mp4)], dossier)
         gif = SHOTS / f'demo-{nom}.gif'
-        subprocess.run(base + [
+        ffmpeg(base + [
             '-vf', (f'fps={GIF_FPS},scale={LARGEUR}:-2:flags=lanczos,split[a][b];'
                     '[a]palettegen=max_colors=160:stats_mode=diff[p];'
                     '[b][p]paletteuse=dither=bayer:bayer_scale=3:diff_mode=rectangle'),
-            '-loop', '0', str(gif)], cwd=dossier, check=True)
+            '-loop', '0', str(gif)], dossier)
 
         duree = self.tfin - self.t0
         fps_moy = len(self.frames) / duree

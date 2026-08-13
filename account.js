@@ -15,7 +15,7 @@ import { triggerImport, collectionSnapshot, _showImportDialog, deleteLocalCollec
 import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg } from './backup.js';
 import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection } from './cloud-ui.js';
-import { isCloudSignedIn, cloudDeleteAll, cloudDeleteSeason } from './cloud-sync.js';
+import { isCloudSignedIn, cloudDeleteSeason } from './cloud-sync.js';
 import { feedbackSectionHTML, bindFeedbackSection } from './feedback.js';
 import { showAdminPinScreen } from './pin.js';
 import { icon } from './icons.js';
@@ -247,8 +247,15 @@ function _bindBackupSection(el){
   });
 }
 
-/* ── Danger modal: scope choice + typed confirmation ── */
-const SCOPE_WARN_KEYS = { local: 'danger.warn_local', cloud: 'danger.warn_cloud', both: 'danger.warn_both' };
+/* ── Danger modal: scope choice + typed confirmation ──
+   Il y avait ici une table SCOPE_WARN_KEYS qui associait chaque portée à
+   une phrase d'avertissement figée. Elle est morte avec l'arrivée de la
+   suppression par saison : le récapitulatif est calculé par
+   deletionSummary() et rendu dans #dangerRecap, parce qu'il doit dire ce
+   qui part ET ce qui reste, ce qu'une phrase figée ne pouvait pas.
+   Les trois clés i18n qu'elle citait (danger.warn_local / _cloud / _both)
+   partent avec elle, dans les 7 langues : une traduction sans lecteur est
+   une dette qui a l'air d'un actif. ── */
 
 export function openDeleteModal(){
   if(deniedForViewer()) return ;   // lecture seule : refus même en appel direct
