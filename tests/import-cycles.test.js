@@ -100,6 +100,14 @@ const ARETES_INTERDITES = [
   ['profile-card.js', 'badges.js',
    'la plomberie canvas → PNG → partage doit servir à autre chose '
    + 'qu’aux badges ; c’est tout l’intérêt de l’avoir extraite'],
+  ['tutorial-snapshot.js', 'tutorial.js',
+   'la sûreté des données du tutoriel doit rester une FEUILLE : app.js '
+   + 'l’importe au démarrage et n’a pas à payer les 700 lignes du moteur '
+   + 'pour deux getters localStorage'],
+  ['tutorial-snapshot.js', 'storage.js',
+   'tutorialKeys() est une liste EN DUR, pas un appel à SEASON_KEY_RE — '
+   + 'c’est ce qui le garde hors de la composante. La cohérence des deux '
+   + 'listes est tenue par tests/key-registry.test.js, pas par un import'],
 ];
 
 /* Taille de la composante géante, MESURÉE. Elle ne doit pas grandir :
@@ -156,11 +164,13 @@ const TAILLE_MAX_COMPOSANTE = 27;
    seulement où vit le code — donc ça mérite son propre chantier, avec
    son propre filet. */
 
-/* Plancher des feuilles : 16 après le découpage. Il ne doit pas
+/* Plancher des feuilles : 16 après le découpage de badges.js, 17 depuis
+   l'extraction de tutorial-snapshot.js (chantier de test du tutoriel —
+   +1 feuille, 0 arête, mesuré AVANT d'être fait). Il ne doit pas
    BAISSER — une feuille qui rejoint la composante est une régression
    structurelle, et c'est exactement ce qui s'est produit deux fois
-   pendant ce chantier avant d'être corrigé. */
-const MIN_FEUILLES = 16;
+   pendant le découpage avant d'être corrigé. */
+const MIN_FEUILLES = 17;
 
 describe('graphe d’imports', () => {
   const scc = composantes(graphe);

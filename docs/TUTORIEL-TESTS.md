@@ -195,18 +195,29 @@ cherché avec une apostrophe typographique (`’`) ne matchait pas le gabarit
 (apostrophe ASCII) — le contrôle négatif tombait dans la mauvaise branche
 sans erreur.
 
-### 3 — extraire `tutorial-snapshot.js` · ~1 h 30
+### 3 — extraire `tutorial-snapshot.js` · **FAIT**
 
-~75 lignes, trois importateurs à repointer, `sw.js` (nouveau fichier
-précaché) et un bump `SW_VERSION`.
+75 lignes sorties : `isTutorialSeen`, `markTutorialSeen`,
+`tutorialKeys`, `captureLocalStorage`, `applyLocalStorage`. Importateurs
+repointés (`app.js`, les deux tests), `sw.js` précache le nouveau
+fichier, `SW_VERSION` v153 → v154.
 
-**Pas pour le graphe** (+1 feuille, 0 arête) : parce que `app.js` importe
-aujourd'hui 746 lignes et neuf dépendances pour deux getters
-`localStorage`, et parce qu'un moteur mesuré à 0 % s'instrumente plus
-franchement qu'un module dont la moyenne est adoucie par la seule partie
-déjà sûre.
+Mesuré après coup, conforme à la simulation : **feuille (0 import),
+17 feuilles au total** (plancher relevé 16 → 17 dans
+`tests/import-cycles.test.js`, avec sa raison), composante 27 nœuds,
+**125 → 124 arêtes** — `app.js` n'importe plus le moteur. Deux arêtes
+interdites posées : `tutorial-snapshot.js` ne doit importer ni
+`tutorial.js` ni `storage.js` (sa qualité de feuille est sa seule
+propriété structurelle, et `tutorialKeys()` est une liste EN DUR dont la
+cohérence est tenue par `key-registry.test.js`, pas par un import).
 
-**Total : ~7 h.** Le premier tiers utile — 0, 2a, 2b — tient en 3 h 30.
+Vérifié en modules bruts (`index-dev.html`) : démarrage du tour, Échap →
+restauration, grille intacte. Au passage, le TROISIÈME piège du cache
+(HTTP des sous-ressources) a rejoué : l'`app.js` encaché importait
+encore depuis `tutorial.js` — contourné par URL horodatée, comme la
+règle « HARD RULE cache » le prescrit.
+
+**Total réel du chantier : les cinq pièces sont faites.**
 
 ---
 

@@ -33,52 +33,14 @@ import {
 import { updateStats } from './stats.js';
 import { applySavedFont } from './pin.js';
 
-const SEEN_KEY = 'f1uno_onboarded'; // reused: existing installs stay flagged
-
-export function isTutorialSeen(){ return localStorage.getItem(SEEN_KEY) === 'true'; }
-export function markTutorialSeen(){ localStorage.setItem(SEEN_KEY, 'true'); }
-
-/* ══════════════════════════════════════════════════════════
-   STATE SNAPSHOT / RESTORE  (pure localStorage part is tested)
-   ══════════════════════════════════════════════════════════ */
-// Every localStorage key the tour could touch, for the given season.
-export function tutorialKeys(season){
-  return [
-    `f1uno_owned_${season}`,
-    `f1uno_badges_${season}`,
-    `f1uno_auto_badges_${season}`,
-    `f1uno_history_${season}`,
-    `f1uno_title_${season}`,
-    `f1uno_pinned_badge_${season}`,
-    'f1uno_changes_since_backup',
-    'f1uno_last_backup',
-    // Le tutoriel ajoute des cartes, donc débloque des badges, donc
-    // pourrait déclencher l'invitation à laisser un avis — et brûler
-    // une des DEUX qu'un utilisateur verra dans sa vie, pendant une
-    // visite guidée. On restaure l'état comme le reste.
-    'f1uno_review',
-    'f1uno_theme',
-    'f1uno_lang',
-    'f1uno_font',
-  ];
-}
-
-// Capture the exact value (or null when absent) of each key.
-export function captureLocalStorage(keys){
-  const snap = {};
-  keys.forEach(k => { snap[k] = localStorage.getItem(k); });
-  return snap;
-}
-
-// Restore each key to its captured value; a key that was absent
-// (null) is removed — so anything the tour created is undone too.
-export function applyLocalStorage(snap){
-  Object.keys(snap).forEach(k => {
-    const v = snap[k];
-    if(v === null || v === undefined) localStorage.removeItem(k);
-    else localStorage.setItem(k, v);
-  });
-}
+/* La partie SÛRETÉ DES DONNÉES (isTutorialSeen, tutorialKeys,
+   capture/applyLocalStorage) vit dans tutorial-snapshot.js : app.js en a
+   besoin au démarrage et n'a pas à payer les 700 lignes du moteur pour
+   deux getters. Le module est une FEUILLE et doit le rester. */
+import {
+  isTutorialSeen, markTutorialSeen,
+  tutorialKeys, captureLocalStorage, applyLocalStorage,
+} from './tutorial-snapshot.js';
 
 // Full snapshot: localStorage + in-memory view state (browser).
 function captureState(){

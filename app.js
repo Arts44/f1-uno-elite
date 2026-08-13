@@ -26,7 +26,7 @@ import {
   setAuthenticated, applySavedFont, applyLoginI18n
 } from './pin.js';
 import { maybeHandleBackupHash } from './backup.js';
-import { isTutorialSeen, markTutorialSeen } from './tutorial.js';
+import { isTutorialSeen, markTutorialSeen } from './tutorial-snapshot.js';
 import { initInstall, maybeShowInstallBanner } from './install.js';
 import { handleAuthRedirect } from './cloud-auth.js';
 import { initUpdateFlow, maybeOfferWhatsNew } from './update.js';

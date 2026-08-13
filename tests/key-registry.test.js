@@ -21,7 +21,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { DATA_KEY_RE } from '../secure-store.js';
 import { SEASON_KEY_RE, _storageKey } from '../storage.js';
-import { tutorialKeys } from '../tutorial.js';
+import { tutorialKeys } from '../tutorial-snapshot.js';
 
 const SEASON = 2025;
 

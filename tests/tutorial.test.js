@@ -6,9 +6,10 @@ import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
 import { loadData, coll, saveData, setTypeData } from '../storage.js';
 import {
-  tutorialKeys, captureLocalStorage, applyLocalStorage, TUTORIAL_STEPS,
-  TUTORIAL_CHAPTERS, isTutorialSeen, markTutorialSeen,
-} from '../tutorial.js';
+  tutorialKeys, captureLocalStorage, applyLocalStorage,
+  isTutorialSeen, markTutorialSeen,
+} from '../tutorial-snapshot.js';
+import { TUTORIAL_STEPS, TUTORIAL_CHAPTERS } from '../tutorial.js';
 
 describe('tutorial — state snapshot / restore (data safety)', () => {
   beforeEach(() => { resetStorage(); installFixtures(); });
