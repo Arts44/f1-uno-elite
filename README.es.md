@@ -30,9 +30,11 @@ Es una **PWA**: instálala desde tu navegador y funciona como una app nativa, to
 
 ### ✨ En movimiento
 
-| Añadido rápido — un toque, un ejemplar | Navegación con píldora | Insignias — 120, siete familias |
-|---|---|---|
-| ![Demo añadido rápido](screenshots/demo-quick-add.gif) | ![Demo navegación](screenshots/demo-nav.gif) | ![Demo insignias](screenshots/demo-badges.gif) |
+| Añadido rápido — un toque, un ejemplar | Navegación con píldora | Insignias — 120, siete familias | Dos temporadas, a un toque |
+|---|---|---|---|
+| ![Demo añadido rápido](screenshots/demo-quick-add.gif) | ![Demo navegación](screenshots/demo-nav.gif) | ![Demo insignias](screenshots/demo-badges.gif) | ![Seasons demo](screenshots/demo-seasons.gif) |
+
+Cada demo la genera `capture_demos.py` con el mismo seed determinista que las capturas fijas. Los GIF van a 33,3 fps; la versión a 60 fps está al lado: [añadido rápido](screenshots/demo-quick-add.mp4) · [navegación](screenshots/demo-nav.mp4) · [insignias](screenshots/demo-badges.mp4) · [temporadas](screenshots/demo-seasons.mp4).
 
 
 ### Novedades 1.29 — la pasada v2
@@ -77,7 +79,7 @@ Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas de la 
 - 📴 **Funciona totalmente sin conexión** — toda la app queda precacheada por un service worker; tras la primera visita, el modo avión no cambia nada.
 - 🔄 **Actualizaciones transparentes** — las nuevas versiones se detectan en segundo plano y se aplican con un toque, con un changelog integrado que muestra qué ha cambiado desde *tu* última versión.
 - 🌍 **7 idiomas** — inglés, francés, español, chino, italiano, neerlandés, alemán. Cada texto, insignia y entrada del changelog.
-- 🎓 **Tutorial interactivo, 28 pasos en 5 capítulos** — un capítulo por página, en el orden de las pestañas. Una visita guiada donde *realizas* las acciones reales, en un entorno aislado que revierte todos los cambios al terminar.
+- 🎓 **Tutorial interactivo, 33 pasos en 5 capítulos** — un capítulo por página, en el orden de las pestañas. Una visita guiada donde *realizas* las acciones reales, en un entorno aislado que revierte todos los cambios al terminar.
 - 🏅 **Una página de insignias que cuenta tu colección** — 120 insignias en 7 familias: trayectoria, sets completos, foils, colores, pasión y experiencias vividas que validas tú mismo. Un anillo de progreso con tu título, una tarjeta *Próxima insignia* que destaca siempre la más cercana — o el objetivo que fijaste —, una escalera de hitos de 1 a 101 cartas, las fechas de desbloqueo y una celebración de verdad cuando cae una: aviso agrupado, vibración breve y estallido en la ficha. Tu tarjeta de coleccionista se exporta como imagen para compartir.
 - 📊 **Panel de estadísticas** — progreso global, donut de rarezas, completitud por categoría, momentos destacados, una curva de progreso día a día (SVG puro, sin librería de gráficos) y las herramientas de coleccionista como pestañas internas: listas de faltantes, repetidas e intercambios.
 - 👤 **Una página Cuenta dedicada** — inicio de sesión en la nube por código de correo, copia/restauración, exportación/importación JSON, transferencia por QR, opiniones integradas y una zona de peligro con tres alcances de borrado, cada uno protegido por una palabra que hay que escribir. En modo espectador toda la página se sustituye por un estado bloqueado: los controles están ausentes, no desactivados.
@@ -99,10 +101,10 @@ Seguir una colección completa de cartas **F1 UNO Élite** — 101 cartas de la 
 | Cripto | **Web Crypto** nativo — SHA-256 (PIN), PBKDF2 + AES-GCM (cifrado en reposo opcional) |
 | Códigos QR | Codificador de un solo archivo vendorizado ([Project Nayuki](https://www.nayuki.io/page/qr-code-generator-library), MIT) |
 | Fuentes | WOFF2 autoalojadas (SIL OFL) — ninguna petición a Google Fonts, 5 temas a elegir |
-| Tests | **Runner de tests integrado en Node** (`node --test`) — 651 tests, sin framework de test |
+| Tests | **Runner de tests integrado en Node** (`node --test`) — 816 tests, sin framework de test |
 | CI | GitHub Actions — tests + build + verificación de frescura del bundle commiteado en cada push/PR |
 
-**Cero dependencias en runtime es una regla de diseño, no una casualidad.** Todo lo que un framework o SDK proporcionaría — renderizado, navegación entre vistas, i18n, caché offline, auth por REST, cifrado, generación de QR — está construido directamente sobre las API de la plataforma web. La app que instalas es exactamente el código de este repositorio.
+**Cero dependencias en runtime es una regla de diseño, no una casualidad.** Todo lo que un framework o SDK proporcionaría — renderizado, navegación entre vistas, i18n, caché offline, auth por REST, cifrado, generación de QR — está construido directamente sobre las API de la plataforma web. La app que instalas es exactamente el código de este repositorio. Desde entonces: `cloud.js` (726 líneas) se dividió en cuatro módulos tras 61 tests de caracterización nunca modificados, lo que desbloqueó `pushSeason(s)` / `listCloudSeasons()` — verificados contra la base real de Supabase; y se cerraron dos agujeros XSS en el origen, en `tEsc()` y en los puntos de entrada de datos.
 
 ---
 
@@ -115,7 +117,7 @@ El código es un conjunto de **módulos ES** enfocados tras un único punto de e
 | Estado y datos | `storage.js` (localStorage, por temporada, migración v1→v2), `data.js`, `history.js` |
 | Interfaz | `render.js` (cuadrícula, filtros, ficha de carta), `stats.js`, `badges.js`, `pin.js` (ajustes) |
 | Plataforma | `sw.js` (precache), `update.js` (actualizaciones), `install.js`, `secure-store.js` |
-| Nube opcional | `cloud.js`, `feedback.js`, `settings-sync.js` — todos en REST puro |
+| Nube opcional | `cloud-http/auth/sync/ui.js`, `feedback.js`, `settings-sync.js` — todos en REST puro |
 
 Las acciones pasan por **un único listener delegado** sobre `[data-action]` en lugar de manejadores en línea — que es también lo que hace posible el modo lector, ya que un solo conjunto `VIEWER_BLOCKED` bloquea toda escritura. El texto de interfaz nunca aparece en el código: pasa por `t()` sobre diccionarios que cubren los 7 idiomas.
 
@@ -143,7 +145,7 @@ flowchart TB
     SW["sw.js"]; UP["update.js"]; IN["install.js"]; BK["backup.js"]
   end
   subgraph CL["Nube opcional"]
-    CLO["cloud.js"]; FB["feedback.js"]; SS["settings-sync.js"]
+    CLO["cloud-*.js (4)"]; FB["feedback.js"]; SS["settings-sync.js"]
   end
   ST --> CL
   STO --> SEC
@@ -177,13 +179,13 @@ Migrar cientos de valores de espaciado escritos a mano hacia tokens, con «a mí
 
 ### Probar una app de navegador sin navegador
 Mantener la promesa de cero dependencias descarta Jest, Vitest y los arneses de navegador headless.
-**Solución:** la lógica se factorizó para ser independiente del navegador y está cubierta por **651 tests en el runner integrado de Node** — sin dependencias de test, sin red real. La CI también reconstruye el bundle y falla si el artefacto commiteado está obsoleto.
+**Solución:** la lógica se factorizó para ser independiente del navegador y está cubierta por **816 tests en el runner integrado de Node** — sin dependencias de test, sin red real. La CI también reconstruye el bundle y falla si el artefacto commiteado está obsoleto.
 
 ---
 
 ### Qué cubren las pruebas — y qué no
 
-651 pruebas sobre el ejecutor integrado de Node, sin framework. Ser preciso sobre el límite importa más que el número:
+816 pruebas sobre el ejecutor integrado de Node, sin framework. Ser preciso sobre el límite importa más que el número:
 
 - **Cubierto:** migraciones de almacenamiento y esquema de claves por temporada; la escala de rareza de siete niveles, incluido el ascenso por set completo; todas las condiciones de insignia y el modelo de dificultad; las listas del coleccionista (que faltan, repetidas, intercambio); los ciclos de codificación de los códigos de copia; los ayudantes de nube contra un `fetch` simulado, incluidos los caminos de fallo; la paridad de claves i18n en los 7 idiomas y la detección de duplicados; la precaché del service worker frente al grafo real de importaciones; los contratos de marcado del acceso por teclado; la procedencia de cada `innerHTML` alimentado desde fuera; el contraste verificado a mano en ambos temas.
 - **No cubierto:** el renderizado real (ninguna aserción DOM más allá de cadenas de marcado), el comportamiento del service worker en ejecución, llamadas de red reales, IndexedDB, los avisos de instalación, y todo lo que exija un motor de navegador — eso se verifica a mano y con la pasada determinista de capturas, no con la suite. El porcentaje citado más arriba mide solo esta parte sin navegador — léelo como tal, no como una medida de la aplicación.
@@ -202,7 +204,7 @@ npm install     # instala esbuild, la única devDependency
 npm run build   # app.js → app.bundle.js (minificado + sourcemap)
 # → http://localhost:8000/  (index.html)
 
-npm test        # 651 tests, node --test, sin framework
+npm test        # 816 tests, node --test, sin framework
 ```
 
 **Despliegue.** El repositorio se despliega tal cual en GitHub Pages: todas las URL son relativas, así que la app funciona igual en la raíz de un dominio, bajo un subdirectorio y en localhost. Rutina de release: añadir una entrada al changelog (eso *es* el bump de versión) → subir `SW_VERSION` → build → push.
@@ -215,13 +217,13 @@ npm test        # 651 tests, node --test, sin framework
 - **Las notificaciones de opinión salen del dominio de pruebas de Resend** (`onboarding@resend.dev`). Desde ese dominio, Resend solo entrega a la dirección del propietario de la cuenta: la notificación llega al mantenedor y a nadie más. Enviar desde otro sitio exigiría poseer y verificar un dominio. Es un límite asumido, no un defecto: la opinión se guarda en la base de datos en cualquier caso, y un envío fallido nunca la bloquea.
 - **Los códigos de acceso viajan por un proveedor SMTP configurado en Supabase** — una cadena totalmente distinta de las notificaciones anteriores. La entrega, las cuotas y la reputación del remitente dependen de ese proveedor y este repositorio no las mide; considera los correos de acceso como «en la medida de lo posible» para un proyecto personal.
 - **El historial de progresión no tiene relleno retroactivo** — la curva de estadísticas empieza el día en que se instaló la función.
-- **La nota de Codacy es A — y dos de sus cuatro objetivos de calidad están en rojo.** En verde: 0 issues abiertas, 4 % de duplicación. En rojo: la complejidad, con 13 de los 30 archivos fuente analizados por encima del umbral (43 %, frente a un objetivo del 10 %); y la cobertura, al 62,72 % medido por la suite de pruebas (el propio indicador de Codacy marca 62 %, sobre un conjunto de archivos algo más amplio) frente a un objetivo del 60 % — en verde, pero con 2,7 puntos de margen. La insignia de arriba es real, pero no es el cuadro completo — por eso el cuadro completo está aquí. El umbral de complejidad es ajustable y subirlo pondría esa medida en verde sin cambiar una línea de código; no se ha subido, porque cuatro de esos archivos hacen realmente demasiado — los dos más pesados son `badges.js` y `cloud.js`, y dividirlos es el próximo trabajo, ya que es lo que separa al proyecto de la exportación de lista de intercambio y del soporte multitemporada. Una salvedad sobre la métrica en sí: cuenta *archivos*, por lo que penaliza una arquitectura hecha de pocos módulos grandes — el mismo código repartido en 300 archivos pasaría sin cambiar una línea. Es un hecho sobre la medición, no una excusa.
+- **La nota de Codacy es A — y dos de sus cuatro objetivos de calidad están en rojo.** En verde: 0 issues abiertas, 4 % de duplicación. En rojo: la complejidad, con 13 de los 30 archivos fuente analizados por encima del umbral **medidos en julio de 2026** (el conjunto analizado tiene ahora 35 archivos) (43 %, frente a un objetivo del 10 %); y la cobertura, al 69,10 % medido por la suite de pruebas (el propio indicador de Codacy marca 62 %, sobre un conjunto de archivos algo más amplio) frente a un objetivo del 60 % — en verde, pero con 2,7 puntos de margen. La insignia de arriba es real, pero no es el cuadro completo — por eso el cuadro completo está aquí. El umbral de complejidad es ajustable y subirlo pondría esa medida en verde sin cambiar una línea de código; no se ha subido, porque cuatro de esos archivos hacen realmente demasiado — los dos más pesados son `badges.js` y `cloud.js`, y dividirlos es el próximo trabajo, ya que es lo que separa al proyecto de la exportación de lista de intercambio y del soporte multitemporada. Una salvedad sobre la métrica en sí: cuenta *archivos*, por lo que penaliza una arquitectura hecha de pocos módulos grandes — el mismo código repartido en 300 archivos pasaría sin cambiar una línea. Es un hecho sobre la medición, no una excusa.
 
 ---
 
 ## 🔩 Notas de ingeniería
 
-Cero dependencias en ejecución (solo esbuild, al compilar); suelo tipográfico de 11 px verificado en 5 tipografías × 2 temas × 320/375/escritorio (una sola excepción, el « ÉLITE » del logotipo a 8 px, que es marca); desplazamiento de diseño medido, y ahora realmente nulo: la altura de baldosa es FIJA (antes 13 alturas distintas, de 246,69 a 292,69 px), el esqueleto lee la misma variable CSS y encaja exactamente — a costa de un +19,4 % de desplazamiento, el precio de reservar el peor caso en todas partes; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio, medición única no repetida en CI); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado, las tres demos animadas grabadas a mano; 651 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
+Cero dependencias en ejecución (solo esbuild, al compilar); suelo tipográfico de 11 px verificado en 5 tipografías × 2 temas × 320/375/escritorio (una sola excepción, el « ÉLITE » del logotipo a 8 px, que es marca); desplazamiento de diseño medido, y ahora realmente nulo: la altura de baldosa es FIJA (antes 13 alturas distintas, de 246,69 a 292,69 px), el esqueleto lee la misma variable CSS y encaja exactamente — a costa de un +19,4 % de desplazamiento, el precio de reservar el peor caso en todas partes; el añadido rápido perfilado y optimizado (~300 ms → ~45 ms en un móvil medio, medición única no repetida en CI); cifrado local opcional ligado al PIN (PBKDF2 + AES-GCM); modo espectador bloqueado en la lógica, no en CSS; capturas regeneradas por un script determinista versionado, las cuatro demos animadas guionizadas y reproducibles; 816 tests en JS vanilla con el runner integrado de Node. Detalles completos en el [README inglés](README.md).
 
 ---
 

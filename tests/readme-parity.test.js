@@ -204,6 +204,11 @@ describe('README — les chiffres ne dérivent pas', () => {
     ['511 tests', 'compte de tests d\'avant les tests fmt* et aléa'],
     ['519 tests', 'compte de tests d\'avant la parité README'],
     ['623 tests', 'compte de tests d\'avant les affirmations vérifiables'],
+    ['651 tests', 'compte de tests d\'avant le chantier des seuils relatifs'],
+    ['62,72', 'couverture d\'avant la passe vitrine'],
+    ['62.72', 'couverture d\'avant la passe vitrine'],
+    ['enregistrées à la main', 'les démos sont scriptées depuis la passe vitrine'],
+    ['recorded by hand', 'les démos sont scriptées depuis la passe vitrine'],
     ['111 badges', 'nombre de badges d\'avant la v3'],
   ];
 
@@ -220,10 +225,10 @@ describe('README — les chiffres ne dérivent pas', () => {
   // valeur. Le séparateur décimal est laissé libre : 62,72 en
   // français et 62.72 en anglais sont la même mesure.
   const FAITS = [
-    { nom: 'compte de tests', motif: /\b651\b/ },
+    { nom: 'compte de tests', motif: /\b816\b/ },
     { nom: 'nombre de cartes', motif: /\b101\b/ },
     { nom: 'nombre de badges', motif: /\b120\b/ },
-    { nom: 'couverture', motif: /\b62[.,]72\b/ },
+    { nom: 'couverture', motif: /\b69[.,]10\b/ },
   ];
 
   for(const f of TOUS){

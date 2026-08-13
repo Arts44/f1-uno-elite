@@ -1,0 +1,26 @@
+[
+ {
+  "nom": "quick-add",
+  "images": 143,
+  "duree": 7.929064417000001,
+  "ecart_median_ms": 35,
+  "gif_ko": 2228,
+  "mp4_ko": 189
+ },
+ {
+  "nom": "badges",
+  "images": 166,
+  "duree": 6.851220875000003,
+  "ecart_median_ms": 16,
+  "gif_ko": 1021,
+  "mp4_ko": 166
+ },
+ {
+  "nom": "seasons",
+  "images": 263,
+  "duree": 8.491642874999997,
+  "ecart_median_ms": 21,
+  "gif_ko": 2326,
+  "mp4_ko": 230
+ }
+]
