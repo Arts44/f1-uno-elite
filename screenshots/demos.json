@@ -1,26 +1,26 @@
 [
  {
   "nom": "quick-add",
-  "images": 143,
-  "duree": 7.929064417000001,
-  "ecart_median_ms": 35,
-  "gif_ko": 2228,
-  "mp4_ko": 189
+  "images": 157,
+  "duree": 5.558259417000001,
+  "ecart_median_ms": 32,
+  "gif_ko": 2204,
+  "mp4_ko": 169
  },
  {
   "nom": "badges",
-  "images": 166,
-  "duree": 6.851220875000003,
-  "ecart_median_ms": 16,
-  "gif_ko": 1021,
-  "mp4_ko": 166
+  "images": 133,
+  "duree": 7.014928834000003,
+  "ecart_median_ms": 25,
+  "gif_ko": 1018,
+  "mp4_ko": 164
  },
  {
   "nom": "seasons",
-  "images": 263,
-  "duree": 8.491642874999997,
-  "ecart_median_ms": 21,
-  "gif_ko": 2326,
-  "mp4_ko": 230
+  "images": 191,
+  "duree": 8.183625499999998,
+  "ecart_median_ms": 31,
+  "gif_ko": 2276,
+  "mp4_ko": 200
  }
 ]

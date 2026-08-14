@@ -242,6 +242,17 @@ with sync_playwright() as pw:
     # ══ 2. NAVIGATION — la pastille glisse (280 ms) ══
     print('— navigation —')
     b, c, pg = page_prete(pw)
+    # ÉCHAUFFEMENT, AVANT d'enregistrer — mesuré le 14/08/2026 : la
+    # PREMIÈRE transition d'un contexte neuf plafonne à 8 images/280 ms
+    # (29 fps), sous le plancher de 30 — JIT et compositeur à froid. Les
+    # suivantes font 32-43 fps. Quatre exécutions, même motif, y compris
+    # sur la version d'AVANT le lockup 1.61.0 : ce n'est pas le contenu,
+    # c'est le froid. On joue donc les transitions une fois À BLANC :
+    # l'app enregistrée est chaude, et le GIF montre le régime réel —
+    # pas l'artefact du premier tour. Le plancher, lui, ne bouge pas.
+    for vue in ('stats', 'account', 'badges', 'collection'):
+        pg.evaluate(f"() => document.querySelector('[data-action=\"switchView\"][data-view=\"{vue}\"]').click()")
+        pg.wait_for_timeout(450)
     r = Enregistreur(pg, c)
     r.start()
     pg.evaluate("() => document.querySelector('[data-action=\"switchView\"][data-view=\"badges\"]').click()")
