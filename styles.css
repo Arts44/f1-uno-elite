@@ -571,16 +571,39 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
    cassé. Uniquement de la typographie, l'accent rouge des tokens
    et une barre de vitesse abstraite — aucun élément de marque.
    Suit --font-d, donc les 5 thèmes de police. */
-.lockup{display:inline-flex;flex-direction:column;gap:0.2em;font-family:var(--font-d);line-height:1;white-space:nowrap;}
-.lk-top{display:flex;align-items:baseline;gap:0.28em;}
-.lk-f1{font-weight:800;font-size:1em;letter-spacing:-0.03em;color:var(--tx1);}
-.lk-uno{font-weight:800;font-size:1em;letter-spacing:-0.03em;color:var(--red);}
-.lk-elite{font-weight:700;font-size:0.4em;letter-spacing:0.3em;color:var(--tx3);text-transform:uppercase;}
-.lk-bar{height:0.11em;border-radius:0.06em;
-  background:linear-gradient(90deg,var(--red) 0 38%,var(--tx3) 38% 100%);
-  -webkit-mask-image:linear-gradient(90deg,#000 0 72%,transparent 100%);
-  mask-image:linear-gradient(90deg,#000 0 72%,transparent 100%);}
+/* ══ SOURCE DE VÉRITÉ de la géométrie du lockup (1.61.0) ══
+   Les VALEURS NOMMÉES ci-dessous sont reprises par icons/icon.svg et
+   par le sceau canvas de profile-card.js. Toute divergence casse
+   tests/lockup-geometry.test.js — ne changez rien ici sans y passer.
+
+     graisse        700       (le VRAI maximum de space-grotesk-var :
+                               la 800 demandée depuis 1.30.0 était un
+                               FAUX GRAS synthétique du navigateur —
+                               le lockup n'était pas mal dessiné, il
+                               était mal rendu)
+     F1–UNO         0.22em    (resserrés : un seul nom)
+     nom–ÉLITE      +0.34em   (écarté : un qualificatif)
+     ÉLITE          500 / 0.34em / interlettre 0.16em, compensée à
+                    droite (le letter-spacing s'ajoute APRÈS chaque
+                    glyphe, dernier compris : sans margin-right négatif
+                    le mot n'est jamais optiquement centré)
+     barre          hauteur max(2px, 0.08em) — jamais sous le pixel —
+                    largeur 78 %, PLEINE (le fondu la rendait illisible)
+     seuil          la barre DISPARAÎT sous 24 px : un élément qui ne
+                    peut pas être net à une taille n'y apparaît pas. */
+.lockup{display:inline-flex;flex-direction:column;gap:0.16em;font-family:var(--font-d);line-height:1;white-space:nowrap;}
+.lk-top{display:flex;align-items:baseline;gap:0.22em;}
+.lk-f1{font-weight:700;font-size:1em;letter-spacing:-0.02em;color:var(--tx1);}
+.lk-uno{font-weight:700;font-size:1em;letter-spacing:-0.02em;color:var(--red);}
+.lk-elite{font-weight:500;font-size:0.34em;letter-spacing:0.16em;margin-left:0.34em;margin-right:-0.16em;color:var(--tx3);text-transform:uppercase;}
+.lk-bar{height:max(2px,0.08em);border-radius:1px;background:var(--red);width:78%;}
 .lk-hd{font-size:20px;}                       /* header */
+.lk-hd .lk-bar{display:none;}                 /* < 24 px : la barre part proprement */
+/* ⚠️ EXCEPTION DOCUMENTÉE, ne pas « uniformiser » : à 20 px, la
+   proportion du grand format (0.34em) donnerait 6,8 px — illisible
+   hors retina. ÉLITE remonte à 0.4em (8 px réels) dans l'en-tête.
+   La proportion ne survit pas au rétrécissement ; le réglage si. */
+.lk-hd .lk-elite{font-size:0.4em;letter-spacing:0.12em;margin-right:-0.12em;}
 .lk-lg{font-size:34px;margin-bottom:var(--space-2);}  /* PIN, langue, setup */
 
 /* ── Monogrammes d'écurie (v2.3) ──

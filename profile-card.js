@@ -52,7 +52,16 @@ export async function shareProfileCard(){
   x.strokeStyle = red; x.lineWidth = 10; x.strokeRect(25, 25, W - 50, H - 50);
   // en-tête
   x.fillStyle = ink; x.textAlign = 'center';
-  x.font = '700 54px system-ui'; x.fillText('F1 UNO ÉLITE', W / 2, 130);
+  /* Le sceau reprend la SOURCE DE VÉRITÉ du lockup (styles.css .lockup) :
+     Space Grotesk, graisse 700 RÉELLE — system-ui portait la mauvaise
+     police sur le seul rendu qui SORT de l'app. Barre pleine dessous,
+     mêmes proportions (hauteur 0.08em, ~78 % du nom). Divergence tenue
+     par tests/lockup-geometry.test.js. */
+  x.font = "700 54px 'Space Grotesk', system-ui"; x.fillText('F1 UNO ÉLITE', W / 2, 126);
+  x.fillStyle = red;
+  const _bw = 240;
+  x.beginPath(); x.roundRect((W - _bw) / 2, 140, _bw, 5, 2.5); x.fill();
+  x.fillStyle = ink;
   x.fillStyle = sub; x.font = '600 30px system-ui'; x.fillText(t('b.title').replace('🏅 ', '').toUpperCase(), W / 2, 180);
   // anneau
   const cx = W / 2, cy = 430, r = 150;

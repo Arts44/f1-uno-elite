@@ -1,33 +1,40 @@
 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="F1 UNO Élite">
-  <!-- F1 UNO Élite — icône d'application (v2.3, lockup « barre de vitesse »).
-       Aucun élément de marque : un aplat rouge, le nom en typographie, et
-       une barre de vitesse abstraite. Remplace l'icône « éventail de cartes »
-       qui accompagnait les logos officiels retirés.
-       Source de vérité des exports icon-512.png / icon-192.png / favicon.ico.
-       Maskable-safe : tout le contenu tient dans le cercle de sûreté central
-       (rayon 205 px = 80 % de 256), donc rien n'est rogné par un masque rond. -->
+  <!-- F1 UNO Élite — icône d'application (v3, lockup empilé, 1.61.0).
+
+       ⚠️ RÈGLE QUI PRIME SUR TOUT (juridique). « F1 » et « UNO » sont
+       des marques déposées. Ce qui rend ce lockup DÉFENDABLE, c'est sa
+       sobriété : de la typographie générique (Space Grotesk), l'accent
+       rouge des tokens, une barre pleine. AUCUNE évocation de la
+       typographie officielle F1, du damier, du style UNO, ni des
+       couleurs d'une écurie identifiable. Une proposition qui
+       ressemble à un logo officiel est disqualifiée, même belle.
+
+       GÉOMÉTRIE : ce fichier REPREND les valeurs nommées de la source
+       de vérité — le bloc .lockup de styles.css (graisse 700 réelle,
+       interlettre -0.02em, ÉLITE 500/0.16em, barre pleine). Toute
+       divergence casse tests/lockup-geometry.test.js.
+       Ici letter-spacing est en px : ratio × font-size
+       (190 × -0.02 = -3.8 ; 64 × 0.16 = 10.24).
+
+       Source de vérité des exports icon-512.png / icon-192.png /
+       favicon.ico — régénérés par export_icons.py (le favicon 16 px y
+       est dessiné à part, « F1 » seul réglé sur la grille de pixels).
+
+       Maskable-safe : tout le contenu tient dans le cercle de sûreté
+       central (rayon 205 px), rien n'est rogné par un masque rond. -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#FF1E45"/>
       <stop offset="1" stop-color="#C40024"/>
     </linearGradient>
-    <!-- la barre s'estompe vers la droite : un trait de vitesse, pas un damier -->
-    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.92"/>
-      <stop offset="0.72" stop-color="#FFFFFF" stop-opacity="0.92"/>
-      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
-    </linearGradient>
   </defs>
 
   <rect width="512" height="512" fill="url(#bg)"/>
 
-  <!-- Wordmark : « F1 » plein, « UNO » en contour pour la hiérarchie -->
-  <g font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" font-weight="800" text-anchor="middle">
-    <text x="256" y="268" font-size="140" letter-spacing="-6" fill="#FFFFFF">F1</text>
-    <text x="256" y="346" font-size="62" letter-spacing="2"
-          fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-opacity="0.85">UNO</text>
+  <g font-family="'Space Grotesk','Helvetica Neue',Arial,sans-serif" text-anchor="middle" fill="#FFFFFF">
+    <text x="256" y="266" font-weight="700" font-size="190" letter-spacing="-3.8">F1</text>
+    <text x="258" y="352" font-weight="500" font-size="64" letter-spacing="10.24" opacity="0.85">UNO</text>
   </g>
-
-  <!-- Barre de vitesse -->
-  <rect x="146" y="378" width="220" height="13" rx="6.5" fill="url(#fade)"/>
+  <!-- barre pleine : 78 % de la largeur du nom (≈230 px), h = 0.08em de 190 -->
+  <rect x="166" y="386" width="180" height="15" rx="7.5" fill="#FFFFFF"/>
 </svg>
