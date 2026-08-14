@@ -1245,6 +1245,14 @@ body.viewer-mode .mo-type-rows button { opacity:0.35;pointer-events:none; }
 .bga2{width:400px;height:400px;background:radial-gradient(circle,rgba(0,76,151,0.04) 0%,transparent 70%);bottom:-100px;left:-100px;}
 
 /* TOAST */
+/* n°17 (POINTS-SIGNALES) — pendant la visite guidée, le toast quitte la
+   zone de la nav : il recouvrait l'onglet que le projecteur désignait
+   (mesuré : elementFromPoint(centre du halo) rendait le toast, pas
+   l'onglet — l'utilisateur obéissant cliquait « Annuler »). 130px = la
+   bande NAV_CLEAR du moteur du tutoriel. Le garde est dans
+   verify_tutorial.py : si cette règle saute, le parcours échoue à
+   « Direction les stats ». */
+body:has(.tut-overlay) .toast{bottom:130px;}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface3);color:var(--tx1);border:1px solid var(--border-s);padding:var(--space-10px) var(--space-4);border-radius:12px;font-size:13px;font-weight:500;box-shadow:var(--sh-lg);z-index:500;opacity:0;transform:translateY(8px);transition:all 0.2s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
 .toast-action{margin-left:var(--space-3);border:none;background:none;color:#4CD964;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;padding:0;}

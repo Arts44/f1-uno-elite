@@ -179,6 +179,9 @@ export const TUTORIAL_STEPS = [
   { id: 'quick_add', chapter: 'collection',
     ensure: async () => { try { closeMo(); } catch(e){} },
     target: () => q('.card .qbtn'),
+    // Le second temps du geste : une fois le « + » pressé, le halo suit
+    // le menu de variantes (voir « cible de suite de geste », plus bas).
+    follow: () => q('.qadd-type'),
     action: { type: 'dataAction', name: 'quickAddType' } },
 
   /* ── CHAPITRE 2 · BADGES ── */
@@ -701,11 +704,41 @@ function _bindAdvance(step, i, el, opts = {}){
   }
 
   // Le halo et la bulle suivent la cible si la page bouge sous eux.
+  // `cible` plutôt que `el` figé : la suite de geste (ci-dessous) peut
+  // la déplacer, et un défilement ne doit pas la ramener en arrière.
+  let cible = el;
   const repos = () => {
-    const shown = el && _isVisible(el);
-    if(shown) _positionSpot(el);
-    _positionBubble(shown ? el : null);
+    const shown = cible && _isVisible(cible);
+    if(shown) _positionSpot(cible);
+    _positionBubble(shown ? cible : null);
   };
+
+  /* ── Cible de SUITE DE GESTE (n°17) ──────────────────────────
+     Quand le geste ouvre une surface intermédiaire — le « + » de
+     l'ajout rapide ouvre un menu de variantes, et l'étape ne valide
+     que sur le choix d'une variante — le halo doit ÉCLAIRER cette
+     surface, pas rester sur le bouton déjà pressé.
+
+     Sonde bornée plutôt que délai fixe : le menu est inséré par le
+     handler DÉLÉGUÉ (bulle), qui court APRÈS ce listener (capture) —
+     l'attente porte sur un ordre d'événements, pas sur une durée, et
+     un délai « suffisant » ne le serait plus sur un CPU lent. Le
+     motif est celui de _waitForTarget. */
+  if(step.follow){
+    const suivre = () => {
+      const t0 = Date.now();
+      const tick = () => {
+        if(finished || !_active) return;
+        const el2 = step.follow();
+        if(el2 && _rects(el2)){ cible = el2; repos(); return; }
+        if(Date.now() - t0 < 1200) setTimeout(tick, 90);
+        else { cible = el; repos(); }   // surface refermée : on revient
+      };
+      setTimeout(tick, 0);   // après le handler délégué du même clic
+    };
+    document.addEventListener('click', suivre, true);
+    cleanups.push(() => document.removeEventListener('click', suivre, true));
+  }
   window.addEventListener('resize', repos);
   window.addEventListener('scroll', repos, true);
   cleanups.push(() => { window.removeEventListener('resize', repos); window.removeEventListener('scroll', repos, true); });

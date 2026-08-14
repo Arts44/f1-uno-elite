@@ -250,10 +250,17 @@ def parcourir(page):
             # célébration retombe ; le script fait pareil. (Le fond du
             # problème — le projecteur désigne une cible momentanément
             # recouverte — est au n°17 de POINTS-SIGNALES.)
-            # Un toast qui traîne au-delà de 8 s n'est pas bloquant :
-            # on tente le geste quand même, et si le clic tombe sur le
-            # toast, l'assertion de progression le dira en face.
-            attendre(page, '() => !document.querySelector(".toast.show")', 8000)
+            # ⚠️ AUCUNE attente de toast ici, et c'est VOULU (n°17).
+            # Ce script attendait la retombée des toasts avant de
+            # cliquer — un contournement : l'app elle-même laissait le
+            # toast recouvrir l'onglet que le projecteur désignait.
+            # Depuis le correctif (styles.css :
+            # `body:has(.tut-overlay) .toast{bottom:130px}`), le toast
+            # ne recouvre plus jamais la zone désignée pendant le tour.
+            # SI CE PARCOURS SE MET À ÉCHOUER à « Direction les stats »
+            # (clic sans progression), c'est ce CSS qui a régressé —
+            # pas le parcours qui est instable. Le contournement retiré
+            # est devenu le garde.
             sp = page.locator('.tut-spot').bounding_box()
             if sp:
                 page.mouse.click(sp['x'] + sp['width'] / 2, sp['y'] + sp['height'] / 2)
@@ -267,6 +274,21 @@ def parcourir(page):
                 menu = page.locator('.qadd-type').first
                 if menu.count():
                     m = menu.bounding_box()
+                    # n°17 partie A : une fois le menu ouvert, le halo
+                    # doit le RECOUVRIR — c'est lui l'étape suivante du
+                    # geste. Un halo resté sur le « + » désigne un bouton
+                    # déjà pressé.
+                    sp2 = page.locator('.tut-spot').bounding_box()
+                    if m and sp2:
+                        recouvre = (sp2['x'] < m['x'] + m['width']
+                                    and sp2['x'] + sp2['width'] > m['x']
+                                    and sp2['y'] < m['y'] + m['height']
+                                    and sp2['y'] + sp2['height'] > m['y'])
+                        if not recouvre:
+                            ECHECS.append(
+                                'le halo ne suit pas le menu de variantes '
+                                f'(halo {sp2}, première variante {m}) — '
+                                'le second temps du geste n’est pas éclairé')
                     if m:
                         page.mouse.click(m['x'] + m['width'] / 2,
                                          m['y'] + m['height'] / 2)
@@ -399,8 +421,13 @@ with sync_playwright() as p:
 
 print(f'\nparcours : {etapes} étapes atteintes, {actions} gestes réels, '
       f'{len(sautees)} passée(s)')
+# Une étape passée est un ÉCHEC, pas un avertissement. Le parcours sain
+# fait 0 passée depuis que le script joue le geste complet ; un saut qui
+# réapparaît signifie qu'un geste guidé ne prend plus — et un garde qui
+# avertit sans échouer n'est pas un garde (exit 0 = personne ne lit).
 for s_ in sautees:
-    print(f'  ⚠ passée par la sortie de secours : {s_}')
+    ECHECS.append(f'étape passée par la sortie de secours : {s_} — '
+                  'le geste guidé ne prend plus dans le temps imparti')
 print(f'clés comparées : {len(set(avant_ls) | set(apres_ls))}, '
       f'dont {len(CHANGEMENTS_ATTENDUS)} autorisées à changer')
 

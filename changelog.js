@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.60.4',
+    date: '2026-08-14',
+    changes: {
+      en: ['During the guided tour, the spotlight now follows the whole quick-add gesture: once you press the “+”, it moves onto the variant menu that just opened, instead of staying on the button you already pressed. And the little confirmation message no longer covers the navigation bar right where the next step asks you to tap — for three seconds, following the spotlight literally would have made you press “Undo”.'],
+      fr: ['Pendant la visite guidée, le projecteur suit désormais le geste d’ajout rapide en entier : une fois le « + » pressé, il se pose sur le menu de variantes qui vient de s’ouvrir, au lieu de rester sur le bouton déjà pressé. Et le petit message de confirmation ne recouvre plus la barre de navigation à l’endroit exact où l’étape suivante demande d’appuyer — pendant trois secondes, suivre le projecteur à la lettre faisait appuyer sur « Annuler ».'],
+      es: ['Durante la visita guiada, el foco ahora sigue el gesto de añadido rápido completo: una vez pulsado el «+», se coloca sobre el menú de variantes que acaba de abrirse, en lugar de quedarse en el botón ya pulsado. Y el mensajito de confirmación ya no cubre la barra de navegación justo donde el siguiente paso pide tocar — durante tres segundos, seguir el foco al pie de la letra hacía pulsar «Deshacer».'],
+      zh: ['在引导教程中，聚光灯现在会跟随完整的快速添加手势：按下「+」后，它会移到刚打开的版本菜单上，而不是停留在已按过的按钮上。确认提示也不再遮住导航栏上下一步要点的位置——之前有三秒钟，完全照着聚光灯操作会按到「撤销」。'],
+      it: ['Durante il tour guidato, il riflettore ora segue l’intero gesto di aggiunta rapida: una volta premuto il «+», si sposta sul menu delle varianti appena aperto, invece di restare sul pulsante già premuto. E il messaggino di conferma non copre più la barra di navigazione proprio dove il passo successivo chiede di toccare — per tre secondi, seguire il riflettore alla lettera faceva premere «Annulla».'],
+      nl: ['Tijdens de rondleiding volgt de spot nu het volledige snel-toevoegen-gebaar: zodra je op de “+” drukt, verplaatst hij zich naar het variantenmenu dat net openging, in plaats van op de al ingedrukte knop te blijven. En het bevestigingsberichtje bedekt de navigatiebalk niet meer precies waar de volgende stap vraagt te tikken — drie seconden lang zou de spot letterlijk volgen op “Ongedaan maken” hebben gedrukt.'],
+      de: ['Während der geführten Tour folgt der Spot jetzt der gesamten Schnell-Hinzufügen-Geste: Nach dem Druck auf das „+“ wandert er auf das gerade geöffnete Variantenmenü, statt auf dem bereits gedrückten Knopf zu bleiben. Und die kleine Bestätigungsmeldung verdeckt die Navigationsleiste nicht mehr genau dort, wo der nächste Schritt zum Tippen auffordert — drei Sekunden lang hätte man dem Spot wörtlich folgend „Rückgängig“ gedrückt.'],
+    },
+  },
+  {
     version: '1.60.3',
     date: '2026-08-13',
     changes: {
