@@ -1102,3 +1102,62 @@ utilisateur ne reste coincé.
 **À faire si le moteur gagne son filet** : la « cible de suite de geste »
 ci-dessus, et le halo qui suit le menu. Les mesures de ce point sont le
 cahier des charges.
+
+---
+
+## 18. Les PWA installées depuis l'ancienne adresse sont GELÉES sans le dire — et la migration est manuelle
+
+**Depuis la bascule sur `arts44.dev` (13/08/2026), l'ancienne adresse
+`arts44.github.io/f1-uno-elite/` répond 301.** Une PWA installée avant la
+bascule continue de fonctionner — son service worker sert tout depuis le
+cache — mais sa vérification de mise à jour échoue en silence : `sw.js`
+répond 301, et **un script de service worker ne peut pas suivre une
+redirection**. Conséquence : app figée à sa version pour toujours,
+**aucun bandeau de mise à jour n'apparaîtra jamais**, collection intacte
+dans le `localStorage` de l'ancienne origine.
+
+Ce n'est pas une perte de données. C'est un **gel permanent non
+signalé** — le pire des deux du point de vue de l'utilisateur, qui croit
+simplement que l'app ne bouge plus.
+
+### Procédure de migration — à donner telle quelle
+
+Depuis l'**ancienne app** (celle installée, qui fonctionne encore) :
+
+**Chemin A — par sauvegarde (aucun compte nécessaire)**
+1. Ouvrir l'ancienne app → page **Compte**.
+2. **Code de sauvegarde** → générer, puis copier le code (ou afficher le
+   QR si la nouvelle app sera sur un autre appareil).
+3. Ouvrir **https://arts44.dev** dans le navigateur.
+4. Page **Compte** → **Importer** → coller le code (ou scanner le QR).
+5. Vérifier la collection, puis installer la nouvelle app (bannière ou
+   menu du navigateur) et **désinstaller l'ancienne**.
+
+**Chemin B — par le cloud (si un compte existe déjà)**
+1. Ancienne app → page **Compte** → vérifier que la dernière
+   synchronisation est récente (sinon : pousser).
+2. Ouvrir **https://arts44.dev** → page **Compte** → se connecter avec le
+   même e-mail.
+3. **Récupérer** (pull). Vérifier la collection.
+4. Installer la nouvelle app, désinstaller l'ancienne.
+
+Dans les deux chemins, l'ancienne app peut rester en place le temps de
+vérifier — elle ne casse rien, elle est seulement figée.
+
+### Ce qui conditionne le chemin A depuis un vieux LIEN
+
+Un lien `#backup=` généré avant la bascule traverse la redirection avec
+son fragment intact — **à condition que « Enforce HTTPS » soit coché**
+dans les réglages GitHub Pages. Mesuré le 14/08/2026 : la redirection
+visait `http://arts44.dev` (en clair), une TROISIÈME origine avec son
+propre localStorage vide et sans service worker possible. Un import qui
+y aboutirait rangerait la collection dans le mauvais silo.
+
+### Côté Supabase
+
+`sendMagicLink()` envoie `redirect_to = location.origin` : la liste
+Auth → URL Configuration doit contenir **`https://arts44.dev/`**, et
+**garder l'ancienne URL le temps de la migration** — une ancienne app
+gelée peut encore initier une connexion, et son `redirect_to` pointe
+l'ancienne origine. Une fois les deux utilisateurs migrés, retirer
+l'ancienne entrée.

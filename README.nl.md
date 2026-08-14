@@ -12,7 +12,7 @@
 ![i18n](https://img.shields.io/badge/languages-7-purple)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/4e7d9096628044aba780a0b2000aee8c)](https://app.codacy.com/gh/Arts44/f1-uno-elite/dashboard)
 
-## ▶️ **[Probeer live → arts44.github.io/f1-uno-elite](https://arts44.github.io/f1-uno-elite/)**
+## ▶️ **[Probeer live → arts44.dev](https://arts44.dev/)**
 
 Het is een **PWA**: installeer haar vanuit je browser en ze draait als een native app, volledig offline, met een eigen icoon — op desktop én mobiel.
 
