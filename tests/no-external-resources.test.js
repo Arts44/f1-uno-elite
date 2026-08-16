@@ -76,6 +76,30 @@ describe('vitrine — l’exception nommée, et rien d’autre', () => {
   });
 });
 
+/* ══ AUCUN PLACEHOLDER dans un fichier livré (1.62.1) ══
+   Vécu : « REMPLACER_PAR_LE_TOKEN_CLOUDFLARE » a survécu un cycle de
+   déploiement — le marqueur a survécu à ce qu'il devait marquer, et
+   seule une lecture humaine de la production l'a vu. Un placeholder
+   est un mot qu'on écrit pour être remplacé : s'il atteint un fichier
+   livré au moment des tests, c'est déjà un échec. */
+describe('aucun placeholder dans les fichiers livrés', () => {
+  // \b partout : sans borne, CHANGE_?ME matchait « CHANGEMENT » — le
+  // français piège les marqueurs anglais. Vu rouge sur l'arbre PROPRE,
+  // corrigé avant d'être cru.
+  const MARQUEURS = /\bREMPLACER_PAR\w*|\bA_REMPLIR\b|\bCHANGE_?ME\b|\bYOUR_[A-Z]+_HERE\b|\bTODO_TOKEN\b|\bxxxxxxxx\b/;
+  test('vitrine, app, SW de démolition : aucun marqueur à remplacer', () => {
+    const livres = [
+      ['index.html (vitrine)', readFileSync(new URL('../index.html', import.meta.url), 'utf8')],
+      ['sw.js (démolition)', readFileSync(new URL('../sw.js', import.meta.url), 'utf8')],
+      ...SHIPPED.map(f => [f, read(f)]),
+    ];
+    for (const [nom, src] of livres) {
+      const m = src.match(MARQUEURS);
+      assert.ok(!m, `${nom} : le placeholder « ${m && m[0]} » a survécu à ce qu'il devait marquer`);
+    }
+  });
+});
+
 describe('aucune URL externe dans les fichiers livrés', () => {
   for (const f of SHIPPED) {
     test(f, () => {
