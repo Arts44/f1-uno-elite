@@ -45,12 +45,17 @@ const SHIPPED = [
    à zéro ressource externe — c'est tout l'objet de la séparation. */
 describe('vitrine — l’exception nommée, et rien d’autre', () => {
   const vitrine = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  test('le script Cloudflare est LÀ, en defer, et c’est le seul script externe', () => {
-    const externes = [...vitrine.matchAll(/<script[^>]*src="(https?:[^"]+)"/g)].map(m => m[1]);
+  test('le script Cloudflare est LÀ, sous la forme EXACTE du fournisseur, et c’est le seul script externe', () => {
+    // Guillemets simples OU doubles : le snippet Cloudflare utilise les
+    // simples, et le test doit matcher la forme RÉELLE, pas la nôtre.
+    const externes = [...vitrine.matchAll(/<script[^>]*src=['"](https?:[^'"]+)['"]/g)].map(m => m[1]);
     assert.deepEqual(externes, ['https://static.cloudflareinsights.com/beacon.min.js'],
       'la vitrine porte exactement UN script externe : le beacon Cloudflare');
-    assert.match(vitrine, /<script defer src="https:\/\/static\.cloudflareinsights\.com/,
-      'defer : la mesure ne bloque jamais le rendu');
+    // type='module' (différé par nature — jamais bloquant), le token dans
+    // data-cf-beacon. Balise reprise telle quelle du fournisseur.
+    assert.match(vitrine,
+      /<script type='module' src='https:\/\/static\.cloudflareinsights\.com\/beacon\.min\.js' data-cf-beacon='\{"token": "[0-9a-f]{32}"\}'><\/script>/,
+      'la balise doit rester celle que Cloudflare fournit — type module, token hexadécimal en clair (ce n’est pas un secret)');
   });
   test('l’hôte Cloudflare est INTERDIT partout ailleurs — l’exception ne voyage pas', () => {
     for (const f of SHIPPED) {
@@ -61,7 +66,7 @@ describe('vitrine — l’exception nommée, et rien d’autre', () => {
       'ni dans le SW de démolition');
   });
   test('la vitrine n’a AUCUNE autre ressource externe (img, css, police)', () => {
-    const hors = [...vitrine.matchAll(/(?:href|src)="(https?:[^"]+)"/g)].map(m => m[1])
+    const hors = [...vitrine.matchAll(/(?:href|src)=['"](https?:[^'"]+)['"]/g)].map(m => m[1])
       .filter(u => !isAllowed(u) && !u.includes('static.cloudflareinsights.com'));
     assert.deepEqual(hors, [], 'tout le reste de la vitrine est servi par le dépôt');
   });

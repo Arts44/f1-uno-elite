@@ -18,10 +18,11 @@ if(/^#(backup|access_token|error)=/.test(location.hash)) location.replace('app/'
      CETTE page uniquement. L'application (/app/) reste à ZÉRO
      ressource externe — tenu par tests/no-external-resources.test.js,
      qui n'autorise cet hôte QUE dans ce fichier-ci.
-     Token : à remplir dans le dashboard Cloudflare (Web Analytics →
-     arts44.dev) — aucun jeton ne transite par un chat. -->
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js"
-        data-cf-beacon='{"token": "REMPLACER_PAR_LE_TOKEN_CLOUDFLARE"}'></script>
+     Le token n'est PAS un secret : il apparaît en clair dans le HTML
+     servi, c'est sa nature — contrairement à la clé Resend, il entre
+     dans le dépôt sans expurgation. Balise reprise TELLE QUELLE du
+     fournisseur (type='module'). -->
+<!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "501224c0ce304706981d65c879845d20"}'></script><!-- End Cloudflare Web Analytics -->
 <style>
 @font-face{font-family:'Space Grotesk';src:url('app/fonts/space-grotesk-var.woff2') format('woff2');font-weight:300 700;font-display:swap;}
 :root{--bg:#100E0F;--surface:#1A1719;--border:#2E2A2C;--tx1:#F3F0F1;--tx2:#A5A0A2;--tx3:#8A8487;--red:#FF4757;--red-deep:#E8002D}
