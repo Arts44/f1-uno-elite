@@ -71,7 +71,8 @@ const P = {
      rôle — une clé à molette pour un pilote de réserve, une cible pour
      un directeur d'écurie — et qui cassaient la famille au trait. */
   // Pilote : le casque, qui dit enfin la même chose que le visuel de tuile.
-  helmet: '<path d="M3.7 14.3a8.3 8.3 0 0 1 16.6 0v.8a2.6 2.6 0 0 1-2.6 2.6H6.3a2.6 2.6 0 0 1-2.6-2.6z"/><path d="M8.4 12.1h11.7"/><path d="M8.4 12.1a3 3 0 0 0 0 5.6"/>',
+  // helmet : plus de tracé propre ici — icon('helmet') sert HELMET_GEOM
+  // (voir plus bas), la MÊME géométrie que les tuiles. Un dessin, pas trois.
   // Réserve : les flèches d'échange. Le symbole vit déjà dans le coin
   // des cartes réserve depuis 1.33.0 — on ne crée pas une convention,
   // on en révèle une.
@@ -127,12 +128,26 @@ const SEAL = '<path fill="currentColor" stroke="none" d="M12 2.5 14.1 4l2.5-.3.9
    (HELMET_DEFS, injecté une fois dans le HTML) + 61 <use> — les
    sélecteurs CSS ne traversant pas le shadow DOM de <use>, la
    colorisation passe par des variables --helm-* héritées. */
-export const HELMET_DEFS = `<svg style="display:none" aria-hidden="true"><symbol id="icHelmC1" viewBox="0 0 120 120">
-  <path fill="var(--helm-shell,#888)" d="M20 76c-3-11-2-24 4-34C32 28 47 20 64 20c17 0 31 8 37 21 4 9 4 19 1 28l-3 9c-2 6-7 9-14 10l-46 3c-8 1-14-3-17-10Z"/>
-  <path fill="var(--helm-visor,#333)" d="M35 51c2-8 9-13 18-13l37 1c7 0 11 5 10 12l-3 14c-2 7-7 11-15 11l-35 1c-9 0-13-5-12-13Z"/>
-  <path fill="var(--helm-det,#eee)" opacity=".85" d="M58 20c8-.5 16 .5 23 4l-3 6c-6-3-12-4-19-3Z"/>
-  <path fill="var(--helm-lip,#222)" d="M28 84l52-3-1 7-49 3Z"/>
-</symbol></svg>`;
+/* ══ LA GÉOMÉTRIE DU CASQUE — une constante, tous les consommateurs ══
+   Profil trois-quarts au trait, adopté à 1.63.0. Source : « F1 Helmet »,
+   SVG Repo — https://www.svgrepo.com/svg/172725/f1-helmet — licence CC0
+   confirmée sur la page le 16/08/2026 (aucune attribution requise ; l'URL
+   reste ici comme trace de vérification). Aucune réplique d'un casque
+   réel : dessin générique du fonds SVG Repo.
+
+   TRAIT PARTOUT, y compris aux petites tailles, et c'est MESURÉ : à
+   densité 1, les lignes fusionnent à la rasterisation en une masse qui
+   garde le profil — meilleure que l'ancien « galet » à 14 et 22 px
+   (pixels comparés un à un). La variante « masse dérivée » reste en
+   réserve, prouvée et non déployée : POINTS-SIGNALES n°20.
+
+   UNE SEULE SOURCE : HELMET_GEOM sert le <symbol> des 61 tuiles pilote
+   ET l'icône de catégorie icon('helmet') — avant 1.63.0 c'étaient DEUX
+   dessins indépendants (trois avec l'icône d'app d'avant 1.61.0), le
+   même défaut que le lockup a corrigé. Tenu par tests/icons.test.js. */
+export const HELMET_GEOM = `<g transform="scale(0.3573)" fill="var(--helm-shell,currentColor)"><path d="M331.947,226.808l-1.932-5.573c-1.31-3.778-2.823-7.482-4.532-11.097L306.735,170.5l-25.861-54.679 c-1.656-3.501-3.447-6.939-5.387-10.291c-0.69-1.193-1.312-2.233-1.653-2.718c-25.83-36.785-75.364-58.221-137.009-59.039 c-0.608-0.009-1.205-0.013-1.811-0.013c-73.817,0-134.382,59.207-135.009,131.982c-0.364,42.22,19.624,82.54,53.467,107.858 c7.311,5.469,16.443,8.48,25.715,8.48h223.812c13.745,0,26.062-9.207,29.952-22.39C337.12,255.559,336.773,240.731,331.947,226.808 z M314.197,215.295h-19.735l-43.618-87.761h21.892c0.018,0.042,0.041,0.093,0.058,0.133l0.084,0.201L314.197,215.295z M173.498,127.877l39.437,79.33c-7.852-3.842-15.105-8.985-21.465-15.35c-15.112-15.111-23.436-35.203-23.436-56.573 C168.034,131.804,170.338,128.854,173.498,127.877z M230.509,213.356l-42.664-85.821h22.982l43.628,87.761h-6.411 C242.069,215.295,236.202,214.622,230.509,213.356z M268.972,215.295l-43.628-87.761h10.983l43.618,87.761H268.972z M320.481,266.012c-2.271,7.695-9.46,13.069-17.483,13.069H79.187c-6.483,0-12.85-2.092-17.928-5.891 c-30.543-22.85-48.583-59.237-48.254-97.337C13.57,110.186,68.303,56.76,135.014,56.76c0.548,0,1.088,0.004,1.638,0.011 c59.62,0.791,106.684,21.727,129.163,57.449c0.053,0.096,0.116,0.209,0.174,0.314h-90.214c-11.436,0-20.74,9.309-20.74,20.75 c0,24.843,9.675,48.199,27.242,65.765c17.559,17.57,40.916,27.246,65.768,27.246h70.66l0.96,2.771 C323.597,242.411,323.88,254.495,320.481,266.012z"/><path d="M128.605,135.536c-11.854,0-21.499,9.645-21.499,21.499s9.645,21.499,21.499,21.499c11.855,0,21.5-9.645,21.5-21.499 S140.46,135.536,128.605,135.536z M128.605,165.534c-4.687,0-8.499-3.813-8.499-8.499s3.813-8.499,8.499-8.499s8.5,3.813,8.5,8.499 S133.292,165.534,128.605,165.534z"/></g>`;
+
+export const HELMET_DEFS = `<svg style="display:none" aria-hidden="true"><symbol id="icHelmC1" viewBox="0 0 120 120">${HELMET_GEOM}</symbol></svg>`;
 export const HELMET_SVG = '<svg class="helm" viewBox="0 0 120 120" aria-hidden="true"><use href="#icHelmC1"/></svg>';
 
 /* ── Sortie ── */
@@ -141,6 +156,13 @@ function svg(inner, cls){
 }
 
 export function icon(name, cls){
+  /* Le casque est en REMPLISSAGE (les autres icônes sont au trait 24vb) :
+     il sort du gabarit svg() pour porter la géométrie partagée des
+     tuiles. currentColor par défaut — les contextes qui colorent par
+     --helm-shell (tuiles) passent par HELMET_SVG, pas par ici. */
+  if(name === 'helmet'){
+    return `<svg class="ic${cls ? ' ' + cls : ''}" viewBox="0 0 120 120" aria-hidden="true">${HELMET_GEOM}</svg>`;
+  }
   if(name === 'danger') return svg(DANGER, 'ic-danger' + (cls ? ' ' + cls : ''));
   if(name === 'seal') return svg(SEAL, 'ic-seal' + (cls ? ' ' + cls : ''));
   if(TYPE_PATHS[name]) return svg(TYPE_PATHS[name], cls);

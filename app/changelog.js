@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.63.0',
+    date: '2026-08-16',
+    changes: {
+      en: ['New driver helmet, everywhere at once: a three-quarter profile drawn in a fine line — angular visor, chin bar, vent wheel — replacing the old rounded silhouette on all 61 driver tiles, the category icon and the corner markers. One drawing now serves every size, and it stays readable even at 14 pixels. Based on a public-domain (CC0) vector from SVG Repo.'],
+      fr: ['Nouveau casque de pilote, partout à la fois : un profil trois-quarts dessiné au trait — visière anguleuse, mentonnière, molette d\'aération — qui remplace l\'ancienne silhouette arrondie sur les 61 tuiles pilote, l\'icône de catégorie et les marqueurs de coin. Un seul dessin sert désormais toutes les tailles, et il reste lisible jusqu\'à 14 pixels. D\'après un vecteur du domaine public (CC0) de SVG Repo.'],
+      es: ['Nuevo casco de piloto, en todas partes a la vez: un perfil de tres cuartos dibujado a línea fina — visera angulosa, mentonera, rueda de ventilación — que sustituye a la antigua silueta redondeada en las 61 fichas de piloto, el icono de categoría y los marcadores de esquina. Un solo dibujo sirve ahora para todos los tamaños, y sigue legible hasta 14 píxeles. Basado en un vector de dominio público (CC0) de SVG Repo.'],
+      zh: ['全新车手头盔，全面更新：细线条勾勒的四分之三侧脸——棱角分明的面罩、护颚、通风旋钮——取代了 61 张车手卡、类别图标和角标上的旧圆形轮廓。现在一个图形通用于所有尺寸，即使缩到 14 像素也清晰可辨。基于 SVG Repo 的公有领域（CC0）矢量图。'],
+      it: ['Nuovo casco da pilota, ovunque insieme: un profilo di tre quarti disegnato a linea fine — visiera angolosa, mentoniera, rotella di aerazione — che sostituisce la vecchia sagoma arrotondata sulle 61 tessere pilota, l\'icona di categoria e i marcatori d\'angolo. Un solo disegno serve ora tutte le taglie, e resta leggibile fino a 14 pixel. Basato su un vettore di pubblico dominio (CC0) di SVG Repo.'],
+      nl: ['Nieuwe coureurshelm, overal tegelijk: een driekwartprofiel in dunne lijn — hoekig vizier, kinbeugel, ventilatiewieltje — dat het oude ronde silhouet vervangt op alle 61 coureurstegels, het categorie-icoon en de hoekmarkeringen. Eén tekening bedient nu elk formaat, en blijft leesbaar tot 14 pixels. Gebaseerd op een publiek-domein (CC0) vector van SVG Repo.'],
+      de: ['Neuer Fahrerhelm, überall zugleich: ein Dreiviertelprofil in feiner Linie — kantiges Visier, Kinnbügel, Lüftungsrad — ersetzt die alte runde Silhouette auf allen 61 Fahrerkacheln, dem Kategorie-Symbol und den Eckmarkierungen. Eine Zeichnung bedient jetzt jede Größe und bleibt bis 14 Pixel lesbar. Basierend auf einer gemeinfreien (CC0) Vektorgrafik von SVG Repo.'],
+    },
+  },
+  {
     version: '1.62.0',
     date: '2026-08-16',
     changes: {

@@ -1198,3 +1198,34 @@ redirigé vers `/app/#backup=X`, fragment préservé.
 le SW de démolition au NOUVEL ancien emplacement, et la démonstration
 sur installation réelle avec l'empreinte localStorage mesurée
 avant/après. Ce point est le mode d'emploi.
+
+
+---
+
+## 20. Le casque « masse » — prouvé, NON déployé, en réserve
+
+**Contexte (1.63.0).** Le casque au trait (SVG Repo, CC0 — 
+https://www.svgrepo.com/svg/172725/f1-helmet, licence vérifiée sur la
+page le 16/08/2026) est déployé PARTOUT, petites tailles comprises. La
+crainte « un trait fin ne survit pas à 14 px » venait d'un banc rendu à
+densité 3 ; à densité 1, les traits fusionnent en masse d'eux-mêmes et
+battent l'ancien galet — pixels comparés un à un, contextes réels
+(rangée outillage de Stats, marqueur de coin). Voir la règle ajoutée à
+CONVENTIONS.md.
+
+**Ce qui reste en réserve : la variante « masse dérivée »** — le contour
+extérieur du MÊME tracé (premier sous-tracé du path source), rempli,
+visière en réserve par `fill-rule="evenodd"` :
+
+```
+contour  : premier sous-tracé de HELMET_GEOM (M331.947,226.808 … z)
+visière  : M178,120 L285,118 L316,220 L235,218
+           C207,211 187,196 172,166 C170,150 172,132 178,120 Z
+```
+
+**Quand la ressortir** : si le 14 px sur écran HAUTE densité (téléphones
+récents — où le trait reste un dessin fin, lisible mais léger) gêne à
+l'usage réel. Le montage serait celui écarté à 1.63.0 : deux symboles
+dérivés de la même source, un seuil NOMMÉ (24 px), documenté ici même.
+Ne pas la redessiner : elle est prouvée sur banc (14/22 px, mono et
+couleur, clair et sombre).

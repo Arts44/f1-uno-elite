@@ -220,3 +220,44 @@ describe('écran de verrouillage — le bouton Parcourir', () => {
     });
   }
 });
+
+/* ══ LE CASQUE : UN dessin, pas trois (1.63.0) ══
+   Avant : le symbol des tuiles, l'icône de catégorie et l'icône d'app
+   étaient TROIS tracés indépendants — le défaut que le lockup a corrigé.
+   Depuis 1.63.0, HELMET_GEOM est l'unique source ; ces tests tiennent
+   l'unicité sur le CODE (le tracé lui-même), pas sur les commentaires. */
+describe('casque — une seule géométrie', () => {
+  const src = readFileSync(new URL('../app/icons.js', import.meta.url), 'utf8');
+  test('le tracé du casque n\'existe qu\'UNE fois dans le module', () => {
+    const occurrences = src.split('M331.947,226.808').length - 1;
+    assert.equal(occurrences, 1,
+      'le path du casque doit vivre dans HELMET_GEOM et nulle part ailleurs');
+  });
+  test('les deux consommateurs passent par HELMET_GEOM', () => {
+    assert.match(src, /symbol id="icHelmC1" viewBox="0 0 120 120">\$\{HELMET_GEOM\}/,
+      'le symbol des tuiles doit interpoler la constante');
+    // Le branchement COMPLET : la branche 'helmet' d'icon() doit rendre
+    // HELMET_GEOM — vérifier l'interpolation « quelque part » laissait
+    // passer un débranchement (contrôle négatif resté vert, resserré).
+    assert.match(src, /if\(name === 'helmet'\)\{\s*return `<svg[^`]*\$\{HELMET_GEOM\}/,
+      'icon(\'helmet\') doit rendre la même constante');
+  });
+  test('les COPIES CUITES des deux HTML portent le même tracé', () => {
+    /* Un HTML statique ne peut pas interpoler HELMET_GEOM : index.html et
+       index-dev.html portent une copie cuite du symbol. C'est la 4e
+       implémentation que l'inventaire avait ratée — découverte parce que
+       le DOM servait l'ANCIEN casque pendant que l'icône de catégorie
+       servait le nouveau. Ce test tient les copies ensemble. */
+    for (const f of ['index.html', 'index-dev.html']) {
+      const html = readFileSync(new URL(`../app/${f}`, import.meta.url), 'utf8');
+      assert.equal(html.split('M331.947,226.808').length - 1, 1,
+        `${f} : la copie cuite doit porter le tracé de HELMET_GEOM, une fois`);
+      assert.ok(!html.includes('M20 76c-3-11'),
+        `${f} : l'ancien galet ne doit pas rester dans le symbol cuit`);
+    }
+  });
+  test('l\'ancien dessin stroke de la catégorie a bien disparu', () => {
+    assert.ok(!src.includes('M3.7 14.3a8.3'),
+      'le troisième dessin (icône de catégorie au trait) ne doit pas revenir');
+  });
+});
