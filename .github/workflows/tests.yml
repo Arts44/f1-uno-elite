@@ -115,7 +115,7 @@ jobs:
       # `npm run build` locally and commit the regenerated bundle.
       - name: Committed bundle is up to date
         run: |
-          git diff --exit-code -- app.bundle.js app.bundle.js.map || {
+          git diff --exit-code -- app/app.bundle.js app/app.bundle.js.map || {
             echo '::error::app.bundle.js is stale — run `npm run build` and commit the regenerated bundle.'
             exit 1
           }

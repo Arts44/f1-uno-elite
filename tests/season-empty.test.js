@@ -21,7 +21,7 @@ import { installFixtures } from './_fixtures.js';
 import {
   CARDS_DB, setCurrentSeason, loadAppData, _applyCards, _applyMetadata,
   seasonCatalogueState,
-} from '../data.js';
+} from '../app/data.js';
 
 const CARTES_2025 = [
   { id: '001', season: 2025, number: 1, name: 'A', team: 'T', category: 'pilote',

@@ -18,21 +18,21 @@ exclude_paths:
   # COMMITÉE (GitHub Pages ne construit rien) mais toute alerte la
   # concernant est un doublon de son source, illisible et non
   # corrigeable : on corrige app.js, pas le bundle.
-  - 'app.bundle.js'
-  - 'app.bundle.js.map'
+  - 'app/app.bundle.js'
+  - 'app/app.bundle.js.map'
 
   # ── Bibliothèque vendorisée, non modifiée ─────────────────────
   # qrcodegen.js est le QR encoder de Project Nayuki (MIT), copié
   # tel quel. Le modifier nous couperait de l'amont et n'est pas
   # notre travail. Il n'a qu'un point d'entrée (encodeText) et ne
   # touche ni au DOM, ni au réseau, ni au stockage.
-  - 'qrcodegen.js'
+  - 'app/qrcodegen.js'
 
   # ── Fichier généré ─────────────────────────────────────────────
   # data-embedded.js est produit par extract_data.mjs : une seule
   # affectation window.__F1UNO_EMBEDDED d'un littéral JSON. Le
   # corriger à la main serait écrasé à la prochaine génération.
-  - 'data-embedded.js'
+  - 'app/data-embedded.js'
 
   # ── Outils de développement, jamais livrés au client ───────────
   # extract_*.mjs tournent sous Node à la main pour régénérer les
@@ -58,10 +58,10 @@ exclude_paths:
 
   # ── Documentation et données ───────────────────────────────────
   - 'docs/**'
-  - 'data/**'
+  - 'app/data/**'
   - 'screenshots/**'
-  - 'icons/**'
-  - 'fonts/**'
+  - 'app/icons/**'
+  - 'app/fonts/**'
   - 'node_modules/**'
 
 # ══════════════════════════════════════════════════════════════════
@@ -236,9 +236,9 @@ engines:
     # La configuration fine (règles désactivées + justifications)
     # vit dans .eslintrc.yml, à côté du code qu'elle concerne.
     exclude_paths:
-      - 'app.bundle.js'
-      - 'qrcodegen.js'
-      - 'data-embedded.js'
+      - 'app/app.bundle.js'
+      - 'app/qrcodegen.js'
+      - 'app/data-embedded.js'
       - 'tests/**'
       - '_*'
   stylelint:

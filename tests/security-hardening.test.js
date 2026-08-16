@@ -14,13 +14,13 @@
       en innerHTML — même vecteur que la XSS #backup= de 1.42.
    ══════════════════════════════════════════════════════════ */
 import './_setup.js';
-import '../translations.js';
+import '../app/translations.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { escapeHtml, safeImagePath } from '../i18n.js';
+import { escapeHtml, safeImagePath } from '../app/i18n.js';
 
-const read = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+const read = f => readFileSync(new URL('../app/' + f, import.meta.url), 'utf8');
 
 describe('PIN — comparaison à temps constant', () => {
   test('plus aucune comparaison naïve d’empreinte dans pin.js', () => {
@@ -199,14 +199,14 @@ describe('aléa — Math.random() ne doit jamais toucher la sécurité', () => {
 
   test('aucun Math.random() dans les modules sensibles', () => {
     for(const f of SENSIBLES){
-      const src = readFileSync(new URL(`../${f}`, import.meta.url), 'utf8');
+      const src = readFileSync(new URL(`../app/${f}`, import.meta.url), 'utf8');
       assert.ok(!/Math\s*\.\s*random\s*\(/.test(src),
         `${f} : le sel, l'IV et tout secret doivent venir de crypto.getRandomValues()`);
     }
   });
 
   test('secure-store.js tire bien son sel et son IV d\'un CSPRNG', () => {
-    const src = readFileSync(new URL('../secure-store.js', import.meta.url), 'utf8');
+    const src = readFileSync(new URL('../app/secure-store.js', import.meta.url), 'utf8');
     const n = (src.match(/crypto\.getRandomValues\(/g) || []).length;
     assert.ok(n >= 3, `attendu ≥3 appels (1 IV + 2 sels), trouvé ${n}`);
   });
@@ -214,7 +214,7 @@ describe('aléa — Math.random() ne doit jamais toucher la sécurité', () => {
   test('le seul Math.random() du dépôt est décoratif et documenté', () => {
     // La célébration (seul Math.random du dépôt) a déménagé dans
     // badge-toasts.js — v2, pas 6 du découpage. Nom de fichier seul.
-    const badges = readFileSync(new URL('../badge-toasts.js', import.meta.url), 'utf8');
+    const badges = readFileSync(new URL('../app/badge-toasts.js', import.meta.url), 'utf8');
     // Le commentaire de justification cite lui-même Math.random() :
     // on compte le CODE, pas la prose qui l'explique.
     const code = badges.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');

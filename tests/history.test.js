@@ -3,8 +3,8 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection } from './_fixtures.js';
-import { loadData } from '../storage.js';
-import { getHistory, recordHistoryPoint } from '../history.js';
+import { loadData } from '../app/storage.js';
+import { getHistory, recordHistoryPoint } from '../app/history.js';
 
 const KEY = 'f1uno_history_2025';
 const today = () => {

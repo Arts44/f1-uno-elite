@@ -10,11 +10,11 @@
       langue affiche « {n} cartes » en clair à l'écran.
    ══════════════════════════════════════════════════════════ */
 import './_setup.js';
-import '../translations.js';
+import '../app/translations.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { pageHeadHTML, pageHeadBtn } from '../pagehead.js';
+import { pageHeadHTML, pageHeadBtn } from '../app/pagehead.js';
 
 const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
 
@@ -82,7 +82,7 @@ describe('clés du bandeau — les 7 langues', () => {
 });
 
 describe('infobulle du tutoriel — contraste des aplats', () => {
-  const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../app/styles.css', import.meta.url), 'utf8');
   const rule = name => {
     const i = css.indexOf(name + '{');
     return i === -1 ? '' : css.slice(i, css.indexOf('}', i));

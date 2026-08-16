@@ -191,7 +191,7 @@ describe('compare_captures.py — la propriété vérifiable', () => {
    capture DOIT la neutraliser chez lui, sinon les captures redeviennent
    variables (mesuré : pin-screen, desktop-collection). */
 describe('content-visibility — l’optimisation et sa contrepartie', () => {
-  const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../app/styles.css', import.meta.url), 'utf8');
 
   test('la règle existe, avec sa taille intrinsèque', () => {
     assert.match(css, /content-visibility:\s*auto/);

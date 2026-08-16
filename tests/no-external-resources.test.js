@@ -14,7 +14,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const read = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+const read = f => readFileSync(new URL('../app/' + f, import.meta.url), 'utf8');
 
 // Hôtes autorisés : documentation, schémas, et le backend cloud opt-in.
 // Aucun n'est chargé comme ressource par la page.
@@ -36,6 +36,40 @@ const SHIPPED = [
   'cloud-http.js', 'cloud-auth.js', 'cloud-sync.js', 'cloud-ui.js',
   'install.js', 'update.js', 'backup.js', 'sw.js', 'data-embedded.js',
 ];
+
+/* ══ L'EXCEPTION NOMMÉE (1.62.0) — la vitrine, et elle seule ══
+   La page d'accueil (index.html à la RACINE, hors de /app/ et hors du
+   précache) porte le script Cloudflare Web Analytics : mesure
+   d'audience sans cookie. C'est le SEUL script externe du dépôt, sur le
+   SEUL fichier qui n'est pas l'application. L'app (/app/), elle, reste
+   à zéro ressource externe — c'est tout l'objet de la séparation. */
+describe('vitrine — l’exception nommée, et rien d’autre', () => {
+  const vitrine = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  test('le script Cloudflare est LÀ, en defer, et c’est le seul script externe', () => {
+    const externes = [...vitrine.matchAll(/<script[^>]*src="(https?:[^"]+)"/g)].map(m => m[1]);
+    assert.deepEqual(externes, ['https://static.cloudflareinsights.com/beacon.min.js'],
+      'la vitrine porte exactement UN script externe : le beacon Cloudflare');
+    assert.match(vitrine, /<script defer src="https:\/\/static\.cloudflareinsights\.com/,
+      'defer : la mesure ne bloque jamais le rendu');
+  });
+  test('l’hôte Cloudflare est INTERDIT partout ailleurs — l’exception ne voyage pas', () => {
+    for (const f of SHIPPED) {
+      assert.ok(!read(f).includes('cloudflareinsights'),
+        `${f} : le script d’audience n’a rien à faire dans l’application`);
+    }
+    assert.ok(!readFileSync(new URL('../sw.js', import.meta.url), 'utf8').includes('cloudflareinsights'),
+      'ni dans le SW de démolition');
+  });
+  test('la vitrine n’a AUCUNE autre ressource externe (img, css, police)', () => {
+    const hors = [...vitrine.matchAll(/(?:href|src)="(https?:[^"]+)"/g)].map(m => m[1])
+      .filter(u => !isAllowed(u) && !u.includes('static.cloudflareinsights.com'));
+    assert.deepEqual(hors, [], 'tout le reste de la vitrine est servi par le dépôt');
+  });
+  test('les fragments historiques sont redirigés vers l’app', () => {
+    assert.match(vitrine, /location\.replace\('app\/' \+ location\.hash\)/,
+      'un vieux lien #backup= ou un retour Supabase doit atterrir dans /app/');
+  });
+});
 
 describe('aucune URL externe dans les fichiers livrés', () => {
   for (const f of SHIPPED) {

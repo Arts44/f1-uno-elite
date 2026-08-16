@@ -6,9 +6,9 @@ import {
   FEEDBACK_MAX, FEEDBACK_TYPES, FEEDBACK_COOLDOWN_MS,
   validateFeedbackMessage, buildFeedbackPayload, feedbackCooldownRemaining,
   sendFeedback, fetchMyFeedback,
-} from '../feedback.js';
-import { SESSION_KEY } from '../cloud-auth.js';
-import { APP_VERSION } from '../changelog.js';
+} from '../app/feedback.js';
+import { SESSION_KEY } from '../app/cloud-auth.js';
+import { APP_VERSION } from '../app/changelog.js';
 
 // A decodable JWT (header.payload.sig) whose sub is auth.uid()
 const jwt = sub => `eyJhbGciOiJIUzI1NiJ9.${btoa(JSON.stringify({ sub }))}.sig`;

@@ -25,7 +25,7 @@ URL = 'http://localhost:8124/index.html'
 # La saison est un PARAMÈTRE : elle était écrite en dur à six endroits.
 #   python3 capture_screenshots.py [année]      (défaut : 2025)
 SEASON = int(sys.argv[1]) if len(sys.argv) > 1 else 2025
-CARDS = json.loads((ROOT / 'data' / f'cards-{SEASON}.json').read_text())
+CARDS = json.loads((ROOT / 'app' / 'data' / f'cards-{SEASON}.json').read_text())
 CARDS = CARDS['cards'] if isinstance(CARDS, dict) else CARDS
 BY_ID = {c['id']: c for c in CARDS}
 

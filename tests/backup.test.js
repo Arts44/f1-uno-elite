@@ -3,8 +3,8 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
-import { loadData, collectionSnapshot } from '../storage.js';
-import { generateBackupCode, decodeBackupCode, buildBackupLink, MAX_CODE_CHARS } from '../backup.js';
+import { loadData, collectionSnapshot } from '../app/storage.js';
+import { generateBackupCode, decodeBackupCode, buildBackupLink, MAX_CODE_CHARS } from '../app/backup.js';
 
 describe('backup code round-trip', () => {
   beforeEach(() => { resetStorage(); installFixtures(); });

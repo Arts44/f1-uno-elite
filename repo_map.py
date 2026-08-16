@@ -37,7 +37,7 @@ import pathlib
 import re
 import sys
 
-RACINE = pathlib.Path(__file__).resolve().parent
+RACINE = pathlib.Path(__file__).resolve().parent / 'app'
 
 # Le bundle est une SORTIE (il contient tout le graphe aplati) ; sw.js
 # n'importe rien. Les inclure fausserait la carte.

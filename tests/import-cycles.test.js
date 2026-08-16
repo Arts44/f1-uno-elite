@@ -16,7 +16,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 
-const RACINE = new URL('../', import.meta.url);
+const RACINE = new URL('../app/', import.meta.url);
 const HORS = new Set(['app.bundle.js', 'sw.js', 'compare_captures.js']);
 
 const modules = readdirSync(RACINE)

@@ -4,13 +4,13 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, CARDS } from './_fixtures.js';
-import { RARITY_KEYS } from '../data.js';
-import { baseCardRarity, variantRarity, cardRarity, loadData } from '../storage.js';
+import { RARITY_KEYS } from '../app/data.js';
+import { baseCardRarity, variantRarity, cardRarity, loadData } from '../app/storage.js';
 
 const card = id => CARDS.find(c => c.id === id);
 
 describe('rarity scale (real metadata)', () => {
-  const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
+  const meta = JSON.parse(readFileSync(new URL('../app/data/metadata.json', import.meta.url), 'utf8'));
 
   test('exactly the 7 current rarities, no common/rare', () => {
     assert.deepEqual(meta.rarityKeys, ['epic', 'legendary', 'mythic', 'ultra', 'cosmic', 'divine', 'eternal']);
@@ -23,7 +23,7 @@ describe('rarity scale (real metadata)', () => {
   });
 
   test('embedded fallback carries the same rarity tables', () => {
-    const src = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+    const src = readFileSync(new URL('../app/data-embedded.js', import.meta.url), 'utf8');
     const emb = JSON.parse(src.match(/metadata:\s*({.*})/)[1]);
     assert.deepEqual(emb.rarityKeys, meta.rarityKeys);
     assert.deepEqual(emb.rarityOrder, meta.rarityOrder);
@@ -154,8 +154,8 @@ describe('cardRarity (collection-aware)', () => {
 });
 
 describe('circuits — parité embarqué / data + géométrie GPS', () => {
-  const circuits = JSON.parse(readFileSync(new URL('../data/circuits.json', import.meta.url), 'utf8'));
-  const embSrc = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+  const circuits = JSON.parse(readFileSync(new URL('../app/data/circuits.json', import.meta.url), 'utf8'));
+  const embSrc = readFileSync(new URL('../app/data-embedded.js', import.meta.url), 'utf8');
 
   test('data-embedded.js embarque exactement data/circuits.json', () => {
     const emb = JSON.parse(embSrc.match(/circuits:\s*({.*})/)[1]);

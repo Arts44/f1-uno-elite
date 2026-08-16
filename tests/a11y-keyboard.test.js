@@ -12,10 +12,10 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const render = readFileSync(new URL('../render.js', import.meta.url), 'utf8');
-const app = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
-const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-const htmlDev = readFileSync(new URL('../index-dev.html', import.meta.url), 'utf8');
+const render = readFileSync(new URL('../app/render.js', import.meta.url), 'utf8');
+const app = readFileSync(new URL('../app/app.js', import.meta.url), 'utf8');
+const html = readFileSync(new URL('../app/index.html', import.meta.url), 'utf8');
+const htmlDev = readFileSync(new URL('../app/index-dev.html', import.meta.url), 'utf8');
 
 describe('tuile de carte — cible clavier de plein droit', () => {
   test('role, tabindex et nom accessible sont posés', () => {

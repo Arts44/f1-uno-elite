@@ -1161,3 +1161,40 @@ Auth → URL Configuration doit contenir **`https://arts44.dev/`**, et
 gelée peut encore initier une connexion, et son `redirect_to` pointe
 l'ancienne origine. Une fois les deux utilisateurs migrés, retirer
 l'ancienne entrée.
+
+---
+
+## 19. Le SW de démolition — la preuve qu'il fonctionne, à refaire à chaque déplacement de l'app
+
+**Contexte (1.62.0).** L'app a quitté la racine pour `/app/`, la racine
+devenant une page vitrine (qui porte la seule ressource externe du
+dépôt — le compteur Cloudflare, exception nommée dans
+`tests/no-external-resources.test.js`). Les PWA installées avant le
+déplacement avaient un service worker de scope `/` : sans parade, elles
+auraient subi le gel silencieux du n°18. La parade est le **`sw.js` de
+démolition** laissé à la racine : `skipWaiting` → purge des caches
+`f1uno-*` → `unregister` → rechargement des clients.
+
+**La démonstration, sur installation réelle — pas en lecture de code :**
+
+1. app servie à la racine, SW v156 actif (scope `/`), 68 fichiers
+   précachés, collection sentinelle posée, **empreinte de la totalité du
+   localStorage : `-2100154741`, 20 clés** ;
+2. `sw.js` remplacé par la démolition, `registration.update()` — le
+   chemin exact d'une vraie installation ;
+3. après démolition : **SW : aucun (désenregistré) · caches : vides ·
+   localStorage : `-2100154741`, 20 clés — identique à l'octet.**
+
+Un service worker n'a de toute façon PAS accès à localStorage (l'API
+n'existe pas dans un worker) — la survie de la collection est une
+garantie de plateforme. Mais elle a été **mesurée**, pas déduite.
+
+**Le parcours complet a aussi été rejoué** : ancienne racine en cache →
+démolition → vitrine → `/app/` → SW v157 (scope `/app/`) → sentinelles
+`owned` et `review` intactes à l'octet ; et un lien `/#backup=X` est
+redirigé vers `/app/#backup=X`, fragment préservé.
+
+**Si l'app déménage à nouveau un jour** : refaire exactement ce geste —
+le SW de démolition au NOUVEL ancien emplacement, et la démonstration
+sur installation réelle avec l'empreinte localStorage mesurée
+avant/après. Ce point est le mode d'emploi.

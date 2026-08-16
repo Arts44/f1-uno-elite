@@ -18,14 +18,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection } from './_fixtures.js';
-import { loadData } from '../storage.js';
+import { loadData } from '../app/storage.js';
 import {
   CARDS_DB, setCurrentSeason, _applyMetadata, _applyCards,
   seasonCardCount, seasonCatalogueState, availableSeasons,
-} from '../data.js';
-import { evaluateBadgeCondition, isAutoBadgeUnlocked, setAutoBadgeUnlocked } from '../badges.js';
+} from '../app/data.js';
+import { evaluateBadgeCondition, isAutoBadgeUnlocked, setAutoBadgeUnlocked } from '../app/badges.js';
 
-const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
+const meta = JSON.parse(readFileSync(new URL('../app/data/metadata.json', import.meta.url), 'utf8'));
 
 describe('seasons[] — la déclaration elle-même', () => {
   test('metadata.json déclare chaque saison avec son total', () => {
@@ -39,7 +39,7 @@ describe('seasons[] — la déclaration elle-même', () => {
   test('le total déclaré correspond au fichier de cartes livré', () => {
     for (const s of meta.seasons) {
       const cards = JSON.parse(
-        readFileSync(new URL(`../data/cards-${s.year}.json`, import.meta.url), 'utf8'));
+        readFileSync(new URL(`../app/data/cards-${s.year}.json`, import.meta.url), 'utf8'));
       assert.equal(cards.length, s.cardCount,
         `cards-${s.year}.json contient ${cards.length} cartes, seasons[] en déclare ${s.cardCount}`);
     }

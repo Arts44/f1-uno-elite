@@ -4,7 +4,7 @@
    test-only exports _applyMetadata/_applyBadges (data.js) and
    by mutating CARDS_DB in place (it is a const array).
    ══════════════════════════════════════════════════════════ */
-import { CARDS_DB, _applyMetadata, _applyBadges } from '../data.js';
+import { CARDS_DB, _applyMetadata, _applyBadges } from '../app/data.js';
 
 export const META = {
   cardTypes: {

@@ -62,7 +62,7 @@ from playwright.sync_api import sync_playwright
 
 from capture_seed import init_script
 
-URL = 'http://localhost:8124/index.html'
+URL = 'http://localhost:8124/app/index.html'
 ECHECS = []
 
 # Les deux SEULES clés qu'un tutoriel terminé a le droit de laisser

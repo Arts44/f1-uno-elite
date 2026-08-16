@@ -9,8 +9,8 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection } from './_fixtures.js';
-import { canConfirmDeletion, deletionPlan, DELETE_SCOPES } from '../account.js';
-import { deleteLocalCollectionData, loadData, cardOwned } from '../storage.js';
+import { canConfirmDeletion, deletionPlan, DELETE_SCOPES } from '../app/account.js';
+import { deleteLocalCollectionData, loadData, cardOwned } from '../app/storage.js';
 
 describe('canConfirmDeletion — typed word gate', () => {
   test('exact word confirms; case and surrounding spaces are forgiven', () => {

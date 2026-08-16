@@ -7,7 +7,7 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection } from './_fixtures.js';
-import { getTypeData, quickAddVariant, undoQuickAdd, cardOwned, loadData } from '../storage.js';
+import { getTypeData, quickAddVariant, undoQuickAdd, cardOwned, loadData } from '../app/storage.js';
 
 describe('quickAddVariant / undoQuickAdd', () => {
   beforeEach(() => { resetStorage(); installFixtures(); });

@@ -6,12 +6,12 @@
    vérification du code — plus un simple « OK ».
    ══════════════════════════════════════════════════════════ */
 import './_setup.js';
-import '../translations.js';
+import '../app/translations.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const read = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+const read = f => readFileSync(new URL('../app/' + f, import.meta.url), 'utf8');
 const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
 
 describe('le rendu PIN vit dans le composant segmenté', () => {

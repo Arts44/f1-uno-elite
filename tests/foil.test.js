@@ -17,8 +17,8 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
-const render = readFileSync(new URL('../render.js', import.meta.url), 'utf8');
+const css = readFileSync(new URL('../app/styles.css', import.meta.url), 'utf8');
+const render = readFileSync(new URL('../app/render.js', import.meta.url), 'utf8');
 
 // Extrait le corps de chaque @keyframes du fichier.
 function keyframes(){

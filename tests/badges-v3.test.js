@@ -2,22 +2,22 @@
    BADGES v3 — nouvelles métriques, semis silencieux, difficulté.
    ══════════════════════════════════════════════════════════ */
 import './_setup.js';
-import '../translations.js';   // charge window.__BADGE_T sur le stub
+import '../app/translations.js';   // charge window.__BADGE_T sur le stub
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resetStorage } from './_setup.js';
-import { _applyMetadata, _applyCards, CARDS_DB, AUTO_BADGES, MANUAL_BADGES, _applyBadges } from '../data.js';
-import { setTypeData, txBatch } from '../storage.js';
+import { _applyMetadata, _applyCards, CARDS_DB, AUTO_BADGES, MANUAL_BADGES, _applyBadges } from '../app/data.js';
+import { setTypeData, txBatch } from '../app/storage.js';
 import {
   evaluateBadgeCondition, seedNewAutoBadges, autoBadgeUnlocked, setAutoBadgeUnlocked,
-} from '../badges.js';
-import { badgeDifficulty, difficultyLabelKey, _resetDifficultyCache } from '../difficulty.js';
+} from '../app/badges.js';
+import { badgeDifficulty, difficultyLabelKey, _resetDifficultyCache } from '../app/difficulty.js';
 
-const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
-const cardsFile = JSON.parse(readFileSync(new URL('../data/cards-2025.json', import.meta.url), 'utf8'));
+const meta = JSON.parse(readFileSync(new URL('../app/data/metadata.json', import.meta.url), 'utf8'));
+const cardsFile = JSON.parse(readFileSync(new URL('../app/data/cards-2025.json', import.meta.url), 'utf8'));
 const cards = Array.isArray(cardsFile) ? cardsFile : cardsFile.cards;
-const badgesJson = JSON.parse(readFileSync(new URL('../data/badges.json', import.meta.url), 'utf8'));
+const badgesJson = JSON.parse(readFileSync(new URL('../app/data/badges.json', import.meta.url), 'utf8'));
 
 function loadRealData(){
   _applyMetadata(meta);

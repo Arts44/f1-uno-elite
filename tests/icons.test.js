@@ -10,11 +10,11 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { icon, typeIcon } from '../icons.js';
+import { icon, typeIcon } from '../app/icons.js';
 
-const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
-const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
-const embedded = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+const meta = JSON.parse(readFileSync(new URL('../app/data/metadata.json', import.meta.url), 'utf8'));
+const css = readFileSync(new URL('../app/styles.css', import.meta.url), 'utf8');
+const embedded = readFileSync(new URL('../app/data-embedded.js', import.meta.url), 'utf8');
 
 describe('typeIcon — la famille de 5 + pastilles', () => {
   test('les 4 couleurs de base donnent une pastille CSS', () => {
@@ -61,7 +61,7 @@ describe('icon() — interface', () => {
    (« remplaçant »). Deux tracés pour un concept, visibles côte à côte.
    Rien ne l'attrapait — d'où ces trois tests, qui lisent la SOURCE. */
 describe('marqueurs de coin de tuile', () => {
-  const render = readFileSync(new URL('../render.js', import.meta.url), 'utf8');
+  const render = readFileSync(new URL('../app/render.js', import.meta.url), 'utf8');
   const markerLine = re => (render.match(re) || [''])[0];
 
   test('le marqueur réserve dessine la MÊME icône que la catégorie réserve', () => {
@@ -86,7 +86,7 @@ describe('marqueurs de coin de tuile', () => {
      désigner deux choses différentes dans la même app. `swap` est réservé
      à la réserve ; les doubles ont `copy`, le rechargement garde `refresh`. */
   test('swap ne sert QU’À la réserve', () => {
-    const sources = ['../render.js', '../stats.js', '../badges.js', '../update.js', '../pin.js']
+    const sources = ['../app/render.js', '../app/stats.js', '../app/badges.js', '../app/update.js', '../app/pin.js']
       .map(f => readFileSync(new URL(f, import.meta.url), 'utf8'));
     const usages = sources.flatMap(s => [...s.matchAll(/icon\('swap'[^)]*\)/g)].map(m => m[0]));
     assert.equal(usages.length, 1,
@@ -95,8 +95,8 @@ describe('marqueurs de coin de tuile', () => {
   });
 
   test('les doubles ne dessinent PAS un arc fléché (voisin de swap)', () => {
-    const render = readFileSync(new URL('../render.js', import.meta.url), 'utf8');
-    const stats = readFileSync(new URL('../stats.js', import.meta.url), 'utf8');
+    const render = readFileSync(new URL('../app/render.js', import.meta.url), 'utf8');
+    const stats = readFileSync(new URL('../app/stats.js', import.meta.url), 'utf8');
     assert.match(render, /'doubles',\s*'copy'/, 'le statut « doubles » doit utiliser copy');
     assert.ok(!/icon\('refresh'\)/.test(stats),
       'les outils de collectionneur ne doivent plus emprunter refresh');
@@ -132,7 +132,7 @@ describe('marqueurs de coin de tuile', () => {
   });
 
   test('le directeur porte un marqueur, le Grand Prix n’en porte pas', () => {
-    const render = readFileSync(new URL('../render.js', import.meta.url), 'utf8');
+    const render = readFileSync(new URL('../app/render.js', import.meta.url), 'utf8');
     assert.match(render, /category==='directeur'\?`<span class="director-icon"[^`]*icon\('headset'\)/,
       'le directeur doit porter le casque-micro de sa catégorie');
     assert.ok(!/category==='gp'\?`<span class="[a-z-]*icon"/.test(render),
@@ -200,8 +200,8 @@ describe('teamLiveries — parité et couverture CSS', () => {
    remettrait data-i18n sur le bouton effacerait l'icône en silence
    — ce test est là pour que ce silence fasse du bruit. */
 describe('écran de verrouillage — le bouton Parcourir', () => {
-  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
-  const dev = readFileSync(new URL('../index-dev.html', import.meta.url), 'utf8');
+  const html = readFileSync(new URL('../app/index.html', import.meta.url), 'utf8');
+  const dev = readFileSync(new URL('../app/index-dev.html', import.meta.url), 'utf8');
 
   for (const [nom, src] of [['index.html', html], ['index-dev.html', dev]]) {
     const ligne = src.split('\n').find(l => l.includes('viewerBrowseBtn'));

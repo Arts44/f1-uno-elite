@@ -20,9 +20,9 @@ import { installFixtures } from './_fixtures.js';
 import {
   CARDS_DB, setCurrentSeason, _applyMetadata, _applyCards,
   availableSeasons, isDevBuild, isTestSeason, loadAppData,
-} from '../data.js';
+} from '../app/data.js';
 
-const lire = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+const lire = f => readFileSync(new URL('../app/' + f, import.meta.url), 'utf8');
 const META = JSON.parse(lire('data/metadata.json'));
 
 const SAISONS = [

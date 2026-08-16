@@ -20,7 +20,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-const lire = f => readFileSync(new URL(`../${f}`, import.meta.url), 'utf8');
+const lire = f => readFileSync(new URL(`../app/${f}`, import.meta.url), 'utf8');
 const sansCommentaires = (src, ouvre, ferme) => src.split(ouvre).map((b, i) => i === 0 ? b : b.slice(b.indexOf(ferme) + ferme.length)).join('');
 
 const css = sansCommentaires(lire('styles.css'), '/*', '*/');

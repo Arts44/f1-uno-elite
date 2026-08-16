@@ -46,7 +46,7 @@ globalThis.document = {
   querySelectorAll: sel => (sel === '.bn-tab' ? tabs : []),
 };
 
-const { layoutNavBead } = await import('../render.js');
+const { layoutNavBead } = await import('../app/render.js');
 
 describe('layoutNavBead — largeur du SVG', () => {
   for (const vw of [0, 320, 375, 1280]) {

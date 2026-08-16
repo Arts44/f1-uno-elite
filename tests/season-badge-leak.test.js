@@ -19,8 +19,8 @@ import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { readFileSync } from 'node:fs';
 import { installFixtures } from './_fixtures.js';
-import { setCurrentSeason } from '../data.js';
-import { loadManualBadges, manualBadges, autoBadgeUnlocked, saveManualBadges } from '../badges.js';
+import { setCurrentSeason } from '../app/data.js';
+import { loadManualBadges, manualBadges, autoBadgeUnlocked, saveManualBadges } from '../app/badges.js';
 
 describe('badges — étanchéité entre saisons', () => {
   beforeEach(() => { resetStorage(); installFixtures(); });
@@ -84,7 +84,7 @@ describe('badges — étanchéité entre saisons', () => {
    sont sains, chacun pour une raison DIFFÉRENTE. Ce test le fige,
    pour qu'une régression sur l'un d'eux se voie. */
 describe('le même motif ailleurs — vérifié, pas supposé', () => {
-  const src = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+  const src = f => readFileSync(new URL('../app/' + f, import.meta.url), 'utf8');
 
   test('storage.js loadData() a bien son else', () => {
     assert.match(src('storage.js'), /if\(s\) \{[\s\S]*?\} else \{[\s\S]*?coll=\{\};/,

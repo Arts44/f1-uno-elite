@@ -7,24 +7,24 @@
    badges.test.js et n'a pas bougé.
    ══════════════════════════════════════════════════════════ */
 import './_setup.js';
-import '../translations.js';
+import '../app/translations.js';
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
-import { loadData } from '../storage.js';
+import { loadData } from '../app/storage.js';
 import {
   FAMILIES, pickNextBadge, hardestUnlockedBadge,
   badgeUnlockDate, groupBadgeToastLabel, setPinnedBadge, getPinnedBadge,
-} from '../badges.js';
+} from '../app/badges.js';
 import { readFileSync } from 'node:fs';
 
-const read = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+const read = f => readFileSync(new URL('../app/' + f, import.meta.url), 'utf8');
 const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
 
 describe('familles — le regroupement couvre tout, une seule fois', () => {
   test('les 68 badges auto RÉELS sont répartis sans doublon ni oubli', () => {
-    const real = JSON.parse(readFileSync(new URL('../data/badges.json', import.meta.url), 'utf8'));
+    const real = JSON.parse(readFileSync(new URL('../app/data/badges.json', import.meta.url), 'utf8'));
     const famIds = FAMILIES.filter(f => !f.manual).flatMap(f => [...(f.ids || []), ...(f.extraIds || [])]); // v3 : extraIds (tuiles sous l'échelle)
     assert.equal(new Set(famIds).size, famIds.length, 'aucun badge dans deux familles');
     const autoIds = real.auto.map(b => b.id);

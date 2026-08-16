@@ -4,9 +4,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
-import { loadData } from '../storage.js';
-import { computeStats } from '../stats.js';
-import { rarityTextColor, rarityChipClass, rarityChipStyle } from '../data.js';
+import { loadData } from '../app/storage.js';
+import { computeStats } from '../app/stats.js';
+import { rarityTextColor, rarityChipClass, rarityChipStyle } from '../app/data.js';
 
 describe('computeStats aggregates', () => {
   beforeEach(() => { resetStorage(); installFixtures(); });
@@ -65,7 +65,7 @@ describe('rarity chip painting', () => {
   });
 
   test('every shipped rarity takes white text — no exceptions, no dark text', () => {
-    const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
+    const meta = JSON.parse(readFileSync(new URL('../app/data/metadata.json', import.meta.url), 'utf8'));
     let checked = 0;
     for(const [key, r] of Object.entries(meta.rarities)){
       if(key === 'divine' || key === 'eternal') continue; // animated gradients, paint themselves
@@ -90,7 +90,7 @@ describe('rarity chip painting', () => {
   // the shadow was removed by the design decision above, and nothing
   // should quietly bring it back.
   test('no rarity chip rule ships a text-shadow', () => {
-    const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+    const css = readFileSync(new URL('../app/styles.css', import.meta.url), 'utf8');
     assert.ok(!/\.rar-legendary-bg/.test(css), 'the .rar-legendary-bg shadow rule must stay removed');
     const divine = css.match(/\.rar-divine-bg\s*\{[^}]*\}/);
     assert.ok(divine, '.rar-divine-bg rule is missing from styles.css');
@@ -112,7 +112,7 @@ describe('rarity chip painting', () => {
    sont là, à l'endroit où quelqu'un le verra : la sortie rouge.
    ══════════════════════════════════════════════════════════ */
 describe('exports gardés pour l’export de liste d’échange', () => {
-  const src = readFileSync(new URL('../stats.js', import.meta.url), 'utf8');
+  const src = readFileSync(new URL('../app/stats.js', import.meta.url), 'utf8');
 
   for (const nom of ['fmtMissing', 'fmtDoubles', 'fmtTrade']) {
     test(`${nom} existe toujours et reste exportée`, () => {
@@ -137,8 +137,8 @@ describe('exports gardés pour l’export de liste d’échange', () => {
    2. le sommaire doit rester des boutons. Des ancres href="#id"
       écriraient dans location.hash, que l'app lit au démarrage. */
 describe('répartitions — sommaire ancré et colonne large', () => {
-  const src = readFileSync(new URL('../stats.js', import.meta.url), 'utf8');
-  const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+  const src = readFileSync(new URL('../app/stats.js', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../app/styles.css', import.meta.url), 'utf8');
 
   test('le bloc « par type » est hors de .sv-breakcols et en sous-colonnes', () => {
     const grid = src.match(/<div class="sv-breakcols">([\s\S]*?)<\/div>/);

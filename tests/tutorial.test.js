@@ -4,12 +4,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
-import { loadData, coll, saveData, setTypeData } from '../storage.js';
+import { loadData, coll, saveData, setTypeData } from '../app/storage.js';
 import {
   tutorialKeys, captureLocalStorage, applyLocalStorage,
   isTutorialSeen, markTutorialSeen,
-} from '../tutorial-snapshot.js';
-import { TUTORIAL_STEPS, TUTORIAL_CHAPTERS } from '../tutorial.js';
+} from '../app/tutorial-snapshot.js';
+import { TUTORIAL_STEPS, TUTORIAL_CHAPTERS } from '../app/tutorial.js';
 
 describe('tutorial — state snapshot / restore (data safety)', () => {
   beforeEach(() => { resetStorage(); installFixtures(); });
@@ -218,7 +218,7 @@ describe('tutorial — parcours en 5 chapitres (1.47.0)', () => {
 
 describe('tutorial — textes ×7 (1.47.0)', () => {
   const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
-  const src = readFileSync(new URL('../translations.js', import.meta.url), 'utf8');
+  const src = readFileSync(new URL('../app/translations.js', import.meta.url), 'utf8');
   const head = src.slice(0, src.indexOf('window.__BADGE_T'));
   const marks = LANGS.map(l => [head.indexOf(l + ':{'), l]).sort((a, b) => a[0] - b[0]);
   const block = {};

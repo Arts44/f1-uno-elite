@@ -13,10 +13,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection } from './_fixtures.js';
-import { isViewer, setViewer, deniedForViewer } from '../session.js';
-import { deleteLocalCollectionData, loadData, cardOwned } from '../storage.js';
+import { isViewer, setViewer, deniedForViewer } from '../app/session.js';
+import { deleteLocalCollectionData, loadData, cardOwned } from '../app/storage.js';
 
-const read = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+const read = f => readFileSync(new URL('../app/' + f, import.meta.url), 'utf8');
 
 describe('session.js — le drapeau de privilège', () => {
   afterEach(() => setViewer(false));

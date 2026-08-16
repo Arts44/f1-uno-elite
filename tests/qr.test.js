@@ -23,8 +23,8 @@
 import './_setup.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { encodeBinary, toSvg, Ecc } from '../qrcodegen.js';
-import { buildBackupLink, makeBackupQrSvg } from '../backup.js';
+import { encodeBinary, toSvg, Ecc } from '../app/qrcodegen.js';
+import { buildBackupLink, makeBackupQrSvg } from '../app/backup.js';
 
 const enc = s => new TextEncoder().encode(s);
 const qrOf = s => encodeBinary(enc(s), Ecc.LOW, 1, 25);

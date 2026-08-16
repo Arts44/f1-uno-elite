@@ -3,8 +3,8 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL, AUTO_BADGES_FIXTURE } from './_fixtures.js';
-import { loadData } from '../storage.js';
-import { evaluateBadgeCondition, isAutoBadgeUnlocked, setAutoBadgeUnlocked, setManualBadges } from '../badges.js';
+import { loadData } from '../app/storage.js';
+import { evaluateBadgeCondition, isAutoBadgeUnlocked, setAutoBadgeUnlocked, setManualBadges } from '../app/badges.js';
 
 const badge = id => AUTO_BADGES_FIXTURE.find(b => b.id === id);
 const evalId = id => evaluateBadgeCondition(badge(id));

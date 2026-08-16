@@ -2,7 +2,7 @@ import './_setup.js';
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
-import { needsLanguageChoice } from '../pin.js';
+import { needsLanguageChoice } from '../app/pin.js';
 
 describe('first-launch language choice — gating', () => {
   beforeEach(() => resetStorage());

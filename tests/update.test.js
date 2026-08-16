@@ -4,11 +4,11 @@ import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import {
   CHANGELOG, APP_VERSION, compareVersions, entriesSince, changesFor,
-} from '../changelog.js';
+} from '../app/changelog.js';
 import {
   lastSeenVersion, markVersionSeen, shouldOfferWhatsNew,
   resolveUpdateCheck, manualCheckCooldownRemaining, MANUAL_CHECK_COOLDOWN_MS,
-} from '../update.js';
+} from '../app/update.js';
 
 const LANG_CODES = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
 

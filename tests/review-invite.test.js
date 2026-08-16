@@ -22,8 +22,8 @@ import { resetStorage } from './_setup.js';
 import { installDom, resetDom } from './_dom.js';
 
 installDom();
-const rv = await import('../review-invite.js');
-const { setViewer } = await import('../session.js');
+const rv = await import('../app/review-invite.js');
+const { setViewer } = await import('../app/session.js');
 
 const JOUR = 24 * 3600 * 1000;
 

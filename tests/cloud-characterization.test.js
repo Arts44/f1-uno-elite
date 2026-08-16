@@ -28,10 +28,10 @@ installDom();
 // quatre couches pour que les tests restent écrits en termes de
 // comportement, pas d'arborescence de fichiers.
 const cloud = {
-  ...await import('../cloud-http.js'),
-  ...await import('../cloud-auth.js'),
-  ...await import('../cloud-sync.js'),
-  ...await import('../cloud-ui.js'),
+  ...await import('../app/cloud-http.js'),
+  ...await import('../app/cloud-auth.js'),
+  ...await import('../app/cloud-sync.js'),
+  ...await import('../app/cloud-ui.js'),
 };
 const {
   cloudSectionHTML, bindCloudSection, classifyOtpError,

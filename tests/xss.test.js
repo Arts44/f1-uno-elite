@@ -15,7 +15,7 @@
 import './_setup.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { escapeHtml, tEsc, t } from '../i18n.js';
+import { escapeHtml, tEsc, t } from '../app/i18n.js';
 
 // translations.js est un script CLASSIQUE (window.__T) : hors navigateur
 // on injecte le strict nécessaire — le gabarit réel de imp.sub.

@@ -1,5 +1,5 @@
 import './_setup.js';
-import '../translations.js';
+import '../app/translations.js';
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
@@ -9,9 +9,9 @@ import {
   decodeJwtSub,
   verifyOtpCode, sendCooldownRemaining, SEND_COOLDOWN_MS,
   normalizeOtpInput, isValidOtpFormat, classifyOtpError,
-} from '../cloud-auth.js';
-import { cloudConfig, isCloudConfigured, authHeaders } from '../cloud-http.js';
-import { buildUpsertRow } from '../cloud-sync.js';
+} from '../app/cloud-auth.js';
+import { cloudConfig, isCloudConfigured, authHeaders } from '../app/cloud-http.js';
+import { buildUpsertRow } from '../app/cloud-sync.js';
 
 const CFG = { url: 'https://proj.supabase.co', anonKey: 'anon-key-123' };
 

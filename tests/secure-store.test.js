@@ -6,7 +6,7 @@ import {
   isEncEnabled, isEncPayload, secureGet, secureSet,
   unlockSecureStore, enableEncryption, disableEncryption, rekeyEncryption,
   quarantineEncryptedData, flushSecureWrites, _resetSecureStoreForTests,
-} from '../secure-store.js';
+} from '../app/secure-store.js';
 
 const OWNED = 'f1uno_owned_2025';
 const BADGES = 'f1uno_badges_2025';

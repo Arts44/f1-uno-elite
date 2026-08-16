@@ -3,7 +3,7 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures } from './_fixtures.js';
-import { loadData, coll } from '../storage.js';
+import { loadData, coll } from '../app/storage.js';
 
 const V1_OWNED = JSON.stringify({ P1: { blue: { owned: true, qty: 1 } } });
 const V1_BADGES = JSON.stringify({ m1: true });

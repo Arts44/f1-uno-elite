@@ -14,8 +14,8 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures } from './_fixtures.js';
-import { setCurrentSeason } from '../data.js';
-import { deleteLocalCollectionData, SEASON_KEY_RE } from '../storage.js';
+import { setCurrentSeason } from '../app/data.js';
+import { deleteLocalCollectionData, SEASON_KEY_RE } from '../app/storage.js';
 
 const PARTAGEES = {
   f1uno_theme: 'dark', f1uno_lang: 'fr', f1uno_font: 'circuit',

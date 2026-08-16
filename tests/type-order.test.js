@@ -9,10 +9,10 @@ import './_setup.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { TYPE_CANONICAL, sortTypesCanonical } from '../data.js';
+import { TYPE_CANONICAL, sortTypesCanonical } from '../app/data.js';
 
-const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
-const cardsFile = JSON.parse(readFileSync(new URL('../data/cards-2025.json', import.meta.url), 'utf8'));
+const meta = JSON.parse(readFileSync(new URL('../app/data/metadata.json', import.meta.url), 'utf8'));
+const cardsFile = JSON.parse(readFileSync(new URL('../app/data/cards-2025.json', import.meta.url), 'utf8'));
 const cards = Array.isArray(cardsFile) ? cardsFile : cardsFile.cards;
 
 describe('ordre canonique des types', () => {

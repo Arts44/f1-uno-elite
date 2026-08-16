@@ -19,9 +19,9 @@ import './_setup.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { DATA_KEY_RE } from '../secure-store.js';
-import { SEASON_KEY_RE, _storageKey } from '../storage.js';
-import { tutorialKeys } from '../tutorial-snapshot.js';
+import { DATA_KEY_RE } from '../app/secure-store.js';
+import { SEASON_KEY_RE, _storageKey } from '../app/storage.js';
+import { tutorialKeys } from '../app/tutorial-snapshot.js';
 
 const SEASON = 2025;
 
@@ -160,7 +160,7 @@ describe('inventaire localStorage — aucune clé hors registre', () => {
     const unknown = new Set();
     for(const file of SOURCES){
       let src;
-      try { src = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'); }
+      try { src = readFileSync(new URL(`../app/${file}`, import.meta.url), 'utf8'); }
       catch { continue; }   // module optionnel absent : rien à inventorier
       // Le lookbehind écarte le marqueur de charge chiffrée
       // `{"__f1uno_enc"` : ce n'est pas une clé de stockage.
@@ -188,7 +188,7 @@ describe('inventaire localStorage — aucune clé hors registre', () => {
     const seen = new Set();
     for(const file of SOURCES){
       let src;
-      try { src = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'); }
+      try { src = readFileSync(new URL(`../app/${file}`, import.meta.url), 'utf8'); }
       catch { continue; }
       for(const m of src.matchAll(/_storageKey\(\s*'([a-z0-9_]+)'/g)) seen.add(m[1]);
     }

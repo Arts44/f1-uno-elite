@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 // dialogs collapsed to 0 after the spacing refactor named a token that
 // the (deliberately sparse) scale never defined.
 describe('styles.css custom properties', () => {
-  const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../app/styles.css', import.meta.url), 'utf8');
 
   // Tokens supplied at runtime by JS (element.style.setProperty) rather
   // than declared in the sheet — legitimately "used but not defined".
@@ -46,7 +46,7 @@ describe('styles.css custom properties', () => {
    variable les casse.
    ══════════════════════════════════════════════════════════ */
 describe('hauteur de tuile fixe', () => {
-  const css = readFileSync(new URL('../styles.css', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../app/styles.css', import.meta.url), 'utf8');
 
   test('--card-h est déclarée une fois, sur :root', () => {
     const decl = css.match(/--card-h\s*:/g) || [];

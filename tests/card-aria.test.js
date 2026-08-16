@@ -27,10 +27,10 @@ import { readFileSync } from 'node:fs';
 
 // Les traductions sont un script global (window.__T), pas un module.
 globalThis.window = globalThis.window || {};
-new Function(readFileSync(new URL('../translations.js', import.meta.url), 'utf8'))
+new Function(readFileSync(new URL('../app/translations.js', import.meta.url), 'utf8'))
   .call(globalThis);
 
-const { cardAriaLabel } = await import('../render.js');
+const { cardAriaLabel } = await import('../app/render.js');
 
 const RESERVE = { id: '070', name: 'Stoffel Vandoorne', category: 'reserve', team: 'Aston Martin' };
 const DIRECTEUR = { id: '076', name: 'James Vowles', category: 'directeur', team: 'Atlassian Williams Racing' };
@@ -76,7 +76,7 @@ describe('nom accessible de la tuile', () => {
 });
 
 describe('marqueurs de coin — décoratifs, et enfin honnêtes', () => {
-  const render = readFileSync(new URL('../render.js', import.meta.url), 'utf8');
+  const render = readFileSync(new URL('../app/render.js', import.meta.url), 'utf8');
   const tuile = render.slice(render.indexOf('MARQUEURS DE COIN'), render.indexOf('<button class="qbtn"'));
 
   test('le sceau de la TUILE ne prétend plus porter une étiquette', () => {

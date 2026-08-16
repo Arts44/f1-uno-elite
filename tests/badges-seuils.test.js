@@ -18,15 +18,15 @@
    test existe pour qu'on ne la « corrige » pas par inadvertance.
    ══════════════════════════════════════════════════════════ */
 import './_setup.js';
-import '../translations.js';
+import '../app/translations.js';
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resetStorage } from './_setup.js';
-import { _applyMetadata, _applyCards, _applyBadges, CARDS_DB, seasonCardCount } from '../data.js';
-import { setTypeData, txBatch } from '../storage.js';
-import { evaluateBadgeCondition, isAutoBadgeUnlocked, setAutoBadgeUnlocked } from '../badges.js';
-import { badgeEffort, _resetDifficultyCache } from '../difficulty.js';
+import { _applyMetadata, _applyCards, _applyBadges, CARDS_DB, seasonCardCount } from '../app/data.js';
+import { setTypeData, txBatch } from '../app/storage.js';
+import { evaluateBadgeCondition, isAutoBadgeUnlocked, setAutoBadgeUnlocked } from '../app/badges.js';
+import { badgeEffort, _resetDifficultyCache } from '../app/difficulty.js';
 
 /* resetStorage() ne vide QUE le localStorage : la collection chargée
    reste en mémoire dans storage.js, et les badges débloqués dans
@@ -35,10 +35,10 @@ import { badgeEffort, _resetDifficultyCache } from '../difficulty.js';
    première écriture. On remet donc explicitement l'état de module. */
 const resetTout = () => { resetStorage(); setAutoBadgeUnlocked({}); _resetDifficultyCache(); };
 
-const meta = JSON.parse(readFileSync(new URL('../data/metadata.json', import.meta.url), 'utf8'));
-const cardsFile = JSON.parse(readFileSync(new URL('../data/cards-2025.json', import.meta.url), 'utf8'));
+const meta = JSON.parse(readFileSync(new URL('../app/data/metadata.json', import.meta.url), 'utf8'));
+const cardsFile = JSON.parse(readFileSync(new URL('../app/data/cards-2025.json', import.meta.url), 'utf8'));
 const allCards = Array.isArray(cardsFile) ? cardsFile : cardsFile.cards;
-const badgesJson = JSON.parse(readFileSync(new URL('../data/badges.json', import.meta.url), 'utf8'));
+const badgesJson = JSON.parse(readFileSync(new URL('../app/data/badges.json', import.meta.url), 'utf8'));
 
 const own = card => txBatch(() => card.types.forEach(ty => {
   setTypeData(card.id, ty, 'owned', true); setTypeData(card.id, ty, 'qty', 1);
@@ -162,7 +162,7 @@ describe('legend_101 — « toutes les cartes », plus « 101 »', () => {
   });
 
   test('data-embedded.js est en parité (repli hors ligne)', () => {
-    const emb = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+    const emb = readFileSync(new URL('../app/data-embedded.js', import.meta.url), 'utf8');
     assert.match(emb, /"id":"legend_101"[^}]*"condition":\{"metric":"owned_count","operator":">=","of":"season"\}/);
     assert.ok(!/"metric":"owned_count","operator":">=","value":101/.test(emb),
       'le repli hors ligne garderait l’ancien seuil');
@@ -224,7 +224,7 @@ describe('of: \'teams\' — le nombre d’écuries n’est plus écrit en dur', 
   });
 
   test('parité data-embedded pour les deux', () => {
-    const emb = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+    const emb = readFileSync(new URL('../app/data-embedded.js', import.meta.url), 'utf8');
     assert.match(emb, /"metric":"teams_owned_count","operator":">=","of":"teams"/);
     assert.match(emb, /"metric":"teams_set_count","operator":">=","of":"teams"/);
   });
@@ -282,13 +282,13 @@ describe('champ season — retiré là où il ment, lu là où il dit vrai', () 
   });
 
   test('data-embedded.js suit le même retrait', () => {
-    const emb = readFileSync(new URL('../data-embedded.js', import.meta.url), 'utf8');
+    const emb = readFileSync(new URL('../app/data-embedded.js', import.meta.url), 'utf8');
     assert.ok(!/"id":"legend_101"[^}]*"season":2025/.test(emb));
     assert.match(emb, /"id":"launch_day"[^}]*"season":2025/);
   });
 
   test('le champ n’est plus inerte : badges.js le lit', () => {
-    const src = readFileSync(new URL('../badges.js', import.meta.url), 'utf8');
+    const src = readFileSync(new URL('../app/badges.js', import.meta.url), 'utf8');
     assert.match(src, /b\.season/, 'le champ doit être lu, sinon il reste décoratif');
     assert.match(src, /y === _currentSeason/, 'la comparaison se fait avec la saison affichée');
   });

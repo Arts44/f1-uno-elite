@@ -5,7 +5,7 @@
 import './_setup.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { nearGoals } from '../collector.js';
+import { nearGoals } from '../app/collector.js';
 
 const cards = [
   { id: '001', name: 'A', team: 'T1', category: 'pilote' },

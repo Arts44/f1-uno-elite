@@ -26,7 +26,7 @@
    test — noté ici plutôt que passé sous silence.
    ══════════════════════════════════════════════════════════ */
 import './_setup.js';
-import '../translations.js';
+import '../app/translations.js';
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -34,16 +34,16 @@ import { resetStorage } from './_setup.js';
 import { installDom, resetDom, mount } from './_dom.js';
 
 installDom();
-const B = await import('../badges.js');
-const D = await import('../data.js');
-const { setTypeData, txBatch, loadData } = await import('../storage.js');
+const B = await import('../app/badges.js');
+const D = await import('../app/data.js');
+const { setTypeData, txBatch, loadData } = await import('../app/storage.js');
 
 /* Le catalogue n'est PAS chargé dans le harnais : data.js le remplit au
    démarrage de l'app, depuis des JSON. On l'injecte donc comme le font
    déjà badges-seuils et badges-v3 — sans quoi CARDS_DB vaut [] et tous
    les tests de correspondance passeraient sur une liste vide, ce qui est
    la pire façon de croire un filet posé. */
-const lireJson = f => JSON.parse(readFileSync(new URL(`../data/${f}`, import.meta.url), 'utf8'));
+const lireJson = f => JSON.parse(readFileSync(new URL(`../app/data/${f}`, import.meta.url), 'utf8'));
 const meta = lireJson('metadata.json');
 const cardsFile = lireJson('cards-2025.json');
 D._applyMetadata(meta);

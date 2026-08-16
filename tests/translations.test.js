@@ -15,7 +15,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de'];
-const src = readFileSync(new URL('../translations.js', import.meta.url), 'utf8');
+const src = readFileSync(new URL('../app/translations.js', import.meta.url), 'utf8');
 const head = src.slice(0, src.indexOf('window.__BADGE_T'));
 
 // Découpe le dictionnaire d'interface en un bloc par langue.

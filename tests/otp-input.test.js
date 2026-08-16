@@ -6,13 +6,13 @@
    tokens de composant, plus d'accent bleu, erreur ≠ accent.
    ══════════════════════════════════════════════════════════ */
 import './_setup.js';
-import '../translations.js';
+import '../app/translations.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { segDisplay, segActiveIndex, segSanitize } from '../otp-input.js';
+import { segDisplay, segActiveIndex, segSanitize } from '../app/otp-input.js';
 
-const read = f => readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+const read = f => readFileSync(new URL('../app/' + f, import.meta.url), 'utf8');
 
 describe('segDisplay — ce que chaque case affiche', () => {
   test('sans masquage : le chiffre, ou rien', () => {

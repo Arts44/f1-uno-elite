@@ -1,7 +1,7 @@
 import './_setup.js';
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { detectPlatform, installInstructionKey, isStandalone } from '../install.js';
+import { detectPlatform, installInstructionKey, isStandalone } from '../app/install.js';
 
 const UA = {
   iphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1',
@@ -57,7 +57,7 @@ describe('install — instruction key per platform', () => {
 });
 
 describe('install — Arc detection via --arc-palette-* CSS variables', async () => {
-  const { isArcBrowser } = await import('../install.js');
+  const { isArcBrowser } = await import('../app/install.js');
   // isArcBrowser reads the global getComputedStyle on win.document —
   // stub it per assertion (restored after).
   test('detects Arc when --arc-palette-title is set, not otherwise', () => {

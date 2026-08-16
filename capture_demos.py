@@ -63,7 +63,7 @@ def ffmpeg(args, cwd):
 ROOT = pathlib.Path(__file__).resolve().parent
 SHOTS = ROOT / 'screenshots'
 TMP = ROOT / '.demo-frames'
-URL = 'http://localhost:8124/index.html'
+URL = 'http://localhost:8124/app/index.html'
 
 LARGEUR = 360           # largeur de sortie ; le rendu est capturé en ×2
 GIF_FPS = '100/3'       # 3 centisecondes — le pas propre le plus rapide du GIF

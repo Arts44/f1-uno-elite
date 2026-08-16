@@ -17,8 +17,8 @@ import { test, describe, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures } from './_fixtures.js';
-import { loadData, coll, _applyImport } from '../storage.js';
-import { _currentSeason, setCurrentSeason } from '../data.js';
+import { loadData, coll, _applyImport } from '../app/storage.js';
+import { _currentSeason, setCurrentSeason } from '../app/data.js';
 
 const OWNED_2025 = { P1: { blue: { owned: true, wishlist: false, doubles: false, favorite: false, qty: 1 } } };
 const OWNED_2026 = { P2: { blue: { owned: true, wishlist: false, doubles: false, favorite: false, qty: 3 } } };

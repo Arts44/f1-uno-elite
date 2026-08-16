@@ -6,8 +6,8 @@ import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
 import {
   gatherSettings, applySettings, backupIncludes, setBackupIncludes,
   PREF_KEYS, SECURITY_KEYS, titleStorageKey,
-} from '../settings-sync.js';
-import { collectionSnapshot, loadData } from '../storage.js';
+} from '../app/settings-sync.js';
+import { collectionSnapshot, loadData } from '../app/storage.js';
 
 function seedDeviceSettings(){
   localStorage.setItem('f1uno_lang', 'fr');

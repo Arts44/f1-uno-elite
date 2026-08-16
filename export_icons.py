@@ -27,7 +27,7 @@ URL = 'http://localhost:8124'
 # Le gabarit charge la MÊME police variable que l'app (fonts/), puis
 # dessine soit l'icon.svg (192/512/32/48), soit le « F1 » du 16 px.
 PAGE = """<!doctype html><meta charset="utf-8">
-<style>@font-face{font-family:'Space Grotesk';src:url('%s/fonts/space-grotesk-var.woff2') format('woff2');font-weight:300 700;}</style>
+<style>@font-face{font-family:'Space Grotesk';src:url('%s/app/fonts/space-grotesk-var.woff2') format('woff2');font-weight:300 700;}</style>
 <canvas id="c"></canvas>
 <script>
 async function rendre(taille){
@@ -45,7 +45,7 @@ async function rendre(taille){
     x.fillText('F1', 8, 9);
   } else {
     const img = new Image();
-    await new Promise(res => { img.onload = res; img.src = '%s/icons/icon.svg'; });
+    await new Promise(res => { img.onload = res; img.src = '%s/app/icons/icon.svg'; });
     x.drawImage(img, 0, 0, taille, taille);
   }
   return c.toDataURL('image/png');
@@ -70,7 +70,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     pg = b.new_page()
     try:
-        pg.goto(URL + '/index.html', timeout=8000)
+        pg.goto(URL + '/app/index.html', timeout=8000)
     except Exception:
         print(f'ÉCHEC : {URL} injoignable — lance `python3 -m http.server 8124`')
         sys.exit(1)
@@ -82,7 +82,9 @@ with sync_playwright() as p:
         sorties[taille] = base64.b64decode(url.split(',', 1)[1])
     b.close()
 
-(ROOT / 'icons' / 'icon-512.png').write_bytes(sorties[512])
-(ROOT / 'icons' / 'icon-192.png').write_bytes(sorties[192])
-(ROOT / 'favicon.ico').write_bytes(ico([(16, sorties[16]), (32, sorties[32]), (48, sorties[48])]))
+(ROOT / 'app' / 'icons' / 'icon-512.png').write_bytes(sorties[512])
+(ROOT / 'app' / 'icons' / 'icon-192.png').write_bytes(sorties[192])
+# Le favicon vit DANS l'app (précaché) ; la vitrine à la racine pointe
+# app/favicon.ico — un seul fichier, pas deux copies à désynchroniser.
+(ROOT / 'app' / 'favicon.ico').write_bytes(ico([(16, sorties[16]), (32, sorties[32]), (48, sorties[48])]))
 print('exports OK — icon-512.png, icon-192.png, favicon.ico (16+32+48)')

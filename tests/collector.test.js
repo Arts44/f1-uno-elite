@@ -3,8 +3,8 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
-import { loadData } from '../storage.js';
-import { missingCards, wishlistCards, doublesList, tradeList } from '../collector.js';
+import { loadData } from '../app/storage.js';
+import { missingCards, wishlistCards, doublesList, tradeList } from '../app/collector.js';
 
 // SAMPLE_COLL over the fixture cards (see _fixtures.js):
 //  P1 champion pilote — blue owned x2 (doubles+fav), nitro owned x1

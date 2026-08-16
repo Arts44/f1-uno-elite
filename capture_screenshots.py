@@ -30,7 +30,7 @@ SHOTS = ROOT / 'screenshots'
 I18N = SHOTS / 'i18n'
 I18N.mkdir(parents=True, exist_ok=True)
 LANGS = ['en', 'fr', 'es', 'zh', 'it', 'nl', 'de']
-URL = 'http://localhost:8124/index.html'
+URL = 'http://localhost:8124/app/index.html'
 FAILS = []
 
 # ══════════════════════════════════════════════════════════
@@ -438,6 +438,12 @@ with sync_playwright() as p:
     # PWA manifest — tailles EXACTES déclarées, @1x
     mobile('dark', 'desktop-collection.png', png=True, w=1280, h=800, scale=1)
     mobile('dark', 'mobile-collection.png', png=True, w=390, h=844, scale=1)
+    # Ces DEUX captures appartiennent au manifest (écrans d'installation
+    # PWA) : elles vivent dans app/screenshots/ et sont précachées —
+    # les autres restent à la racine pour le README et la vitrine.
+    for f in ('desktop-collection.png', 'mobile-collection.png'):
+        (ROOT / 'app' / 'screenshots').mkdir(exist_ok=True)
+        (SHOTS / f).replace(ROOT / 'app' / 'screenshots' / f)
     print('captures historiques OK')
 
     # ── 3. Surfaces nées depuis le gel v1 ──

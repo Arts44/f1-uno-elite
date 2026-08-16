@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.62.0',
+    date: '2026-08-16',
+    changes: {
+      en: ['The app has a front door now: arts44.dev shows a small landing page, and the app itself lives at arts44.dev/app — your collection, settings and sign-in all survive the move, and old backup links or QR codes are redirected automatically. Being transparent: the landing page includes a cookieless visit counter (Cloudflare Web Analytics) so we can see whether anyone is coming; the app itself still loads zero external resources, and an automated test keeps it that way.'],
+      fr: ['L\'app a désormais une porte d\'entrée : arts44.dev montre une petite page de présentation, et l\'app vit sur arts44.dev/app — ta collection, tes réglages et ta connexion survivent au déménagement, et les anciens liens de sauvegarde ou QR codes sont redirigés automatiquement. En toute transparence : la page d\'accueil inclut un compteur de visites sans cookie (Cloudflare Web Analytics) pour savoir si quelqu\'un arrive ; l\'app, elle, ne charge toujours aucune ressource externe, et un test automatique y veille.'],
+      es: ['La app tiene ahora una puerta de entrada: arts44.dev muestra una pequeña página de presentación, y la app vive en arts44.dev/app — tu colección, ajustes e inicio de sesión sobreviven a la mudanza, y los antiguos enlaces de copia o códigos QR se redirigen automáticamente. Con transparencia: la portada incluye un contador de visitas sin cookies (Cloudflare Web Analytics); la app sigue sin cargar ningún recurso externo, y un test automático lo garantiza.'],
+      zh: ['应用现在有了「前门」：arts44.dev 显示一个简洁的介绍页，应用本身位于 arts44.dev/app——你的收藏、设置和登录都会随迁移保留，旧的备份链接和二维码会自动重定向。坦诚说明：门户页包含一个无 Cookie 的访问计数器（Cloudflare Web Analytics）；应用本身仍然不加载任何外部资源，并由自动测试持续把关。'],
+      it: ['L\'app ha ora una porta d\'ingresso: arts44.dev mostra una piccola pagina di presentazione, e l\'app vive su arts44.dev/app — collezione, impostazioni e accesso sopravvivono al trasloco, e i vecchi link di backup o codici QR vengono reindirizzati automaticamente. In trasparenza: la home include un contatore di visite senza cookie (Cloudflare Web Analytics); l\'app continua a non caricare alcuna risorsa esterna, e un test automatico lo garantisce.'],
+      nl: ['De app heeft nu een voordeur: arts44.dev toont een kleine presentatiepagina, en de app zelf woont op arts44.dev/app — je collectie, instellingen en aanmelding overleven de verhuizing, en oude back-uplinks of QR-codes worden automatisch doorgestuurd. Voor de transparantie: de startpagina bevat een cookieloze bezoekersteller (Cloudflare Web Analytics); de app zelf laadt nog steeds geen enkele externe bron, en een automatische test bewaakt dat.'],
+      de: ['Die App hat jetzt eine Eingangstür: arts44.dev zeigt eine kleine Präsentationsseite, die App selbst wohnt unter arts44.dev/app — Sammlung, Einstellungen und Anmeldung überstehen den Umzug, alte Backup-Links und QR-Codes werden automatisch weitergeleitet. Transparent gesagt: Die Startseite enthält einen cookielosen Besucherzähler (Cloudflare Web Analytics); die App selbst lädt weiterhin keinerlei externe Ressourcen, und ein automatischer Test wacht darüber.'],
+    },
+  },
+  {
     version: '1.61.0',
     date: '2026-08-14',
     changes: {

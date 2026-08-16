@@ -3,7 +3,7 @@ import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { resetStorage } from './_setup.js';
 import { installFixtures, seedCollection, SAMPLE_COLL } from './_fixtures.js';
-import { loadData, setTypeData, cardSetComplete } from '../storage.js';
+import { loadData, setTypeData, cardSetComplete } from '../app/storage.js';
 
 describe('cardSetComplete — every variant of the card owned', () => {
   beforeEach(() => { resetStorage(); installFixtures(); seedCollection(SAMPLE_COLL); loadData(); });
