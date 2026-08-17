@@ -1215,7 +1215,7 @@ avant/après. Ce point est le mode d'emploi.
 
 ---
 
-## 20. Le casque « masse » — prouvé, NON déployé, en réserve
+## 20. ~~Le casque « masse » — prouvé, NON déployé, en réserve~~ — CLASSÉ (17/08/2026), la réserve ne sera pas déployée
 
 **Contexte (1.63.0).** Le casque au trait (SVG Repo, CC0 — 
 https://www.svgrepo.com/svg/172725/f1-helmet, licence vérifiée sur la
@@ -1242,3 +1242,16 @@ l'usage réel. Le montage serait celui écarté à 1.63.0 : deux symboles
 dérivés de la même source, un seuil NOMMÉ (24 px), documenté ici même.
 Ne pas la redessiner : elle est prouvée sur banc (14/22 px, mono et
 couleur, clair et sombre).
+
+> **TRANCHÉ (17/08/2026), mesuré en situation** : la rangée catégories de
+> Stats rendue aux trois densités, trait contre masse, pixels réels.
+> À dsf 2 et 3, le trait est NET — visière hachurée lisible, silhouette
+> claire — « plus léger » que la masse, pas gênant. Le seul rendu
+> fusionné est dsf 1, déjà tranché en 1.63.0 (la fusion y JOUE POUR le
+> trait). Et l'argument que ce point n'avait pas vu : toutes les icônes
+> voisines sont AU TRAIT (le système d'icônes est stroke) — une masse
+> serait plus grasse que le texte et que ses voisines, elle crierait
+> dans une rangée utilitaire. La réserve reste documentée ci-dessus par
+> honnêteté d'archive, mais le critère de sortie est désormais réputé
+> non atteint : ne la déployer que si un RETOUR UTILISATEUR réel — pas
+> une intuition — la réclame.
