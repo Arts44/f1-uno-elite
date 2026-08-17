@@ -10,7 +10,7 @@ import { loadData, coll, exportCollection, _handleImportFile } from './storage.j
 import { maybeShowQuickAddHint, dismissQuickAddHint,
   showGridSkeleton, hideGridSkeleton,
   renderCollection, switchView, closeMo,
-  toggleTheme, quickToggle, changeMoQty, showToast,
+  toggleTheme, quickToggle, changeMoQty, selectMoType, showToast,
   toggleQuickAdd, quickAddType, closeQuickAdd, initNavBead
 } from './render.js';
 import { updateStats, renderCollectionHead } from './stats.js';
@@ -145,6 +145,12 @@ function initEvents(){
         const typeId = el.getAttribute('data-type');
         const delta = parseInt(el.getAttribute('data-delta'), 10);
         changeMoQty(cardId, typeId, delta);
+        break;
+      }
+      // Sélection d'une cellule de la matrice : LECTURE seule (ouvre le
+      // type dans l'inspecteur) — pas dans VIEWER_BLOCKED, exprès.
+      case 'selectMoType': {
+        selectMoType(el.getAttribute('data-card'), el.getAttribute('data-type'));
         break;
       }
       case 'quickAdd': {

@@ -575,84 +575,118 @@ export function openModal(id){
     <div class="mib"><div class="mib-l">${t('mo.total_copies')||'Total copies'}</div><div class="mib-v" style="color:var(--red-ink,var(--red))">${cardTotalQty(id)}</div></div>
   `;
 
+  _mxSelected = null;   // l'inspecteur repart du premier type existant
   renderModalTypes(card);
   document.getElementById('mo').classList.add('open');
 }
 
+/* ── LA MATRICE 4×4 (1.64.0) — les 16 variantes en 4 colonnes de
+   couleur × 4 familles, trois états par cellule (possédée + quantité,
+   manquante, n'existe pas), un inspecteur unique qui remplace les 16
+   paires de boutons −/+.
+
+   LA MATRICE EST TOUJOURS 4×4, même sur une carte Grand Prix qui n'a
+   que 4 types : ses 12 cellules « n'existe pas » restent affichées,
+   hachurées. NE PAS « OPTIMISER » EN SAUTANT LES RANGÉES VIDES —
+   c'est délibéré : la même carte mentale sur les 101 fiches (une
+   cellule au même endroit veut toujours dire la même variante), et le
+   comptage « X inexistantes » dit déjà pourquoi ces cellules sont
+   éteintes. L'ancien rendu par liste sautait les rangées absentes ;
+   c'est précisément ce que ce chantier remplace.
+
+   Colonnes = icônes de couleur, JAMAIS des abréviations traduites
+   (règle i18n n°2). Rangées = famille traduite en toutes lettres —
+   courtes dans les 7 langues, mesuré (l'abréviation « BAS/FOI/SPÉ »
+   de la maquette d'origine imposait un apprentissage évitable). ── */
+const MX_ROWS = [
+  ['blue', 'green', 'red', 'yellow'],
+  ['blue_foil', 'green_foil', 'red_foil', 'yellow_foil'],
+  ['blue_red_foil', 'green_yellow_foil', 'wild_foil', 'nitro_foil'],
+  ['promo_blue', 'promo_green', 'promo_red', 'promo_yellow'],
+];
+const MX_FAM = [
+  ['mx.fam_base', null], ['mx.fam_foil', 'foil'],
+  ['mx.fam_special', 'wild'], ['mx.fam_promo', 'promo'],
+];
+/* Type ouvert dans l'inspecteur — état de session de la modale,
+   réinitialisé à chaque ouverture (openModal). */
+let _mxSelected = null;
+
+/* L'encre du wild (#0a0a0a) est invisible sur fond sombre — défaut
+   PRÉEXISTANT de l'ancienne liste, corrigé au passage : la couleur
+   passe par --wild-ink, redéfinie par thème dans styles.css. */
+function _typeInk(typeId){
+  return typeId === 'wild_foil' ? 'var(--wild-ink)' : CARD_TYPES[typeId].color;
+}
+function _typeLabel(typeId){
+  const k = 'type.' + typeId, l = t(k);
+  return l === k ? (CARD_TYPES[typeId]?.label || typeId) : l;
+}
+
+export function selectMoType(cardId, typeId){
+  _mxSelected = typeId;
+  const card = CARDS_DB.find(c => c.id === cardId);
+  if(card) renderModalTypes(card);
+}
+
 export function renderModalTypes(card){
-  const grid=document.getElementById('moTypeRows');
-  grid.innerHTML='';
-  grid.className='mo-type-grid';
+  const grid = document.getElementById('moTypeRows');
+  const typeSet = new Set(card.types);
+  const qtyOf = ty => getTypeData(card.id, ty).qty || 0;
+  const stateOf = ty => !typeSet.has(ty) ? 'none' : qtyOf(ty) > 0 ? 'owned' : 'missing';
 
-  const typeSet=new Set(card.types);
+  // Sélection : garder celle en cours si elle existe sur CETTE carte,
+  // sinon le premier type existant (ordre canonique) — c'est lui que le
+  // tutoriel presse deux fois (mark_owned puis mark_double).
+  if(!_mxSelected || !typeSet.has(_mxSelected)){
+    _mxSelected = sortTypesCanonical(card.types)[0];
+  }
+  const sel = _mxSelected;
+  const selState = stateOf(sel);
 
-  const COLS = ['blue','green','red','yellow'];
-  const BASE_FOIL_MAP = {blue:'blue_foil',green:'green_foil',red:'red_foil',yellow:'yellow_foil'};
-  // Ordre canonique (TYPE_CANONICAL) : duals, wild, nitro, promos.
-  const SPECIALS = ['blue_red_foil','green_yellow_foil','wild_foil','nitro_foil','promo_blue','promo_green','promo_red','promo_yellow'];
+  const existN = card.types.length;
+  const ownedN = card.types.filter(ty => qtyOf(ty) > 0).length;
+  const noneN = 16 - existN;
 
-  function makeCell(typeId){
-    const ct=CARD_TYPES[typeId];
-    const d=getTypeData(card.id, typeId);
-    const qty=d.qty||0;
-    const cell=document.createElement('div');
-    cell.className=`mo-type-cell${qty>0?' has-qty':''}`;
-    cell.innerHTML=`
-      <div class="mo-cell-icon" style="background:${ct.color}20;border:1.5px solid ${ct.color}40;color:${ct.color};">${typeIcon(typeId)}</div>
-      <div class="mo-cell-label">${ct.label}</div>
+  const cells = MX_ROWS.map((row, ri) => {
+    const [famKey, famIc] = MX_FAM[ri];
+    const lab = `<div class="mo-mx-rowlab">${famIc ? icon(famIc) : ''}<span>${t(famKey)}</span></div>`;
+    return lab + row.map(ty => {
+      const st = stateOf(ty);
+      // La colonne donne la couleur, pas l'identité (wild n'est pas
+      // « rouge ») : les rangées non-base portent leur glyphe en coin.
+      const glyph = ri > 0 ? `<span class="mx-ty" style="color:${_typeInk(ty)}" aria-hidden="true">${typeIcon(ty)}</span>` : '';
+      if(st === 'none') return `<div class="mo-mx-cell none" aria-hidden="true">${glyph}</div>`;
+      const aria = `${_typeLabel(ty)} — ${st === 'owned' ? `${t('mx.own')} ×${qtyOf(ty)}` : t('mx.miss')}`;
+      return `<button type="button" class="mo-mx-cell ${st}${ty === sel ? ' sel' : ''}" data-action="selectMoType" data-card="${card.id}" data-type="${ty}" aria-label="${aria}" aria-pressed="${ty === sel}">${glyph}${st === 'owned' ? qtyOf(ty) : '<span aria-hidden="true">▢</span>'}</button>`;
+    }).join('');
+  }).join('');
+
+  const inspState = selState === 'owned'
+    ? `<span class="mi-state own">${t('mx.own')}</span>`
+    : `<span class="mi-state">${t('mx.miss')}</span>`;
+  grid.className = 'mo-type-rows';
+  grid.innerHTML = `
+    <div class="mo-mx-count">${tEsc('mx.count', { o: ownedN, e: existN, n: noneN })}</div>
+    <div class="mo-mx">
+      <div class="mo-mx-corner"></div>
+      ${['blue', 'green', 'red', 'yellow'].map(c => `<div class="mo-mx-colhead" aria-hidden="true">${typeIcon(c)}</div>`).join('')}
+      ${cells}
+    </div>
+    <div class="mo-mx-legend">
+      <span><i class="lg-own"></i>${t('mx.own')}</span>
+      <span><i></i>${t('mx.miss')}</span>
+      <span><i class="lg-none"></i>${t('mx.none')}</span>
+    </div>
+    <div class="mo-insp">
+      <div class="mi-ic" style="background:color-mix(in srgb,${_typeInk(sel)} 13%,transparent);border:1.5px solid color-mix(in srgb,${_typeInk(sel)} 25%,transparent);color:${_typeInk(sel)};">${typeIcon(sel)}</div>
+      <div class="mi-tx">${inspState}<div class="mi-name">${_typeLabel(sel)}</div></div>
       <div class="mo-qty-wrap">
-        <button class="mqbtn" data-action="changeMoQty" data-card="${card.id}" data-type="${typeId}" data-delta="-1" aria-label="${t('mo.qty_dec')}" title="${t('mo.qty_dec')}">−</button>
-        <span class="mqval" id="mqv-${card.id}-${typeId}">${qty}</span>
-        <button class="mqbtn" data-action="changeMoQty" data-card="${card.id}" data-type="${typeId}" data-delta="1" aria-label="${t('mo.qty_inc')}" title="${t('mo.qty_inc')}">+</button>
-      </div>`;
-    return cell;
-  }
-
-  function makeEmpty(){
-    const cell=document.createElement('div');
-    cell.className='mo-type-cell empty';
-    return cell;
-  }
-
-  // Row 1: Base types — always 4 columns with empties
-  const hasBase = COLS.some(c=>typeSet.has(c));
-  if(hasBase){
-    const label=document.createElement('div');
-    label.className='mo-grid-row-label';
-    label.textContent='Base';
-    grid.appendChild(label);
-    COLS.forEach(c=>{
-      if(typeSet.has(c)) grid.appendChild(makeCell(c));
-      else grid.appendChild(makeEmpty());
-    });
-  }
-
-  // Row 2: Base foil types — always 4 columns aligned under base, with empties
-  const hasFoil = COLS.some(c=>typeSet.has(BASE_FOIL_MAP[c]));
-  if(hasFoil){
-    const label=document.createElement('div');
-    label.className='mo-grid-row-label';
-    label.textContent='Foil';
-    grid.appendChild(label);
-    COLS.forEach(c=>{
-      const fid=BASE_FOIL_MAP[c];
-      if(typeSet.has(fid)) grid.appendChild(makeCell(fid));
-      else grid.appendChild(makeEmpty());
-    });
-  }
-
-  // Row 3: Special types — fill 4 columns, promo spans all 4
-  const cardSpecials=SPECIALS.filter(s=>typeSet.has(s));
-  if(cardSpecials.length){
-    const label=document.createElement('div');
-    label.className='mo-grid-row-label';
-    label.textContent='Spécial';
-    grid.appendChild(label);
-    cardSpecials.forEach(s=>grid.appendChild(makeCell(s)));
-    // Compléter la dernière rangée (jamais de case orpheline flottante)
-    const remaining = (4 - cardSpecials.length % 4) % 4;
-    for(let i=0;i<remaining;i++) grid.appendChild(makeEmpty());
-  }
+        <button class="mqbtn" data-action="changeMoQty" data-card="${card.id}" data-type="${sel}" data-delta="-1" aria-label="${t('mo.qty_dec')}" title="${t('mo.qty_dec')}">−</button>
+        <span class="mqval" id="mqv-${card.id}-${sel}">${qtyOf(sel)}</span>
+        <button class="mqbtn" data-action="changeMoQty" data-card="${card.id}" data-type="${sel}" data-delta="1" aria-label="${t('mo.qty_inc')}" title="${t('mo.qty_inc')}">+</button>
+      </div>
+    </div>`;
 }
 
 

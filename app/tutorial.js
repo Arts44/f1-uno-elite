@@ -379,7 +379,13 @@ function _scrollerOf(el){
 // Amène la cible au centre de la bande sûre. Défilement instantané si
 // l'utilisateur a demandé moins d'animations.
 async function _bringIntoView(el){
-  if(!el || _isPinned(el)) return;   // ancré : la page n'a pas à bouger
+  if(!el) return;
+  // Ancré (header, nav, overlay fixe) : la PAGE n'a pas à bouger — mais
+  // un défileur INTERNE à l'ancrage peut, lui, amener la cible. Le cas
+  // réel : l'inspecteur de la matrice (1.64.0) vit en bas du corps
+  // défilant de la fiche carte, hors écran à l'ouverture. L'exemption
+  // totale des ancrés laissait le halo éteint sur une cible atteignable.
+  if(_isPinned(el) && !_scrollerOf(el)) return;
   const behavior = _reduceMotion() ? 'auto' : 'smooth';
   const band = _band();
   const r = el.getBoundingClientRect();

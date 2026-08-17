@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.64.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['The card sheet now shows its 16 variants as a matrix: 4 colour columns × 4 family rows (base, foil, special, promo), each cell owned with its count, missing, or non-existent — always the same 4×4 layout on all 101 cards. Tap a cell to open it in the inspector, a single −/+ pair that replaces the sixteen.'],
+      fr: ['La fiche carte montre désormais ses 16 variantes en matrice : 4 colonnes de couleur × 4 familles (base, foil, spécial, promo), chaque cellule possédée avec son compte, manquante ou inexistante — toujours la même disposition 4×4 sur les 101 cartes. Touchez une cellule pour l’ouvrir dans l’inspecteur, une seule paire −/+ qui remplace les seize.'],
+      es: ['La ficha de carta muestra ahora sus 16 variantes en matriz: 4 columnas de color × 4 familias (base, foil, especial, promo), cada celda poseída con su recuento, faltante o inexistente — siempre la misma disposición 4×4 en las 101 cartas. Toca una celda para abrirla en el inspector, un solo par −/+ que reemplaza a los dieciséis.'],
+      zh: ['卡片详情现在以矩阵展示 16 种变体：4 个颜色列 × 4 个家族行（基础、闪卡、特殊、促销），每格显示已拥有及数量、缺少或不存在——101 张卡片始终保持相同的 4×4 布局。点按一格即可在检视器中打开，一对 −/+ 取代了原来的十六对。'],
+      it: ['La scheda carta mostra ora le sue 16 varianti in matrice: 4 colonne di colore × 4 famiglie (base, foil, speciale, promo), ogni cella posseduta con il suo conteggio, mancante o inesistente — sempre la stessa disposizione 4×4 su tutte le 101 carte. Tocca una cella per aprirla nell’ispettore, una sola coppia −/+ che sostituisce le sedici.'],
+      nl: ['De kaartfiche toont zijn 16 varianten nu als matrix: 4 kleurkolommen × 4 families (basis, foil, speciaal, promo), elke cel in bezit met aantal, ontbrekend of onbestaand — altijd dezelfde 4×4-indeling op alle 101 kaarten. Tik op een cel om die in de inspector te openen, één −/+-paar dat de zestien vervangt.'],
+      de: ['Das Kartenblatt zeigt seine 16 Varianten jetzt als Matrix: 4 Farbspalten × 4 Familien (Basis, Foil, Spezial, Promo), jede Zelle vorhanden mit Anzahl, fehlend oder nicht existent — immer dasselbe 4×4-Raster auf allen 101 Karten. Eine Zelle antippen öffnet sie im Inspektor, ein einziges −/+-Paar ersetzt die sechzehn.'],
+    },
+  },
+  {
     version: '1.63.2',
     date: '2026-08-17',
     changes: {
