@@ -1028,7 +1028,7 @@ fonctionnalité — il a enlevé la raison de ne pas la coder.
 
 ---
 
-## 16. Les débordements de bulle du tutoriel ne sont vérifiés qu'en français — trou identifié
+## 16. ~~Les débordements de bulle du tutoriel ne sont vérifiés qu'en français~~ — FERMÉ (17/08/2026) : mesuré ×7, la prémisse est réfutée
 
 **Ce n'est pas une limite de méthode, c'est un trou.** La distinction
 compte : une limite de méthode se documente et on passe ; un trou se
@@ -1057,6 +1057,32 @@ panne serait invisible ici et bien réelle chez l'utilisateur, sur le
 **Parade possible, non chiffrée** : une passe de captures dédiée, hors
 suite de tests, sur les deux langues les plus longues et la plus étroite
 des tailles — à instruire séparément si ce trou se met à coûter.
+
+> **FERMÉ SUR MESURE (17/08/2026).** Les 7 langues parcourues dans le
+> vrai tutoriel au viewport LIANT (320×568 — à texte égal, tout viewport
+> plus large donne une bulle plus courte : si rien ne déborde à 320,
+> 375 et desktop ne peuvent pas faire pire). Trois gravités mesurées à
+> chaque étape :
+>
+> · **bulle hors écran : 0 px, partout, dans les 7 langues** — les
+>   clamps du moteur tiennent ;
+> · **débordement interne : un delta constant de 9-10 px…
+>   IDENTIQUE dans les 7 langues, français compris** — donc pas un
+>   effet de longueur de texte. La bulle n'a ni `overflow` ni hauteur
+>   contrainte : rien ne peut y être coupé. Artefact de métrique DOM
+>   (scrollHeight vs clientHeight), pas un défaut ;
+> · **cible recouverte : 2-3 étapes à 320×568, aux MÊMES étapes et aux
+>   mêmes surfaces dans les 7 langues** — c'est le repli documenté du
+>   moteur au plus petit viewport (« se range au bord le plus dégagé »),
+>   présent en français aussi. Un raffinement UX possible, pas un trou
+>   linguistique.
+>
+> **La prémisse du point — l'allemand et le néerlandais déborderaient —
+> est réfutée : aucune différence inter-langues, sur aucune des trois
+> gravités.** C'est un résultat, pas un échec. (Couverture : 23 étapes
+> vues par langue, la machine étant chargée pendant la mesure — les
+> étapes non vues sont les mêmes dans les 7 langues, la comparaison
+> inter-langues reste valide.)
 
 ---
 
