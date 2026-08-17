@@ -2400,7 +2400,12 @@ button:not(:disabled, .bn-tab):active,
 .card-visual.not-owned .team-emblem,.modal-visual.not-owned .team-emblem{opacity:.45;}
 
 /* ── CASQUE C1 « Visière XL » — silhouette générique, couleurs d'écurie ── */
-.helm{position:absolute;left:6px;bottom:2px;width:92px;height:92px;z-index:2;
+/* Centré dans la bande visuelle (1.63.1) : l'ancrage bottom:2px laissait
+   le contenu à 38 px du haut et 14 px du bas — MESURÉ, alors que le tracé
+   est symétrique dans son viewBox (15,6/15,7). top:0+bottom:0+margin:auto
+   centre la boîte sans valeur magique ; le numéro, déjà centré dans la
+   bande, s'aligne optiquement de lui-même. */
+.helm{position:absolute;left:6px;top:0;bottom:0;margin:auto 0;width:92px;height:92px;z-index:2;
   filter:drop-shadow(0 4px 10px rgba(0,0,0,.45));
   /* colorisation du <use> partagé : SATURÉE — la couleur d'écurie pure
      porte l'identité (le turquoise est turquoise, le rosso est rouge).
@@ -2410,7 +2415,7 @@ button:not(:disabled, .bn-tab):active,
      dessin à quatre couches. */
   --helm-shell:var(--tc,#888);}
 .card-visual.not-owned .helm{filter:grayscale(1) opacity(.55);}
-.modal-visual .helm{left:18px;bottom:4px;width:140px;height:140px;}
+.modal-visual .helm{left:18px;width:140px;height:140px;}  /* centré comme la tuile (hérite top/bottom/margin) */
 /* Tuiles étroites (2 colonnes à 320 px) : casque réduit, le numéro respire */
 @media (max-width:420px){
   .card-visual .helm{width:72px;height:72px;left:2px;}

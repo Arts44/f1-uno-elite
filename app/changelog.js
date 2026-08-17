@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.63.1',
+    date: '2026-08-17',
+    changes: {
+      en: ['The helmet now sits centred in the visual band of each driver card, optically level with the number — it used to hug the separator line. Measured, not eyeballed: the drawing itself was already symmetric; only its anchoring was off.'],
+      fr: ['Le casque est désormais centré dans la bande visuelle de chaque carte pilote, à niveau optique avec le numéro — il collait auparavant à la ligne de séparation. Mesuré, pas estimé : le dessin lui-même était déjà symétrique ; seul son ancrage était en cause.'],
+      es: ['El casco queda ahora centrado en la banda visual de cada carta de piloto, a nivel óptico con el número — antes se pegaba a la línea separadora. Medido, no a ojo: el dibujo ya era simétrico; solo su anclaje fallaba.'],
+      zh: ['头盔现在在每张车手卡的视觉区内垂直居中，与号码在视觉上齐平——之前它紧贴着分隔线。经过测量而非目测：图形本身已经对称，问题只出在定位方式上。'],
+      it: ['Il casco è ora centrato nella banda visiva di ogni carta pilota, otticamente a livello con il numero — prima aderiva alla linea di separazione. Misurato, non a occhio: il disegno era già simmetrico; solo l\'ancoraggio era sbagliato.'],
+      nl: ['De helm staat nu gecentreerd in de visuele band van elke coureurskaart, optisch op één lijn met het nummer — voorheen plakte hij tegen de scheidingslijn. Gemeten, niet geschat: de tekening zelf was al symmetrisch; alleen de verankering zat fout.'],
+      de: ['Der Helm sitzt jetzt zentriert im Bildband jeder Fahrerkarte, optisch auf Höhe der Nummer — zuvor klebte er an der Trennlinie. Gemessen, nicht geschätzt: Die Zeichnung selbst war bereits symmetrisch; nur ihre Verankerung stimmte nicht.'],
+    },
+  },
+  {
     version: '1.63.0',
     date: '2026-08-16',
     changes: {
