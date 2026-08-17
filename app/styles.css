@@ -2456,7 +2456,27 @@ button:not(:disabled, .bn-tab):active,
    complet reste lisible dans la fiche, à 13 px.
    Le -18px n'est pas arrondi : à 320 px, avec -16, le bas du nom
    tombait 1 px DANS le bouton. 18 dégage la boîte de ligne entière et
-   laisse encore 7 px de marge en haut du visuel. */
+   laisse encore 7 px de marge en haut du visuel.
+
+   ⚠️ LE CENTRAGE A ÉTÉ ÉVALUÉ PUIS ÉCARTÉ (17/08/2026), quand le
+   casque a été recentré (1.63.1). Mesuré sur les 9 écuries du seed :
+
+     nom sur…            h. emblème   haut/bas actuels   DÉBORD sur « + »
+                                                         si centré
+     2 lignes (Mercedes,
+       Aston, RB VCARB,
+       Williams)             70 px        7 / 43            +17 px
+     1 ligne (Ferrari,
+       McLaren, Red Bull,
+       Haas, Sauber)         56,3 px     13,9 / 49,9        +10,1 px
+
+   Ce -18px n'est donc PAS un ancrage hérité à « corriger » : c'est la
+   parade minimale mesurée (débord centré − 18 ≈ −1 px) à une collision
+   réelle. La vraie nature du conflit : l'emblème est un bloc PLEINE
+   LARGEUR (monogramme + filet + nom centrés) qui doit céder la place à
+   un bouton qui n'occupe que la COLONNE DROITE — centrer l'un fait
+   passer l'autre dessous. Recentrer exigerait de sortir le nom du bloc
+   (redesign du visuel écurie), pas un réglage d'alignement. */
 .card-visual .team-name{display:-webkit-box;-webkit-line-clamp:2;
   -webkit-box-orient:vertical;overflow:hidden;max-width:100%;}
 .card-visual .team-emblem{transform:translateY(-18px);}
