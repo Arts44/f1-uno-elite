@@ -1060,7 +1060,7 @@ des tailles — à instruire séparément si ce trou se met à coûter.
 
 ---
 
-## 17. Le projecteur du tutoriel n'éclaire que la moitié du geste d'ajout rapide — mesuré, coût chiffré
+## 17. ~~Le projecteur du tutoriel n'éclaire que la moitié du geste d'ajout rapide~~ — CORRIGÉ (1.60.4, commit 5a15368)
 
 **Le diagnostic d'origine était faux, et la mesure l'a corrigé.** Première
 lecture : « la pastille `+` est excentrée, le script n'y arrive pas au
@@ -1102,6 +1102,19 @@ utilisateur ne reste coincé.
 **À faire si le moteur gagne son filet** : la « cible de suite de geste »
 ci-dessus, et le halo qui suit le menu. Les mesures de ce point sont le
 cahier des charges.
+
+> **CORRIGÉ en 1.60.4 (5a15368)**, une fois le filet en place — les deux
+> parties : le toast quitte la zone désignée pendant le tour
+> (`body:has(.tut-overlay) .toast{bottom:130px}`, une règle CSS, zéro
+> ligne de moteur) et le halo suit le menu de variantes (`step.follow`,
+> ~16 lignes dans `_bindAdvance()`). Pas de délai fixe : le menu s'ouvre
+> SYNCHRONIQUEMENT dans le handler délégué, l'attente est une sonde
+> bornée (tick 90 ms, plafond 1,2 s), vérifiée à CPU ×6. TDD complet :
+> deux assertions vues rouges avant, vert trois fois, deux contrôles
+> négatifs inverses vus rouges. Le contournement de 8 s du script est
+> devenu LE GARDE : s'il échoue à « Direction les stats », c'est le CSS
+> qui a régressé. Revérifié vert sur HEAD après le changement de casque
+> (1.63.2).
 
 ---
 
