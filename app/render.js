@@ -4,7 +4,7 @@
 import { DEBUG, log } from './logger.js';
 import { t, tEsc, escapeHtml, safeImagePath, setSafeHTML } from './i18n.js';
 import {
-  CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityChipClass, rarityChipStyle,
+  CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, RARITY_KEYS, TYPE_BADGE_RARITY, TYPE_BADGE_STYLES, rarityChipClass, rarityChipStyle,
   CATS, CIRCUIT_SVGS, DRIVER_NUMBERS, TEAM_COLORS, TEAM_MONOGRAMS, TEAM_LIVERIES, sortTypesCanonical,
   seasonCatalogueState, _currentSeason
 } from './data.js';
@@ -12,7 +12,7 @@ import { icon, typeIcon, HELMET_SVG } from './icons.js';
 import {
   getTypeData, setTypeData,
   cardOwned, cardWishlist, cardDoubles, cardFavorite, cardTotalQty,
-  cardSetComplete, cardRarity, variantRarity,
+  cardSetComplete, cardRarity, variantRarity, nextTierInfo,
   quickAddVariant, undoQuickAdd, txBatch
 } from './storage.js';
 import { updateStats, renderStats } from './stats.js';
@@ -726,7 +726,45 @@ function _renderModalTags(card){
     }
     rarEl.appendChild(rt);
   }
+  _renderNextTier(card);
   _renderModalStatus(card);
+}
+
+/* ── LE CRAN SUIVANT (1.65.0) — rareté et palier EMPILÉS (règle i18n :
+   « ULTRASELTEN » ne tient pas à côté de « STUFE 4/7 »), puis la ligne
+   qui dit ce qui fait monter. Rafraîchi par _renderModalTags à chaque
+   changement de quantité : la promesse suit la collection en direct.
+   Le calcul vit dans storage.js (nextTierInfo) ; ici, les phrases.
+
+   LE PLAFOND N'AFFICHE JAMAIS UNE LIGNE VIDE : une carte au maximum
+   (éternel, ou set complet sans variante au-dessus) dit qu'elle y est —
+   c'est le cas le moins visible et le premier testé (next-tier.test.js). */
+function _joinTypeNames(ids){
+  const names = ids.map(_typeLabel);
+  const sep = t('nx.sep'), or = t('nx.or');
+  if(names.length === 1) return names[0];
+  return names.slice(0, -1).join(sep) + or + names[names.length - 1];
+}
+function _renderNextTier(card){
+  const tierEl = document.getElementById('moTier');
+  const nextEl = document.getElementById('moNext');
+  if(!tierEl || !nextEl) return;
+  const info = nextTierInfo(card);
+  tierEl.textContent = t('mo.tier', { n: (RARITY_ORDER[info.cur] ?? 0) + 1, max: RARITY_KEYS.length });
+  if(info.kind === 'top' || info.kind === 'ceiling'){
+    nextEl.className = 'mo-next is-top';
+    nextEl.textContent = t(info.kind === 'top' ? 'nx.top' : 'nx.ceiling');
+    return;
+  }
+  // types / set — la couleur de la ligne est celle du palier VISÉ.
+  const rar = RARITIES[info.next] || {};
+  nextEl.className = 'mo-next';
+  nextEl.style.setProperty('--next-c', rar.color || 'var(--red)');
+  const head = t('nx.next', { r: `<span class="nx-r">${t('rar.' + info.next) || rar.label || info.next}</span>` });
+  const body = info.kind === 'types'
+    ? t('nx.types', { list: _joinTypeNames(info.types) })
+    : t('nx.set', { list: _joinTypeNames(info.missing) });
+  nextEl.innerHTML = `<b>${head}</b> ${body}`;
 }
 
 /* At-a-glance state of the card — owned / doubles / wishlist / favourite.

@@ -8,7 +8,8 @@ import { deniedForViewer } from './session.js';
 import { t, tEsc, setSafeHTML } from './i18n.js';
 import {
   _currentSeason, switchSeason,
-  CARDS_DB, CARD_TYPES, RARITY_ORDER, RARITY_KEYS, ROLE_BASE_RARITY
+  CARDS_DB, CARD_TYPES, RARITY_ORDER, RARITY_KEYS, ROLE_BASE_RARITY,
+  sortTypesCanonical
 } from './data.js';
 import { updateStats } from './stats.js';
 import { renderCollection, showToast } from './render.js';
@@ -252,6 +253,33 @@ export function cardRarity(card){
     return RARITY_KEYS[Math.min(RARITY_ORDER[best]+1, RARITY_KEYS.length-1)];
   }
   return best;
+}
+
+/* ── LE CRAN SUIVANT (1.65.0) — ce qui ferait monter la carte d'un
+   palier. C'est l'INVERSION de variantRarity : au lieu de « que vaut ce
+   que je possède », « qu'est-ce qui vaudrait plus ».
+
+   Quatre issues, dans l'ordre où on les teste :
+   · top     — la carte est à l'éternel : dernier palier, rien à promettre.
+   · types   — des types manquants dont variantRarity dépasse le palier
+               actuel existent : les acquérir fait monter.
+   · set     — aucun type seul ne suffit, mais le set est incomplet :
+               le compléter fait +1 (cardRarity), et c'est mécaniquement
+               le palier suivant — les types manquants valent ≤ actuel.
+   · ceiling — set complet et rien au-dessus : le plafond STRUCTUREL de
+               cette carte (un GP 4 couleurs plafonne à mythique). C'est
+               le cas que personne ne teste — il est testé en premier.
+
+   Pure (aucun DOM) : le rendu vit dans render.js, les phrases en i18n. */
+export function nextTierInfo(card){
+  const cur = cardRarity(card);
+  const curIdx = RARITY_ORDER[cur] ?? 0;
+  if(curIdx >= RARITY_KEYS.length - 1) return { cur, kind: 'top' };
+  const has = t => { const d = getTypeData(card.id, t); return d.owned && (d.qty||0) > 0; };
+  const raising = card.types.filter(t => !has(t) && (RARITY_ORDER[variantRarity(card, t)] ?? 0) > curIdx);
+  if(raising.length) return { cur, kind: 'types', next: RARITY_KEYS[curIdx+1], types: sortTypesCanonical(raising) };
+  if(!cardSetComplete(card.id)) return { cur, kind: 'set', next: RARITY_KEYS[curIdx+1], missing: sortTypesCanonical(card.types.filter(t => !has(t))) };
+  return { cur, kind: 'ceiling' };
 }
 
 /* ══════════════════════════════════════════════════════════ EXPORT */

@@ -1250,6 +1250,16 @@ body.viewer-mode .mo-type-rows .mqbtn { opacity:0.35;pointer-events:none; }
   color:var(--tx2);margin-bottom:var(--space-3);padding-top:var(--space-3);
   border-top:1px solid var(--border);
 }
+/* ── LE CRAN SUIVANT (1.65.0) — rareté et palier EMPILÉS (règle i18n :
+   l'allemand ne tient pas côte à côte), puis la ligne de montée.
+   Le liseré porte la couleur du palier VISÉ ; les plafonds passent à
+   l'or, sans promesse. */
+.mo-tier{font-family:var(--font-d);font-weight:700;font-size:11px;letter-spacing:1px;color:var(--tx3);text-transform:uppercase;margin:4px 0 0;}
+.mo-next{border-left:3px solid var(--next-c,var(--red));border-radius:0 10px 10px 0;background:var(--surface2);padding:8px 12px;margin:10px 0 2px;font-size:12.5px;line-height:1.55;color:var(--tx2);}
+.mo-next b{color:var(--tx1);}
+.mo-next .nx-r{color:var(--next-c,var(--tx1));font-weight:700;}
+.mo-next.is-top{border-left-color:var(--gold);}
+
 /* ── LA MATRICE 4×4 (1.64.0) — 4 colonnes de couleur × 4 familles.
    Colonnes = icônes (règle i18n : jamais d'abréviation traduite).
    Rangées = famille en toutes lettres, retour à la ligne autorisé.

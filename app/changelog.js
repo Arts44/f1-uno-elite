@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.65.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['The card sheet now tells you what raises the card one tier: which foil to hunt, or that completing the set is the only way up — and a card at its ceiling says so honestly instead of promising nothing. The rarity name and its tier now stack, so they fit in every language.'],
+      fr: ['La fiche carte dit désormais ce qui la fait monter d’un palier : quel foil chasser, ou que compléter le set est la seule voie — et une carte au plafond le dit honnêtement au lieu de ne rien promettre. Le nom de rareté et son palier s’empilent désormais, pour tenir dans toutes les langues.'],
+      es: ['La ficha de carta dice ahora qué la hace subir un nivel: qué foil buscar, o que completar el set es la única vía — y una carta en su techo lo dice honestamente en vez de no prometer nada. El nombre de rareza y su nivel ahora se apilan, para caber en todos los idiomas.'],
+      zh: ['卡片详情现在会告诉你是什么能让卡片升一阶：该追寻哪种闪卡，或者集齐整套是唯一的升阶之路——已达上限的卡片会如实说明，而不是不作任何说明。稀有度名称与阶级现在上下排列，以适应所有语言。'],
+      it: ['La scheda carta dice ora cosa la fa salire di un livello: quale foil cercare, o che completare il set è l’unica via — e una carta al suo tetto lo dice onestamente invece di non promettere nulla. Il nome di rarità e il suo livello ora si impilano, per stare in tutte le lingue.'],
+      nl: ['De kaartfiche vertelt nu wat de kaart een niveau hoger brengt: welke foil te zoeken, of dat het voltooien van het set de enige weg omhoog is — en een kaart aan zijn plafond zegt dat eerlijk in plaats van niets te beloven. De zeldzaamheidsnaam en het niveau staan nu onder elkaar, zodat ze in elke taal passen.'],
+      de: ['Das Kartenblatt sagt jetzt, was die Karte eine Stufe höher bringt: welches Foil zu jagen ist, oder dass nur das Vervollständigen des Sets nach oben führt — und eine Karte an ihrer Obergrenze sagt das ehrlich, statt nichts zu versprechen. Seltenheitsname und Stufe stehen jetzt übereinander, damit sie in jeder Sprache passen.'],
+    },
+  },
+  {
     version: '1.64.0',
     date: '2026-08-18',
     changes: {

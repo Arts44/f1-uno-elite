@@ -16,7 +16,10 @@ describe('styles.css custom properties', () => {
   // --c1/--c2 : couleurs de livrée posées inline par liveryHTML() (render.js).
   // --tut-arrow : décalage de la flèche de l'infobulle, calculé sur le
   //   centre du halo à chaque étape (tutorial.js, _positionBubble).
-  const RUNTIME_SET = new Set(['--tc', '--rarc', '--px', '--py', '--dur', '--delay', '--logo-bg', '--c1', '--c2', '--tut-arrow']);
+  // --next-c : couleur du palier VISÉ par la ligne « cran suivant »,
+  //   posée par _renderNextTier (render.js) depuis RARITIES — une
+  //   couleur de données, pas de thème.
+  const RUNTIME_SET = new Set(['--tc', '--rarc', '--px', '--py', '--dur', '--delay', '--logo-bg', '--c1', '--c2', '--tut-arrow', '--next-c']);
 
   test('every var(--token) used is defined somewhere (or set at runtime)', () => {
     const defined = new Set([...css.matchAll(/(--[\w-]+)\s*:/g)].map(m => m[1]));
