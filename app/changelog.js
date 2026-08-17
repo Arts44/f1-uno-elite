@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.63.2',
+    date: '2026-08-17',
+    changes: {
+      en: ['The helmet now sits at the same horizontal position on all 101 cards, optically centred between the livery bar and a fixed number column — it used to drift with the width of each driver number. Centred on the drawing\'s true visual weight, not its bounding box: a three-quarter helmet leans right, and the maths account for it.'],
+      fr: ['Le casque occupe désormais la même position horizontale sur les 101 cartes, centré optiquement entre la barre de livrée et une colonne de numéro fixe — il dérivait auparavant selon la largeur du numéro de chaque pilote. Centré sur le poids visuel réel du dessin, pas sur sa boîte : un casque de trois-quarts penche à droite, et le calcul en tient compte.'],
+      es: ['El casco ocupa ahora la misma posición horizontal en las 101 cartas, centrado ópticamente entre la barra de librea y una columna de número fija — antes derivaba según el ancho del número de cada piloto. Centrado en el peso visual real del dibujo, no en su caja: un casco de tres cuartos se inclina a la derecha, y el cálculo lo tiene en cuenta.'],
+      zh: ['头盔现在在全部 101 张卡片上处于相同的水平位置，在涂装条与固定宽度的号码栏之间实现视觉居中——此前它会随每位车手号码的宽度而漂移。居中基于图形真实的视觉重心而非外框：四分之三视角的头盔重心偏右，计算已将此纳入。'],
+      it: ['Il casco occupa ora la stessa posizione orizzontale su tutte le 101 carte, centrato otticamente tra la barra della livrea e una colonna numero fissa — prima derivava con la larghezza del numero di ogni pilota. Centrato sul peso visivo reale del disegno, non sulla sua scatola: un casco di tre quarti pende a destra, e il calcolo ne tiene conto.'],
+      nl: ['De helm staat nu op alle 101 kaarten op dezelfde horizontale positie, optisch gecentreerd tussen de kleurbalk en een vaste nummerkolom — voorheen verschoof hij met de breedte van elk rijdersnummer. Gecentreerd op het echte visuele gewicht van de tekening, niet op zijn kader: een driekwarthelm helt naar rechts, en de berekening houdt daar rekening mee.'],
+      de: ['Der Helm sitzt jetzt auf allen 101 Karten an derselben horizontalen Position, optisch zentriert zwischen Lackierungsbalken und einer festen Nummernspalte — zuvor wanderte er mit der Breite der jeweiligen Fahrernummer. Zentriert auf das echte visuelle Gewicht der Zeichnung, nicht auf ihren Rahmen: ein Dreiviertelhelm neigt nach rechts, und die Rechnung berücksichtigt das.'],
+    },
+  },
+  {
     version: '1.63.1',
     date: '2026-08-17',
     changes: {

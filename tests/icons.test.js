@@ -256,6 +256,15 @@ describe('casque — une seule géométrie', () => {
         `${f} : l'ancien galet ne doit pas rester dans le symbol cuit`);
     }
   });
+  test('le centre optique reste 0.5475 — le centroïde MESURÉ, pas le centre de boîte', () => {
+    /* Un casque trois-quarts est asymétrique : son encre pèse à droite
+       (centroïde rasterisé : 65,7/120 = 0.5475). Quelqu'un qui
+       « corrigerait » vers 0.5 centrerait la boîte et décalerait le
+       dessin — même famille que le plancher de --card-h. */
+    const css = readFileSync(new URL('../app/styles.css', import.meta.url), 'utf8');
+    assert.match(css, /--helm-cx:0\.5475;/, 'le centre optique est une mesure, pas un réglage');
+    assert.ok(!/--helm-cx:0\.5[;}]/.test(css), '0.5 serait le centre de BOÎTE — faux pour un trois-quarts');
+  });
   test('l\'ancien dessin stroke de la catégorie a bien disparu', () => {
     assert.ok(!src.includes('M3.7 14.3a8.3'),
       'le troisième dessin (icône de catégorie au trait) ne doit pas revenir');
