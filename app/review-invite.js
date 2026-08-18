@@ -130,6 +130,10 @@ function _zoneOccupee(){
   if(b) return true;
   const inst = document.querySelector('.install-banner');
   if(inst) return true;
+  // La célébration de palier (1.67.0) : la file la garantit déjà
+  // (l'invitation ne tire que file vide, et la célébration la tient),
+  // mais la ceinture est explicite — même famille que le tut-overlay.
+  if(document.getElementById('tierCele')) return true;
   return !!document.querySelector('.tut-overlay');
 }
 

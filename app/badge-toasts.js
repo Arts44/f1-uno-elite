@@ -24,11 +24,12 @@
    rAF ne tourne pas dans un onglet en arrière-plan, le toast ne serait
    jamais monté à l'écran au retour.
    ══════════════════════════════════════════════════════════ */
-import { t } from './i18n.js';
-import { AUTO_BADGES, badgeTr } from './data.js';
+import { t, tEsc } from './i18n.js';
+import { AUTO_BADGES, badgeTr, CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, RARITY_KEYS, DRIVER_NUMBERS, sortTypesCanonical } from './data.js';
 import { switchView } from './render.js';
 import { autoBadgeUnlocked, saveManualBadges } from './badges-store.js';
 import { evaluateBadgeCondition } from './badge-rules.js';
+import { getTypeData, cardRarity, cardSetComplete, variantRarity } from './storage.js';
 
 
 export function _celebrate(tile){
@@ -71,6 +72,7 @@ export function groupBadgeToastLabel(names, tf = t){
 
 const _toastQueue = [];
 let _toastShowing = false;
+let _celeOpen = false;   // la célébration de palier tient la file (voir plus bas)
 export function queueBadgeToasts(badges, opts = {}){
   if(!badges.length) return;
   _toastQueue.push({ badges, navigate: opts.navigate !== false });
@@ -78,6 +80,12 @@ export function queueBadgeToasts(badges, opts = {}){
 }
 function _drainToastQueue(){
   if(_toastShowing || !_toastQueue.length) return;
+  // La célébration de palier TIENT la file : les badges tombés dans le
+  // même geste s'annoncent dedans (« + N badges »), puis se déroulent en
+  // toasts après sa fermeture — jamais par-dessus. C'est ce qui garde
+  // les trois garanties de l'invitation d'avis (file vide = tout est
+  // retombé, célébration comprise).
+  if(_celeOpen){ setTimeout(_drainToastQueue, 800); return; }
   // le toast standard (Annuler…) est prioritaire : repasser après lui
   const std = document.getElementById('toast');
   if(std && std.classList.contains('show')){ setTimeout(_drainToastQueue, 1200); return; }
@@ -117,6 +125,120 @@ function _drainToastQueue(){
       }
     }, 400);
   }, 2800);
+}
+
+/* ══════════════════════════════════════════════════════════
+   LA CÉLÉBRATION DE PALIER (1.67.0) — ce qui se fête n'est pas le
+   badge, c'est la CARTE qui change de matière. Elle vit ICI, avec la
+   file, parce qu'elle en fait partie : elle la tient ouverte
+   (_celeOpen) et annonce ce qui suit (« + N badges »).
+
+   SANS MOUVEMENT, par construction : le tampon est déjà posé, aucune
+   animation d'entrée, aucun confetti — prefers-reduced-motion n'a rien
+   à neutraliser (vérifié animationName === 'none', pas affirmé). Seule
+   la matière tv-* du nouveau palier vit sa vie habituelle de tuile.
+
+   QUAND ELLE NE PART PAS — les trois cas de la revue, dans l'ordre :
+   1. TUTORIEL : un plein écran par-dessus la visite guidée serait le
+      défaut du n°17 ; garde explicite sur .tut-overlay, testé.
+   2. IMPORT / pull cloud : structurellement impossible — les DEUX seuls
+      appelants sont les gestes (changeMoQty, quickAddType, render.js),
+      jamais setTypeData ; restaurer une sauvegarde n'y passe pas. Un
+      test compte les appelants. (Le journal du chantier 5, accroché à
+      setTypeData, aura LUI besoin d'un drapeau de suspension — pas la
+      célébration : le point d'accroche fait le garde.)
+   3. SPECTATEUR : les deux gestes sont dans VIEWER_BLOCKED (app.js).
+   Et JAMAIS pour un simple +1 : seuil = montée de palier réelle
+   (RARITY_ORDER strictement croissant), le set complété n'étant qu'une
+   montée comme une autre (cardRarity porte le bonus).
+   ══════════════════════════════════════════════════════════ */
+export function showTierCelebration(card, beforeKey, afterKey){
+  if(document.querySelector('.tut-overlay')) return false;   // cas 1 — jamais sur le tour
+  if(document.getElementById('tierCele')) return false;      // une seule à la fois
+  const rar = RARITIES[afterKey] || {};
+  const setDone = cardSetComplete(card.id);
+  const isEternal = afterKey === 'eternal';
+  // Le type qui a fait monter : le meilleur possédé au nouveau palier
+  // (ordre canonique). Pour un set complété, c'est le set qui monte.
+  const afterIdx = RARITY_ORDER[afterKey] ?? 0;
+  const risers = sortTypesCanonical(card.types.filter(ty => {
+    const d = getTypeData(card.id, ty);
+    return d.owned && (d.qty||0) > 0 && (RARITY_ORDER[variantRarity(card, ty)] ?? 0) >= afterIdx;
+  }));
+  // Un type possédé au nouveau palier = c'est lui qui a fait monter ;
+  // sinon la montée vient du bonus set complet (seule autre voie).
+  const kind = risers.length ? 'type' : 'set';
+  const tyLabel = risers.length ? (() => { const k = 'type.' + risers[0], l = t(k); return l === k ? (CARD_TYPES[risers[0]]?.label || risers[0]) : l; })() : '';
+  const atTier = CARDS_DB.filter(c => cardRarity(c) === afterKey).length;
+  // DRIVER_NUMBERS : { n, cls } — c'est `n` qu'on affiche, pas l'objet.
+  const num = DRIVER_NUMBERS[card.name]?.n ?? `#${card.id}`;
+  const stars = isEternal ? '✦'.repeat(rar.stars || 7) : '★'.repeat(rar.stars || 1);
+
+  _celeOpen = true;
+  const el = document.createElement('div');
+  el.id = 'tierCele';
+  el.className = 'tier-cele';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  el.setAttribute('aria-label', t(kind === 'set' ? 'cele.kicker_set' : 'cele.kicker'));
+  el.innerHTML = `
+    <div class="tier-card">
+      <div class="tier-stamp">${t(kind === 'set' ? 'cele.kicker_set' : 'cele.kicker')}</div>
+      <div class="modal-visual ${risers.length ? CARD_TYPES[risers[0]].css : ''} tier-visual"${isEternal ? ' data-eternal' : ''}><span class="tv-num">${num}</span></div>
+      <div class="tier-id">#${card.id} · ${card.category ? card.category.toUpperCase() : ''}</div>
+      <div class="tier-name"></div>
+      <div class="tier-rar">
+        <span class="mtag mtag-rarity" style="color:${rar.color};background:color-mix(in srgb,${rar.color} 11%,transparent);">${stars} ${t('rar.' + afterKey) || rar.label}</span>
+        <span class="mo-tier">${tEsc('mo.tier', { n: afterIdx + 1, max: RARITY_KEYS.length })}</span>
+      </div>
+      <div class="tier-line">${kind === 'set'
+        ? tEsc('cele.line_set', { e: card.types.length })
+        : tEsc('cele.line_type', { ty: tyLabel })}
+        ${tEsc('cele.count', { n: atTier, r: t('rar.' + afterKey) || rar.label })}</div>
+      <div class="tier-queue" id="tcQueue" hidden></div>
+      <div class="tier-actions">
+        <button class="setv-btn" id="tcSee" type="button" hidden>${t('cele.see')}</button>
+        <button class="setv-btn primary" id="tcGo" type="button">${t('cele.continue')}</button>
+      </div>
+    </div>`;
+  el.querySelector('.tier-name').textContent = card.name;   // donnée, jamais en gabarit
+  document.body.appendChild(el);
+
+  const close = () => {
+    _celeOpen = false;
+    el.remove();
+    document.removeEventListener('keydown', onKey);
+    _drainToastQueue();   // les badges retenus se déroulent maintenant
+  };
+  const onKey = e => {
+    if(e.key === 'Escape'){ close(); return; }
+    if(e.key === 'Tab'){                       // focus piégé entre les deux boutons
+      const btns = [...el.querySelectorAll('button:not([hidden])')];
+      if(!btns.length) return;
+      const i = btns.indexOf(document.activeElement);
+      e.preventDefault();
+      btns[(i + (e.shiftKey ? -1 : 1) + btns.length) % btns.length].focus();
+    }
+  };
+  document.addEventListener('keydown', onKey);
+  el.querySelector('#tcGo').addEventListener('click', close);
+  el.querySelector('#tcSee').addEventListener('click', () => { close(); switchView('badges'); });
+  el.querySelector('#tcGo').focus();
+  return true;
+}
+
+/* Appelé APRÈS updateStats() par les deux gestes : les badges du même
+   geste sont alors dans la file (retenue par _celeOpen) — la ligne
+   « + N badges » peut dire la vérité. */
+export function refreshTierCeleBadges(){
+  const el = document.getElementById('tierCele');
+  if(!el) return;
+  const n = _toastQueue.reduce((s, q) => s + q.badges.length, 0);
+  const q = el.querySelector('#tcQueue'), see = el.querySelector('#tcSee');
+  if(n > 0){
+    q.hidden = false; q.textContent = t('cele.queue', { n });
+    see.hidden = false;
+  }
 }
 
 // Détecte les transitions verrouillé → débloqué depuis la dernière

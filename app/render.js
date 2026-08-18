@@ -17,6 +17,7 @@ import {
 } from './storage.js';
 import { updateStats, renderStats } from './stats.js';
 import { renderBadges, resetHeroAnimation } from './badges.js';
+import { showTierCelebration, refreshTierCeleBadges } from './badge-toasts.js';
 import { renderSettings, showAdminPinScreen } from './pin.js';
 import { isViewer } from './session.js';
 import { renderAccount } from './account.js';
@@ -828,6 +829,11 @@ function updateModalVisual(card){
 }
 
 export function changeMoQty(cardId, typeId, delta){
+  const card=CARDS_DB.find(c=>c.id===cardId);
+  // Célébration de palier (1.67.0) : avant/après autour de l'écriture,
+  // rien de plus — le geste est le SEUL point d'accroche (un import ne
+  // passe jamais ici, voir badge-toasts.js).
+  const rarBefore=card?cardRarity(card):null;
   const d=getTypeData(cardId,typeId);
   const newQty=Math.max(0,(d.qty||0)+delta);
   txBatch(()=>{
@@ -841,11 +847,16 @@ export function changeMoQty(cardId, typeId, delta){
   if(el) el.textContent=newQty;
   // refresh total in moInfo
   document.querySelector('#moInfo .mib:last-child .mib-v').textContent=cardTotalQty(cardId);
-  const card=CARDS_DB.find(c=>c.id===cardId);
   renderModalTypes(card);
   updateModalVisual(card);
   _renderModalTags(card);
+  // OUVERTE AVANT updateStats : la file des toasts (alimentée par
+  // checkNewAutoBadges dans updateStats) doit trouver _celeOpen posé,
+  // sinon un toast partirait sous l'écran de célébration.
+  const rarAfter=cardRarity(card);
+  if(rarBefore && RARITY_ORDER[rarAfter] > RARITY_ORDER[rarBefore]) showTierCelebration(card, rarBefore, rarAfter);
   updateStats(); updateCardTile(cardId);
+  refreshTierCeleBadges();   // la ligne « + N badges » dit alors la vérité
 }
 
 export function closeMo(){ document.getElementById('mo').classList.remove('open'); currentCardId=null; }
@@ -1155,12 +1166,25 @@ export function closeQuickAdd(target){
 
 export function quickAddType(cardId, typeId){
   dismissQuickAddHint();
+  const card=CARDS_DB.find(c=>c.id===cardId);
+  const rarBefore=card?cardRarity(card):null;
   const prev=quickAddVariant(cardId, typeId);
-  showToast(t('quick.added'), {
-    actionLabel:t('quick.undo'),
-    onAction:()=>{ undoQuickAdd(cardId, typeId, prev); updateStats(); updateCardTile(cardId); }
-  });
+  const rarAfter=card?cardRarity(card):null;
+  const rose=rarBefore && RARITY_ORDER[rarAfter] > RARITY_ORDER[rarBefore];
+  if(rose){
+    // La célébration REMPLACE le toast « exemplaire ajouté » : elle
+    // confirme le geste bien plus fort, et un Annuler sous un plein
+    // écran serait inatteignable. Défaire reste possible par la fiche
+    // (−). C'est le geste qu'on ne veut justement pas annuler.
+    showTierCelebration(card, rarBefore, rarAfter);
+  } else {
+    showToast(t('quick.added'), {
+      actionLabel:t('quick.undo'),
+      onAction:()=>{ undoQuickAdd(cardId, typeId, prev); updateStats(); updateCardTile(cardId); }
+    });
+  }
   updateStats(); updateCardTile(cardId); // la tuile remplacée emporte son popover
+  if(rose) refreshTierCeleBadges();
 }
 
 /* TOAST — msg simple, ou avec bouton d'action ({actionLabel, onAction}) */

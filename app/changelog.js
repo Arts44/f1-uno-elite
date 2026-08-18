@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.67.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['When a card climbs a tier — a foil found, or its set completed — the app now celebrates the card itself: a full-screen still of the card in its new material, the stamp already placed, with the badges earned in the same move announced below. No motion by design, so it respects reduced-motion preferences by construction. Never for a simple +1.'],
+      fr: ['Quand une carte monte d’un palier — un foil trouvé, ou son set complété — l’app célèbre désormais la carte elle-même : un plein écran de la carte dans sa nouvelle matière, le tampon déjà posé, avec les badges gagnés dans le même geste annoncés dessous. Aucun mouvement par choix, donc compatible avec la préférence « réduire les animations » par construction. Jamais pour un simple +1.'],
+      es: ['Cuando una carta sube un nivel — un foil encontrado, o su set completado — la app celebra ahora la carta misma: una pantalla completa de la carta en su nuevo material, el sello ya puesto, con las insignias ganadas en el mismo gesto anunciadas debajo. Sin movimiento por elección, compatible por construcción con la preferencia de reducir animaciones. Nunca por un simple +1.'],
+      zh: ['当一张卡片升阶——找到一张闪卡，或集齐一套——应用现在庆祝的是卡片本身：全屏展示卡片的新材质，印章已经盖好，同一操作中获得的徽章在下方一并宣布。特意不使用任何动画，因此天然兼容「减少动态效果」偏好。简单的 +1 绝不会触发。'],
+      it: ['Quando una carta sale di livello — un foil trovato, o il suo set completato — l’app celebra ora la carta stessa: uno schermo intero della carta nel suo nuovo materiale, il timbro già posato, con i distintivi guadagnati nello stesso gesto annunciati sotto. Nessun movimento per scelta, quindi compatibile per costruzione con la preferenza di ridurre le animazioni. Mai per un semplice +1.'],
+      nl: ['Wanneer een kaart een niveau stijgt — een foil gevonden, of het set voltooid — viert de app nu de kaart zelf: een volledig scherm van de kaart in zijn nieuwe materiaal, de stempel al geplaatst, met de badges uit dezelfde handeling eronder aangekondigd. Bewust zonder beweging, dus per constructie verenigbaar met de voorkeur voor minder animaties. Nooit voor een simpele +1.'],
+      de: ['Wenn eine Karte eine Stufe aufsteigt — ein Foil gefunden, oder ihr Set vervollständigt — feiert die App jetzt die Karte selbst: ein Vollbild der Karte in ihrem neuen Material, der Stempel bereits gesetzt, mit den im selben Zug verdienten Abzeichen darunter angekündigt. Bewusst ohne Bewegung, daher konstruktionsbedingt verträglich mit der Einstellung „Animationen reduzieren“. Nie für ein einfaches +1.'],
+    },
+  },
+  {
     version: '1.66.0',
     date: '2026-08-18',
     changes: {
