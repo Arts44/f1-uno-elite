@@ -16,7 +16,7 @@ import { log } from './logger.js';
 import { t, getLang } from './i18n.js';
 import { CHANGELOG, APP_VERSION, compareVersions, entriesSince, changesFor } from './changelog.js';
 import { icon } from './icons.js';
-import { quandLeMomentEstBon, peutAfficherSurcouche } from './moment.js';
+import { demanderLaZone, libererLaZone, zoneBasse, RANG } from './moment.js';
 
 const SEEN_KEY = 'f1uno_seen_version';
 const CHECK_EVERY_MS = 60 * 60 * 1000; // hourly while the app stays open
@@ -94,6 +94,7 @@ function _checkForUpdate(){
 export function applyUpdate(){
   const waiting = _reg && _reg.waiting;
   _removeUpdateBanner();
+  libererLaZone('maj');
   if(waiting){
     _reloading = true;
     waiting.postMessage({ type: 'SKIP_WAITING' });
@@ -189,17 +190,27 @@ export function peutReproposer(maintenant, fermeA, silenceMs = SILENCE_APRES_FER
 function _fermerBanniere(){
   _fermeA = Date.now();
   _removeUpdateBanner();
+  libererLaZone('maj');
 }
 
+/* DEMANDEUR et POSEUR sont séparés depuis 1.77.0 : la file de
+   moment.js rappelle `_poserBanniere` quand la zone se libère, et
+   `_showUpdateBanner` ne fait plus que poser la demande. Sans cette
+   séparation, l'entrée rappelée redemanderait la zone en boucle.
+
+   LE BANDEAU ATTEND LA FIN DE LA MISE EN ROUTE — mesuré au premier
+   lancement : présent 6 fois sur 6, ATTEIGNABLE 0 fois sur 6.
+   C'est désormais la file qui tient cette règle, pour les sept
+   surfaces au lieu d'une. */
 function _showUpdateBanner(){
   if(document.getElementById('updateBanner')) return;
   if(!peutReproposer(Date.now(), _fermeA)) return;
-  /* LE BANDEAU ATTEND LA FIN DE LA MISE EN ROUTE. Mesuré au premier
-     lancement : présent 6 fois sur 6, ATTEIGNABLE 0 fois sur 6 —
-     l'écran de langue/PIN interceptait les clics. Un bandeau qu'on ne
-     peut pas toucher n'existe pas. La règle est partagée avec la fiche
-     d'échange reçue (moment.js), qui souffrait du même défaut. */
-  if(!peutAfficherSurcouche()){ quandLeMomentEstBon(_showUpdateBanner); return; }
+  demanderLaZone({ id: 'maj', rang: RANG.maj, selecteur: '#updateBanner',
+                   montrer: _poserBanniere, cacher: _removeUpdateBanner });
+}
+
+function _poserBanniere(){
+  if(document.getElementById('updateBanner')) return;
   const b = document.createElement('div');
   b.className = 'install-banner update-banner';
   b.id = 'updateBanner';
@@ -209,7 +220,7 @@ function _showUpdateBanner(){
     <span class="install-banner-text">${t('upd.banner')}</span>
     <button class="install-banner-btn" id="updateReloadBtn" type="button">${t('upd.reload')}</button>
     <button class="install-banner-close" id="updateCloseBtn" type="button" aria-label="${t('upd.later')}">✕</button>`;
-  document.body.appendChild(b);
+  zoneBasse().appendChild(b);
   document.getElementById('updateReloadBtn').addEventListener('click', applyUpdate);
   document.getElementById('updateCloseBtn').addEventListener('click', _fermerBanniere);
 }
@@ -232,6 +243,21 @@ export function maybeOfferWhatsNew(){
   markVersionSeen();
   if(_whatsNewOffered || !entries.length || document.getElementById('whatsNewBanner')) return;
   _whatsNewOffered = true;
+  /* IL N'AVAIT AUCUN GARDE. Son jumeau `_showUpdateBanner` attendait la
+     fin de la mise en route depuis 1.76.0 ; celui-ci s'affichait en
+     plein tutoriel — mesuré, capture à l'appui, avant la refonte
+     (POINTS-SIGNALES n°26). La file le corrige au passage. */
+  _entreesWhatsNew = entries;
+  demanderLaZone({ id: 'nouveautes', rang: RANG.nouveautes, selecteur: '#whatsNewBanner',
+                   montrer: _poserNouveautes, cacher: _removeWhatsNewBanner });
+}
+
+let _entreesWhatsNew = [];
+function _removeWhatsNewBanner(){ document.getElementById('whatsNewBanner')?.remove(); }
+
+function _poserNouveautes(){
+  const entries = _entreesWhatsNew;
+  if(document.getElementById('whatsNewBanner')) return;
   const b = document.createElement('div');
   b.className = 'install-banner update-banner';
   b.id = 'whatsNewBanner';
@@ -241,8 +267,8 @@ export function maybeOfferWhatsNew(){
     <span class="install-banner-text">${t('upd.updated')}</span>
     <button class="install-banner-btn" id="whatsNewSeeBtn" type="button">${t('upd.whatsnew')}</button>
     <button class="install-banner-close" id="whatsNewCloseBtn" type="button" aria-label="${t('upd.later')}">✕</button>`;
-  document.body.appendChild(b);
-  const close = () => b.remove();
+  zoneBasse().appendChild(b);
+  const close = () => { b.remove(); libererLaZone('nouveautes'); };
   document.getElementById('whatsNewSeeBtn').addEventListener('click', () => { close(); openChangelog(entries); });
   document.getElementById('whatsNewCloseBtn').addEventListener('click', close);
 }

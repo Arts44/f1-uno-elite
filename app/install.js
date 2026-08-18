@@ -11,6 +11,7 @@
 import { log } from './logger.js';
 import { t } from './i18n.js';
 import { icon } from './icons.js';
+import { demanderLaZone, libererLaZone, zoneBasse, RANG } from './moment.js';
 
 const DISMISS_KEY = 'f1uno_install_dismissed';
 
@@ -98,6 +99,7 @@ export function initInstall(){
     _deferredPrompt = null;
     log('install: appinstalled');
     _removeBanner();
+    libererLaZone('installation');
     refreshInstallRow();
   });
 }
@@ -160,6 +162,12 @@ export function maybeShowInstallBanner(){
   if(document.getElementById('installBanner')) return;
   const wrapper = document.getElementById('app-wrapper');
   if(!wrapper || wrapper.style.display === 'none') return; // wait for login
+  demanderLaZone({ id: 'installation', rang: RANG.installation, selecteur: '#installBanner',
+                   montrer: _poserBanniere, cacher: _removeBanner });
+}
+
+function _poserBanniere(){
+  if(document.getElementById('installBanner')) return;
   const b = document.createElement('div');
   b.className = 'install-banner';
   b.id = 'installBanner';
@@ -168,15 +176,17 @@ export function maybeShowInstallBanner(){
     <span class="install-banner-text">${t('install.banner')}</span>
     <button class="install-banner-btn" id="installBannerBtn" type="button">${t('install.btn')}</button>
     <button class="install-banner-close" id="installBannerClose" type="button" aria-label="${t('install.later')}">✕</button>`;
-  document.body.appendChild(b);
+  zoneBasse().appendChild(b);
   document.getElementById('installBannerBtn').addEventListener('click', async () => {
     const ok = await promptInstall();
     if(!ok) _dismissBanner(); // declined the native prompt: stop nagging
     _removeBanner();
+    libererLaZone('installation');
   });
   document.getElementById('installBannerClose').addEventListener('click', () => {
     _dismissBanner();
     _removeBanner();
+    libererLaZone('installation');
     log('install: banner dismissed');
   });
 }

@@ -142,7 +142,15 @@
   </div>
 </div>
 
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!-- ZONE BASSE (1.77.0) — un seul point d'amarrage pour toutes les
+     surcouches du bas d'écran. La géométrie appartient au conteneur :
+     aucune de ses surfaces ne porte plus de `bottom`, de `z-index` ni
+     de centrage. L'arbitrage (qui a le droit d'être là) vit dans
+     moment.js ; le toast standard partage la géométrie mais PAS
+     l'arbitrage — il répond à un geste et ne doit jamais attendre. -->
+<div class="zone-basse" id="zoneBasse">
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
 
 <script src="data-embedded.js"></script>
 <script src="translations.js"></script>

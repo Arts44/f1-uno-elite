@@ -332,16 +332,65 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 .lang-name{font-family:var(--font-b);font-size:14px;font-weight:600;color:var(--tx1);}
 @media (prefers-reduced-motion:reduce){.lang-opt:hover{transform:none;}}
 
+/* ══════════════════════════════════════════════════════════
+   ZONE BASSE (1.77.0) — UNE zone, UN propriétaire, UNE règle.
+
+   AVANT : sept surfaces, six règles d'amarrage (24px, 92px, 150px,
+   --nav-clear+6, --nav-clear+8, 14px+zone sûre), une seule qui suivait
+   env(safe-area-inset-bottom), et cinq z-index sans échelle
+   (300/400/401/500/901). Collisions MESURÉES : superposition totale des
+   deux bandeaux, 21 à 47 px entre bandeau et badge-toast, 9 px entre
+   installation et mise à jour à 320, 38 px du toast standard sur la nav.
+
+   APRÈS : un conteneur, un `bottom`, un `z-index`. Les surfaces n'ont
+   plus de position du tout — la mise en page les empile. C'EST CE QUI
+   REND LA HAUTEUR VARIABLE SANS OBJET : un bandeau fait 51 px en
+   français et 67 px en néerlandais à 320 px, et plus aucune constante
+   du dépôt n'en dépend.
+
+   `column-reverse` : le premier enfant du DOM (#toast, statique) se
+   pose EN BAS, au plus près de la nav ; les surcouches ajoutées
+   ensuite s'empilent au-dessus. Aucun code d'ordonnancement.
+
+   `pointer-events` : none sur le conteneur, auto sur ses enfants — les
+   trous entre les surfaces laissent passer les clics vers l'app.
+   ══════════════════════════════════════════════════════════ */
+.zone-basse{position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(var(--nav-clear) + 6px);z-index:400;
+  width:min(480px,calc(100vw - 24px));
+  display:flex;flex-direction:column-reverse;align-items:stretch;gap:var(--space-2);
+  pointer-events:none;}
+.zone-basse > *{pointer-events:auto;}
+
+/* PENDANT LA VISITE GUIDÉE, deux choses à la fois.
+
+   ① La zone monte d'un cran : `.tut-away` occupe le bas (hauteur 34 px
+      DÉCLARÉE plus bas, donc constante légitime : 34 + 8 de gouttière
+      + 6 = 48). Remplace la règle morte
+      `body:has(.tut-overlay) .toast{bottom:130px}`, qui ne traitait
+      qu'UNE des sept surfaces et n'avait plus d'objet.
+
+   ② Rien n'y est cliquable. `.tut-overlay` est `pointer-events:none`
+      (sans quoi le voile bloquerait le défilement automatique) : une
+      surface à z:400 sous un halo à z:900 était donc ÉTEINTE À L'ŒIL
+      ET PLEINEMENT CLIQUABLE — mesuré sur le bandeau d'installation
+      (POINTS-SIGNALES n°25). L'échelle unique aurait généralisé le
+      défaut aux sept ; cette règle le supprime pour les sept d'un coup.
+      Ce qui est grisé est inerte : c'est ce que le halo promet. */
+body:has(.tut-overlay) .zone-basse{bottom:calc(var(--nav-clear) + 48px);}
+body:has(.tut-overlay) .zone-basse,
+body:has(.tut-overlay) .zone-basse > *{pointer-events:none;}
+
 /* ── "Install the app" (PWA) ──
    Settings row bits + a discreet dismissable banner above the bottom
    nav (shown only when the native install prompt is available). */
 .install-ok{font-size:13px;font-weight:600;color:var(--tx2);padding:var(--space-1) 0;}
 .install-ins{font-size:13px;line-height:1.55;color:var(--tx2);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--space-10px) var(--space-3);}
-.install-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:92px;z-index:400;display:flex;align-items:center;gap:var(--space-10px);max-width:min(480px,calc(100vw - 24px));background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);box-shadow:var(--sh-lg);padding:var(--space-2) var(--space-10px) var(--space-2) var(--space-14px);animation:instIn 0.25s ease;}
-@keyframes instIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+.install-banner{display:flex;align-items:center;gap:var(--space-10px);background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-pill);box-shadow:var(--sh-lg);padding:var(--space-2) var(--space-10px) var(--space-2) var(--space-14px);animation:instIn 0.25s ease;}
+@keyframes instIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .install-banner-icon{font-size:18px;line-height:1;}
 .install-banner-text{flex:1;font-size:12.5px;font-weight:600;color:var(--tx1);line-height:1.3;}
-@media (max-width:480px){.install-banner{width:calc(100vw - 24px);border-radius:18px;}}
+@media (max-width:480px){.install-banner{border-radius:18px;}}
 .install-banner-btn{background:var(--red);border:none;color:#fff;font-family:var(--font-b);font-size:12px;font-weight:700;border-radius:var(--r-pill);padding:var(--space-2) var(--space-14px);cursor:pointer;transition:var(--ease);white-space:nowrap;}
 .install-banner-btn:hover{filter:brightness(1.08);}
 .install-banner-close{background:none;border:none;color:var(--tx3);font-size:13px;cursor:pointer;padding:var(--space-6px) var(--space-2);border-radius:50%;transition:var(--ease);line-height:1;}
@@ -351,7 +400,9 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
 /* ── App updates (banner) + changelog dialog + version badge ──
    The update/what's-new pills reuse the install-banner look; when an
    install banner is also present they stack above it. */
-.update-banner{bottom:150px;z-index:401;}
+/* Le bandeau de mise à jour et celui des nouveautés n'ont plus de
+   position propre : la zone les place, la file garantit qu'ils ne
+   s'y trouvent jamais ensemble (POINTS-SIGNALES n°24). */
 /* Soutien — un lien, dans la grammaire des boutons existants. Aucun
    traitement racoleur : ni couleur d'accent, ni pastille, ni animation.
    Le cœur suffit à dire ce que c'est. */
@@ -1424,8 +1475,7 @@ body.viewer-mode .mo-type-rows .mqbtn { opacity:0.35;pointer-events:none; }
    bande NAV_CLEAR du moteur du tutoriel. Le garde est dans
    verify_tutorial.py : si cette règle saute, le parcours échoue à
    « Direction les stats ». */
-body:has(.tut-overlay) .toast{bottom:130px;}
-.toast{position:fixed;bottom:24px;right:24px;background:var(--surface3);color:var(--tx1);border:1px solid var(--border-s);padding:var(--space-10px) var(--space-4);border-radius:12px;font-size:13px;font-weight:500;box-shadow:var(--sh-lg);z-index:500;opacity:0;transform:translateY(8px);transition:all 0.2s;pointer-events:none;}
+.toast{align-self:flex-end;background:var(--surface3);color:var(--tx1);border:1px solid var(--border-s);padding:var(--space-10px) var(--space-4);border-radius:12px;font-size:13px;font-weight:500;box-shadow:var(--sh-lg);opacity:0;transform:translateY(8px);transition:all 0.2s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);pointer-events:auto;}
 .toast-action{margin-left:var(--space-3);border:none;background:none;color:#4CD964;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;padding:0;}
 
@@ -1567,8 +1617,8 @@ body:has(.tut-overlay) .toast{bottom:130px;}
 }
 
 /* toast badge — même anatomie que le toast standard, au-dessus de la nav */
-.badge-toast{position:fixed;left:50%;transform:translate(-50%,16px);bottom:calc(var(--nav-clear) + 6px);z-index:300;display:flex;align-items:center;gap:var(--space-10px);background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-md);padding:var(--space-10px) var(--space-4);box-shadow:var(--sh-lg);opacity:0;pointer-events:none;transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.22,0.9,0.36,1);cursor:pointer;}
-.badge-toast.show{opacity:1;transform:translate(-50%,0);pointer-events:all;}
+.badge-toast{transform:translateY(16px);display:flex;align-items:center;gap:var(--space-10px);background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-md);padding:var(--space-10px) var(--space-4);box-shadow:var(--sh-lg);opacity:0;pointer-events:none;transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.22,0.9,0.36,1);cursor:pointer;}
+.badge-toast.show{opacity:1;transform:translateY(0);pointer-events:all;}
 /* ── Invitation à laisser un avis ──────────────────────────────
    Même grammaire que .badge-toast : elle se pose là où la célébration
    vient de disparaître, avec la même carte et la même ombre. Plus haute,
@@ -1578,15 +1628,13 @@ body:has(.tut-overlay) .toast{bottom:130px;}
    Rien n'est bloquant : aucun voile, aucun piège de focus, l'app
    continue de fonctionner dessous. Une invitation qui empêche
    d'utiliser l'app ne mérite pas de réponse honnête. */
-.rv-invite{position:fixed;left:50%;transform:translate(-50%,16px);
-  bottom:calc(var(--nav-clear) + 6px);z-index:300;
-  width:min(420px, calc(100vw - 28px));box-sizing:border-box;
+.rv-invite{transform:translateY(16px);box-sizing:border-box;
   display:flex;align-items:flex-start;gap:var(--space-3);
   background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-md);
   padding:var(--space-3) var(--space-10px);box-shadow:var(--sh-lg);
   opacity:0;pointer-events:none;
   transition:opacity 0.35s ease,transform 0.35s cubic-bezier(0.22,0.9,0.36,1);}
-.rv-invite.show{opacity:1;transform:translate(-50%,0);pointer-events:all;}
+.rv-invite.show{opacity:1;transform:translateY(0);pointer-events:all;}
 .rv-ic{flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:var(--red-s);
   display:flex;align-items:center;justify-content:center;color:var(--red);}
 .rv-ic .ic{width:17px;height:17px;}
@@ -2276,7 +2324,7 @@ body:has(.tut-overlay) .toast{bottom:130px;}
   display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 var(--space-4);
   border-radius:var(--r-pill);background:var(--red);color:var(--on-red,#fff);
   font:700 12px var(--font-b);box-shadow:var(--sh-md);}
-.tut-away.down{bottom:calc(var(--nav-clear) + 8px);}
+.tut-away.down{bottom:calc(var(--nav-clear) + 6px);}
 .tut-away.up{top:calc(56px + 12px);}
 
 /* Mobile étroit : la bulle doit rester bien sous 40 % de la hauteur

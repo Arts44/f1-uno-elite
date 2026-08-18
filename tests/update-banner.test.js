@@ -64,8 +64,17 @@ describe('② fermer veut dire « pas maintenant », pas « jamais »', () => {
 
 describe('① le bandeau attend un moment où on peut le toucher', () => {
   test('il diffère l’affichage au lieu de se poser derrière un écran', () => {
+    /* CE TEST A CHANGÉ EN 1.77.0 — changement de comportement assumé.
+       Le garde n'est plus écrit dans `_showUpdateBanner` : celui-ci ne
+       fait que DEMANDER la zone, et c'est `demanderLaZone` qui tient la
+       règle du bon moment, pour les sept surfaces au lieu d'une. La
+       garantie mesurée en 1.76.0 — présent 6/6, atteignable 0/6 avant
+       correctif — est inchangée ; son point d'application a bougé. */
     const fn = read('update.js').match(/function _showUpdateBanner\(\)\{[\s\S]*?\n}/)[0];
-    assert.match(fn, /if\(!peutAfficherSurcouche\(\)\)\{ quandLeMomentEstBon\(_showUpdateBanner\); return; \}/);
+    assert.match(fn, /demanderLaZone\(\{ id: 'maj'/);
+    const dz = read('moment.js').match(/export function demanderLaZone[\s\S]*?\n}/)[0];
+    assert.match(dz, /if\(!peutAfficherSurcouche\(\)\)\{ _placer\(e\); _armerSonde\(\); return false; \}/,
+      'sans ce garde dans la file, une surcouche se poserait derrière un écran');
   });
 
   test('la règle est PARTAGÉE avec la fiche reçue — une seule source', () => {

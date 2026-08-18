@@ -25,6 +25,7 @@
    jamais monté à l'écran au retour.
    ══════════════════════════════════════════════════════════ */
 import { t, tEsc } from './i18n.js';
+import { demanderLaZone, libererLaZone, zoneBasse, RANG } from './moment.js';
 import { AUTO_BADGES, badgeTr, CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, RARITY_KEYS, DRIVER_NUMBERS, sortTypesCanonical } from './data.js';
 import { switchView } from './render.js';
 import { autoBadgeUnlocked, saveManualBadges } from './badges-store.js';
@@ -91,12 +92,23 @@ function _drainToastQueue(){
   if(std && std.classList.contains('show')){ setTimeout(_drainToastQueue, 1200); return; }
   _toastShowing = true;
   const { badges, navigate } = _toastQueue.shift();
+  /* ÉPHÉMÈRE : il s'efface seul en 2,8 s. Il PRÉEMPTE donc un bandeau
+     persistant, qui revient en tête de file dès sa retombée — la
+     priorité de la zone est la durée de vie, pas l'importance. Sans
+     préemption, un bandeau ouvert bloquerait indéfiniment l'annonce
+     d'un badge : une perte de message, pas un report. */
+  demanderLaZone({ id: 'badge', rang: RANG.badge, ephemere: true, selecteur: '#badgeToast',
+                   montrer: () => _poserToast(badges, navigate),
+                   cacher: () => document.getElementById('badgeToast')?.remove() });
+}
+
+function _poserToast(badges, navigate){
   let el = document.getElementById('badgeToast');
   if(!el){
     el = document.createElement('div');
     el.id = 'badgeToast';
     el.className = 'badge-toast';
-    document.body.appendChild(el);
+    zoneBasse().appendChild(el);
   }
   const names = badges.map(b => badgeTr(b).name || b.name);
   el.innerHTML = `<div class="bgt-med">${badges[0].emoji}</div>
@@ -110,6 +122,8 @@ function _drainToastQueue(){
   setTimeout(() => {
     el.classList.remove('show');
     setTimeout(() => {
+      el.remove();
+      libererLaZone('badge');    // rend la place, et le préempté revient
       _toastShowing = false;
       _drainToastQueue();
       // LA FILE EST VIDE = la célébration vient de retomber. C'est le

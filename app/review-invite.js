@@ -36,6 +36,7 @@ import { icon } from './icons.js';
 import { deniedForViewer } from './session.js';
 import { getHistory } from './history.js';
 import { openFeedbackForm } from './feedback.js';
+import { zoneOccupee, peutAfficherSurcouche, demanderLaZone, libererLaZone, zoneBasse, RANG } from './moment.js';
 
 /* ── L'état, en UNE clé d'appareil ───────────────────────────────
    Globale, pas par saison, et c'est un choix argumenté : l'invitation
@@ -125,16 +126,20 @@ export function _resetSession(){ _vueCetteSession = false; }   // tests
    Important : ce refus ne consomme PAS la session. Ni un bandeau de
    mise à jour ni un tutoriel ne sont un refus de l'utilisateur — la
    prochaine célébration reposera la question. */
+/* LA RÈGLE A DÉMÉNAGÉ (1.77.0). Elle est née ici, elle était juste, et
+   elle était à SENS UNIQUE : l'invitation cédait à tout le monde,
+   personne ne lui cédait — six surfaces sur sept l'ignoraient. Elle vit
+   maintenant dans moment.js, bidirectionnelle, pour les sept.
+   `zoneOccupee()` couvre les trois bandeaux ; `peutAfficherSurcouche()`
+   couvre la célébration et la visite guidée. Rien n'est perdu de
+   l'ancien prédicat, tout est devenu partagé. */
 function _zoneOccupee(){
-  const b = document.getElementById('updateBanner');
-  if(b) return true;
-  const inst = document.querySelector('.install-banner');
-  if(inst) return true;
-  // La célébration de palier (1.67.0) : la file la garantit déjà
-  // (l'invitation ne tire que file vide, et la célébration la tient),
-  // mais la ceinture est explicite — même famille que le tut-overlay.
-  if(document.getElementById('tierCele')) return true;
-  return !!document.querySelector('.tut-overlay');
+  // DEUX SOURCES, LA PLUS PESSIMISTE GAGNE : le registre de la file, et
+  // le DOM. Un bandeau posé hors file — du code futur, un test — doit
+  // compter comme une occupation, sinon la garantie de 1.71.0 tiendrait
+  // à la discipline des appelants.
+  return !!zoneOccupee() || !peutAfficherSurcouche()
+      || !!document.querySelector('#updateBanner, .install-banner');
 }
 
 export function peutInviter(maintenant = Date.now()){
@@ -155,6 +160,7 @@ export function peutInviter(maintenant = Date.now()){
 function _fermer(el, passif){
   el.classList.remove('show');
   setTimeout(() => el.remove(), 400);
+  libererLaZone('avis');
   if(passif){
     const s = reviewState();
     saveReviewState({ ...s, n: s.n + 1, t: Date.now() });
@@ -165,7 +171,12 @@ function _fermer(el, passif){
 export function showReviewInvite(){
   if(document.getElementById('reviewInvite')) return;
   _vueCetteSession = true;
+  demanderLaZone({ id: 'avis', rang: RANG.avis, selecteur: '#reviewInvite',
+                   montrer: _poserInvitation,
+                   cacher: () => document.getElementById('reviewInvite')?.remove() });
+}
 
+function _poserInvitation(){
   const el = document.createElement('div');
   el.id = 'reviewInvite';
   el.className = 'rv-invite';
@@ -183,7 +194,7 @@ export function showReviewInvite(){
       </div>
     </div>
     <button type="button" class="rv-x" id="rvClose" aria-label="${t('rv.close')}">${icon('x')}</button>`;
-  document.body.appendChild(el);
+  zoneBasse().appendChild(el);
   setTimeout(() => el.classList.add('show'), 20);   // pas rAF : onglet en arrière-plan
 
   // « Donner mon avis » n'est PAS une fermeture passive comptée à part :

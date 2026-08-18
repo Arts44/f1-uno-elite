@@ -85,7 +85,16 @@ describe('la file et l\'invitation restent honnêtes', () => {
   });
 
   test('review-invite : la célébration compte comme bandeau visible (ceinture)', () => {
-    assert.match(read('review-invite.js'), /getElementById\('tierCele'\)\) return true/);
+    /* CE TEST A CHANGÉ EN 1.77.0, et c'est un changement de
+       comportement assumé, pas un ajustement de refactor. La ceinture
+       ne s'écrit plus dans review-invite.js : `tierCele` est un des
+       trois écrans prioritaires de moment.js, et `_zoneOccupee()` passe
+       désormais par `peutAfficherSurcouche()`. La GARANTIE est
+       identique — l'invitation ne paraît pas pendant une célébration —
+       mais elle vaut maintenant pour les sept surfaces au lieu d'une.
+       On teste donc la garantie, plus la ligne. */
+    assert.match(read('review-invite.js'), /!peutAfficherSurcouche\(\)/);
+    assert.match(read('moment.js'), /tierCele/);
   });
 
   test('la célébration s\'ouvre AVANT updateStats dans changeMoQty (la file doit la trouver posée)', () => {
