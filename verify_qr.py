@@ -30,6 +30,7 @@ dépendance porte sur ce que l'app EMBARQUE. S'il manque, ce script le
 DIT et sort en échec — il ne passe jamais au vert en silence.
 ══════════════════════════════════════════════════════════"""
 import sys, os, tempfile
+from contextlib import suppress
 
 MANQUE_CV2 = """
 ╔══════════════════════════════════════════════════════════╗
@@ -93,11 +94,10 @@ with sync_playwright() as p:
     ctx.add_init_script(init_script('fr', 'dark'))
     pg = ctx.new_page()
     pg.goto(URL); pg.wait_for_timeout(900)
-    try: pg.click('#updateBanner .ub-close', timeout=700)
-    except Exception:
-        # Le bandeau de mise à jour n'est pas toujours là ; son absence
-        # n'est pas une erreur, elle ne doit rien interrompre.
-        pass
+    # Le bandeau de mise à jour n'est pas toujours là : son absence
+    # n'est pas une erreur et ne doit rien interrompre.
+    with suppress(Exception):
+        pg.click('#updateBanner .ub-close', timeout=700)
 
     print('── densités rendues (plancher = 6 px/module) ──')
     dens = pg.evaluate("""async () => {
@@ -172,8 +172,8 @@ with sync_playwright() as p:
     ctx2.add_init_script(init_script('fr', 'dark'))
     pg2 = ctx2.new_page()
     pg2.goto(URL); pg2.wait_for_timeout(900)
-    try: pg2.click('#updateBanner .ub-close', timeout=700)
-    except Exception: pass
+    with suppress(Exception):
+        pg2.click('#updateBanner .ub-close', timeout=700)
     pg2.click('.bn-tab[data-view="stats"]')
     pg2.wait_for_selector('#svTradeSheet', timeout=6000)
     try:
