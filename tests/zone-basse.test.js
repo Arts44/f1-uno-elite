@@ -14,6 +14,7 @@ import './_setup.js';
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
 import { installDom, resetDom, mount } from './_dom.js';
+import { resetStorage } from './_setup.js';
 
 installDom();
 /* `miseEnRouteEnCours()` lit le style calculé de #login-screen : le
@@ -24,6 +25,8 @@ globalThis.getComputedStyle = el => ({ display: (el && el.style && el.style.disp
 import {
   demanderLaZone, libererLaZone, zoneOccupee, _resetZone, RANG, zoneBasse,
 } from '../app/moment.js';
+import { maybeOfferWhatsNew, lastSeenVersion, _resetWhatsNew } from '../app/update.js';
+import { APP_VERSION } from '../app/changelog.js';
 
 // Une surface de démonstration : elle pose et retire un vrai nœud, ce
 // qui rend l'autoguérison observable.
@@ -258,5 +261,64 @@ describe('le point d’amarrage', () => {
   test('zoneBasse() se replie sur le corps — jamais de surface perdue', () => {
     resetDom();
     assert.equal(zoneBasse(), document.body);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════
+   LE MESSAGE NE SE CONSOMME QU'UNE FOIS TRAITÉ
+
+   L'éviction par rang rouvrait la porte que l'option 1 avait fermée :
+   `markVersionSeen()` était appelé À L'OFFRE, avant même la demande de
+   zone. Mesuré sur le bundle — un profil en retard voyait
+   « Application mise à jour ! » pendant 1624 ms, se faisait évincer par
+   le bandeau de mise à jour, et le message ne revenait JAMAIS
+   (`whatsnew_revient: false`, `seen_version` déjà à la version
+   courante). Une perte de message, exactement celle qui avait
+   disqualifié le prédicat sans file.
+
+   CES DEUX TESTS SONT LE CONTRÔLE : le premier doit ROUGIR si la
+   consommation revient à l'offre.
+   ══════════════════════════════════════════════════════════ */
+describe('les nouveautés ne se consomment qu’une fois traitées', () => {
+  const APRES = new Promise(r => setTimeout(r, 0));
+
+  beforeEach(() => {
+    resetDom();
+    mount('<div id="zoneBasse"></div>');
+    _resetZone();
+    resetStorage();
+    _resetWhatsNew();
+    localStorage.setItem('f1uno_seen_version', '1.29.0');
+  });
+
+  test('évincé et jamais réaffiché : la version N’EST PAS estampillée', async () => {
+    maybeOfferWhatsNew();
+    await APRES;
+    assert.equal(zoneOccupee(), 'nouveautes', 'le bandeau a bien pris la zone');
+    // un rang supérieur l'évince — c'est la séquence de production
+    demanderLaZone({ id: 'maj', rang: RANG.maj, selecteur: '#updateBanner',
+                     montrer(){ const e = document.createElement('div');
+                                e.id = 'updateBanner'; zoneBasse().appendChild(e); },
+                     cacher(){ document.getElementById('updateBanner')?.remove(); } });
+    assert.equal(zoneOccupee(), 'maj');
+    assert.equal(document.getElementById('whatsNewBanner'), null, 'évincé');
+    assert.equal(lastSeenVersion(), '1.29.0',
+      'un message jamais lu ne doit pas être consommé — sinon il est PERDU');
+  });
+
+  test('fermé par l’utilisateur : la version EST estampillée', async () => {
+    maybeOfferWhatsNew();
+    await APRES;
+    document.getElementById('whatsNewCloseBtn').click();
+    assert.equal(lastSeenVersion(), APP_VERSION,
+      'traité veut dire consommé, sinon il reviendrait à chaque session');
+  });
+
+  test('rien à annoncer : la version est estampillée sans rien montrer', async () => {
+    localStorage.setItem('f1uno_seen_version', APP_VERSION);
+    maybeOfferWhatsNew();
+    await APRES;
+    assert.equal(lastSeenVersion(), APP_VERSION);
+    assert.equal(document.getElementById('whatsNewBanner'), null);
   });
 });

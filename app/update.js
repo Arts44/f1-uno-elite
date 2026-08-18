@@ -37,8 +37,37 @@ export function shouldOfferWhatsNew(lastSeen, current = APP_VERSION){
 let _reg = null;
 let _reloading = false;
 
+/* LE SONDAGE DU WORKER, ET POURQUOI LES NOUVEAUTÉS L'ATTENDENT.
+   Mesuré sur le bundle : `maybeOfferWhatsNew()` pose sa demande à
+   ~77 ms, le bandeau de mise à jour arrive après le sondage du service
+   worker, et l'éviction retirait « Application mise à jour ! » au bout
+   de 1624 ms. Un bandeau qui paraît une seconde et demie puis
+   s'escamote est un SCINTILLEMENT — pas une file qui fonctionne.
+   On attend donc de SAVOIR s'il y a une mise à jour à annoncer avant
+   de proposer les nouveautés. Borné : hors ligne, sans service worker
+   ou si l'enregistrement échoue, la promesse se résout quand même et
+   les nouveautés paraissent. Elles ne dépendent de personne. */
+export const DELAI_SONDAGE_MAX_MS = 4000;
+/* `var` et création PARESSEUSE, délibérément — pas un oubli de style.
+   app.js appelle `initUpdateFlow()` au niveau module (app.js:405), et
+   le graphe est circulaire : la fonction peut donc tourner AVANT que
+   le corps de ce fichier soit terminé. Avec `let`, la zone morte
+   temporelle faisait échouer l'import entier
+   (« Cannot access '_finSondage' before initialization »). */
+var _finSondage;
+var _sondageTermine;
+function _promesseSondage(){
+  if(!_sondageTermine) _sondageTermine = new Promise(r => { _finSondage = r; });
+  return _sondageTermine;
+}
+function _sondageFait(){
+  _promesseSondage();
+  if(_finSondage){ _finSondage(); _finSondage = null; }
+}
+
 export function initUpdateFlow(){
-  if(!('serviceWorker' in navigator)) return; // file:// etc. — expected
+  if(!('serviceWorker' in navigator)){ _sondageFait(); return; } // file:// etc. — expected
+  setTimeout(_sondageFait, DELAI_SONDAGE_MAX_MS);
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
       .then(reg => {
@@ -47,6 +76,17 @@ export function initUpdateFlow(){
         // A new SW may already be parked in "waiting" (downloaded on a
         // previous visit, banner never acted on): offer it again.
         if(reg.waiting && navigator.serviceWorker.controller) _showUpdateBanner();
+        /* ON ATTEND QUE LE CONTRÔLE SOIT FINI, et deux essais plus
+           naïfs ont été mesurés faux avant celui-ci :
+             · `_sondageFait()` après `register()` — les nouveautés
+               partaient à ~80 ms et se faisaient évincer à 1630 ms ;
+             · attendre `reg.installing` — il est NUL à cet instant,
+               le navigateur n'a pas encore commencé sa vérification.
+           `update()` résout quand le travail est terminé, installation
+           comprise : c'est la seule promesse qui réponde à la question
+           « y a-t-il une mise à jour à annoncer ? ». Une requête
+           conditionnelle de plus sur sw.js au démarrage, assumée. */
+        reg.update().then(_sondageFait, _sondageFait);
         reg.addEventListener('updatefound', () => {
           const nw = reg.installing;
           if(!nw) return;
@@ -61,7 +101,7 @@ export function initUpdateFlow(){
           });
         });
       })
-      .catch(err => console.error('Service worker registration failed:', err));
+      .catch(err => { console.error('Service worker registration failed:', err); _sondageFait(); });
 
     // Reload exactly once when the waiting SW takes control after OUR
     // skip-waiting request. The guard ignores controller changes we did
@@ -229,6 +269,7 @@ function _poserBanniere(){
    "What's new" — post-update offer + changelog dialog
    ══════════════════════════════════════════════════════════ */
 let _whatsNewOffered = false;
+export function _resetWhatsNew(){ _whatsNewOffered = false; _entreesWhatsNew = []; }  // tests
 
 // Called from initApp(): if this device just moved to a newer version,
 // offer (never impose) the changelog of what it missed. Fresh installs
@@ -240,16 +281,27 @@ export function maybeOfferWhatsNew(){
     return;
   }
   const entries = entriesSince(last);
-  markVersionSeen();
-  if(_whatsNewOffered || !entries.length || document.getElementById('whatsNewBanner')) return;
+  /* ON NE CONSOMME PLUS À L'OFFRE. `markVersionSeen()` était appelé
+     ICI, avant même que le bandeau soit demandé : mesuré sur le
+     bundle, un profil en retard voyait « Application mise à jour ! »
+     1624 ms puis se faire évincer, et le message ne revenait JAMAIS
+     — `seen_version` valait déjà la version courante. C'est très
+     exactement la perte de message qui a fait rejeter l'option du
+     prédicat sans file ; elle s'était réintroduite par une autre
+     porte. La version n'est estampillée que lorsque le message a été
+     TRAITÉ : lu, ou fermé. Un bandeau jamais vu ne consomme rien, et
+     la session suivante repose la question. */
+  if(!entries.length){ markVersionSeen(); return; }   // rien à annoncer
+  if(_whatsNewOffered || document.getElementById('whatsNewBanner')) return;
   _whatsNewOffered = true;
   /* IL N'AVAIT AUCUN GARDE. Son jumeau `_showUpdateBanner` attendait la
      fin de la mise en route depuis 1.76.0 ; celui-ci s'affichait en
      plein tutoriel — mesuré, capture à l'appui, avant la refonte
      (POINTS-SIGNALES n°26). La file le corrige au passage. */
   _entreesWhatsNew = entries;
-  demanderLaZone({ id: 'nouveautes', rang: RANG.nouveautes, selecteur: '#whatsNewBanner',
-                   montrer: _poserNouveautes, cacher: _removeWhatsNewBanner });
+  _promesseSondage().then(() => demanderLaZone({
+    id: 'nouveautes', rang: RANG.nouveautes, selecteur: '#whatsNewBanner',
+    montrer: _poserNouveautes, cacher: _removeWhatsNewBanner }));
 }
 
 let _entreesWhatsNew = [];
@@ -268,7 +320,7 @@ function _poserNouveautes(){
     <button class="install-banner-btn" id="whatsNewSeeBtn" type="button">${t('upd.whatsnew')}</button>
     <button class="install-banner-close" id="whatsNewCloseBtn" type="button" aria-label="${t('upd.later')}">✕</button>`;
   zoneBasse().appendChild(b);
-  const close = () => { b.remove(); libererLaZone('nouveautes'); };
+  const close = () => { markVersionSeen(); b.remove(); libererLaZone('nouveautes'); };
   document.getElementById('whatsNewSeeBtn').addEventListener('click', () => { close(); openChangelog(entries); });
   document.getElementById('whatsNewCloseBtn').addEventListener('click', close);
 }

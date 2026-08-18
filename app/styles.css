@@ -62,6 +62,11 @@
      verbatim in the four scrolling views. */
   --nav-clear:calc(107px + env(safe-area-inset-bottom)); /* 14 marge + 58 barre + 35 débord pastille */
   --r-pill:100px;--content-max:800px;--tap-min:44px;
+  /* Hauteur de `.tut-away`. NOMMÉE parce que la zone basse s'en sert
+     pour se décaler pendant la visite guidée : la constante était
+     recopiée à deux endroits, verify_zone.py mesure qu'elle vaut bien
+     ce qu'elle dit. */
+  --tut-away-h:34px;
   --ease:all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);
   --ease-fast:all 0.15s cubic-bezier(0.25,0.46,0.45,0.94);
   /* Stats semantic accents — palette validated for contrast & CVD
@@ -377,7 +382,7 @@ body{font-family:var(--font-b);background:var(--bg);color:var(--tx1);min-height:
       (POINTS-SIGNALES n°25). L'échelle unique aurait généralisé le
       défaut aux sept ; cette règle le supprime pour les sept d'un coup.
       Ce qui est grisé est inerte : c'est ce que le halo promet. */
-body:has(.tut-overlay) .zone-basse{bottom:calc(var(--nav-clear) + 48px);}
+body:has(.tut-overlay) .zone-basse{bottom:calc(var(--nav-clear) + var(--tut-away-h) + 14px);}
 body:has(.tut-overlay) .zone-basse,
 body:has(.tut-overlay) .zone-basse > *{pointer-events:none;}
 
@@ -2335,7 +2340,7 @@ body.viewer-mode .mo-type-rows .mqbtn { opacity:0.35;pointer-events:none; }
 /* Cible hors cadre malgré le défilement : on dit OÙ regarder, on ne
    laisse jamais un écran grisé inerte. */
 .tut-away{position:fixed;left:50%;transform:translateX(-50%);z-index:901;pointer-events:none;
-  display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 var(--space-4);
+  display:inline-flex;align-items:center;gap:6px;height:var(--tut-away-h);padding:0 var(--space-4);
   border-radius:var(--r-pill);background:var(--red);color:var(--on-red,#fff);
   font:700 12px var(--font-b);box-shadow:var(--sh-md);}
 .tut-away.down{bottom:calc(var(--nav-clear) + 6px);}

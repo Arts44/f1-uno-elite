@@ -17,7 +17,12 @@ TROIS CHOSES, ET AUCUNE N'EST DÉDUITE DU CSS :
      pas `getElementById`. Trois occurrences ont été payées pour cette
      distinction ; on ne la redemande pas.
 
-  ③ PENDANT LE TUTORIEL, AUCUNE N'EST CLIQUABLE — et c'est un VRAI
+  ③ `.tut-away` NE CHEVAUCHE RIEN. C'était la dernière affirmation
+     géométrique du chantier qui reposait sur une CONSTANTE DÉCLARÉE
+     (`height:34px`, d'où le décalage de 48 px de la zone pendant la
+     visite) et non sur une mesure. Elle est mesurée ici.
+
+  ④ PENDANT LE TUTORIEL, AUCUNE N'EST CLIQUABLE — et c'est un VRAI
      CLIC qui l'établit, pas la lecture de `pointer-events` (n°25 :
      le CSS disait déjà `pointer-events:none` sur le voile, et le
      bandeau répondait quand même).
@@ -223,7 +228,48 @@ def main():
                   f"plus haute {haut} px · chevauchement {len(m['chevauchements'])}")
             c.close()
 
-        # ③ pendant le tutoriel, aucun clic ne passe
+        # ③ `.tut-away` contre la zone, pendant la visite guidée
+        c = br.new_context(viewport={'width': 375, 'height': 812})
+        c.add_init_script(';'.join(f'localStorage.setItem({json.dumps(k)},{json.dumps(v)})'
+                                   for k, v in dict(SEED, f1uno_lang='nl').items()) + ';')
+        pg = c.new_page()
+        pg.goto(URL)
+        pg.wait_for_load_state('networkidle')
+        pg.wait_for_selector('.card', timeout=20000)
+        scene(pg, 'nl')
+        pg.evaluate("""() => {
+            const o = document.createElement('div'); o.className = 'tut-overlay';
+            const a = document.createElement('div'); a.className = 'tut-away down';
+            a.textContent = 'Richting de statistieken';
+            o.appendChild(a); document.body.appendChild(o);
+        }""")
+        pg.wait_for_timeout(250)
+        aw = pg.evaluate("""() => {
+          const a = document.querySelector('.tut-away');
+          const ra = a.getBoundingClientRect();
+          const pires = [];
+          for (const el of document.getElementById('zoneBasse').children) {
+            const r = el.getBoundingClientRect();
+            if (r.height <= 0) continue;
+            const v = Math.min(r.bottom, ra.bottom) - Math.max(r.top, ra.top);
+            const h = Math.min(r.right, ra.right) - Math.max(r.left, ra.left);
+            if (v > 0 && h > 0) pires.push({nom: el.id || el.className, px: Math.round(v)});
+          }
+          const nav = document.querySelector('.bottom-nav').getBoundingClientRect();
+          return {hauteur_reelle: Math.round(ra.height), chevauchements: pires,
+                  bas_a_nav: Math.round(nav.top - ra.bottom)};
+        }""")
+        print(f"  tut-away       hauteur réelle {aw['hauteur_reelle']} px · "
+              f"chevauchement {len(aw['chevauchements'])} · à {aw['bas_a_nav']} px de la nav")
+        if aw['chevauchements']:
+            echecs.append('tut-away chevauche la zone — ' +
+                          ', '.join(f"{x['nom']} {x['px']} px" for x in aw['chevauchements']))
+        if aw['hauteur_reelle'] != 34:
+            echecs.append(f"tut-away mesure {aw['hauteur_reelle']} px et non 34 : "
+                          'le décalage de 48 px de la zone repose sur cette constante')
+        c.close()
+
+        # ④ pendant le tutoriel, aucun clic ne passe
         seed = ';'.join(f'localStorage.setItem({json.dumps(k)},{json.dumps(v)})'
                         for k, v in dict(SEED, f1uno_lang='fr', f1uno_theme='dark').items()) + ';'
         c = br.new_context(viewport={'width': 375, 'height': 812})
