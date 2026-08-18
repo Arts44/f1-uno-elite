@@ -30,7 +30,6 @@ dépendance porte sur ce que l'app EMBARQUE. S'il manque, ce script le
 DIT et sort en échec — il ne passe jamais au vert en silence.
 ══════════════════════════════════════════════════════════"""
 import sys, os, tempfile
-from contextlib import suppress
 
 MANQUE_CV2 = """
 ╔══════════════════════════════════════════════════════════╗
@@ -63,6 +62,16 @@ TMP = os.environ.get('QR_TMP') or tempfile.mkdtemp(prefix='f1uno-qr-')
 os.makedirs(TMP, exist_ok=True)
 ECHECS = []
 
+def _fermer_bandeau(page):
+    """Ferme le bandeau de mise à jour s'il est là. Renvoie True si un
+    clic a eu lieu — la présence se TESTE, elle ne s'attrape pas."""
+    bouton = page.query_selector('#updateBanner .ub-close')
+    if bouton and bouton.is_visible():
+        bouton.click()
+        return True
+    return False
+
+
 def decode(path):
     """Décodage par lecteur TIERS. Renvoie le texte, ou None."""
     img = cv2.imread(path)
@@ -94,10 +103,10 @@ with sync_playwright() as p:
     ctx.add_init_script(init_script('fr', 'dark'))
     pg = ctx.new_page()
     pg.goto(URL); pg.wait_for_timeout(900)
-    # Le bandeau de mise à jour n'est pas toujours là : son absence
-    # n'est pas une erreur et ne doit rien interrompre.
-    with suppress(Exception):
-        pg.click('#updateBanner .ub-close', timeout=700)
+    # Le bandeau de mise à jour n'est pas toujours là. On TESTE sa
+    # présence au lieu d'attraper l'échec du clic : une exception n'est
+    # pas un test de présence, et l'avaler masquerait une vraie panne.
+    _fermer_bandeau(pg)
 
     print('── densités rendues (plancher = 6 px/module) ──')
     dens = pg.evaluate("""async () => {
@@ -172,8 +181,7 @@ with sync_playwright() as p:
     ctx2.add_init_script(init_script('fr', 'dark'))
     pg2 = ctx2.new_page()
     pg2.goto(URL); pg2.wait_for_timeout(900)
-    with suppress(Exception):
-        pg2.click('#updateBanner .ub-close', timeout=700)
+    _fermer_bandeau(pg2)
     pg2.click('.bn-tab[data-view="stats"]')
     pg2.wait_for_selector('#svTradeSheet', timeout=6000)
     try:
