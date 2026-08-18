@@ -111,22 +111,21 @@ describe('rarity chip painting', () => {
    échoue si elles disparaissent — et son message dit pourquoi elles
    sont là, à l'endroit où quelqu'un le verra : la sortie rouge.
    ══════════════════════════════════════════════════════════ */
-describe('exports gardés pour l’export de liste d’échange', () => {
+describe('exports de l’export de liste d’échange', () => {
   const src = readFileSync(new URL('../app/stats.js', import.meta.url), 'utf8');
 
+  /* Longtemps gardées SANS appelant sur décision du mainteneur (1.48.x),
+     avec un sous-test qui exigeait la mise en garde « NE PAS
+     SUPPRIMER » au-dessus d'elles. Depuis 1.66.0 elles ont leurs
+     appelants (Copier · Partager, n°15 fermé) : la décision a changé,
+     le sous-test est parti avec elle — comme son message le prévoyait.
+     stats-inverse.test.js tient le contrat inverse (appelants présents,
+     mise en garde absente). */
   for (const nom of ['fmtMissing', 'fmtDoubles', 'fmtTrade']) {
     test(`${nom} existe toujours et reste exportée`, () => {
-      assert.match(src, new RegExp(`export\\s+function\\s+${nom}\\s*\\(`),
-        `${nom} a été retirée. Ce n'est PAS du code mort : décision du `
-        + `mainteneur de la garder comme base de l'export de liste `
-        + `d'échange. Si la décision a changé, retire ce test avec elle.`);
+      assert.match(src, new RegExp(`export\\s+function\\s+${nom}\\s*\\(`));
     });
   }
-
-  test('la raison de les garder est écrite au-dessus', () => {
-    assert.match(src, /NE PAS SUPPRIMER comme code mort/,
-      'le commentaire qui explique la décision doit rester');
-  });
 });
 
 /* ── Répartitions : sommaire + colonne large (1.56.0) ──

@@ -1833,18 +1833,36 @@ body:has(.tut-overlay) .toast{bottom:130px;}
 .setv-btn.danger{border-color:var(--red-m);color:var(--red);}
 .setv-btn.danger:hover{background:var(--red-s);}
 
-/* ── Stats : outils de collectionneur (onglets internes + listes) ── */
-.sv-tools{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
-  padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-3);margin-bottom:var(--space-5);}
-.sv-tools-tabs{display:flex;gap:var(--space-2);flex-wrap:wrap;}
-.sv-tool-tab{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 var(--space-3);
-  border-radius:var(--r-pill);border:1px solid var(--border);background:var(--surface2);
-  color:var(--tx2);font-family:var(--font-b);font-size:12.5px;font-weight:600;cursor:pointer;
-  transition:var(--ease);}
-.sv-tool-tab:hover{color:var(--tx1);border-color:var(--tx3);background:var(--surface3);}
-.sv-tool-tab.active{background:var(--tx1);border-color:var(--tx1);color:var(--surface);}
+/* ── Stats : le renversement 1f (1.66.0) — héros du manque + portes ──
+   Le héros bascule par mode (heroModel, stats.js) : missing en rouge,
+   early en vert, start neutre, done à l'or — le sous-titre reste
+   LISIBLE (12px, pas une mention) : c'est lui qui empêche le chiffre
+   rouge d'être une claque. */
+.sv-lack{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);padding:var(--space-4);display:flex;flex-direction:column;gap:4px;margin-bottom:var(--space-3);}
+.sv-lack-n{font-family:var(--font-d);font-weight:800;font-size:44px;line-height:1;color:var(--st-missing);font-variant-numeric:tabular-nums;}
+.sv-lack-l{font-size:14px;font-weight:600;color:var(--tx1);}
+.sv-lack-sub{font-size:12px;color:var(--tx2);}
+.sv-lack-early .sv-lack-n{color:var(--st-owned);}
+.sv-lack-start .sv-lack-n{color:var(--tx1);}
+.sv-lack-done .sv-lack-n{color:var(--gold);}
+/* Chaque liste est une PORTE : une action visible, pas un onglet caché.
+   Sémantique tablist conservée — les portes pilotent le même panneau. */
+.sv-doors{display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-2);}
+.sv-door{display:flex;align-items:center;gap:var(--space-10px);border:1px solid var(--border);border-radius:12px;background:var(--surface2);padding:var(--space-3);cursor:pointer;transition:var(--ease);text-align:left;color:var(--tx1);font-family:var(--font-b);}
+.sv-door:hover{border-color:var(--red-m);}
+.sv-door:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
+.sv-door.active{border-color:var(--tx3);}
+.sv-door .dr-n{font-family:var(--font-d);font-weight:800;font-size:22px;color:var(--st-missing);min-width:34px;text-align:center;font-variant-numeric:tabular-nums;}
+.sv-door.doubles .dr-n{color:var(--st-doubles);}
+.sv-door.trade .dr-n{color:var(--red);display:flex;align-items:center;justify-content:center;}
+.sv-door .dr-tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.sv-door .dr-t{font-size:13.5px;font-weight:700;}
+.sv-door .dr-s{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.4px;}
+.sv-door .dr-go{color:var(--tx3);font-size:16px;}
+/* Copier · Partager la liste d'échange — deux gestes, 44 px chacun */
+.sv-share{display:flex;gap:var(--space-2);margin-bottom:var(--space-3);}
+.sv-share .setv-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:var(--tap-min);}
 .qbtn:focus-visible,.qadd-type:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
-.sv-tool-tab:focus-visible{outline:2px solid var(--red);outline-offset:2px;}
 .sv-tool-n{font-variant-numeric:tabular-nums;opacity:0.75;}
 .sv-tools-body{display:flex;flex-direction:column;gap:2px;max-height:420px;overflow-y:auto;}
 .sv-tool-row{display:flex;align-items:center;gap:var(--space-2);padding:7px var(--space-2);
@@ -2568,10 +2586,10 @@ button:not(:disabled, .bn-tab):active,
 /* .qbtn et .modal-close sont DÉJÀ position:absolute — les
    passer en relative les sortait de leur coin (régression 1.32.0) ;
    leur ::after fonctionne tel quel sur un élément absolu. */
-.schip,.qadd-type,.mqbtn,.sv-tool-tab,
+.schip,.qadd-type,.mqbtn,
 .user-title-next,.season-pill,.logo,.setv-btn,.toast-action{position:relative;}
 .schip::after,.qbtn::after,.qadd-type::after,.mqbtn::after,.modal-close::after,
-.sv-tool-tab::after,.user-title-next::after,.season-pill::after,
+.user-title-next::after,.season-pill::after,
 .logo::after,.setv-btn::after,.toast-action::after,.setv-toggle::before{
   content:'';position:absolute;inset:-5px;}
 /* ⭐/❤️ des tuiles (24 px) : 44×44 chacune — l'étoile s'étend vers la
@@ -2593,7 +2611,6 @@ button:not(:disabled, .bn-tab):active,
 .setv-toggle::before{top:-9px;bottom:-9px;left:0;right:0;}
 /* onglets outils (32 px), pilule saison (28 px), boutons réglages (34 px),
    action de toast : 44 en vertical */
-.sv-tool-tab::after{top:-6px;bottom:-6px;left:0;right:0;}
 .season-pill::after{top:-8px;bottom:-8px;left:-2px;right:-2px;}
 .setv-btn::after{top:-5px;bottom:-5px;left:-2px;right:-2px;}
 .toast-action::after{top:-12px;bottom:-12px;left:-8px;right:-8px;}

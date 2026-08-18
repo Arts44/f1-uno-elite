@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.66.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['Stats now open on what you can act on: how many cards are missing, then three doors — the missing list, your doubles, your trade list — with Copy and Share buttons on the trade list. Charts moved below as the supporting evidence. On a young collection the big number flips to the positive: what there is to collect, not what is missing.'],
+      fr: ['Les stats s’ouvrent désormais sur ce qui appelle l’action : combien de cartes manquent, puis trois portes — la liste des manquantes, vos doubles, votre liste d’échange — avec Copier et Partager sur la liste d’échange. Les graphiques descendent en justification. Sur une jeune collection, le grand chiffre bascule en positif : ce qu’il y a à collectionner, pas ce qui manque.'],
+      es: ['Las estadísticas se abren ahora con lo que llama a la acción: cuántas cartas faltan, luego tres puertas — la lista de faltantes, tus repetidas, tu lista de cambio — con Copiar y Compartir en la lista de cambio. Los gráficos bajan como justificación. En una colección joven, la gran cifra pasa a positivo: lo que hay por coleccionar, no lo que falta.'],
+      zh: ['统计页现在以可行动的信息开场：还缺多少张卡片，然后是三扇门——缺卡清单、重复卡、交换清单——交换清单上新增复制与分享按钮。图表下移作为佐证。收藏尚少时，大数字会转为正向表述：展示待收集的内容，而非缺少的数量。'],
+      it: ['Le statistiche si aprono ora su ciò che chiama all’azione: quante carte mancano, poi tre porte — l’elenco delle mancanti, i tuoi doppioni, la tua lista di scambio — con Copia e Condividi sulla lista di scambio. I grafici scendono come giustificazione. Su una collezione giovane, il grande numero passa al positivo: cosa c’è da collezionare, non cosa manca.'],
+      nl: ['Statistieken openen nu met wat om actie vraagt: hoeveel kaarten ontbreken, dan drie deuren — de lijst met ontbrekende kaarten, je dubbelen, je ruillijst — met Kopiëren en Delen op de ruillijst. De grafieken zakken naar onderen als onderbouwing. Bij een jonge collectie slaat het grote getal om naar het positieve: wat er te verzamelen valt, niet wat er ontbreekt.'],
+      de: ['Die Statistiken öffnen jetzt mit dem, was zum Handeln ruft: wie viele Karten fehlen, dann drei Türen — die Fehlend-Liste, deine Doubletten, deine Tauschliste — mit Kopieren und Teilen auf der Tauschliste. Die Diagramme rücken als Begründung nach unten. Bei einer jungen Sammlung kippt die große Zahl ins Positive: was es zu sammeln gibt, nicht was fehlt.'],
+    },
+  },
+  {
     version: '1.65.0',
     date: '2026-08-18',
     changes: {

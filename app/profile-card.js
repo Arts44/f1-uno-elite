@@ -23,6 +23,7 @@
    capturé avant et après, et comparé. Résultat dans le commit.
    ══════════════════════════════════════════════════════════ */
 import { t } from './i18n.js';
+import { shareOrDownloadFile } from './share-file.js';
 import { AUTO_BADGES, MANUAL_BADGES, badgeTr } from './data.js';
 import { showToast } from './render.js';
 import { manualBadges, autoBadgeUnlocked, loadManualBadges } from './badges-store.js';
@@ -91,13 +92,8 @@ export async function shareProfileCard(){
 
   const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
   if(!blob) return;
-  const file = new File([blob], 'f1-uno-badges.png', { type: 'image/png' });
-  if(navigator.canShare && navigator.canShare({ files: [file] })){
-    try { await navigator.share({ files: [file] }); return; } catch(e){ /* annulé → repli */ }
-  }
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'f1-uno-badges.png'; a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
-  showToast(t('b.share_saved'));
+  // La plomberie de sortie vit dans share-file.js depuis 1.66.0
+  // (n°15 fermé) : ce module ne garde que le dessin du sceau.
+  const how = await shareOrDownloadFile(blob, 'f1-uno-badges.png');
+  if(how === 'saved') showToast(t('b.share_saved'));
 }

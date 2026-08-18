@@ -11,8 +11,23 @@ import {
 } from './storage.js';
 import { getHistory } from './history.js';
 import { loadManualBadges, isAutoBadgeUnlocked, manualBadges, renderBadges, updateUserTitle, checkNewAutoBadges } from './badges.js';
-import { currentView } from './render.js';
+import { currentView, showToast } from './render.js';
+import { shareOrDownloadFile } from './share-file.js';
 import { icon, typeIcon } from './icons.js';
+
+/* ── Le héros du manque (1.66.0) — pur, testé aux seuils.
+   Sous SEUIL_HERO_POSITIF possédées, la formulation bascule en
+   positif : « 101 cartes vous manquent » sur une collection vierge
+   serait absurde et démoralisant (garde-fou validé au chiffrage). ── */
+export const SEUIL_HERO_POSITIF = 10;
+export function heroModel(owned, total){
+  const missing = total - owned;
+  const pct = total ? Math.round(owned / total * 100) : 0;
+  if(total > 0 && missing === 0) return { mode: 'done',  big: total, labelKey: 'st.hero_done',  subKey: 'st.hero_done_sub',  subParams: { total } };
+  if(owned === 0)                return { mode: 'start', big: total, labelKey: 'st.hero_start', subKey: 'st.hero_start_sub', subParams: { total } };
+  if(owned < SEUIL_HERO_POSITIF) return { mode: 'early', big: owned, labelKey: 'st.hero_early', subKey: 'st.hero_early_sub', subParams: { missing, total } };
+  return { mode: 'missing', big: missing, labelKey: 'st.hero_missing', subKey: 'st.hero_missing_sub', subParams: { owned, total, pct } };
+}
 
 // Pure aggregates over the current CARDS_DB + collection state —
 // extracted from updateStats() (DOM-free, unit-testable).
@@ -396,18 +411,54 @@ export function renderStats(){
   }
   histHtml += `<div class="sv-note">${t('st.history_note')}</div>`;
 
-  // — Outils de collectionneur : onglets Manquantes / Doubles / Échange —
+  /* — LE RENVERSEMENT (1.66.0, maquette 1f validée) — le héros du
+     manque puis trois PORTES : chaque liste est une action visible,
+     plus un onglet caché. Les portes gardent la sémantique tablist
+     (elles pilotent le même panneau _toolPanelHTML qu'avant) ; les
+     calculs de collector.js n'ont pas bougé d'une ligne. — */
+
+  // Garde-fou du héros (validé au chiffrage) : sous SEUIL_HERO_POSITIF
+  // possédées, « 101 cartes vous manquent » serait absurde — l'écran
+  // presque vide parle de ce qu'il y a À OBTENIR, pas de ce qui manque
+  // (même raisonnement que l'état vide du Compte). Le sous-titre reste
+  // en clair : c'est lui qui empêche le chiffre rouge d'être une claque.
+  const hero = heroModel(owned, total);
+  const heroHtml = `
+    <div class="sv-lack sv-lack-${hero.mode}">
+      <div class="sv-lack-n">${hero.big}</div>
+      <div class="sv-lack-l">${t(hero.labelKey)}</div>
+      <div class="sv-lack-sub">${tEsc(hero.subKey, hero.subParams)}</div>
+    </div>`;
+
+  // « exemplaires en trop » : la somme des copies au-delà de la première
+  // sur les types marqués doubles — le chiffre qu'un échangeur regarde.
+  const extraCopies = doublesList().reduce((s, r) => s + r.types.reduce((x, ty) => x + Math.max(0, ty.qty - 1), 0), 0);
   const toolsHtml = `
     <section class="sv-block" id="svTools">
     <div class="sv-section-title">${icon('wrench')} ${t('st.tools')}</div>
-    <div class="sv-tools">
-      <div class="sv-tools-tabs" role="tablist" aria-label="${t('st.tools')}">
-        <button class="sv-tool-tab active" data-tool="missing" role="tab" aria-selected="true" type="button">${t('tools.missing')} <span class="sv-tool-n">${missing}</span></button>
-        <button class="sv-tool-tab" data-tool="doubles" role="tab" aria-selected="false" type="button">${t('tools.doubles')} <span class="sv-tool-n">${doubles}</span></button>
-        <button class="sv-tool-tab" data-tool="trade" role="tab" aria-selected="false" type="button">${t('tools.trade')}</button>
-      </div>
-      <div class="sv-tools-body" id="svToolsBody">${_toolPanelHTML('missing')}</div>
-    </div></section>`;
+    <div class="sv-doors" role="tablist" aria-label="${t('st.tools')}">
+      <button class="sv-door active" data-tool="missing" role="tab" aria-selected="true" type="button">
+        <span class="dr-n">${missing}</span>
+        <span class="dr-tx"><span class="dr-t">${tEsc('st.door_missing', { n: missing })}</span><span class="dr-s">${tEsc('st.door_missing_sub', { n: wish })}</span></span>
+        <span class="dr-go" aria-hidden="true">→</span>
+      </button>
+      <button class="sv-door doubles" data-tool="doubles" role="tab" aria-selected="false" type="button">
+        <span class="dr-n">${doubles}</span>
+        <span class="dr-tx"><span class="dr-t">${tEsc('st.door_doubles', { n: doubles })}</span><span class="dr-s">${tEsc('st.door_doubles_sub', { n: extraCopies })}</span></span>
+        <span class="dr-go" aria-hidden="true">→</span>
+      </button>
+      <button class="sv-door trade" data-tool="trade" role="tab" aria-selected="false" type="button">
+        <span class="dr-n">${icon('handshake')}</span>
+        <span class="dr-tx"><span class="dr-t">${t('st.door_trade')}</span><span class="dr-s">${t('st.door_trade_sub')}</span></span>
+        <span class="dr-go" aria-hidden="true">→</span>
+      </button>
+    </div>
+    <div class="sv-share">
+      <button class="setv-btn" id="svTradeCopy" type="button">${icon('clipboard')} ${t('st.copy')}</button>
+      <button class="setv-btn" id="svTradeShare" type="button">${icon('upload')} ${t('st.share')}</button>
+    </div>
+    <div class="sv-tools-body" id="svToolsBody">${_toolPanelHTML('missing')}</div>
+    </section>`;
 
   // — Objectifs proches (phase H) : les buts « à N cartes près »,
   //   cliquables → les manquantes concernées (chips), même grammaire de
@@ -486,6 +537,9 @@ export function renderStats(){
   }) + `
     <div class="sv-layout">
       <div class="sv-col">
+        ${heroHtml}
+        ${toolsHtml}
+
         ${block(t('st.general'), `<div class="sv-cards">
           <div class="sv-card owned"><div class="sv-card-value">${owned}<span class="sv-card-total">/${total}</span></div><div class="sv-card-label">${t('st.owned')}</div></div>
           <div class="sv-card wish"><div class="sv-card-value">${wish}</div><div class="sv-card-label">${t('st.wish')}</div></div>
@@ -494,6 +548,8 @@ export function renderStats(){
           <div class="sv-card fav"><div class="sv-card-value">${fav}</div><div class="sv-card-label">${t('st.fav')}</div></div>
           <div class="sv-card exemplaires"><div class="sv-card-value">${totalExemplaires}</div><div class="sv-card-label">${t('st.copies')}</div></div>
         </div>`)}
+
+        ${block(t('st.history'), histHtml)}
 
         ${jumpHtml}
 
@@ -504,9 +560,6 @@ export function renderStats(){
         </div>
 
         ${typeRows ? block(t('st.by_type'), `<div class="sv-rows-block sv-rows-split">${typeRows}</div>`, 'svByType') : ''}
-
-        ${toolsHtml}
-        ${block(t('st.history'), histHtml)}
       </div>
 
       <aside class="sv-rail">
@@ -538,16 +591,33 @@ export function renderStats(){
     });
   });
 
-  // Onglets outils : bascule locale (lecture seule, pas d'écriture)
-  el.querySelectorAll('.sv-tool-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      el.querySelectorAll('.sv-tool-tab').forEach(x => {
-        x.classList.toggle('active', x === tab);
-        x.setAttribute('aria-selected', x === tab ? 'true' : 'false');
+  // Portes outils : bascule locale (lecture seule, pas d'écriture)
+  el.querySelectorAll('.sv-door').forEach(door => {
+    door.addEventListener('click', () => {
+      el.querySelectorAll('.sv-door').forEach(x => {
+        x.classList.toggle('active', x === door);
+        x.setAttribute('aria-selected', x === door ? 'true' : 'false');
       });
       const body = el.querySelector('#svToolsBody');
-      if(body) body.innerHTML = _toolPanelHTML(tab.dataset.tool);
+      if(body) body.innerHTML = _toolPanelHTML(door.dataset.tool);
     });
+  });
+
+  // Copier · Partager la liste d'échange — fmtTrade() a enfin ses
+  // appelants (n°15 fermé). La sortie fichier passe par la plomberie
+  // EXTRAITE de profile-card.js (share-file.js), pas recopiée.
+  const copyBtn = el.querySelector('#svTradeCopy');
+  if(copyBtn) copyBtn.addEventListener('click', () => {
+    const done = () => showToast(t('st.copied'));
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(fmtTrade()).then(done).catch(() => {});
+    }
+  });
+  const shareBtn = el.querySelector('#svTradeShare');
+  if(shareBtn) shareBtn.addEventListener('click', async () => {
+    const blob = new Blob([fmtTrade()], { type: 'text/plain' });
+    const how = await shareOrDownloadFile(blob, 'f1-uno-echange.txt');
+    if(how === 'saved') showToast(t('st.trade_saved'));
   });
 }
 
@@ -591,17 +661,13 @@ function _toolPanelHTML(tool){
 }
 
 /* ── Collector-tools text formatting (shareable lists) — moved from
-   pin.js with the tools UI. Not wired to a button yet: kept exported
-   as the ready-made v2.x text export. Card names are data (never
-   translated); category/rarity/type labels use i18n.
+   pin.js with the tools UI. Card names are data (never translated);
+   category/rarity/type labels use i18n.
 
-   NE PAS SUPPRIMER comme code mort. fmtMissing / fmtDoubles /
-   fmtTrade n'ont aucun appelant, et tout analyseur — comme tout
-   nettoyage automatique — les signalera. C'est délibéré : elles sont
-   la base de l'export de liste d'échange (partage en texte ou en
-   image), une évolution décidée mais pas encore datée. Elles restent
-   exportées pour que ce jour-là il n'y ait qu'une UI à brancher.
-   Décision du mainteneur, 1.48.x. ── */
+   Branchées depuis 1.66.0 : Copier · Partager sur la liste d'échange
+   (renderStats). La dette « aucun appelant » posée en 1.48.x est
+   soldée, sa mise en garde retirée avec elle — POINTS-SIGNALES n°15
+   fermé. ── */
 function _catLabel(cat){ const k='cat.'+cat, l=t(k); return l===k ? (CATS[cat]?.label||cat) : l; }
 function _typeLabel(id){ const k='type.'+id, l=t(k); return l===k ? (CARD_TYPES[id]?.label||id) : l; }
 

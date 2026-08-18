@@ -13,11 +13,12 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Aucun point ouvert.** Les quatorze sont corrigés, mesurés ou tranchés,
-> et tous conservés avec leur diagnostic : 1a, 1b, 2, 3, 4, 5, 6, 7, 8,
-> 9, 10, 11, 12, 13, 14, plus le n°15 qui est une piste ouverte, pas un
-> défaut. Reste une hypothèse non mesurée, notée au n°12 §C :
-> ce que voit l'utilisateur quand le quota Resend est atteint.
+> **Aucun point ouvert.** Tous corrigés, mesurés ou tranchés, et tous
+> conservés avec leur diagnostic : 1a, 1b, 2, 3, 4, 5, 6, 7, 8,
+> 9, 10, 11, 12, 13, 14, et le n°15 — longtemps piste ouverte — fermé
+> en 1.66.0 par le partage de la liste d'échange. Reste une hypothèse
+> non mesurée, notée au n°12 §C : ce que voit l'utilisateur quand le
+> quota Resend est atteint.
 
 ---
 
@@ -999,7 +1000,17 @@ revoit jamais.
 
 ---
 
-## 15. L'export de liste d'échange devient faisable — piste identifiée
+## 15. ~~L'export de liste d'échange devient faisable~~ — FERMÉ (18/08/2026, 1.66.0) : Copier · Partager sur la liste d'échange
+
+**Fermé par le chantier « stats renversées »** : `fmtTrade()` a ses
+appelants — les boutons Copier (presse-papiers) et Partager (fichier
+texte) de la page Stats. La plomberie de sortie a été **extraite** de
+`profile-card.js` en un module feuille, [`share-file.js`](../app/share-file.js)
+(`shareOrDownloadFile`), consommé par le sceau de badges ET la liste
+d'échange — déplacée, pas recopiée. Le commentaire « NE PAS SUPPRIMER »
+de `stats.js`, posé en 1.48.x, est parti avec la dette qu'il gardait.
+
+Le texte d'origine, pour mémoire :
 
 **Ce n'est pas un défaut, c'est une porte qui vient de s'ouvrir.**
 
