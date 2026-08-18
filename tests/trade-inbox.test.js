@@ -107,10 +107,16 @@ describe('strictement locale — les registres', () => {
 
 describe('le moment de l’affichage — ni perdue, ni surgissante', () => {
   test('trois écrans ont priorité, et la visite guidée en fait partie', () => {
-    const src = read('trade-inbox.js');
+    // La règle a déménagé dans moment.js (1.76.0) — DÉPLACEMENT de
+    // fichier, pas changement de comportement : le bandeau de mise à
+    // jour souffrait du même défaut et la dupliquer l'aurait laissée
+    // diverger. Le test suit la source de vérité ; les contrats testés
+    // sont identiques au caractère près.
+    const src = read('moment.js');
     assert.match(src, /login-screen/);
     assert.match(src, /\.tut-overlay/);
     assert.match(src, /tierCele/);
+    assert.match(read('trade-inbox.js'), /peutAfficherSurcouche as peutAfficher/);
   });
 
   test('ENREGISTRER d’abord, AFFICHER ensuite — jamais l’inverse', () => {

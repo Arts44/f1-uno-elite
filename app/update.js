@@ -16,6 +16,7 @@ import { log } from './logger.js';
 import { t, getLang } from './i18n.js';
 import { CHANGELOG, APP_VERSION, compareVersions, entriesSince, changesFor } from './changelog.js';
 import { icon } from './icons.js';
+import { quandLeMomentEstBon, peutAfficherSurcouche } from './moment.js';
 
 const SEEN_KEY = 'f1uno_seen_version';
 const CHECK_EVERY_MS = 60 * 60 * 1000; // hourly while the app stays open
@@ -79,7 +80,13 @@ export function initUpdateFlow(){
 }
 
 function _checkForUpdate(){
-  if(_reg) _reg.update().catch(() => {}); // offline/network errors: silent
+  if(!_reg) return;
+  _reg.update().catch(() => {}); // offline/network errors: silent
+  /* ET ON REGARDE L'ÉTAT, pas seulement l'événement : `update()`
+     n'émet `updatefound` que s'il TÉLÉCHARGE quelque chose. Quand un
+     worker est déjà garé — le cas après une fermeture — il n'émet
+     rien, et sans cette ligne le bandeau ne revenait jamais. */
+  if(_reg.waiting && navigator.serviceWorker.controller) _showUpdateBanner();
 }
 
 // User clicked "Reload": promote the waiting SW, then reload on
@@ -149,8 +156,50 @@ function _removeUpdateBanner(){
   if(b) b.remove();
 }
 
+/* ══════════════════════════════════════════════════════════
+   FERMER VEUT DIRE « PAS MAINTENANT », PAS « JAMAIS » (1.76.0)
+
+   LE DÉFAUT MESURÉ : un bandeau fermé ne revenait JAMAIS. Le
+   mécanisme — `registration.update()` n'émet aucun `updatefound` quand
+   le worker est déjà garé en waiting, donc les vérifications
+   périodiques ne rallumaient rien. Il suffisait de fermer une fois,
+   par réflexe, pour ne plus jamais voir la mise à jour de cette
+   version. C'est l'explication du « une fois sur deux ».
+
+   LE CONTRAT, clair et testable — trois règles, pas « il revient
+   parfois » :
+     1. fermer fait taire le bandeau pendant SILENCE_APRES_FERMETURE ;
+     2. passé ce délai, la prochaine vérification le repropose ;
+     3. un RECHARGEMENT le repropose tout de suite — c'est une
+        nouvelle session, et recharger est un geste actif.
+
+   Le silence dure aussi longtemps que l'intervalle de vérification :
+   « il revient à la prochaine vérification » est alors vrai à la
+   lettre. Il vit en MÉMOIRE, pas dans localStorage : un refus ne doit
+   pas survivre à la session qui l'a exprimé.
+   ══════════════════════════════════════════════════════════ */
+export const SILENCE_APRES_FERMETURE_MS = CHECK_EVERY_MS;
+let _fermeA = 0;
+
+// Pur, testable : le bandeau a-t-il le droit de reparaître ?
+export function peutReproposer(maintenant, fermeA, silenceMs = SILENCE_APRES_FERMETURE_MS){
+  return !fermeA || (maintenant - fermeA) >= silenceMs;
+}
+
+function _fermerBanniere(){
+  _fermeA = Date.now();
+  _removeUpdateBanner();
+}
+
 function _showUpdateBanner(){
   if(document.getElementById('updateBanner')) return;
+  if(!peutReproposer(Date.now(), _fermeA)) return;
+  /* LE BANDEAU ATTEND LA FIN DE LA MISE EN ROUTE. Mesuré au premier
+     lancement : présent 6 fois sur 6, ATTEIGNABLE 0 fois sur 6 —
+     l'écran de langue/PIN interceptait les clics. Un bandeau qu'on ne
+     peut pas toucher n'existe pas. La règle est partagée avec la fiche
+     d'échange reçue (moment.js), qui souffrait du même défaut. */
+  if(!peutAfficherSurcouche()){ quandLeMomentEstBon(_showUpdateBanner); return; }
   const b = document.createElement('div');
   b.className = 'install-banner update-banner';
   b.id = 'updateBanner';
@@ -162,7 +211,7 @@ function _showUpdateBanner(){
     <button class="install-banner-close" id="updateCloseBtn" type="button" aria-label="${t('upd.later')}">✕</button>`;
   document.body.appendChild(b);
   document.getElementById('updateReloadBtn').addEventListener('click', applyUpdate);
-  document.getElementById('updateCloseBtn').addEventListener('click', _removeUpdateBanner);
+  document.getElementById('updateCloseBtn').addEventListener('click', _fermerBanniere);
 }
 
 /* ══════════════════════════════════════════════════════════

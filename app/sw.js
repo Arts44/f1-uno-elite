@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v173';
+const SW_VERSION = 'v174';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -57,7 +57,7 @@ const SHELL_ASSETS = [
   'update.js',
   'changelog.js',
   'secure-store.js',
-  'feedback.js', 'review-invite.js', 'storage-keys.js', 'badges-store.js', 'season.js', 'badge-cards.js', 'badge-titles.js', 'badge-rules.js', 'badge-toasts.js', 'profile-card.js', 'share-file.js', 'journal.js', 'trade-inbox.js', 'tutorial-snapshot.js',
+  'feedback.js', 'review-invite.js', 'storage-keys.js', 'badges-store.js', 'season.js', 'badge-cards.js', 'badge-titles.js', 'badge-rules.js', 'badge-toasts.js', 'profile-card.js', 'share-file.js', 'journal.js', 'trade-inbox.js', 'moment.js', 'tutorial-snapshot.js',
   'otp-input.js',
   'session.js',
   'account.js',

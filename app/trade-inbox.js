@@ -89,17 +89,13 @@ export function clearInbox(){
   try { localStorage.removeItem(INBOX_KEY); } catch(e){ /* rien à faire */ }
 }
 
-/* PEUT-ON AFFICHER MAINTENANT ? Même famille que le garde de la
-   célébration de palier : le point d'accroche décide, pas un drapeau.
-   Trois écrans ont priorité — et pendant une visite guidée la fiche ne
-   s'affiche NI pendant NI à la fin : un plein écran à la sortie du
-   tutoriel serait le même défaut, décalé de trente secondes. La
-   pastille sur la porte dit qu'elle est là ; l'utilisateur y va quand
-   il veut. */
-export function peutAfficher(){
-  const login = document.getElementById('login-screen');
-  if(login && getComputedStyle(login).display !== 'none') return false;
-  if(document.querySelector('.tut-overlay')) return false;
-  if(document.getElementById('tierCele')) return false;
-  return true;
-}
+/* PEUT-ON AFFICHER MAINTENANT ? La règle vit dans moment.js depuis
+   1.76.0 — elle est partagée avec le bandeau de mise à jour, qui
+   souffrait exactement du même défaut (présent, inatteignable). La
+   dupliquer l'aurait laissée diverger.
+
+   Pendant une visite guidée la fiche ne s'affiche NI pendant NI à la
+   fin : un plein écran à la sortie du tutoriel serait le même défaut,
+   décalé de trente secondes. La pastille sur la porte dit qu'elle est
+   là ; l'utilisateur y va quand il veut. */
+export { peutAfficherSurcouche as peutAfficher } from './moment.js';

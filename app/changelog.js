@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.76.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['The “new version” banner is reliable now. It used to appear behind the first-run screens — present but impossible to tap — and once dismissed it never came back, which is why updates seemed to show up about half the time. It now waits for a moment when you can actually reach it, stays quiet during setup and the guided tour, and treats a dismissal as “not now” rather than “never”: it returns at the next check.'],
+      fr: ['Le bandeau « nouvelle version » est fiable désormais. Il apparaissait derrière les écrans de mise en route — présent mais impossible à toucher — et une fois fermé il ne revenait jamais, ce qui explique qu’une mise à jour semblait s’afficher une fois sur deux. Il attend maintenant un moment où on peut vraiment l’atteindre, reste silencieux pendant la mise en route et la visite guidée, et traite une fermeture comme « pas maintenant » plutôt que « jamais » : il revient à la vérification suivante.'],
+      es: ['El aviso de «nueva versión» ya es fiable. Aparecía detrás de las pantallas de puesta en marcha — presente pero imposible de tocar — y una vez cerrado no volvía nunca, por eso una actualización parecía mostrarse una de cada dos veces. Ahora espera un momento en que se pueda alcanzar de verdad, permanece en silencio durante la puesta en marcha y la visita guiada, y trata el cierre como «ahora no» en vez de «nunca»: vuelve en la siguiente comprobación.'],
+      zh: ['「新版本」提示条现在可靠了。此前它会出现在初次设置的界面后面——存在却点不到——而且一旦关闭就再也不会出现，这就是更新提示看起来时有时无的原因。现在它会等到你真正能点到它的时机，在初次设置和引导教程期间保持安静，并把关闭理解为「暂时不要」而非「永不」：下次检查时它会再次出现。'],
+      it: ['L’avviso «nuova versione» è ora affidabile. Compariva dietro le schermate di avvio — presente ma impossibile da toccare — e una volta chiuso non tornava mai, ed è per questo che un aggiornamento sembrava mostrarsi una volta su due. Ora attende un momento in cui lo si possa davvero raggiungere, resta in silenzio durante l’avvio e la visita guidata, e tratta la chiusura come «non ora» invece di «mai»: torna al controllo successivo.'],
+      nl: ['De melding «nieuwe versie» is nu betrouwbaar. Ze verscheen achter de opstartschermen — aanwezig maar niet aan te tikken — en eenmaal weggeklikt kwam ze nooit terug, waardoor een update ongeveer om de twee keer leek te verschijnen. Ze wacht nu op een moment waarop je haar echt kunt bereiken, blijft stil tijdens het opstarten en de rondleiding, en beschouwt wegklikken als «nu even niet» in plaats van «nooit»: ze komt terug bij de volgende controle.'],
+      de: ['Der Hinweis „neue Version“ ist jetzt zuverlässig. Er erschien hinter den Einrichtungsbildschirmen — vorhanden, aber nicht antippbar — und einmal geschlossen kam er nie zurück; deshalb schien ein Update nur etwa jedes zweite Mal aufzutauchen. Er wartet jetzt auf einen Moment, in dem man ihn wirklich erreichen kann, bleibt während Einrichtung und geführter Tour still, und versteht das Schließen als „jetzt nicht“ statt „nie“: er kehrt bei der nächsten Prüfung zurück.'],
+    },
+  },
+  {
     version: '1.75.0',
     date: '2026-08-18',
     changes: {

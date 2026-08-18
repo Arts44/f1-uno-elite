@@ -1397,3 +1397,33 @@ réglage : le bloc disparaît au premier export.
 information que l'écran plein ne porte pas, et qu'un utilisateur risque
 de payer cher en l'ignorant. Le Compte remplit ce critère (perte de
 données) ; les trois autres non.
+
+
+---
+
+## 23. L'installation du service worker en réseau dégradé n'a JAMAIS été mesurée
+
+**Ce n'est pas un défaut du produit : c'est un trou dans ce qu'on sait,
+et il doit rester visible plutôt que d'être comblé par une estimation.**
+
+Au diagnostic du bandeau de mise à jour (1.76.0), les trois moments ont
+été chronométrés **en local** : vérification ~5 ms, installation **82 ms
+médians pour 66 fichiers**, application ~2 ms.
+
+**La mesure « réseau lent » qui les accompagnait est INVALIDE**, et le
+contrôle d'instrument l'a montré avant qu'elle soit publiée :
+l'émulation `Network.emulateNetworkConditions` de CDP (400 kb/s, 400 ms
+de latence) **ne s'applique pas à localhost** — le même `fetch` de
+580 Ko prend **5 ms avec et sans throttling**. Les chiffres « dégradés »
+étaient donc les chiffres normaux portant une autre étiquette.
+
+**Ce qu'on ne sait pas** : combien de temps dure réellement le précache
+de 66 fichiers sur un réseau mobile lent. L'ordre de grandeur local
+suffit pour décider de la FORME d'un écran de chargement (une barre de
+progression sur l'installation serait invisible dans le cas courant),
+mais pas pour promettre une durée à l'utilisateur.
+
+**Ce qu'il faudrait pour combler** : un serveur qui ralentit lui-même
+ses réponses, ou une mesure contre la production réelle depuis un
+réseau bridé. Décidé de ne pas le faire tant qu'aucune décision n'en
+dépend — la noter vaut mieux que la refaire pour rien.
