@@ -71,7 +71,7 @@ def _rapport_final():
 # ── Le SEED vit dans capture_seed.py : les démos en ont besoin
 #    aussi, et un module partagé vaut mieux qu'un script qui en
 #    exécute un autre.
-from capture_seed import SEED, init_script, SEASON, OWNED_COUNT, \
+from capture_seed import SEED, init_script, SEASON, OWNED_COUNT, seed_presque_vide, \
     AUTO_BADGES, MANUAL_BADGES, CLOUD_SESSION
 
 # ── Bande de comparaison des 5 familles de foil (injectée par Playwright).
@@ -481,6 +481,82 @@ with sync_playwright() as p:
         pg.evaluate('document.querySelector(".set-security").scrollIntoView({block:"center"})')
         pg.wait_for_timeout(400)
     mobile('dark', 'settings-dark.jpg', open_settings)
+
+    # ══════════════════════════════════════════════════════════
+    # LES SURFACES DE 1.64.0 → 1.72.0 — sept versions que la planche
+    # de captures ne montrait pas.
+    # ══════════════════════════════════════════════════════════
+
+    # 1.64.0 + 1.65.0 — la matrice 4×4 et le cran suivant, dans la fiche
+    def open_matrice(pg):
+        card(pg, '044').click()
+        pg.wait_for_selector('.mo-mx')
+        pg.evaluate('document.querySelector(".mo-mx").scrollIntoView({block:"center"})')
+        pg.wait_for_timeout(400)
+    mobile('dark', 'matrice-dark.jpg', open_matrice)
+    mobile('light', 'matrice-light.jpg', open_matrice)
+
+    def open_cran(pg):
+        card(pg, '044').click()
+        pg.wait_for_selector('#moNext')
+        pg.evaluate('document.querySelector("#moNext").scrollIntoView({block:"center"})')
+        pg.wait_for_timeout(400)
+    mobile('dark', 'cran-suivant.jpg', open_cran)
+
+    # 1.66.0 — les stats renversées : héros du manque + les trois portes
+    def open_stats_haut(pg):
+        go(pg, 'stats')
+        pg.wait_for_selector('.sv-lack')
+        pg.wait_for_timeout(400)
+    mobile('dark', 'stats-renversees-dark.jpg', open_stats_haut)
+    mobile('light', 'stats-renversees-light.jpg', open_stats_haut)
+
+    # 1.72.0 — L'ÉTAT PRESQUE VIDE, celui que voit un nouvel utilisateur.
+    # C'est l'angle mort qui a laissé six défauts en production : les 40
+    # captures étaient toutes prises sur le seed à 72 cartes.
+    def mobile_vide(theme, name, fn=None, n=1, wait='.card'):
+        c = ctx_for('en', theme, 375, 812, 2, **seed_presque_vide(n))
+        page = new_page(c, wait=wait)
+        if fn:
+            fn(page)
+        shot(page, name)
+        c.close()
+    mobile_vide('dark', 'stats-presque-vide.jpg', open_stats_haut, n=1)
+    mobile_vide('light', 'stats-presque-vide-light.jpg', open_stats_haut, n=1)
+    mobile_vide('dark', 'stats-vide.jpg', open_stats_haut, n=0)
+
+    # 1.67.0 — la célébration de palier (statique par construction)
+    def open_palier(pg):
+        card(pg, '044').click()
+        pg.wait_for_selector('.mo-mx')
+        pg.evaluate("""() => {
+          const cell = document.querySelector('#moTypeRows .mo-mx-cell[data-type="nitro_foil"]');
+          if(cell) cell.click();
+        }""")
+        pg.wait_for_timeout(200)
+        pg.click('#moTypeRows .mqbtn[data-delta="1"]')
+        pg.wait_for_selector('#tierCele', timeout=4000)
+        pg.wait_for_timeout(400)
+    mobile('dark', 'palier-dark.jpg', open_palier)
+
+    # 1.69.0 — la fiche d'échange : son QR à la bonne densité
+    def open_fiche_echange(pg):
+        go(pg, 'stats')
+        pg.wait_for_selector('#svTradeSheet')
+        pg.evaluate('document.querySelector("#svTradeSheet").scrollIntoView({block:"center"})')
+        pg.wait_for_timeout(400)
+    mobile('dark', 'fiche-echange-bouton.jpg', open_fiche_echange)
+
+    # 1.70.0 — l'état vide du Compte (aucune sauvegarde jamais faite)
+    def open_compte_vide(pg):
+        go(pg, 'account')
+        pg.wait_for_timeout(700)
+    c = ctx_for('en', 'dark', 375, 812, 2, f1uno_cloud_session='',
+                f1uno_last_backup='', **seed_presque_vide(0))
+    page = new_page(c, wait='body')
+    open_compte_vide(page)
+    shot(page, 'compte-vide.jpg')
+    c.close()
 
     # Saisie OTP au repos — cases vides, aucun code réel à l'écran.
     # Contexte DÉDIÉ déconnecté : add_init_script rejoue le seed à chaque
