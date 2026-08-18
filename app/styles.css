@@ -386,14 +386,28 @@ body:has(.tut-overlay) .zone-basse > *{pointer-events:none;}
    nav (shown only when the native install prompt is available). */
 .install-ok{font-size:13px;font-weight:600;color:var(--tx2);padding:var(--space-1) 0;}
 .install-ins{font-size:13px;line-height:1.55;color:var(--tx2);background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--space-10px) var(--space-3);}
-.install-banner{display:flex;align-items:center;gap:var(--space-10px);background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-pill);box-shadow:var(--sh-lg);padding:var(--space-2) var(--space-10px) var(--space-2) var(--space-14px);animation:instIn 0.25s ease;}
+.install-banner{display:flex;align-items:center;min-width:0;gap:var(--space-10px);background:var(--surface);border:1px solid var(--border-s);border-radius:var(--r-pill);box-shadow:var(--sh-lg);padding:var(--space-2) var(--space-10px) var(--space-2) var(--space-14px);animation:instIn 0.25s ease;}
 @keyframes instIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .install-banner-icon{font-size:18px;line-height:1;}
-.install-banner-text{flex:1;font-size:12.5px;font-weight:600;color:var(--tx1);line-height:1.3;}
+.install-banner-text{flex:1;min-width:0;font-size:12.5px;font-weight:600;color:var(--tx1);line-height:1.3;}
 @media (max-width:480px){.install-banner{border-radius:18px;}}
-.install-banner-btn{background:var(--red);border:none;color:#fff;font-family:var(--font-b);font-size:12px;font-weight:700;border-radius:var(--r-pill);padding:var(--space-2) var(--space-14px);cursor:pointer;transition:var(--ease);white-space:nowrap;}
+/* --on-red, pas #fff. Mesuré : blanc sur --red vaut 4.7 en clair mais
+   3.34 en SOMBRE — sous le seuil AA de 4.5 pour du 12 px gras. Le
+   dépôt avait déjà la correction (--on-red = #2A0509 en sombre,
+   5.6), appliquée au tutoriel et jamais ici : ces trois bandeaux
+   dataient d'avant.
+   --tap-min : la hauteur était de 31 px pour un plancher de 44 déclaré
+   dans les tokens du dépôt. ATTENTION, cette classe porte TROIS
+   surfaces (installation, nouveautés, mise à jour) : elle les grandit
+   ensemble, et c'est le conteneur qui absorbe le changement de
+   hauteur — plus aucune constante ne dépend de leur taille. */
+.install-banner-btn{background:var(--red);border:none;color:var(--on-red,#fff);font-family:var(--font-b);font-size:12px;font-weight:700;border-radius:var(--r-pill);min-height:var(--tap-min);padding:0 var(--space-14px);cursor:pointer;transition:var(--ease);white-space:nowrap;}
 .install-banner-btn:hover{filter:brightness(1.08);}
-.install-banner-close{background:none;border:none;color:var(--tx3);font-size:13px;cursor:pointer;padding:var(--space-6px) var(--space-2);border-radius:50%;transition:var(--ease);line-height:1;}
+/* 26 × 25 px mesurés — 32 % de l'aire exigée. Le glyphe garde sa
+   taille : c'est la CIBLE qui grandit, pas le dessin. */
+.install-banner-close{background:none;border:none;color:var(--tx3);font-size:13px;cursor:pointer;
+  min-width:var(--tap-min);min-height:var(--tap-min);display:inline-flex;align-items:center;justify-content:center;
+  padding:0;border-radius:50%;transition:var(--ease);line-height:1;flex:0 0 auto;}
 .install-banner-close:hover{color:var(--tx1);background:var(--surface2);}
 @media (prefers-reduced-motion:reduce){.install-banner{animation:none;}}
 
