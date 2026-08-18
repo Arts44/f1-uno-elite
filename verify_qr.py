@@ -29,7 +29,7 @@ opencv-python-headless), comme Playwright et cairosvg. La règle zéro
 dépendance porte sur ce que l'app EMBARQUE. S'il manque, ce script le
 DIT et sort en échec — il ne passe jamais au vert en silence.
 ══════════════════════════════════════════════════════════"""
-import sys, os, json
+import sys, os, tempfile
 
 MANQUE_CV2 = """
 ╔══════════════════════════════════════════════════════════╗
@@ -52,10 +52,13 @@ except ImportError:
 
 from playwright.sync_api import sync_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from capture_seed import init_script, SEASON
+from capture_seed import init_script
 
 URL = 'http://localhost:8123/app/index-dev.html'
-TMP = os.environ.get('QR_TMP', '/tmp/f1uno-qr')
+# Répertoire de travail : un dossier PROPRE au processus (tempfile), pas
+# un chemin fixe sous /tmp — un chemin partagé et prévisible se collisionne
+# entre deux exécutions et se détourne par lien symbolique.
+TMP = os.environ.get('QR_TMP') or tempfile.mkdtemp(prefix='f1uno-qr-')
 os.makedirs(TMP, exist_ok=True)
 ECHECS = []
 
@@ -91,7 +94,10 @@ with sync_playwright() as p:
     pg = ctx.new_page()
     pg.goto(URL); pg.wait_for_timeout(900)
     try: pg.click('#updateBanner .ub-close', timeout=700)
-    except Exception: pass
+    except Exception:
+        # Le bandeau de mise à jour n'est pas toujours là ; son absence
+        # n'est pas une erreur, elle ne doit rien interrompre.
+        pass
 
     print('── densités rendues (plancher = 6 px/module) ──')
     dens = pg.evaluate("""async () => {
