@@ -1292,3 +1292,32 @@ couleur, clair et sombre).
 > honnêteté d'archive, mais le critère de sortie est désormais réputé
 > non atteint : ne la déployer que si un RETOUR UTILISATEUR réel — pas
 > une intuition — la réclame.
+
+---
+
+## 21. Le recoupement (piste 3c) — REPORTÉ, pas refusé
+
+**Piste identifiée à l'exploration du tour 3, consignée pour ne pas se
+perdre — et pour ne pas se rejouer sans ses conditions.**
+
+L'inverse de la fiche d'échange : on ne publie pas sa liste, on colle le
+code de l'autre et l'app calcule l'intersection — ce qui part, ce qui
+arrive, et ce que ça fait monter de palier. L'artefact partagé n'est
+plus une liste mais un accord.
+
+**Pourquoi reporté, et ses trois conditions de réouverture :**
+
+1. **Il dépend de l'existence de la fiche d'échange** (chantier 6,
+   format `#trade=`) : sans fiche qui circule, il n'y a pas de code à
+   coller.
+2. **Il suppose que deux personnes se parlent déjà en privé** — rien ne
+   se poste dans un fil ; ça ne remplace pas la fiche, ça vient après.
+3. **Coût moyen** : l'intersection des deux listes, et la prédiction
+   « ce que ça fait monter » — qui rejoue le calcul de rareté sur un
+   état hypothétique (nextTierInfo sur une collection simulée).
+
+**À rouvrir si la fiche d'échange trouve des utilisateurs** (le besoin
+observé du fil r/F1Cards, pas une intuition). Réserve de la maquette à
+tenir ce jour-là : le code échangé doit se réduire à manquantes +
+doubles — jamais la collection entière de l'autre, qui est plus que ce
+qu'un échange demande.
