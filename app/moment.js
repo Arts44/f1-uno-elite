@@ -1,23 +1,61 @@
 /* ══════════════════════════════════════════════════════════
-   LE BON MOMENT — une seule règle pour toutes les surcouches.
+   LA ZONE BASSE — le bon moment, et qui a le droit d'y être.
 
-   POURQUOI CE MODULE DE VINGT LIGNES EXISTE. Trois fois de suite, un
-   élément a été construit AU BON MOMENT et empilé AU MAUVAIS :
-     · la fiche d'échange reçue, derrière la visite guidée (1.74.0) ;
-     · le bandeau de mise à jour, derrière l'écran de première visite
-       — mesuré ATTEIGNABLE 0 fois sur 6 (1.76.0) ;
-   et à chaque fois le symptôme était le même : présent dans le DOM,
-   inatteignable pour un doigt. La règle ne pouvait pas rester dans le
-   module de l'un des deux ; dupliquée, elle aurait divergé.
+   CE FICHIER A CHANGÉ DE TAILLE, PAS DE NATURE, et son en-tête a
+   longtemps menti là-dessus : il annonçait « vingt lignes » et
+   « rien d'autre ne doit entrer ici » alors qu'il en portait 191.
+   La correction est ici, et la règle qui vaut d'être protégée n'est
+   pas la taille — c'est L'INVARIANT D'IMPORT.
 
-   CE QU'ELLE DIT : trois écrans ont priorité absolue, parce qu'ils
+   ── CE QUE LE MODULE EST ──────────────────────────────────────
+   Le propriétaire de la zone basse de l'écran. Il répond à deux
+   questions, et c'est la même famille :
+     · QUAND une surcouche a le droit de paraître ;
+     · QUI a le droit d'y être, et où elle se pose.
+
+   ① LE BON MOMENT (1.74.0-1.76.0). Trois fois de suite, un élément a
+   été construit AU BON MOMENT et empilé AU MAUVAIS : la fiche
+   d'échange reçue derrière la visite guidée, le bandeau de mise à
+   jour derrière l'écran de première visite — mesuré ATTEIGNABLE
+   0 fois sur 6. Trois écrans ont priorité absolue parce qu'ils
    demandent une action ou racontent une séquence qu'une surcouche
-   casserait — l'écran de première visite (langue, PIN, mise en route),
-   la visite guidée, et la célébration de palier.
+   casserait : l'écran de première visite, la visite guidée, la
+   célébration de palier.
 
-   RIEN D'AUTRE NE DOIT ENTRER ICI, comme season.js : ce module vaut
-   par ce qu'il ignore. Aucun import, donc feuille du graphe, donc
-   utilisable par n'importe qui sans rien traîner.
+   ② L'ARBITRAGE (1.77.0) — file, préemption, éviction par rang, plus
+   le point d'amarrage `zoneBasse()`. POURQUOI C'ÉTAIT SA PLACE ET PAS
+   UN MODULE DE PLUS : la règle vivait déjà ici pour EXACTEMENT ces
+   surfaces-là. Sept d'entre elles se disputaient le bas de l'écran
+   avec six règles d'amarrage et cinq z-index ; celle qui savait déjà
+   leur dire « pas maintenant » est celle qui devait leur dire « pas
+   toi ». Écrire l'arbitrage ailleurs aurait dupliqué la liste des
+   surcouches — et une règle dupliquée diverge, c'est ce qui avait
+   fait naître ce fichier. Aucun nouveau fichier précaché, non plus.
+
+   ── CE QUE LE MODULE CONTINUE DE REFUSER ─────────────────────
+   AUCUN IMPORT. C'est l'invariant, il est testé, et il vaut plus que
+   n'importe quelle limite de lignes : sans import, ce module est une
+   FEUILLE du graphe, donc utilisable par n'importe qui — update.js,
+   install.js, badge-toasts.js, review-invite.js, trade-inbox.js —
+   sans rien traîner derrière lui. Le jour où une règle d'arbitrage
+   aurait besoin d'un import, elle n'a rien à faire ici : c'est ce
+   seuil-là qui protège le fichier, pas sa longueur.
+
+   ── DEUX POINTS QUE JE TIENS POUR DISCUTABLES ────────────────
+   Mesuré : 31 points de décision, dont 11 dans `demanderLaZone` — six
+   contrats distincts, chacun avec un test qui rougit sans lui. La
+   complexité est donc celle des règles. Sauf pour ces deux-là, ~10 % :
+
+     · `_occupantPerdu()` — une CEINTURE, pas une règle. Elle rattrape
+       un nœud retiré hors de la file. Elle sort le jour où un garde
+       structurel empêche ce retrait à la source ; tant qu'un `remove()`
+       reste possible ailleurs, elle vaut mieux qu'une zone gelée.
+     · `zoneBasse()` — de la GÉOMÉTRIE dans un module d'arbitrage. Elle
+       est ici pour n'ajouter aucun fichier précaché. Elle sort le jour
+       où un module de zone existe pour une autre raison que celle-là.
+
+   Consigné, pas refactorisé : aucune mesure ne dit aujourd'hui que
+   les déplacer améliore quoi que ce soit.
    ══════════════════════════════════════════════════════════ */
 
 // L'écran de première visite est-il devant ? (display, pas seulement
