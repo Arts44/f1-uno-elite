@@ -1250,6 +1250,20 @@ body.viewer-mode .mo-type-rows .mqbtn { opacity:0.35;pointer-events:none; }
   color:var(--tx2);margin-bottom:var(--space-3);padding-top:var(--space-3);
   border-top:1px solid var(--border);
 }
+/* ── L'ÉTAT VIDE DU COMPTE (1.70.0) — la promesse et son revers.
+   Visible tant qu'aucune sauvegarde n'a jamais été faite ; disparaît
+   au premier export (fait, pas réglage). */
+.acc-empty{border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2);margin-bottom:var(--space-4);}
+.acc-empty-t{font-family:var(--font-d);font-weight:800;font-size:18px;line-height:1.15;color:var(--tx1);}
+.acc-empty-s{font-size:13px;line-height:1.6;color:var(--tx2);}
+.acc-empty-warn{border-left:3px solid var(--orange);border-radius:0 10px 10px 0;background:var(--surface2);padding:var(--space-2) var(--space-3);margin-top:var(--space-1);}
+.acc-empty-wt{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--tx1);}
+.acc-empty-wt .ic{width:14px;height:14px;color:var(--orange);flex:none;}
+.acc-empty-ws{font-size:12.5px;line-height:1.55;color:var(--tx2);margin-top:3px;}
+.acc-empty-acts{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-top:var(--space-1);}
+.acc-empty-acts .setv-btn{flex:1;min-width:150px;min-height:var(--tap-min);display:inline-flex;align-items:center;justify-content:center;}
+.acc-empty-acts .primary{background:var(--red);color:#fff;border-color:var(--red);}
+
 /* ── LA FICHE D'ÉCHANGE REÇUE (1.69.0) — un lien #trade= scanné
    ouvre cette liste en LECTURE seule : rien n'est écrit, rien n'est
    proposé à l'import (c'est une fiche, pas une sauvegarde). */

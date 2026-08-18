@@ -257,6 +257,13 @@ export function noteChange(){
   }
 }
 
+/* Une sauvegarde a-t-elle DÉJÀ été faite sur cet appareil ? Lu par
+   l'état vide du Compte (1.70.0) : l'avertissement disparaît au
+   premier geste de sauvegarde, sans réglage à tenir. */
+export function hasEverBackedUp(){
+  return !!localStorage.getItem(K_LAST);
+}
+
 // Called after a successful JSON export or backup-code generation.
 export function markBackupDone(){
   localStorage.setItem(K_LAST, String(Date.now()));

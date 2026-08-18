@@ -12,7 +12,7 @@ import { t, tEsc, setSafeHTML } from './i18n.js';
 import { showToast, renderCollection } from './render.js';
 import { updateStats } from './stats.js';
 import { triggerImport, collectionSnapshot, _showImportDialog, deleteLocalCollectionData } from './storage.js';
-import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg } from './backup.js';
+import { generateBackupCode, decodeBackupCode, markBackupDone, buildBackupLink, makeBackupQrSvg, hasEverBackedUp } from './backup.js';
 import { backupIncludes, setBackupIncludes } from './settings-sync.js';
 import { cloudSectionHTML, bindCloudSection } from './cloud-ui.js';
 import { isCloudSignedIn, cloudDeleteSeason } from './cloud-sync.js';
@@ -92,11 +92,45 @@ export function renderAccount(){
     el.querySelector('#accAdminBtn')?.addEventListener('click', showAdminPinScreen);
     return;
   }
+  /* ── L'ÉTAT VIDE DU COMPTE (1.70.0, piste 3a — le FRAGMENT retenu)
+     Tant que rien n'a jamais été sauvegardé sur cet appareil, la page
+     s'ouvre sur la promesse ET son revers : la collection vit ici, donc
+     vider le navigateur l'efface. C'est vrai, c'est utile, et c'est le
+     bon moment pour le dire — « tant qu'il n'y a rien à perdre ».
+
+     La condition est un FAIT, pas un réglage : dès que markBackupDone()
+     passe (export fichier ou code), le bloc disparaît de lui-même. Rien
+     à tenir, rien à oublier de remettre.
+
+     CE QUI N'A PAS ÉTÉ PRIS de la piste 3a, et pourquoi — écrit ici ET
+     dans POINTS-SIGNALES n°22 pour que ça ne se rejoue pas :
+     · la PROJECTION des stats (« une carte par jour, complète le
+       27 novembre ») est une invention sans base dans les données — la
+       maquette l'admet elle-même ;
+     · les QUATRE écrans vides complets coûtent quatre gabarits en sept
+       langues que personne ne revoit jamais (ils disparaissent à la
+       première carte). Un seul écran, celui qui dit quelque chose de
+       VRAI et d'actionnable, valait la peine. ── */
+  const showEmpty = !hasEverBackedUp();
+  const emptyHTML = showEmpty ? `
+    <div class="acc-accent acc-empty">
+      <div class="acc-empty-t">${t('acc.empty_t')}</div>
+      <div class="acc-empty-s">${t('acc.empty_s')}</div>
+      <div class="acc-empty-warn">
+        <div class="acc-empty-wt">${icon('info')} ${t('acc.empty_warn_t')}</div>
+        <div class="acc-empty-ws">${t('acc.empty_warn_s')}</div>
+      </div>
+      <div class="acc-empty-acts">
+        <button class="setv-btn primary" id="accEmptyExport" data-action="exportCollection">${t('acc.empty_cta')}</button>
+        <button class="setv-btn" id="accEmptyImport">${t('acc.empty_import')}</button>
+      </div>
+    </div>` : '';
+
   el.innerHTML = pageHeadHTML({
     icon: 'user',
     title: t('acc.title'),
     sub: t('ph.acc_sub')
-  }) + `
+  }) + emptyHTML + `
 
     <div class="acc-accent acc-cloud">${cloudSectionHTML()}</div>
 
@@ -183,6 +217,8 @@ export function renderAccount(){
 /* ── Backup bindings (moved verbatim from pin.js) ── */
 function _bindBackupSection(el){
   el.querySelector('#importBtn')?.addEventListener('click', triggerImport);
+  // État vide : le même geste, à l'endroit où il compte le plus
+  el.querySelector('#accEmptyImport')?.addEventListener('click', triggerImport);
   el.querySelector('#bkIncPrefs')?.addEventListener('change', e => setBackupIncludes({ prefs: e.target.checked }));
   el.querySelector('#bkIncSec')?.addEventListener('change', e => setBackupIncludes({ security: e.target.checked }));
 

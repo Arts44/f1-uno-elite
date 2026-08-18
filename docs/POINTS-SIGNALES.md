@@ -1321,3 +1321,36 @@ observé du fil r/F1Cards, pas une intuition). Réserve de la maquette à
 tenir ce jour-là : le code échangé doit se réduire à manquantes +
 doubles — jamais la collection entière de l'autre, qui est plus que ce
 qu'un échange demande.
+
+---
+
+## 22. Les états vides de la piste 3a — UN retenu, trois refusés
+
+**Le fragment retenu (1.70.0)** : l'écran Compte, tant qu'aucune
+sauvegarde n'a jamais été faite. Il dit une chose vraie et actionnable —
+la collection vit sur cet appareil, donc vider le navigateur l'efface —
+au seul moment où le dire ne coûte rien : « tant qu'il n'y a rien à
+perdre ». La condition est un FAIT (`hasEverBackedUp()`), pas un
+réglage : le bloc disparaît au premier export.
+
+**Ce qui n'a PAS été pris, et pourquoi — pour que ça ne se rejoue pas :**
+
+1. **La projection des stats** (« une carte par jour, et la collection
+   est complète le 27 novembre ») est une **invention sans base dans les
+   données** — la maquette l'admet elle-même (« "une carte par jour" est
+   une invention, elle n'a aucune base »). Une app qui invente une date
+   pour motiver ment à son utilisateur ; c'est la famille du refus de la
+   piste C (n°21 : ne pas dessiner ce que les données ne portent pas).
+2. **Les quatre écrans vides complets** coûtent quatre gabarits en sept
+   langues **que personne ne revoit jamais** : ils disparaissent à la
+   première carte. Le rapport valeur/maintenance ne tient que pour celui
+   qui dit quelque chose qu'on ne peut pas deviner.
+3. **Le catalogue numéroté de la grille vide** et **les paliers de
+   badges atteignables** sont jolis mais redondants : la grille montre
+   déjà les 101 emplacements, et la page Badges montre déjà le prochain
+   badge. Ils remplacent du vide par du décor, pas par de l'information.
+
+**Critère de réouverture** : un état vide se justifie quand il porte une
+information que l'écran plein ne porte pas, et qu'un utilisateur risque
+de payer cher en l'ignorant. Le Compte remplit ce critère (perte de
+données) ; les trois autres non.

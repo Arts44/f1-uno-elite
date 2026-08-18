@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.70.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['The Account page now opens with a plain warning while you have never saved a backup: your collection lives on this device, so clearing your browser data erases it. A backup is one file or one code — best done now, while there is nothing to lose. The block disappears the moment you save one.'],
+      fr: ['La page Compte s’ouvre désormais sur un avertissement clair tant que vous n’avez jamais fait de sauvegarde : votre collection vit sur cet appareil, donc effacer les données du navigateur l’efface. Une sauvegarde est un fichier ou un code — à faire maintenant, tant qu’il n’y a rien à perdre. Le bloc disparaît dès que vous en enregistrez une.'],
+      es: ['La página Cuenta se abre ahora con un aviso claro mientras nunca hayas hecho una copia de seguridad: tu colección vive en este dispositivo, así que borrar los datos del navegador la borra. Una copia es un archivo o un código — mejor hacerlo ahora, mientras no hay nada que perder. El bloque desaparece en cuanto guardas una.'],
+      zh: ['在您从未做过备份之前，「账户」页面现在会先给出一句明确的提醒：您的收藏保存在这台设备上，清除浏览器数据就会将其抹掉。备份只是一个文件或一段代码——趁现在还没有什么可失去，做一次就好。保存备份后该提示会自动消失。'],
+      it: ['La pagina Account si apre ora con un avviso chiaro finché non hai mai fatto un backup: la tua collezione vive su questo dispositivo, quindi cancellare i dati del browser la cancella. Un backup è un file o un codice — meglio farlo ora, finché non c’è nulla da perdere. Il blocco sparisce appena ne salvi uno.'],
+      nl: ['De pagina Account opent nu met een duidelijke waarschuwing zolang je nooit een back-up hebt gemaakt: je collectie leeft op dit apparaat, dus het wissen van je browsergegevens wist haar. Een back-up is één bestand of één code — doe het nu, zolang er niets te verliezen valt. Het blok verdwijnt zodra je er een opslaat.'],
+      de: ['Die Konto-Seite öffnet jetzt mit einem klaren Hinweis, solange Sie nie ein Backup gemacht haben: Ihre Sammlung lebt auf diesem Gerät, das Löschen der Browserdaten löscht sie also. Ein Backup ist eine Datei oder ein Code — am besten jetzt, solange nichts zu verlieren ist. Der Block verschwindet, sobald Sie eines speichern.'],
+    },
+  },
+  {
     version: '1.69.0',
     date: '2026-08-18',
     changes: {
