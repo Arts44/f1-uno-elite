@@ -1428,6 +1428,21 @@ ses réponses, ou une mesure contre la production réelle depuis un
 réseau bridé. Décidé de ne pas le faire tant qu'aucune décision n'en
 dépend — la noter vaut mieux que la refaire pour rien.
 
+### Facteur aggravant ajouté en 1.77.0, connu et NON mesuré
+
+Le sondage des nouveautés attend `reg.update()` au démarrage
+(`app/update.js`, `DELAI_SONDAGE_MAX_MS`). C'est une **requête
+conditionnelle de plus sur `sw.js` à chaque lancement**, assumée à
+l'écriture pour supprimer un scintillement, et elle tombe exactement
+dans le trou décrit ci-dessus : sur un réseau dégradé, son coût est
+inconnu comme le reste. Elle est bornée à 4000 ms côté produit — les
+nouveautés paraissent quand même — mais **cette borne protège
+l'affichage, pas le démarrage** : la requête, elle, part toujours.
+
+**À intégrer à la campagne quand n°23 sera enfin instrumenté** : mesurer
+le démarrage AVEC et SANS ce sondage, sur le même réseau bridé. Noté
+ici plutôt qu'estimé, pour la même raison que le reste de l'entrée.
+
 
 ---
 
@@ -1567,3 +1582,46 @@ exactement le raisonnement qui a fait passer de « trois bugs » à « une
 zone sans propriétaire ». La file de `moment.js` le corrige en
 supprimant la possibilité même d'un appelant qui oublie : plus
 personne ne pose une surcouche sans passer par elle.
+
+
+---
+
+## 27. Deux ✕ identiques, deux contrats opposés — la pièce la plus grave du chantier de formulation
+
+**Trouvé en cherchant une borne de fréquence, pas en cherchant ça. Antérieur
+à la refonte de la zone basse ; 1.77.0 ne l'a ni créé ni corrigé.**
+
+Les deux bandeaux de `update.js` portent le **même glyphe**, la **même
+classe** et **la même clé i18n** pour leur croix — `t('upd.later')`,
+« Plus tard » dans les sept langues :
+
+| | [update.js:262](../app/update.js) | [update.js:321](../app/update.js) |
+|---|---|---|
+| bouton | `#updateCloseBtn` | `#whatsNewCloseBtn` |
+| libellé accessible | `upd.later` → « Plus tard » | `upd.later` → « Plus tard » |
+| **ce que le clic fait** | pose `_fermeA` | appelle `markVersionSeen()` |
+| **mesuré** | +59 min → silence tenu (3011 ms observés) ; **+1 h et 1 ms → le bandeau REVIENT (2 ms)** | après ✕ : `seen` passe à `1.77.0` ; **2 rechargements sur 2 → ABSENT** |
+| contrat réel | **« pas maintenant »** | **« jamais »** |
+
+**Pourquoi c'est plus grave que le reste du chantier de formulation.** Les
+autres pièces déjà consignées hors périmètre — texte sur 2-3 lignes selon la
+langue, contrat de fermeture invisible, « Plus tard » seulement en
+`aria-label` — sont de l'**imprécision** : elles rendent la lecture moins
+nette. Celle-ci est une **contradiction** : un utilisateur qui a appris le
+premier geste se trompe nécessairement sur le second. Il croit reporter, il
+efface. Et l'erreur est silencieuse — rien ne lui dira que le message ne
+reviendra pas.
+
+**Ce n'est PAS un défaut géométrique**, et c'est pour ça qu'il n'entre pas
+dans `verify_zone.py` : les deux croix sont à la bonne place, à la bonne
+taille (44 px depuis 1.77.0), atteignables, contrastées. Le défaut est dans
+ce qu'elles **promettent**.
+
+**STOP volontaire : non corrigé.** Deux questions sont éditoriales et se
+tranchent avec un utilisateur devant, pas dans un commit de correction :
+que doit dire chaque ✕, et **faut-il deux glyphes distincts** — un « plus
+tard » et un « c'est lu » ne sont pas le même geste. Toute réponse ouvre le
+chantier de contenu à **sept langues**, qui est déjà consigné hors périmètre.
+
+**Condition de réouverture** : la décision éditoriale prise sur le sens des
+deux gestes. C'est elle qui commande, pas l'inverse.

@@ -291,6 +291,16 @@ export function maybeOfferWhatsNew(){
      porte. La version n'est estampillée que lorsque le message a été
      TRAITÉ : lu, ou fermé. Un bandeau jamais vu ne consomme rien, et
      la session suivante repose la question. */
+  /* LE CONTRAT, écrit ici parce que c'est ici qu'il se joue. Le bandeau
+     « nouveautés » est un INDICATEUR DE NON-LU : offert une fois par
+     chargement de page (jamais par navigation interne — `_whatsNewOffered`
+     tient la session), jamais consommé tant qu'il n'a pas été traité, et
+     TERMINÉ DÉFINITIVEMENT par un clic sur l'un ou l'autre bouton.
+     Aucune borne de fréquence : elle a été chiffrée et refusée faute de
+     toute mesure de fréquence de lancement (docs/V2-REFACTOR.md, troisième
+     chantier refusé). Ce que ce contrat ne dit pas ENCORE à l'utilisateur
+     est le n°27 : cette croix veut dire « jamais » là où la croix
+     identique du bandeau de mise à jour veut dire « pas maintenant ». */
   if(!entries.length){ markVersionSeen(); return; }   // rien à annoncer
   if(_whatsNewOffered || document.getElementById('whatsNewBanner')) return;
   _whatsNewOffered = true;

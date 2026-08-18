@@ -515,3 +515,52 @@ du code déjà testé ne change pas le ratio, mais un chantier qui ajoute du
 code neuf sans tests le fera tomber vite — de l'ordre de 300 lignes non
 testées suffisent à repasser sous la barre. À surveiller pendant le
 multi-saisons, qui touchera ces fichiers-là.
+
+---
+
+## Troisième chantier refusé : borner la fréquence du bandeau « nouveautés »
+
+**Refusé en 1.77.0**, après le correctif de `f0be4d0` (un message jamais vu
+n'est plus consommé). Ce correctif a un effet mesuré : un bandeau jamais
+touché est **re-proposé à chaque chargement de page, indéfiniment** —
+3 fois sur 3 relevées, `seen_version` inchangé, une offre par chargement et
+non par navigation interne (`_whatsNewOffered` tient la session).
+
+Quatre bornes ont été chiffrées. **La borne « au plus une par jour »
+(clé `f1uno_whatsnew_jour`, ~5 lignes) était la recommandation, et elle est
+refusée.**
+
+**L'argument, et il tient en une ligne : elle borne une fréquence qui n'a
+jamais été mesurée.** « 12 lancements par jour ramenés à 1 » suppose douze
+lancements par jour. Le dépôt n'a **aucune donnée de fréquence de
+lancement** : Cloudflare Web Analytics est posé sur la **vitrine**, pas sur
+l'app, et l'app n'émet rien. Pour un usage à un lancement par jour — le seul
+profil que rien ne contredit — la borne ne change **strictement rien** : elle
+ajoute une clé de stockage, un registre à tenir et un cas de test pour un
+effet nul. C'est la même faute que le chantier 3 et que la découpe de
+`storage.js` : une amélioration dont le bénéfice est postulé, pas mesuré.
+
+**Condition de réouverture — deux voies, l'une ou l'autre suffit :**
+
+1. une **mesure de fréquence de lancement** montrant un usage
+   multi-sessions quotidien (l'app instrumentée, pas la vitrine) ;
+2. un **retour d'utilisateur** disant que le bandeau insiste.
+
+Le second est le plus probable et le moins cher : il ne demande rien à
+écrire aujourd'hui.
+
+### Le contrat retenu, à documenter plutôt qu'à borner
+
+Le bandeau « nouveautés » est un **indicateur de non-lu** :
+
+- **offert une fois par chargement de page** — pas par navigation interne ;
+- **jamais consommé tant qu'il n'a pas été traité** : ni l'affichage, ni
+  l'éviction par un bandeau de rang supérieur ne l'effacent ;
+- **terminé définitivement par un clic sur l'un OU l'autre bouton** —
+  « Nouveautés » comme la croix estampillent `seen_version`.
+
+Un seul geste suffit à en finir, et c'est ce qui rend l'insistance
+acceptable sans borne. Ce que ce contrat NE dit pas encore à l'utilisateur
+est consigné en POINTS-SIGNALES n°27 : la croix des nouveautés veut dire
+« jamais » là où la croix identique du bandeau de mise à jour veut dire
+« pas maintenant ».
