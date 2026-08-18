@@ -143,6 +143,31 @@ node --check render.js
 
 🇫🇷 Commits en Conventional Commits : `type(scope): sujet` en minuscules, à l'impératif, tiret cadratin `—` pour préciser. Types : `feat, fix, docs, style, refactor, test, chore, build`.
 
+### LIVRER — `scripts/livrer.sh`, jamais une chaîne de `&&` à la main
+
+**Une règle qui ne tient pas après trois occurrences n'est pas une
+règle, c'est une intention.** Trois fois un push est parti avec un
+filet rouge, alors que la règle du code de sortie était écrite ici. La
+parade est désormais MÉCANIQUE, en deux couches :
+
+```bash
+scripts/livrer.sh          # build → tests → lint → les trois filets navigateur
+LENTS=0 scripts/livrer.sh  # sans les filets (commit de documentation seule)
+```
+
+`set -euo pipefail` : au **premier** code non nul, tout s'arrête. Le
+script monte et démonte lui-même le serveur local sur 8123 — trois fois,
+un filet a rougi parce que le serveur d'une session précédente était
+tombé, un rouge qui n'accusait pas le produit.
+
+**Et un hook `pre-push`** (installé par `scripts/installer-hooks.sh`,
+versionné parce que les hooks ne le sont pas) qui **refuse** le push si
+`npm test` ou `npm run lint` échoue — vu rouge au contrôle. Il ne lance
+QUE le rapide (~26 s) : un garde de plusieurs minutes se contourne avec
+`--no-verify`, donc il vérifie seulement que les filets lents ont laissé
+leur **trace horodatée** sur le commit poussé (`.git/derniere-livraison`),
+et le dit sans bloquer sinon. **Rapide toujours, lent tracé.**
+
 ### MESSAGES DE COMMIT — pas de trailer Co-Authored-By
 
 **Les messages de commit ne portent pas de trailer `Co-Authored-By`.**

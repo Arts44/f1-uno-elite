@@ -1427,3 +1427,38 @@ mais pas pour promettre une durée à l'utilisateur.
 ses réponses, ou une mesure contre la production réelle depuis un
 réseau bridé. Décidé de ne pas le faire tant qu'aucune décision n'en
 dépend — la noter vaut mieux que la refaire pour rien.
+
+
+---
+
+## 24. Deux bandeaux coexistent sur un profil qui saute plusieurs versions
+
+**Signalé et MESURÉ pendant le diagnostic du bandeau de mise à jour
+(1.76.0), volontairement non corrigé dans ce commit** — il n'a rien à
+voir avec l'intermittence, et l'empiler aurait mélangé deux sujets.
+
+Sur un profil dont `f1uno_seen_version` est très en retard (le seed de
+capture porte `1.29.0`), `maybeOfferWhatsNew()` pose `whatsNewBanner`
+au moment même où `_showUpdateBanner()` pose `updateBanner`. Les deux
+utilisent la classe `.install-banner` et occupent la même zone.
+
+**Ce que la mesure dit exactement** — c'est la nuance qui a fait
+reporter plutôt que corriger dans l'urgence :
+
+```
+{p: true, a: true, intercepte: 'updateReloadBtn',
+ autres: ['whatsNewBanner', 'updateBanner']}
+```
+
+Le bouton du bandeau de mise à jour **reste atteignable** (`a: true`,
+et l'élément au point visé est bien le bouton lui-même). Ce n'est donc
+PAS la famille « présent mais inatteignable » qui a coûté trois
+occurrences : c'est un défaut de mise en page, pas de fonctionnement.
+
+**Ce qu'il faudrait trancher le jour où on le corrige** : les deux
+bandeaux disent des choses différentes (« une nouvelle version est
+prête » / « voici ce qui a changé depuis votre dernière visite ») et
+l'un rend l'autre presque caduc — après un rechargement, « nouveautés »
+est le seul qui a encore du sens. La correction n'est donc pas de les
+empiler proprement, mais de décider lequel s'efface. Ça se décide avec
+un utilisateur sous les yeux, pas dans un commit de correction de bug.
