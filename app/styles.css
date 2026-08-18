@@ -1264,6 +1264,22 @@ body.viewer-mode .mo-type-rows .mqbtn { opacity:0.35;pointer-events:none; }
 .acc-empty-acts .setv-btn{flex:1;min-width:150px;min-height:var(--tap-min);display:inline-flex;align-items:center;justify-content:center;}
 .acc-empty-acts .primary{background:var(--red);color:#fff;border-color:var(--red);}
 
+/* ── LA 4e PORTE : LA FICHE REÇUE (1.74.0) ──
+   Pastille tant qu'elle n'est pas ouverte, échéance écrite, effacement
+   explicite sur une cible de 44 px séparée de l'ouverture. */
+.sv-door.recue .dr-n{color:var(--st-wish);position:relative;display:flex;align-items:center;justify-content:center;}
+.sv-door.recue .dr-badge{position:absolute;top:-6px;right:-10px;min-width:16px;height:16px;border-radius:8px;
+  background:var(--red);color:#fff;font:700 10px/16px var(--font-b);text-align:center;padding:0 4px;}
+.sv-door .dr-exp{font-size:10px;color:var(--tx3);text-transform:none;letter-spacing:0;}
+.sv-door .dr-del{color:var(--tx3);cursor:pointer;min-width:var(--tap-min);min-height:var(--tap-min);
+  display:flex;align-items:center;justify-content:center;border-radius:10px;}
+.sv-door .dr-del:hover{color:var(--red);background:var(--red-s);}
+.sv-door .dr-del .ic{width:15px;height:15px;}
+/* La confirmation qui NOMME ce qui va partir */
+.tr-confirm .old{background:var(--surface2);border-radius:10px;padding:9px 11px;font-size:12px;
+  color:var(--tx2);margin:10px 0;border-left:3px solid var(--orange);text-align:left;}
+.tr-confirm .old b{color:var(--tx1);}
+
 /* ── LA FICHE D'ÉCHANGE REÇUE (1.69.0) — un lien #trade= scanné
    ouvre cette liste en LECTURE seule : rien n'est écrit, rien n'est
    proposé à l'import (c'est une fiche, pas une sauvegarde). */

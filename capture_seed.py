@@ -193,6 +193,58 @@ def seed_presque_vide(n=1):
     }
 
 
+# ══════════════════════════════════════════════════════════
+# « JAMAIS LANCÉE » — l'état qu'aucun seed ne pouvait produire
+#
+# POURQUOI CE HELPER EXISTE, et pourquoi il ne ressemble à aucun autre :
+# tous les autres RENVOIENT des clés à écrire. Celui-ci renvoie le VIDE,
+# et c'est tout son intérêt. Un contexte « vierge » au sens des données
+# — localStorage effacé, seed neutre — n'est PAS un premier lancement :
+# il saute le choix de langue, la mise en route et la proposition de
+# tutoriel, c'est-à-dire exactement la séquence qui casse.
+#
+# Deux fois payé en deux semaines : les six défauts de l'état « 1 carte »
+# (aucune capture ne le montrait), puis la fiche d'échange reçue perdue
+# au premier lancement — un lien partagé vise pourtant EN PRIORITÉ un
+# appareil qui n'a jamais vu l'app.
+#
+# Usage : un contexte SANS add_init_script, et le parcours joué en
+# entier (langue → mise en route → tutoriel). `PREMIER_LANCEMENT`
+# documente les étapes à franchir pour que personne n'en oublie une.
+# ══════════════════════════════════════════════════════════
+PREMIER_LANCEMENT = (
+    ('choix de langue', '.lang-opt[data-lang="fr"]'),
+    ('mise en route',   '#setupNoBtn'),
+    ('tutoriel proposé', '.tut-skip'),
+)
+
+
+def seed_jamais_lancee():
+    """Aucune clé : le contexte doit être créé SANS init_script.
+
+    Renvoie un dict vide — l'appelant ne doit rien injecter du tout.
+    C'est la seule façon de rendre le vrai premier lancement.
+    """
+    return {}
+
+
+def franchir_premier_lancement(page, timeout=2500):
+    """Joue le parcours de mise en route comme un humain, dans l'ordre.
+
+    Renvoie la liste des étapes réellement franchies — utile pour
+    affirmer dans un test que le parcours a bien eu lieu, plutôt que de
+    le supposer.
+    """
+    franchies = []
+    for nom, sel in PREMIER_LANCEMENT:
+        loc = page.locator(sel).first
+        if loc.count() and loc.is_visible():
+            loc.click()
+            page.wait_for_timeout(timeout)
+            franchies.append(nom)
+    return franchies
+
+
 def init_script(lang, theme, **over):
     seed = dict(SEED, f1uno_lang=lang, f1uno_theme=theme)
     seed.update(over)

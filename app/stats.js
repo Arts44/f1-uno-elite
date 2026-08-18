@@ -13,7 +13,8 @@ import { getHistory } from './history.js';
 import { loadManualBadges, isAutoBadgeUnlocked, manualBadges, renderBadges, updateUserTitle, checkNewAutoBadges } from './badges.js';
 import { currentView, showToast } from './render.js';
 import { shareOrDownloadFile } from './share-file.js';
-import { encodeTradeCode, buildTradeLink } from './backup.js';
+import { encodeTradeCode, buildTradeLink, ouvrirFicheRecue } from './backup.js';
+import { getInbox, clearInbox, joursRestants } from './trade-inbox.js';
 import { shareTradeSheet } from './profile-card.js';
 import { icon, typeIcon } from './icons.js';
 
@@ -470,6 +471,22 @@ export function renderStats(){
   // « exemplaires en trop » : la somme des copies au-delà de la première
   // sur les types marqués doubles — le chiffre qu'un échangeur regarde.
   const extraCopies = doublesList().reduce((s, r) => s + r.types.reduce((x, ty) => x + Math.max(0, ty.qty - 1), 0), 0);
+  /* LA 4e PORTE (1.74.0) — elle n'existe QUE si une fiche est en
+     attente. Pastille tant qu'elle n'a pas été ouverte : c'est elle qui
+     remplace le surgissement quand le moment est mal choisi (mise en
+     route, visite guidée, célébration). L'ÉCHÉANCE EST ÉCRITE : rien
+     n'expire en silence — la version utilisateur de ce qu'on s'applique
+     au code. */
+  const recue = getInbox();
+  const ficheRecueHtml = recue ? `
+      <button class="sv-door recue" id="svFicheRecue" type="button">
+        <span class="dr-n">${icon('download')}${recue.lue ? '' : '<span class="dr-badge" aria-hidden="true">1</span>'}</span>
+        <span class="dr-tx"><span class="dr-t">${t('st.door_recue')}</span>
+          <span class="dr-s">${tEsc('st.door_recue_sub', { w: recue.want.length, o: recue.offer.length })}</span>
+          <span class="dr-exp">${tpEsc('st.door_recue_exp', joursRestants(recue))}</span></span>
+        <span class="dr-del" id="svFicheDel" role="button" tabindex="0" aria-label="${t('st.recue_del')}" title="${t('st.recue_del')}">${icon('x')}</span>
+      </button>` : '';
+
   const toolsHtml = `
     <section class="sv-block" id="svTools">
     <div class="sv-section-title">${icon('wrench')} ${t('st.tools')}</div>
@@ -489,6 +506,7 @@ export function renderStats(){
         <span class="dr-tx"><span class="dr-t">${t('st.door_trade')}</span><span class="dr-s">${t('st.door_trade_sub')}</span></span>
         <span class="dr-go" aria-hidden="true">→</span>
       </button>
+      ${ficheRecueHtml}
     </div>
     <div class="sv-share">
       <button class="setv-btn" id="svTradeCopy" type="button">${icon('clipboard')} ${t('st.copy')}</button>
@@ -657,6 +675,20 @@ export function renderStats(){
     const how = await shareOrDownloadFile(blob, 'f1-uno-echange.txt');
     if(how === 'saved') showToast(t('st.trade_saved'));
   });
+  // La fiche REÇUE : ouvrir, ou effacer explicitement.
+  const recueBtn = el.querySelector('#svFicheRecue');
+  if(recueBtn) recueBtn.addEventListener('click', e => {
+    if(e.target.closest('#svFicheDel')){
+      e.stopPropagation();
+      clearInbox();
+      showToast(t('st.recue_deleted'));
+      renderStats();
+      return;
+    }
+    ouvrirFicheRecue();
+    renderStats();   // la pastille « non lue » disparaît
+  });
+
   // La FICHE D'ÉCHANGE (1.69.0) : l'image plafonnée à 6 lignes + le QR
   // qui porte la liste COMPLÈTE (#trade=). Charge en identifiants nus —
   // l'app d'en face a le catalogue.

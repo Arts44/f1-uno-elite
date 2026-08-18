@@ -44,6 +44,11 @@ export function tutorialKeys(season){
     `f1uno_pinned_badge_${season}`,
     'f1uno_changes_since_backup',
     'f1uno_last_backup',
+    // La FICHE D'ÉCHANGE REÇUE (1.74.0) : le tour restaure le
+    // localStorage à la fin. Sans cette clé, une visite guidée
+    // EMPORTERAIT une fiche reçue juste avant — et son propriétaire ne
+    // saurait même pas qu'il l'a eue. Contrat tenu par un test.
+    'f1uno_trade_inbox',
     // Le tutoriel ajoute des cartes, donc débloque des badges, donc
     // pourrait déclencher l'invitation à laisser un avis — et brûler
     // une des DEUX qu'un utilisateur verra dans sa vie, pendant une

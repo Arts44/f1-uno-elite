@@ -56,6 +56,10 @@ const DEVICE_KEYS = [
   // concerne la personne, pas la collection. Quelqu'un qui bascule de
   // saison est le même qui a répondu « non merci » l'année d'avant.
   'f1uno_review',
+  // fiche d'échange REÇUE : strictement locale et périssable (30 j) —
+  // ni chiffrée (c'est la collection de quelqu'un d'autre, pas la
+  // nôtre), ni dans une sauvegarde, ni par saison : une seule à la fois
+  'f1uno_trade_inbox',
   // schéma de stockage
   'f1uno_version',
   // clés héritées, uniquement LUES par la migration puis effacées
@@ -118,6 +122,9 @@ describe('registres de clés — périmètres', () => {
      écrire et qui manque ici est une donnée réelle abîmée chez un
      utilisateur, silencieusement. */
   const DEVICE_KEYS_TOUCHEES = [
+    ['f1uno_trade_inbox',
+     'le tour restaure le localStorage : sans cette clé, une visite '
+     + 'guidée emporterait une fiche d’échange reçue juste avant'],
     ['f1uno_review',
      'la visite guidée ajoute des cartes → débloque des badges → peut '
      + 'déclencher l’invitation à laisser un avis. Non restaurée, elle '
@@ -153,7 +160,7 @@ describe('inventaire localStorage — aucune clé hors registre', () => {
     'storage.js', 'badges.js', 'history.js', 'backup.js', 'pin.js',
     'tutorial.js', 'settings-sync.js', 'secure-store.js', 'cloud-auth.js',
     'install.js', 'update.js', 'session.js', 'i18n.js', 'data.js',
-    'render.js', 'stats.js', 'app.js', 'feedback.js', 'journal.js',
+    'render.js', 'stats.js', 'app.js', 'feedback.js', 'journal.js', 'trade-inbox.js',
   ];
 
   test('toute clé f1uno_* du code est classée', () => {

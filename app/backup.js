@@ -12,6 +12,7 @@ import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
 import { t, tEsc, setSafeHTML } from './i18n.js';
 import { CARDS_DB, CARD_TYPES } from './data.js';
+import { setInbox, getInbox, peutAfficher, markInboxLue } from './trade-inbox.js';
 import { showToast } from './render.js';
 import { encodeBinary, toSvg, Ecc } from './qrcodegen.js';
 import { _showImportDialog } from './storage.js';
@@ -269,12 +270,67 @@ export async function maybeHandleTradeHash(){
   try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
   try {
     const data = await decodeTradeCode(hash);
-    _showIncomingTrade(data);
+    /* ENREGISTRER D'ABORD, AFFICHER ENSUITE — dans cet ordre et jamais
+       l'inverse : c'est l'enregistrement qui fait survivre la fiche à la
+       mise en route, à la visite guidée et à une fermeture. L'affichage
+       n'est qu'un confort du moment. */
+    const ancienne = getInbox();
+    if(ancienne && !_memeFiche(ancienne, data)){
+      _confirmerRemplacement(ancienne, data);
+      return true;
+    }
+    setInbox(data);
+    if(peutAfficher()){ _showIncomingTrade(data); markInboxLue(); }
+    else showToast(t('tr.recue_toast'));   // repli : la porte porte la pastille
     return true;
   } catch(e){
     showToast(e && e.message || t('tr.invalid'));
     return false;
   }
+}
+
+function _memeFiche(a, b){
+  return a.season === b.season
+    && a.want.length === b.want.length && a.offer.length === b.offer.length
+    && a.want.join() === (b.want||[]).join();
+}
+
+/* La confirmation NOMME ce qui va partir — saison, nombre de lignes,
+   date de réception, et le fait qu'elle n'ait pas encore été lue. On ne
+   perd jamais une fiche sans le savoir. */
+function _confirmerRemplacement(ancienne, nouvelle){
+  const overlay = document.createElement('div');
+  overlay.className = 'import-dialog-overlay';
+  const d = new Date(ancienne.recue).toLocaleDateString();
+  setSafeHTML(overlay, `
+    <div class="import-dialog tr-confirm">
+      <div class="import-dialog-title">${t('tr.replace_t')}</div>
+      <div class="import-dialog-sub">${t('tr.replace_sub')}</div>
+      <div class="old">${t('tr.replace_old')}<br>
+        <b>${tEsc('tr.replace_sum', { season: ancienne.season || '?', w: ancienne.want.length, o: ancienne.offer.length })}</b><br>
+        ${tEsc('tr.replace_when', { d })}${ancienne.lue ? '' : ' · ' + t('tr.replace_unread')}</div>
+      <div class="import-dialog-btns">
+        <button class="import-dialog-btn" id="trKeep">${t('tr.replace_keep')}</button>
+        <button class="import-dialog-btn primary" id="trSwap">${t('tr.replace_do')}</button>
+      </div>
+    </div>`);
+  document.body.appendChild(overlay);
+  overlay.querySelector('#trKeep').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#trSwap').addEventListener('click', () => {
+    overlay.remove();
+    setInbox(nouvelle);
+    if(peutAfficher()){ _showIncomingTrade(nouvelle); markInboxLue(); }
+    else showToast(t('tr.recue_toast'));
+  });
+}
+
+// Rouvrir la fiche conservée (4e porte de Stats)
+export function ouvrirFicheRecue(){
+  const f = getInbox();
+  if(!f) return false;
+  _showIncomingTrade(f);
+  markInboxLue();
+  return true;
 }
 
 /* ══════════════════════════════════════════════════════════
