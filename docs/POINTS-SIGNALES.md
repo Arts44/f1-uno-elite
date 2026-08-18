@@ -1491,3 +1491,79 @@ La correction n'est donc pas de les empiler proprement, mais de décider
 lequel s'efface — ou dans quel ordre ils se succèdent. Ça se décide
 avec un utilisateur sous les yeux, pas dans un commit de correction de
 bug.
+
+
+---
+
+## 25. Éteint à l'œil, pleinement cliquable — la famille INVERSE
+
+**Trouvé en comblant la dernière case de la carte de la zone basse
+(1.77.0), pas cherché.** La question posée était « le bandeau
+d'installation peut-il coexister avec le tutoriel ? ». La réponse est
+oui, et ce n'est pas le plus intéressant.
+
+**La mesure** — contrôle positif d'abord, comme la parade ⑧ l'exige
+(hors tutoriel, `maybeShowInstallBanner()` produit bien le bandeau,
+donc l'instrument sait le faire paraître) :
+
+```
+prompt_capture:               true
+controle_hors_tutoriel:       true    ← l'instrument sait le produire
+pendant_tutoriel_apparait:    true
+install_atteignable:          true
+au_point_de_install:          'install-banner-text'
+```
+
+`.tut-overlay` porte `z-index:900` **et `pointer-events:none`**
+([styles.css:2202](../app/styles.css)) — sans quoi le voile
+intercepterait le défilement automatique qui amène la cible dans le
+cadre. Une surface à `z:400` se retrouve donc **sous le halo qui la
+grise, et pourtant au-dessus de rien du tout pour les clics**.
+
+**Pourquoi ça mérite une entrée et pas une ligne au registre.** Le
+registre des instruments menteurs recense les cas où la MESURE trompe
+celui qui mesure. Ici l'instrument dit vrai : c'est **le produit qui
+ment à l'utilisateur**. Un élément grisé annonce « indisponible » ; il
+répond quand même. C'est la famille **inverse** de « présent mais
+inatteignable » — celle qui a coûté trois occurrences — et elle est
+plus sournoise : la première frustre, la seconde fait agir sans qu'on
+l'ait voulu.
+
+**Corrigé dans le même chantier**, et l'échelle de z unique de la zone
+basse est ce qui rendait la correction obligatoire : sans elle, les
+**sept** surfaces auraient hérité du défaut d'une seule. Une règle
+suffit désormais — `body:has(.tut-overlay) .zone-basse` neutralise le
+conteneur et ses enfants — et `verify_zone.py` le prouve par un clic
+qui ne passe pas, jamais par la lecture du CSS.
+
+**Ce qui reste ouvert** : le dépôt n'a aucune règle générale disant que
+ce qu'un voile grise doit être inerte. Elle vaudrait pour toute
+surcouche future. Réouverture le jour où un deuxième voile apparaît.
+
+
+---
+
+## 26. `maybeOfferWhatsNew()` n'avait aucun garde de moment
+
+**Défaut TROUVÉ AVANT la refonte de la zone basse, consigné pour que
+la trace ne disparaisse pas dans le commit qui le corrige.**
+
+`_showUpdateBanner()` attend la fin de la mise en route depuis 1.76.0
+([update.js](../app/update.js), garde `peutAfficherSurcouche()`). Son
+**jumeau**, écrit dans le même fichier, à quarante lignes de là, n'en
+avait pas : `maybeOfferWhatsNew()` posait `whatsNewBanner`
+inconditionnellement depuis `initApp()`.
+
+**Mesuré**, capture à l'appui : le bandeau « Application mise à jour ! »
+s'affiche **en plein tutoriel**, grisé par le halo — et cliquable
+(voir n°25). La carte de la zone basse disait « visite guidée ×
+bandeaux de mise à jour : non ». C'était vrai pour l'un, faux pour
+l'autre : **une correction de ma propre carte**.
+
+**Ce que ça dit au-delà du cas** : une règle appliquée par un appelant
+sur deux n'est pas une règle. Le correctif de 1.76.0 avait été posé
+là où le défaut avait été observé, pas là où la règle vivait — c'est
+exactement le raisonnement qui a fait passer de « trois bugs » à « une
+zone sans propriétaire ». La file de `moment.js` le corrige en
+supprimant la possibilité même d'un appelant qui oublie : plus
+personne ne pose une surcouche sans passer par elle.
