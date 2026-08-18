@@ -83,7 +83,16 @@ POSER = """
          le filet aurait rendu vert sans jamais éprouver le néerlandais,
          qui est précisément le cas qui décide. */
       .replace(/\\$\\{t\\('([a-z._]+)'\\)\\}/g, (_, k) => (window.__T[lang] && window.__T[lang][k]) || k)
-      .replace(/\\$\\{[^}]*\\}/g, 'Badge');
+      /* Les expressions IMBRIQUÉES du badge-toast (ternaires contenant
+         eux-mêmes des `${}`) ne se substituent pas au motif simple : le
+         filet rendait alors un libellé tronqué, donc un toast PLUS COURT
+         que le vrai — il aurait mesuré une hauteur qui n'existe pas. On
+         leur donne les vraies chaînes, et un nom de badge long. */
+      .replace(/\\$\\{badges\\.length > 1 \\?[\\s\\S]*?t\\('b\\.toast_one'\\)\\}/g,
+               (window.__T[lang] && window.__T[lang]['b.toast_one']) || 'Badge')
+      .replace(/\\$\\{badges\\.length > 1 \\?[\\s\\S]*?names\\[0\\]\\}/g,
+               'Collectionneur de Grands Prix')
+      .replace(/\\$\\{[^{}]*\\}/g, '🏁');
     zone.appendChild(el);
   }
   if (avecToast) {
