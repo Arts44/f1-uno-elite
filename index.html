@@ -48,10 +48,14 @@ body{background:var(--bg);color:var(--tx1);font-family:'Space Grotesk',system-ui
 .hint{margin-top:12px;font-size:12.5px;color:var(--tx3)}
 .shots{margin-top:52px;display:flex;gap:24px;align-items:flex-start;justify-content:center;
        max-width:1040px;width:100%}
-.shots img{border-radius:14px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.shot-desktop{flex:1 1 auto;min-width:0;max-width:760px;width:100%;height:auto}
-.shot-mobile{width:200px;flex:0 0 auto;height:auto}
-@media(max-width:720px){.shot-mobile{display:none}.shots{margin-top:40px}}
+.shots img{border-radius:14px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.5);
+       display:block;width:100%;height:auto}
+/* <picture> (1.73.0) : c'est LUI qui porte la géométrie flex désormais,
+   l'image qu'il contient se contente de remplir. Poser flex sur elle
+   ne ferait plus rien — elle n'est plus enfant de .shots. */
+.pic-desktop{flex:1 1 auto;min-width:0;max-width:760px}
+.pic-mobile{width:200px;flex:0 0 auto}
+@media(max-width:720px){.pic-mobile{display:none}.shots{margin-top:40px}}
 footer{margin-top:auto;padding-top:56px;display:flex;gap:26px;align-items:center;
        font-size:13px;color:var(--tx3)}
 footer a{color:var(--tx3);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:1px}
@@ -73,10 +77,26 @@ footer .sep{opacity:.5}
   <div class="hint">Free · no account needed · works offline once loaded</div>
 
   <div class="shots">
-    <img class="shot-desktop" src="screenshots/grid-desktop-dark.jpg" width="1600" height="1000"
-         alt="The collection grid — 101 cards with team liveries, helmets and rarity tiers">
-    <img class="shot-mobile" src="screenshots/badges-dark.jpg" width="750" height="1624"
-         alt="The badges page on mobile — 120 badges in seven families">
+    <!-- LCP : fetchpriority="high" l'avance dans la file du navigateur,
+         width/height gardent le zéro décalage de mise en page. Les
+         variantes sortent de capture_screenshots.py — mêmes octets à
+         chaque exécution, vérifié sur les deux formats. -->
+    <picture class="pic-desktop">
+      <source srcset="screenshots/vitrine-grid.webp" type="image/webp">
+      <img class="shot-desktop" src="screenshots/vitrine-grid.jpg" width="1520" height="950"
+           fetchpriority="high" decoding="async"
+           alt="The collection grid — 101 cards with team liveries, helmets and rarity tiers">
+    </picture>
+    <!-- Masquée sous 720 px ET chargée quand même : 116 Ko perdus sur
+         tout mobile, en concurrence directe avec le LCP. lazy + async
+         la sortent du chemin critique — le transfert réel est MESURÉ en
+         conditions mobile, pas déduit de la présence de l'attribut. -->
+    <picture class="pic-mobile">
+      <source srcset="screenshots/vitrine-badges.webp" type="image/webp">
+      <img class="shot-mobile" src="screenshots/vitrine-badges.jpg" width="400" height="866"
+           loading="lazy" decoding="async"
+           alt="The badges page on mobile — 120 badges in seven families">
+    </picture>
   </div>
 
   <footer>

@@ -558,6 +558,52 @@ with sync_playwright() as p:
     shot(page, 'compte-vide.jpg')
     c.close()
 
+    # ══════════════════════════════════════════════════════════
+    # LES VARIANTES DE LA VITRINE (1.73.0) — le LCP mesuré par
+    # Cloudflare sur du trafic réel : 5 091 ms au P90, 13 % des visites
+    # en « Poor ». Les deux captures pesaient 246 Ko sur les 277 Ko de
+    # la page, soit 89 % du poids.
+    #
+    # CE QUE LA MESURE A CORRIGÉ dans l'hypothèse de départ : la capture
+    # LCP n'était PAS sur-dimensionnée (1600 px pour 760 px CSS = 1,05×
+    # sur un écran 2×, ce qui est correct). Le coupable était le FORMAT.
+    # Redimensionner seul : −9 %. Passer en WebP : −62 %.
+    # La seconde image, elle, cumulait les deux : 750 px pour 200 px
+    # d'affichage, ET masquée sous 720 px tout en étant téléchargée.
+    #
+    # Ces variantes sortent du MÊME script que les captures du README —
+    # jamais d'une compression manuelle, qui dériverait. Les captures du
+    # README ne changent pas : ce sont des sorties EN PLUS.
+    # ══════════════════════════════════════════════════════════
+    def variante_vitrine(nom_src_fn, sortie, largeur_cible, theme='dark', w=800, h=500):
+        """Capture PNG en mémoire, redimensionne, encode en WebP + JPEG."""
+        import cv2, numpy as np
+        c = ctx_for('en', theme, w, h, 2)
+        page = new_page(c)
+        if nom_src_fn:
+            nom_src_fn(page)
+        brut = page.screenshot(type='png')
+        c.close()
+        img = cv2.imdecode(np.frombuffer(brut, np.uint8), cv2.IMREAD_COLOR)
+        hh, ww = img.shape[:2]
+        if ww != largeur_cible:
+            img = cv2.resize(img, (largeur_cible, round(hh * largeur_cible / ww)),
+                             interpolation=cv2.INTER_AREA)
+        # q80 : mesuré au chiffrage — le meilleur rapport avant que les
+        # aplats sombres de l'app ne commencent à baver.
+        cv2.imwrite(str(SHOTS / (sortie + '.webp')), img, [cv2.IMWRITE_WEBP_QUALITY, 80])
+        cv2.imwrite(str(SHOTS / (sortie + '.jpg')), img, [cv2.IMWRITE_JPEG_QUALITY, 82])
+        return img.shape[1], img.shape[0]
+
+    def _badges_mobile(pg):
+        go(pg, 'badges')
+        pg.wait_for_selector('.badge-fam')
+        pg.wait_for_timeout(900)
+
+    wv = variante_vitrine(None, 'vitrine-grid', 1520)
+    mv = variante_vitrine(_badges_mobile, 'vitrine-badges', 400, w=375, h=812)
+    print(f'variantes vitrine OK — grid {wv[0]}x{wv[1]}, badges {mv[0]}x{mv[1]}')
+
     # Saisie OTP au repos — cases vides, aucun code réel à l'écran.
     # Contexte DÉDIÉ déconnecté : add_init_script rejoue le seed à chaque
     # navigation, donc supprimer la session puis recharger la restaurerait.

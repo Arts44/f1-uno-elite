@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.73.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['The landing page loads about four times lighter. Its screenshots were 89 % of its weight and the slowest thing on it — real-traffic data showed the main image taking over five seconds for the slowest tenth of visits. They are now served as modern WebP files sized for how they are actually displayed, and the one hidden on phones is no longer downloaded there at all: 277 KB down to 73 KB on mobile.'],
+      fr: ['La page d’accueil se charge environ quatre fois plus léger. Ses captures faisaient 89 % de son poids et étaient ce qu’elle avait de plus lent — les données de trafic réel montraient l’image principale mettant plus de cinq secondes pour le dixième de visites le plus lent. Elles sont désormais servies en WebP dimensionnés pour leur affichage réel, et celle qui est masquée sur téléphone n’y est plus téléchargée du tout : 277 Ko ramenés à 73 Ko sur mobile.'],
+      es: ['La página de inicio carga unas cuatro veces más ligera. Sus capturas eran el 89 % de su peso y lo más lento de la página — los datos de tráfico real mostraban la imagen principal tardando más de cinco segundos en el decil más lento. Ahora se sirven en WebP dimensionados para su visualización real, y la que se oculta en el móvil ya no se descarga allí: de 277 KB a 73 KB en móvil.'],
+      zh: ['首页的加载体积减少到约四分之一。此前截图占页面体积的 89%，也是最慢的部分——真实流量数据显示，最慢的十分之一访问要等待五秒以上才能看到主图。现在它们以按实际显示尺寸生成的 WebP 提供，而在手机上被隐藏的那张干脆不再下载：移动端从 277 KB 降到 73 KB。'],
+      it: ['La pagina iniziale si carica circa quattro volte più leggera. Le sue schermate erano l’89 % del peso e la cosa più lenta della pagina — i dati di traffico reale mostravano l’immagine principale impiegare oltre cinque secondi per il decimo di visite più lento. Ora sono servite in WebP dimensionati per la loro visualizzazione reale, e quella nascosta su telefono non viene più scaricata lì: da 277 KB a 73 KB su mobile.'],
+      nl: ['De startpagina laadt ongeveer vier keer lichter. De schermafbeeldingen waren 89 % van het gewicht en het traagste op de pagina — echte verkeersdata lieten zien dat de hoofdafbeelding ruim vijf seconden duurde voor het traagste tiende deel van de bezoeken. Ze worden nu geleverd als WebP op hun werkelijke weergavegrootte, en die op telefoons verborgen is wordt daar niet meer gedownload: van 277 KB naar 73 KB op mobiel.'],
+      de: ['Die Startseite lädt rund viermal leichter. Ihre Screenshots machten 89 % des Gewichts aus und waren das Langsamste daran — echte Traffic-Daten zeigten, dass das Hauptbild für das langsamste Zehntel der Besuche über fünf Sekunden brauchte. Sie werden jetzt als WebP in ihrer tatsächlichen Anzeigegröße ausgeliefert, und das auf Telefonen verborgene wird dort gar nicht mehr geladen: von 277 KB auf 73 KB mobil.'],
+    },
+  },
+  {
     version: '1.72.0',
     date: '2026-08-18',
     changes: {
