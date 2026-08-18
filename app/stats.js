@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════════════════════
    STATS — live header/counter updates + stats view rendering
    ══════════════════════════════════════════════════════════ */
-import { t, tEsc, getLang } from './i18n.js';
+import { t, tEsc, tp, tpEsc, getLang } from './i18n.js';
 import { pageHeadHTML } from './pagehead.js';
 import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, MANUAL_BADGES, rarityChipClass, rarityChipStyle, _currentSeason } from './data.js';
 import { missingCards, doublesList, tradeList, nearGoals, tradeSheetModel } from './collector.js';
@@ -22,13 +22,15 @@ import { icon, typeIcon } from './icons.js';
    positif : « 101 cartes vous manquent » sur une collection vierge
    serait absurde et démoralisant (garde-fou validé au chiffrage). ── */
 export const SEUIL_HERO_POSITIF = 10;
+/* En dessous, « cartes phares » ne dit rien : voir sa composition. */
+export const SEUIL_PHARES = 5;
 export function heroModel(owned, total){
   const missing = total - owned;
   const pct = total ? Math.round(owned / total * 100) : 0;
   if(total > 0 && missing === 0) return { mode: 'done',  big: total, labelKey: 'st.hero_done',  subKey: 'st.hero_done_sub',  subParams: { total } };
-  if(owned === 0)                return { mode: 'start', big: total, labelKey: 'st.hero_start', subKey: 'st.hero_start_sub', subParams: { total } };
-  if(owned < SEUIL_HERO_POSITIF) return { mode: 'early', big: owned, labelKey: 'st.hero_early', subKey: 'st.hero_early_sub', subParams: { missing, total } };
-  return { mode: 'missing', big: missing, labelKey: 'st.hero_missing', subKey: 'st.hero_missing_sub', subParams: { owned, total, pct } };
+  if(owned === 0)                return { mode: 'start', big: total, labelKey: 'st.hero_start', plural: true, subKey: 'st.hero_start_sub', subParams: { total } };
+  if(owned < SEUIL_HERO_POSITIF) return { mode: 'early', big: owned, labelKey: 'st.hero_early', plural: true, subKey: 'st.hero_early_sub', subPlural: true, subPluralOn: missing, subParams: { missing, total } };
+  return { mode: 'missing', big: missing, labelKey: 'st.hero_missing', plural: true, subKey: 'st.hero_missing_sub', subParams: { owned, total, pct } };
 }
 
 // Pure aggregates over the current CARDS_DB + collection state —
@@ -311,12 +313,23 @@ export function renderStats(){
   // "Last added card" is deliberately omitted: no per-card timestamp
   // is stored, and we don't invent data.
   const ownedCards = CARDS_DB.filter(c=>cardOwned(c.id));
+  /* SEUIL DES CARTES PHARES (1.72.0) — même raisonnement que le héros
+     du manque : à une carte, « la plus rare » et « le plus
+     d'exemplaires » désignent LA MÊME carte avec ×1, et le bloc dit
+     deux fois la même chose sans rien apprendre. En dessous du seuil il
+     ne s'affiche pas du tout : un bloc vide vaudrait mieux qu'un bloc
+     faux, mais pas d'affichage vaut mieux que les deux. */
   let featuredHtml;
+  const rarest0 = ownedCards.length ? ownedCards.reduce((b,c)=> (RARITY_ORDER[cardRarity(c)]||0) > (RARITY_ORDER[cardRarity(b)]||0) ? c : b) : null;
+  const most0 = ownedCards.length ? ownedCards.reduce((b,c)=> cardTotalQty(c.id) > cardTotalQty(b.id) ? c : b) : null;
+  const pharesRedondantes = rarest0 && most0 && rarest0.id === most0.id;
+  const pharesUtiles = ownedCards.length >= SEUIL_PHARES && !pharesRedondantes;
   if(ownedCards.length === 0){
     featuredHtml = `<div class="sv-empty-note">${t('st.empty_coll')}</div>`;
+  } else if(!pharesUtiles){
+    featuredHtml = null;   // bloc entier omis — voir la composition plus bas
   } else {
-    const rarest = ownedCards.reduce((b,c)=> (RARITY_ORDER[cardRarity(c)]||0) > (RARITY_ORDER[cardRarity(b)]||0) ? c : b);
-    const most = ownedCards.reduce((b,c)=> cardTotalQty(c.id) > cardTotalQty(b.id) ? c : b);
+    const rarest = rarest0, most = most0;
     const rr = RARITIES[cardRarity(rarest)]||{};
     featuredHtml = `<div class="sv-feat">
       <div class="sv-feat-item">
@@ -364,7 +377,20 @@ export function renderStats(){
     const segs = donutData.map(d => {
       const len = d.n/ownedCards.length*C;
       const drawn = Math.max(len - GAP, 0.8);
-      const stroke = d.k==='divine' ? 'url(#divineGrad)' : d.k==='eternal' ? 'url(#eternalGrad)' : d.color;
+      /* L'IRIDESCENCE EST UNE INFORMATION, PAS UNE DÉCORATION — et
+         c'est pour ça qu'elle DISPARAÎT dans le cas où elle serait le
+         plus spectaculaire, ce qui est contre-intuitif : quelqu'un
+         voudra la remettre. Le dégradé animé du divin (et de l'éternel)
+         distingue ces raretés PARMI les autres segments. Quand un seul
+         segment couvre 100 % de l'anneau, il n'y a plus rien à
+         distinguer : il ne reste qu'un arc-en-ciel sur un graphique de
+         répartition, qui donne à croire que toutes les raretés sont
+         représentées. Une carte d'une seule rareté → anneau ENTIÈREMENT
+         de cette couleur. Constaté sur une collection réelle à une
+         carte, l'état que voit un nouvel utilisateur. */
+      const seul = donutData.length === 1;
+      const stroke = (!seul && d.k==='divine') ? 'url(#divineGrad)'
+        : (!seul && d.k==='eternal') ? 'url(#eternalGrad)' : d.color;
       const s = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${stroke}" stroke-width="16" stroke-dasharray="${drawn.toFixed(2)} ${(C-drawn).toFixed(2)}" stroke-dashoffset="${(-(offset + GAP/2)).toFixed(2)}" transform="rotate(-90 60 60)"/>`;
       offset += len;
       return s;
@@ -377,7 +403,14 @@ export function renderStats(){
         ${divineDefs}
         ${segs}
         <text x="60" y="57" text-anchor="middle" class="sv-donut-big">${ownedCards.length}</text>
-        <text x="60" y="72" text-anchor="middle" class="sv-donut-small">${t('st.history_owned')}</text>
+        <!-- LE TROU FAIT 64 UNITÉS (R 40 − demi-trait 8, ×2) et ce
+             libellé en faisait 67,2 : il passait SOUS l'anneau des deux
+             côtés. Une taille de police plus petite ne suffit pas — la
+             longueur dépend de la LANGUE. textLength + lengthAdjust
+             garantissent la largeur quelle que soit la traduction, et
+             la valeur est un peu sous 64 pour laisser respirer. -->
+        <text x="60" y="72" text-anchor="middle" class="sv-donut-small"
+              textLength="54" lengthAdjust="spacingAndGlyphs">${tp('st.owned_cards', ownedCards.length)}</text>
       </svg>
       <div class="sv-legend">${legend}</div>
     </div>`;
@@ -425,11 +458,13 @@ export function renderStats(){
   // (même raisonnement que l'état vide du Compte). Le sous-titre reste
   // en clair : c'est lui qui empêche le chiffre rouge d'être une claque.
   const hero = heroModel(owned, total);
+  /* Le libellé s'accorde sur le GRAND CHIFFRE (hero.big), pas sur le
+     nombre de possédées : c'est lui que l'œil lit juste au-dessus. */
   const heroHtml = `
     <div class="sv-lack sv-lack-${hero.mode}">
       <div class="sv-lack-n">${hero.big}</div>
-      <div class="sv-lack-l">${t(hero.labelKey)}</div>
-      <div class="sv-lack-sub">${tEsc(hero.subKey, hero.subParams)}</div>
+      <div class="sv-lack-l">${hero.plural ? tp(hero.labelKey, hero.big) : t(hero.labelKey)}</div>
+      <div class="sv-lack-sub">${hero.subPlural ? tpEsc(hero.subKey, hero.subPluralOn, hero.subParams) : tEsc(hero.subKey, hero.subParams)}</div>
     </div>`;
 
   // « exemplaires en trop » : la somme des copies au-delà de la première
@@ -441,12 +476,12 @@ export function renderStats(){
     <div class="sv-doors" role="tablist" aria-label="${t('st.tools')}">
       <button class="sv-door active" data-tool="missing" role="tab" aria-selected="true" type="button">
         <span class="dr-n">${missing}</span>
-        <span class="dr-tx"><span class="dr-t">${tEsc('st.door_missing', { n: missing })}</span><span class="dr-s">${tEsc('st.door_missing_sub', { n: wish })}</span></span>
+        <span class="dr-tx"><span class="dr-t">${t('st.door_missing')}</span><span class="dr-s">${tpEsc('st.door_missing_sub', wish)}</span></span>
         <span class="dr-go" aria-hidden="true">→</span>
       </button>
       <button class="sv-door doubles" data-tool="doubles" role="tab" aria-selected="false" type="button">
         <span class="dr-n">${doubles}</span>
-        <span class="dr-tx"><span class="dr-t">${tEsc('st.door_doubles', { n: doubles })}</span><span class="dr-s">${tEsc('st.door_doubles_sub', { n: extraCopies })}</span></span>
+        <span class="dr-tx"><span class="dr-t">${t('st.door_doubles')}</span><span class="dr-s">${tpEsc('st.door_doubles_sub', extraCopies)}</span></span>
         <span class="dr-go" aria-hidden="true">→</span>
       </button>
       <button class="sv-door trade" data-tool="trade" role="tab" aria-selected="false" type="button">
@@ -567,7 +602,7 @@ export function renderStats(){
 
       <aside class="sv-rail">
         ${donutHtml ? block(t('st.chart_rarity'), donutHtml) : ''}
-        ${block(t('st.featured'), featuredHtml)}
+        ${featuredHtml ? block(t('st.featured'), featuredHtml) : ''}
         ${goalsHtml}
       </aside>
     </div>

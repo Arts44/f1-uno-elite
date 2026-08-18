@@ -1275,6 +1275,22 @@ body.viewer-mode .mo-type-rows .mqbtn { opacity:0.35;pointer-events:none; }
 .tr-in-row span{font-family:var(--font-d);font-weight:700;font-size:11px;color:var(--tx3);margin-right:6px;}
 .tr-in-row em{font-style:normal;color:var(--tx3);font-size:11px;}
 
+/* ── LE FONDU SOUS LA BARRE FLOTTANTE (1.72.0) ──
+   Signalé sur iPad : « la barre masque les cartes ». MESURÉ aux quatre
+   tailles (iPhone, iPad mini, iPad portrait et paysage) : en FIN de
+   défilement rien n'est recouvert — le padding `--nav-clear` fait son
+   travail. Le défaut est PENDANT le défilement : la barre est opaque et
+   coupe net les lignes qui passent dessous, ce qui donne à croire que
+   du contenu est perdu.
+
+   Un fondu du fond vers le transparent, juste au-dessus de la barre,
+   rend la chose lisible : le contenu s'efface au lieu d'être tranché,
+   et on voit qu'il continue. `pointer-events:none` — ce voile ne doit
+   jamais intercepter un geste destiné à la liste dessous. */
+.main::after{content:'';position:fixed;left:0;right:0;bottom:0;height:calc(var(--nav-clear) + 12px);
+  background:linear-gradient(to top,var(--bg) 42%,color-mix(in srgb,var(--bg) 55%,transparent) 72%,transparent);
+  pointer-events:none;z-index:90;}
+
 /* ── LA CÉLÉBRATION DE PALIER (1.67.0) — SANS MOUVEMENT, par
    construction : aucune propriété animation ici, aucun @keyframes —
    le tampon est déjà posé, seule l'opacité du fond appartient au

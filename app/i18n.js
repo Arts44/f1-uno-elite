@@ -37,6 +37,41 @@ export function t(key, p={}){
   return s;
 }
 
+/* ══════════════════════════════════════════════════════════
+   LE PLURIEL (1.72.0) — « 1 cartes dans votre collection » était
+   faux sur CHAQUE libellé de la page Stats à une carte, c'est-à-dire
+   dans l'état que voit un nouvel utilisateur : celui qui compte le
+   plus, et le seul qu'aucune capture ne montrait.
+
+   Les règles DIFFÈRENT selon la langue, et c'est pour ça qu'un
+   `n > 1 ? 's' : ''` bricolé au point d'appel ne pouvait pas marcher :
+     · fr  — 0 et 1 au SINGULIER (« 0 carte », « 1 carte »)
+     · en, de, nl, es, it — seul 1 est singulier (« 0 cards »)
+     · zh  — AUCUN pluriel : une seule forme, toujours
+   D'où deux clés par libellé, `…_one` et `…_other`, et cette
+   fonction qui choisit. En zh les deux clés portent le même texte :
+   c'est voulu et lisible, plutôt qu'une exception dans le code.
+
+   `tp('st.hero_early', n)` → cherche `st.hero_early_one` /
+   `st.hero_early_other`, avec {n} interpolé par défaut.
+   ══════════════════════════════════════════════════════════ */
+const _UNE_SEULE_FORME = new Set(['zh']);          // pas de pluriel du tout
+const _ZERO_EST_SINGULIER = new Set(['fr']);       // « 0 carte », pas « 0 cartes »
+
+export function pluralForm(lang, n){
+  if(_UNE_SEULE_FORME.has(lang)) return 'other';
+  const abs = Math.abs(n);
+  if(_ZERO_EST_SINGULIER.has(lang)) return abs < 2 ? 'one' : 'other';
+  return abs === 1 ? 'one' : 'other';
+}
+
+export function tp(key, n, p = {}){
+  return t(`${key}_${pluralForm(getLang(), n)}`, { n, ...p });
+}
+export function tpEsc(key, n, p = {}){
+  return tEsc(`${key}_${pluralForm(getLang(), n)}`, { n, ...p });
+}
+
 /* t() destiné à innerHTML : les VALEURS interpolées sont échappées,
    pas le gabarit traduit (qui est du contenu maîtrisé du dépôt).
    À utiliser dès qu'un paramètre vient d'ailleurs que du code —

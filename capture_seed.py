@@ -162,6 +162,37 @@ SEED = {
 }
 
 
+
+# ══════════════════════════════════════════════════════════
+# LE SEED « COLLECTION PRESQUE VIDE » (1.72.0)
+#
+# POURQUOI IL EXISTE. Six défauts d'affichage ont vécu sur la page
+# Stats — pluriel faux (« 1 cartes »), libellé de donut débordant de son
+# trou, nombre écrit deux fois, cartes phares désignant deux fois la
+# même carte — et AUCUNE capture ne les montrait : toutes étaient
+# prises sur le seed à 72 cartes. L'état d'un nouvel utilisateur était
+# le seul jamais rendu, et c'est celui qui compte le plus.
+#
+# `seed_presque_vide(n)` produit la même scène avec n cartes possédées
+# seulement, badges et historique vidés pour rester cohérent (une
+# collection d'une carte n'a pas 40 badges ni douze mois de courbe).
+# ══════════════════════════════════════════════════════════
+def seed_presque_vide(n=1):
+    """Collection de n cartes (une variante chacune), sans badge ni historique."""
+    petit = {}
+    for card in CARDS[:n]:
+        petit[card['id']] = {card['types'][0]: {
+            'owned': True, 'wishlist': False, 'doubles': False, 'favorite': False, 'qty': 1}}
+    return {
+        f'f1uno_owned_{SEASON}': json.dumps(petit),
+        f'f1uno_auto_badges_{SEASON}': '{}',
+        f'f1uno_badges_{SEASON}': '{}',
+        f'f1uno_history_{SEASON}': '[]',
+        f'f1uno_pinned_badge_{SEASON}': '',
+        'f1uno_title': '',
+    }
+
+
 def init_script(lang, theme, **over):
     seed = dict(SEED, f1uno_lang=lang, f1uno_theme=theme)
     seed.update(over)
