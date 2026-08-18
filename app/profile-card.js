@@ -21,6 +21,7 @@
 import { t, tEsc } from './i18n.js';
 import { shareOrDownloadFile } from './share-file.js';
 import { encodeBinary, Ecc } from './qrcodegen.js';
+import { QR_MIN_PX_PER_MODULE, qrRenderSize } from './backup.js';
 import { AUTO_BADGES, MANUAL_BADGES, badgeTr } from './data.js';
 import { showToast } from './render.js';
 import { manualBadges, autoBadgeUnlocked, loadManualBadges } from './badges-store.js';
@@ -108,10 +109,15 @@ export async function shareTradeSheet(m){
   const W = 1000;
   const rowH = 56, secGap = 46;
   const wantRows = m.sheet.want.length, offerRows = m.sheet.offer.length;
+  /* Le QR est encodé D'ABORD : sa taille dépend de sa version (donc de
+     la longueur de la liste) et la hauteur de la fiche en dépend. */
+  const qr = encodeBinary(new TextEncoder().encode(m.link), Ecc.LOW, 1, 25);
+  const cell = QR_MIN_PX_PER_MODULE;                 // pas ENTIER, par construction
+  const qrSize = qrRenderSize(qr.size);              // (modules + quiet zone) × pas
   const H = 330
     + (m.sheet.hasWant ? secGap + wantRows * rowH + (m.sheet.wantMore ? 44 : 0) : 0)
     + (m.sheet.hasOffer ? secGap + offerRows * rowH + (m.sheet.offerMore ? 44 : 0) : 0)
-    + 360;   // QR 220 + pied + marges — mesuré sur le rendu réel (le pied débordait à 320)
+    + qrSize + 140;   // le QR + son en-tête + le pied + les marges
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const x = cv.getContext('2d');
   const ink = dark ? '#F3F0F1' : '#191716';
@@ -170,15 +176,21 @@ export async function shareTradeSheet(m){
     });
   }
 
-  // QR — dessiné module par module (le SVG de toSvg ne se pose pas sur
-  // un canvas sans rasterisation asynchrone ; getModule suffit).
-  const qr = encodeBinary(new TextEncoder().encode(m.link), Ecc.LOW, 1, 25);
-  const qrSize = 220, cell = qrSize / (qr.size + 8);
+  /* QR — dessiné module par module (le SVG de toSvg ne se pose pas sur
+     un canvas sans rasterisation asynchrone ; getModule suffit).
+
+     DEUX RÈGLES, toutes deux payées par un échec réel sur iPad
+     (1.71.0) : le pas est ENTIER (des modules de 4 px posés sur un pas
+     de 3,38 bavaient de 0,6 px chacun), et la taille respecte le
+     PLANCHER DE DENSITÉ (QR_MIN_PX_PER_MODULE, backup.js) — à 220 px
+     ce QR faisait 3,38 px/module et aucun lecteur ne le trouvait dans
+     l'image. Ne pas remettre une taille fixe ici : elle doit suivre la
+     version, qui suit la longueur de la liste. */
   const qx = 70, qy = y + 10;
   x.fillStyle = '#ffffff'; x.fillRect(qx, qy, qrSize, qrSize);
   x.fillStyle = '#111111';
   for(let ry = 0; ry < qr.size; ry++) for(let rx = 0; rx < qr.size; rx++)
-    if(qr.getModule(rx, ry)) x.fillRect(qx + (rx + 4) * cell, qy + (ry + 4) * cell, Math.ceil(cell), Math.ceil(cell));
+    if(qr.getModule(rx, ry)) x.fillRect(qx + (rx + 4) * cell, qy + (ry + 4) * cell, cell, cell);
   x.fillStyle = ink; x.font = '700 26px system-ui';
   x.fillText(t('tr.scan_t'), qx + qrSize + 34, qy + 56);
   x.fillStyle = sub; x.font = '500 23px system-ui';

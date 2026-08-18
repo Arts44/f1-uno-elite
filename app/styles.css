@@ -1813,7 +1813,10 @@ body:has(.tut-overlay) .toast{bottom:130px;}
 .sv-note{font-size:11px;color:var(--tx3);margin:var(--space-6px) auto 0;max-width:800px;}
 
 /* BACKUP QR */
-.bk-qr-wrap{display:flex;flex-direction:column;align-items:center;gap:var(--space-2);padding:var(--space-3);background:var(--surface2);border:1px solid var(--border);border-radius:12px;}
+.bk-qr-wrap{display:flex;overflow-x:auto;flex-direction:column;align-items:center;gap:var(--space-2);padding:var(--space-3);background:var(--surface2);border:1px solid var(--border);border-radius:12px;}
+/* La largeur est posée en INLINE par account.js (elle suit la version
+   du QR — voir QR_MIN_PX_PER_MODULE). Ce 220 n'est qu'un plancher de
+   secours si le style inline manque. */
 .bk-qr{width:220px;max-width:100%;background:#fff;padding:var(--space-10px);border-radius:var(--r-sm);box-shadow:var(--sh-sm);}
 .bk-qr svg{display:block;width:100%;height:auto;}
 .bk-qr-hint{font-size:11px;color:var(--tx3);text-align:center;line-height:1.4;}

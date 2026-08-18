@@ -26,6 +26,44 @@ export const MAX_CODE_CHARS = 4000;
 // JSON export instead.
 const MAX_QR_VERSION = 25;
 
+/* ══════════════════════════════════════════════════════════
+   LE PLANCHER DE DENSITÉ (1.71.0) — un QR trop petit pour sa
+   version est ILLISIBLE, et c'est le défaut qui a fait échouer le
+   QR de la fiche d'échange sur un vrai iPad : l'app s'ouvrait,
+   puis refusait le code, parce que la caméra en tirait une charge
+   corrompue.
+
+   MESURÉ (décodeur OpenCV, indépendant de qrcodegen) sur le QR de
+   la fiche — version 10, 57 modules, rendu à 220 px, soit
+   3,38 px/module :
+     · 2,15 px/module (140 px) : illisible
+     · 2,77 px/module (180 px) : illisible
+     · 3,38 px/module (220 px) : charge intacte une fois RECADRÉE,
+       mais INTROUVABLE dans l'image entière — le cas réel
+     · 5,08 px/module (330 px) : décodée dans l'image entière
+   Le seuil pratique est donc ~3,4 px/module, et il ne suffit pas :
+   un lecteur doit TROUVER le code avant de le lire.
+
+   D'où 6 px/module : ~1,8× le seuil mesuré. La marge paie le
+   flou de mise au point, l'angle, et la compression JPEG d'une
+   capture repartagée.
+
+   CE PLANCHER VAUT POUR LES DEUX QR. Celui de la sauvegarde
+   passait par CHANCE (version 8 à 220 px = 4,7 px/module) ; une
+   collection plus grosse monte la version et le fait tomber. Un
+   QR de sauvegarde illisible, c'est une collection perdue.
+   ══════════════════════════════════════════════════════════ */
+export const QR_MIN_PX_PER_MODULE = 6;
+
+// Taille de rendu minimale d'un QR, quiet zone (4 modules de chaque
+// côté) comprise. `floor` puis multiplication : le pas reste ENTIER,
+// donc aucun module ne déborde sur son voisin (le dessin canvas
+// posait des modules de 4 px sur un pas de 3,38 — 0,6 px de bavure
+// chacun, qui aggravait la densité déjà limite).
+export function qrRenderSize(modules, minPx = QR_MIN_PX_PER_MODULE){
+  return (modules + 8) * minPx;
+}
+
 /* ── base64url helpers ── */
 function bytesToB64url(bytes){
   let bin = '';
@@ -111,7 +149,12 @@ export function buildBackupLink(code){
 export function makeBackupQrSvg(link){
   try {
     const qr = encodeBinary(new TextEncoder().encode(link), Ecc.LOW, 1, MAX_QR_VERSION);
-    return { svg: toSvg(qr, { border: 4, dark: '#111111', light: '#ffffff' }), version: qr.version };
+    // `minPx` : la largeur SOUS LAQUELLE ce QR devient illisible (voir
+    // QR_MIN_PX_PER_MODULE). L'appelant la pose en style inline — une
+    // largeur CSS fixe ne peut pas suivre la version, qui dépend de la
+    // taille de la collection.
+    return { svg: toSvg(qr, { border: 4, dark: '#111111', light: '#ffffff' }),
+             version: qr.version, modules: qr.size, minPx: qrRenderSize(qr.size) };
   } catch(e){
     log('QR too big for link length', link.length, e && e.message);
     return { tooBig: true };

@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.71.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['QR codes are now readable. Both the backup QR and the trade-sheet QR were being drawn too small for the amount of data they carry — a camera would open the app and then reject the code. They now scale with their density, so a scan works the first time. Verified with an independent QR reader, not with our own encoder.'],
+      fr: ['Les codes QR sont désormais lisibles. Le QR de sauvegarde comme celui de la fiche d’échange étaient dessinés trop petits pour la quantité de données qu’ils portent — une caméra ouvrait l’app puis refusait le code. Leur taille suit maintenant leur densité, et un scan fonctionne du premier coup. Vérifié avec un lecteur de QR indépendant, pas avec notre propre encodeur.'],
+      es: ['Los códigos QR ahora son legibles. Tanto el QR de copia de seguridad como el de la ficha de cambio se dibujaban demasiado pequeños para la cantidad de datos que llevan — una cámara abría la app y luego rechazaba el código. Su tamaño sigue ahora su densidad, y un escaneo funciona a la primera. Verificado con un lector de QR independiente, no con nuestro propio codificador.'],
+      zh: ['二维码现在可以正常识别了。备份二维码和交换单二维码此前都被绘制得太小，与其承载的数据量不匹配——相机会打开应用，然后拒绝该代码。现在它们的尺寸会随密度调整，扫码一次即可成功。此修复由独立的二维码识别库验证，而非我们自己的编码器。'],
+      it: ['I codici QR sono ora leggibili. Sia il QR di backup sia quello della scheda di scambio venivano disegnati troppo piccoli per la quantità di dati che portano — una fotocamera apriva l’app e poi rifiutava il codice. Ora la loro dimensione segue la densità, e una scansione funziona al primo colpo. Verificato con un lettore QR indipendente, non con il nostro codificatore.'],
+      nl: ['QR-codes zijn nu leesbaar. Zowel de back-up-QR als die van het ruilblad werden te klein getekend voor de hoeveelheid data die ze dragen — een camera opende de app en weigerde daarna de code. Hun formaat volgt nu hun dichtheid, en scannen werkt in één keer. Gecontroleerd met een onafhankelijke QR-lezer, niet met onze eigen encoder.'],
+      de: ['QR-Codes sind jetzt lesbar. Sowohl der Backup-QR als auch der des Tauschblatts wurden für ihre Datenmenge zu klein gezeichnet — eine Kamera öffnete die App und wies den Code dann ab. Ihre Größe folgt nun ihrer Dichte, und ein Scan klappt beim ersten Versuch. Geprüft mit einem unabhängigen QR-Leser, nicht mit unserem eigenen Encoder.'],
+    },
+  },
+  {
     version: '1.70.0',
     date: '2026-08-18',
     changes: {

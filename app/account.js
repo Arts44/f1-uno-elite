@@ -254,15 +254,30 @@ function _bindBackupSection(el){
     const hint = el.querySelector('#backupQrHint');
     if(!out.value) return;
     if(wrap.style.display !== 'none'){ wrap.style.display = 'none'; return; }
-    const { svg, tooBig } = makeBackupQrSvg(buildBackupLink(out.value));
+    const { svg, tooBig, minPx } = makeBackupQrSvg(buildBackupLink(out.value));
     if(tooBig){
       qrBox.innerHTML = '';
       hint.textContent = t('bk.qr_too_big');
       hint.classList.add('bk-qr-warn');
     } else {
       qrBox.innerHTML = svg;
-      hint.textContent = t('bk.qr_hint');
-      hint.classList.remove('bk-qr-warn');
+      /* LA LARGEUR SUIT LA VERSION (1.71.0). La règle CSS fixait 220 px
+         quelle que soit la densité — et la MESURE est sans appel : à
+         220 px, TOUTES les versions affichables tombaient sous le
+         plancher, de 4,49 px/module (version 6, le plus petit code
+         possible) à 1,76 (version 25). Dès ~236 caractères de code, ce
+         QR était illisible pour un lecteur réel. Un QR de sauvegarde
+         illisible, c'est une collection perdue.
+
+         Le QR garde donc sa taille PHYSIQUE (minPx) et son conteneur
+         défile plutôt que de le réduire : réduire, c'est reproduire le
+         défaut en silence. Quand la taille requise dépasse la largeur
+         disponible, le hint le DIT — même famille que `tooBig`. */
+      qrBox.style.width = minPx + 'px';
+      const place = wrap.clientWidth || document.documentElement.clientWidth;
+      const deborde = minPx > place - 24;
+      hint.textContent = deborde ? t('bk.qr_scroll') : t('bk.qr_hint');
+      hint.classList.toggle('bk-qr-warn', deborde);
     }
     wrap.style.display = 'flex';
   });
