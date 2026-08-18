@@ -48,6 +48,26 @@ export function tradeList(){
   return { want: missingCards(), offer: doublesList() };
 }
 
+/* ── LA FICHE D'ÉCHANGE (1.69.0) — le modèle de l'IMAGE.
+   L'image plafonne à `cap` lignes par colonne (souhaitées d'abord) ;
+   le CODE porte toujours la liste complète. Deux règles d'honnêteté,
+   tenues ici et testées : jamais de « + 0 autres dans le code »
+   (xxxMore vaut 0 → pas de ligne), jamais de colonne vide (hasXxx
+   faux → la section ne se dessine pas). Pur, sans DOM ni i18n. ── */
+export function tradeSheetModel(want, offer, cap = 6){
+  const wantSorted = [...want].sort((a, b) => (b.wishlist ? 1 : 0) - (a.wishlist ? 1 : 0));
+  return {
+    want: wantSorted.slice(0, cap),
+    offer: offer.slice(0, cap),
+    wantMore: Math.max(0, want.length - cap),
+    offerMore: Math.max(0, offer.length - cap),
+    hasWant: want.length > 0,
+    hasOffer: offer.length > 0,
+    wantTotal: want.length,
+    offerTotal: offer.length,
+  };
+}
+
 
 /* ── OBJECTIFS PROCHES (phase H) — les buts « à N cartes près ».
    Pur et injectable : candidats = chaque écurie (posséder toutes ses

@@ -4,7 +4,7 @@
 import { t, tEsc, getLang } from './i18n.js';
 import { pageHeadHTML } from './pagehead.js';
 import { CARDS_DB, CATS, CARD_TYPES, RARITY_KEYS, RARITIES, RARITY_ORDER, TEAM_COLORS, AUTO_BADGES, MANUAL_BADGES, rarityChipClass, rarityChipStyle, _currentSeason } from './data.js';
-import { missingCards, doublesList, tradeList, nearGoals } from './collector.js';
+import { missingCards, doublesList, tradeList, nearGoals, tradeSheetModel } from './collector.js';
 import {
   getTypeData, cardOwned, cardWishlist, cardDoubles, cardMissing, cardFavorite,
   cardRarity, variantRarity, cardTotalQty
@@ -13,6 +13,8 @@ import { getHistory } from './history.js';
 import { loadManualBadges, isAutoBadgeUnlocked, manualBadges, renderBadges, updateUserTitle, checkNewAutoBadges } from './badges.js';
 import { currentView, showToast } from './render.js';
 import { shareOrDownloadFile } from './share-file.js';
+import { encodeTradeCode, buildTradeLink } from './backup.js';
+import { shareTradeSheet } from './profile-card.js';
 import { icon, typeIcon } from './icons.js';
 
 /* ── Le héros du manque (1.66.0) — pur, testé aux seuils.
@@ -456,6 +458,7 @@ export function renderStats(){
     <div class="sv-share">
       <button class="setv-btn" id="svTradeCopy" type="button">${icon('clipboard')} ${t('st.copy')}</button>
       <button class="setv-btn" id="svTradeShare" type="button">${icon('upload')} ${t('st.share')}</button>
+      <button class="setv-btn" id="svTradeSheet" type="button">${icon('handshake')} ${t('tr.btn')}</button>
     </div>
     <div class="sv-tools-body" id="svToolsBody">${_toolPanelHTML('missing')}</div>
     </section>`;
@@ -618,6 +621,27 @@ export function renderStats(){
     const blob = new Blob([fmtTrade()], { type: 'text/plain' });
     const how = await shareOrDownloadFile(blob, 'f1-uno-echange.txt');
     if(how === 'saved') showToast(t('st.trade_saved'));
+  });
+  // La FICHE D'ÉCHANGE (1.69.0) : l'image plafonnée à 6 lignes + le QR
+  // qui porte la liste COMPLÈTE (#trade=). Charge en identifiants nus —
+  // l'app d'en face a le catalogue.
+  const sheetBtn = el.querySelector('#svTradeSheet');
+  if(sheetBtn) sheetBtn.addEventListener('click', async () => {
+    const { want, offer } = tradeList();
+    if(!want.length && !offer.length){ showToast(t('st.trade_empty')); return; }
+    const payload = { v: 1, season: _currentSeason,
+      want: want.map(r => r.id),
+      offer: offer.map(r => [r.id, r.types.map(ty => [ty.type, ty.qty])]) };
+    const code = await encodeTradeCode(payload);
+    const model = {
+      sheet: tradeSheetModel(
+        want,
+        offer.map(r => ({ ...r, typesLabel: r.types.map(ty => `${_typeLabel(ty.type)} ×${ty.qty}`).join(', ') }))),
+      season: _currentSeason,
+      owned: computeStats().owned, total: CARDS_DB.length,
+      code, link: buildTradeLink(code),
+    };
+    await shareTradeSheet(model);
   });
 }
 

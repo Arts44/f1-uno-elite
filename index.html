@@ -11,7 +11,7 @@
    racine : liens/QR de sauvegarde (#backup=) et retours de connexion
    Supabase (#access_token=, #error=). Le fragment survit à
    location.replace ; l'app les traite comme avant. */
-if(/^#(backup|access_token|error)=/.test(location.hash)) location.replace('app/' + location.hash);
+if(/^#(backup|trade|access_token|error)=/.test(location.hash)) location.replace('app/' + location.hash);
 </script>
 <!-- ══ EXCEPTION NOMMÉE — le SEUL script externe du dépôt ══
      Cloudflare Web Analytics : mesure d'audience sans cookie, sur

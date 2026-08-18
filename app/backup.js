@@ -10,7 +10,8 @@
    ══════════════════════════════════════════════════════════ */
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
-import { t } from './i18n.js';
+import { t, tEsc, setSafeHTML } from './i18n.js';
+import { CARDS_DB, CARD_TYPES } from './data.js';
 import { showToast } from './render.js';
 import { encodeBinary, toSvg, Ecc } from './qrcodegen.js';
 import { _showImportDialog } from './storage.js';
@@ -68,6 +69,11 @@ export async function decodeBackupCode(input){
   let s = (input||'').trim();
   const m = s.match(/#backup=([^&\s]+)/);
   if(m) s = m[1];
+  // UNE FICHE D'ÉCHANGE N'EST PAS UNE SAUVEGARDE. Un utilisateur qui
+  // croit restaurer et importe une liste d'échange serait un incident
+  // sérieux : le préfixe F1T1 est refusé ICI, avec son propre message —
+  // jamais laissé tomber dans un « code invalide » générique.
+  if(/^F1T1\./.test(s)) throw new Error(t('tr.is_trade'));
   if(!/^F1U[01]\./.test(s)) throw new Error(t('bk.invalid'));
   const compressed = s.startsWith('F1U1.');
   let data;
@@ -127,6 +133,103 @@ export async function maybeHandleBackupHash(){
     return true;
   } catch(e){
     showToast(t('bk.invalid'));
+    return false;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   LA FICHE D'ÉCHANGE (#trade=) — même chaîne, AUTRE ENVELOPPE.
+
+   Format : F1T1.<base64url deflate-raw> — préfixe DISTINCT de F1U*
+   (sauvegarde), et les deux décodeurs se REFUSENT mutuellement avec
+   un message dédié : croire restaurer et importer une liste d'échange
+   serait un incident sérieux, dans les deux sens.
+
+   Charge : { v:1, season, want:[ids], offer:[[id,[[type,qty]…]]…] } —
+   des identifiants, jamais des noms (l'app d'en face a le catalogue).
+
+   MESURE (chiffrage 1.69.0), pour qui voudra ajouter un champ : la
+   charge réelle du seed (29 manquantes + 8 doubles) fait ~196
+   caractères → QR version 9 ; le PIRE CAS ABSOLU (collection vierge,
+   101 manquantes) fait 284 caractères → QR version 11, sur un plafond
+   de 25 (MAX_QR_VERSION). La marge est large — c'est elle qui permet
+   au QR de porter TOUJOURS la liste complète pendant que l'image
+   plafonne à 6 lignes.
+   ══════════════════════════════════════════════════════════ */
+export async function encodeTradeCode(payload){
+  const raw = new TextEncoder().encode(JSON.stringify(payload));
+  if(typeof CompressionStream !== 'function')
+    throw new Error(t('tr.invalid'));   // pas de repli non compressé : le QR est la raison d'être
+  const packed = await _pipe(raw, CompressionStream, 'deflate-raw');
+  return 'F1T1.' + bytesToB64url(packed);
+}
+
+export async function decodeTradeCode(input){
+  let s = (input||'').trim();
+  const m = s.match(/#trade=([^&\s]+)/);
+  if(m) s = m[1];
+  // Le symétrique du garde de decodeBackupCode : une SAUVEGARDE n'est
+  // pas une fiche d'échange — refus nommé, jamais générique.
+  if(/^F1U[01]\./.test(s)) throw new Error(t('tr.is_backup'));
+  if(!/^F1T1\./.test(s)) throw new Error(t('tr.invalid'));
+  let data;
+  try {
+    const raw = await _pipe(b64urlToBytes(s.slice(5)), DecompressionStream, 'deflate-raw');
+    data = JSON.parse(new TextDecoder().decode(raw));
+  } catch(e){
+    throw new Error(t('tr.invalid'));
+  }
+  if(!data || typeof data !== 'object' || data.v !== 1
+    || !Array.isArray(data.want) || !Array.isArray(data.offer)
+    || (data.season !== undefined && !Number.isInteger(data.season)))
+    throw new Error(t('tr.invalid'));
+  return data;
+}
+
+export function buildTradeLink(code){
+  const base = location.origin + location.pathname;
+  return `${base}#trade=${code}`;
+}
+
+/* La fiche REÇUE : scanner/coller le lien ouvre l'app avec la liste
+   complète préchargée — lecture seule (rien n'est écrit : pas de garde
+   spectateur, exprès). Les noms se résolvent sur NOTRE catalogue. */
+function _cardName(id){ const c = CARDS_DB.find(x => x.id === id); return c ? c.name : `#${id}`; }
+function _typeLabelTr(ty){ const k = 'type.' + ty, l = t(k); return l === k ? (CARD_TYPES[ty]?.label || ty) : l; }
+
+export function _showIncomingTrade(data){
+  const overlay = document.createElement('div');
+  overlay.className = 'import-dialog-overlay';
+  const wantRows = data.want.map(id =>
+    `<div class="tr-in-row"><span>#${id}</span> ${_cardName(id)}</div>`).join('');
+  const offerRows = data.offer.map(([id, types]) =>
+    `<div class="tr-in-row"><span>#${id}</span> ${_cardName(id)} <em>${(types||[]).map(([ty, q]) => `${_typeLabelTr(ty)} ×${q}`).join(', ')}</em></div>`).join('');
+  setSafeHTML(overlay, `
+    <div class="import-dialog tr-in">
+      <div class="import-dialog-title">${t('tr.recv')}</div>
+      <div class="import-dialog-sub">${tEsc('tools.season', { season: data.season || '?' })}</div>
+      ${data.want.length ? `<div class="tr-in-h want">▲ ${t('tools.want')} · ${data.want.length}</div>${wantRows}` : ''}
+      ${data.offer.length ? `<div class="tr-in-h offer">▼ ${t('tools.offer')} · ${data.offer.length}</div>${offerRows}` : ''}
+      <div class="import-dialog-btns">
+        <button class="import-dialog-btn primary" id="trInClose">${t('tr.close')}</button>
+      </div>
+    </div>`);
+  document.body.appendChild(overlay);
+  overlay.querySelector('#trInClose').addEventListener('click', () => overlay.remove());
+}
+
+// Démarrage : un lien #trade= ouvre la fiche reçue, puis retire le
+// hash — même mécanique que maybeHandleBackupHash, enveloppe séparée.
+export async function maybeHandleTradeHash(){
+  const hash = location.hash || '';
+  if(!/#trade=/.test(hash)) return false;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+  try {
+    const data = await decodeTradeCode(hash);
+    _showIncomingTrade(data);
+    return true;
+  } catch(e){
+    showToast(e && e.message || t('tr.invalid'));
     return false;
   }
 }

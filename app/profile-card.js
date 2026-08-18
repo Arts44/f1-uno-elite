@@ -6,15 +6,11 @@
    PLOMBERIE DE SORTIE de l'app — `toBlob`, `File`, `navigator.share`,
    repli sur un téléchargement, toast de confirmation.
 
-   `fmtMissing()`, `fmtDoubles()` et `fmtTrade()` existent depuis la
-   v2.x dans stats.js, produisent du texte, et n'ont AUCUN appelant. Ce
-   qui leur manque n'est pas la logique : c'est cette plomberie. Tant
-   qu'elle vivait au milieu de mille lignes de page Badges, l'atteindre
-   voulait dire importer le DOM, l'i18n, les minuteurs et 120 badges —
-   ou la recopier.
-
-   Un futur `export-trade-list.js` importe désormais ce module seul.
-   Voir docs/POINTS-SIGNALES.md, point n°15.
+   La promesse est tenue depuis : la plomberie elle-même vit dans
+   share-file.js (1.66.0, n°15 fermé — fmtTrade a ses appelants), et ce
+   module est devenu la maison des DESSINS canvas qui sortent de l'app :
+   le sceau de badges (shareProfileCard) et la fiche d'échange
+   (shareTradeSheet, 1.69.0).
 
    ⚠️ C'EST LE SEUL MORCEAU DU DÉCOUPAGE QUE LE FILET NE PROUVE PAS.
    `shareProfileCard()` dessine sur un canvas : sa sortie est une image,
@@ -22,8 +18,9 @@
    Son déplacement a donc été vérifié AUTREMENT — le PNG produit a été
    capturé avant et après, et comparé. Résultat dans le commit.
    ══════════════════════════════════════════════════════════ */
-import { t } from './i18n.js';
+import { t, tEsc } from './i18n.js';
 import { shareOrDownloadFile } from './share-file.js';
+import { encodeBinary, Ecc } from './qrcodegen.js';
 import { AUTO_BADGES, MANUAL_BADGES, badgeTr } from './data.js';
 import { showToast } from './render.js';
 import { manualBadges, autoBadgeUnlocked, loadManualBadges } from './badges-store.js';
@@ -96,4 +93,120 @@ export async function shareProfileCard(){
   // (n°15 fermé) : ce module ne garde que le dessin du sceau.
   const how = await shareOrDownloadFile(blob, 'f1-uno-badges.png');
   if(how === 'saved') showToast(t('b.share_saved'));
+}
+/* ══════════════════════════════════════════════════════════
+   LA FICHE D'ÉCHANGE (1.69.0) — le second consommateur de la
+   plomberie canvas, celui que l'arête interdite
+   profile-card → badges promettait (« doit servir à autre chose
+   qu'aux badges »). L'IMAGE plafonne à 6 lignes par colonne
+   (modèle tradeSheetModel, collector.js — règles d'honnêteté
+   incluses) ; le QR en pied porte TOUJOURS la liste complète
+   (#trade=, backup.js — mesuré v11/25 au pire cas absolu).
+   ══════════════════════════════════════════════════════════ */
+export async function shareTradeSheet(m){
+  const dark = document.documentElement.getAttribute('data-theme') !== 'light';
+  const W = 1000;
+  const rowH = 56, secGap = 46;
+  const wantRows = m.sheet.want.length, offerRows = m.sheet.offer.length;
+  const H = 330
+    + (m.sheet.hasWant ? secGap + wantRows * rowH + (m.sheet.wantMore ? 44 : 0) : 0)
+    + (m.sheet.hasOffer ? secGap + offerRows * rowH + (m.sheet.offerMore ? 44 : 0) : 0)
+    + 360;   // QR 220 + pied + marges — mesuré sur le rendu réel (le pied débordait à 320)
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const x = cv.getContext('2d');
+  const ink = dark ? '#F3F0F1' : '#191716';
+  const sub = dark ? '#A5A0A2' : '#6A6461';
+  const red = dark ? '#FF4757' : '#E8002D';
+  const green = dark ? '#1DAF54' : '#00A94F';
+  const line = dark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)';
+  x.fillStyle = dark ? '#100E0F' : '#F4F1ED'; x.fillRect(0, 0, W, H);
+  x.strokeStyle = red; x.lineWidth = 10; x.strokeRect(25, 25, W - 50, H - 50);
+
+  // En-tête : titre + date + sous-titre
+  x.textAlign = 'left'; x.fillStyle = ink;
+  x.font = "700 52px 'Space Grotesk', system-ui";
+  x.fillText(t('tr.title'), 70, 130);
+  x.textAlign = 'right'; x.fillStyle = sub; x.font = '700 24px system-ui';
+  x.fillText(new Date().toLocaleDateString().toUpperCase(), W - 70, 130);
+  x.textAlign = 'left'; x.font = '500 28px system-ui';
+  x.fillText(tEsc('st.sub', { owned: m.owned, total: m.total }) + ' · ' + m.season, 70, 180);
+
+  let y = 240;
+  const section = (color, label, total, rows, more, rowFn) => {
+    x.fillStyle = color; x.font = "800 30px 'Space Grotesk', system-ui";
+    x.fillText(label.toUpperCase() + '  ·  ' + total, 70, y);
+    y += 26;
+    rows.forEach(r => {
+      y += rowH;
+      x.strokeStyle = line; x.lineWidth = 1;
+      x.beginPath(); x.moveTo(70, y + 14); x.lineTo(W - 70, y + 14); x.stroke();
+      rowFn(r, y);
+    });
+    if(more){
+      y += 44;
+      x.fillStyle = sub; x.font = 'italic 500 26px system-ui';
+      x.fillText(tEsc('tr.more', { n: more }), 70, y);
+    }
+    y += secGap;
+  };
+
+  if(m.sheet.hasWant){
+    section(red, '▲ ' + t('tools.want'), m.sheet.wantTotal, m.sheet.want, m.sheet.wantMore, (r, yy) => {
+      x.fillStyle = sub; x.font = "700 24px 'Space Grotesk', system-ui";
+      x.fillText('#' + r.id, 70, yy);
+      x.fillStyle = ink; x.font = '600 30px system-ui';
+      x.fillText(r.name, 160, yy);
+      if(r.wishlist){ x.fillStyle = dark ? '#F472B6' : '#EC4899'; x.font = '600 26px system-ui'; x.textAlign = 'right'; x.fillText('★', W - 70, yy); x.textAlign = 'left'; }
+    });
+  }
+  if(m.sheet.hasOffer){
+    section(green, '▼ ' + t('tools.offer'), m.sheet.offerTotal, m.sheet.offer, m.sheet.offerMore, (r, yy) => {
+      x.fillStyle = sub; x.font = "700 24px 'Space Grotesk', system-ui";
+      x.fillText('#' + r.id, 70, yy);
+      x.fillStyle = ink; x.font = '600 30px system-ui';
+      x.fillText(r.name, 160, yy);
+      x.fillStyle = sub; x.font = '500 24px system-ui'; x.textAlign = 'right';
+      x.fillText(r.typesLabel, W - 70, yy); x.textAlign = 'left';
+    });
+  }
+
+  // QR — dessiné module par module (le SVG de toSvg ne se pose pas sur
+  // un canvas sans rasterisation asynchrone ; getModule suffit).
+  const qr = encodeBinary(new TextEncoder().encode(m.link), Ecc.LOW, 1, 25);
+  const qrSize = 220, cell = qrSize / (qr.size + 8);
+  const qx = 70, qy = y + 10;
+  x.fillStyle = '#ffffff'; x.fillRect(qx, qy, qrSize, qrSize);
+  x.fillStyle = '#111111';
+  for(let ry = 0; ry < qr.size; ry++) for(let rx = 0; rx < qr.size; rx++)
+    if(qr.getModule(rx, ry)) x.fillRect(qx + (rx + 4) * cell, qy + (ry + 4) * cell, Math.ceil(cell), Math.ceil(cell));
+  x.fillStyle = ink; x.font = '700 26px system-ui';
+  x.fillText(t('tr.scan_t'), qx + qrSize + 34, qy + 56);
+  x.fillStyle = sub; x.font = '500 23px system-ui';
+  _wrapText(x, t('tr.scan'), qx + qrSize + 34, qy + 96, W - 70 - (qx + qrSize + 34), 32);
+  x.font = "700 20px 'Space Grotesk', system-ui";
+  x.fillText(`${m.code.length} car. · QR v${qr.version} / 25`, qx + qrSize + 34, qy + qrSize - 8);
+
+  // Pied : lockup (source de vérité styles.css — graisse 700 réelle)
+  x.fillStyle = ink; x.font = "700 34px 'Space Grotesk', system-ui";
+  x.fillText('F1 UNO', 70, H - 70);
+  x.fillStyle = red; x.font = "500 16px 'Space Grotesk', system-ui";
+  x.fillText('É L I T E', 70, H - 44);
+  x.fillStyle = sub; x.font = '500 22px system-ui'; x.textAlign = 'right';
+  x.fillText('arts44.dev', W - 70, H - 50); x.textAlign = 'left';
+
+  const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
+  if(!blob) return;
+  const how = await shareOrDownloadFile(blob, 'f1-uno-echange.png');
+  if(how === 'saved') showToast(t('tr.saved'));
+}
+
+function _wrapText(x, txt, tx, ty, maxW, lh){
+  const words = String(txt).split(' ');
+  let lineTxt = '';
+  for(const w of words){
+    const test = lineTxt ? lineTxt + ' ' + w : w;
+    if(x.measureText(test).width > maxW && lineTxt){ x.fillText(lineTxt, tx, ty); ty += lh; lineTxt = w; }
+    else lineTxt = test;
+  }
+  if(lineTxt) x.fillText(lineTxt, tx, ty);
 }

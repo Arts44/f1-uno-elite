@@ -25,7 +25,7 @@ import {
   _bindViewerBrowseBtn, isViewerModeAllowed, isSetupDone, isPinEnabled,
   setAuthenticated, applySavedFont, applyLoginI18n
 } from './pin.js';
-import { maybeHandleBackupHash } from './backup.js';
+import { maybeHandleBackupHash, maybeHandleTradeHash } from './backup.js';
 import { isTutorialSeen, markTutorialSeen } from './tutorial-snapshot.js';
 import { initInstall, maybeShowInstallBanner } from './install.js';
 import { handleAuthRedirect } from './cloud-auth.js';
@@ -84,6 +84,7 @@ export function initApp() {
     // If the app was opened from a scanned QR / shared #backup= link,
     // trigger the existing restore (merge/replace) dialog.
     maybeHandleBackupHash();
+    maybeHandleTradeHash();   // fiche d'échange reçue (#trade=) — enveloppe séparée
 
     // Install banner: the beforeinstallprompt event may have fired
     // while the login screen was still up — show it now if relevant.

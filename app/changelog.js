@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.69.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['Stats can now produce a trade sheet: a shareable image of what you are looking for and what you can offer, with a QR code at the foot that carries the WHOLE list — scanning it opens the app on the other side with everything preloaded. The image shows six lines per column; the code holds the rest. A trade code can never be mistaken for a backup: each refuses the other by name.'],
+      fr: ['Les stats produisent désormais une fiche d’échange : une image partageable de ce que vous cherchez et de ce que vous offrez, avec un QR en pied qui porte la liste ENTIÈRE — le scanner ouvre l’app d’en face avec tout préchargé. L’image montre six lignes par colonne ; le code porte le reste. Un code d’échange ne peut jamais être pris pour une sauvegarde : chacun refuse l’autre nommément.'],
+      es: ['Las estadísticas producen ahora una ficha de cambio: una imagen compartible de lo que buscas y lo que ofreces, con un QR al pie que lleva la lista ENTERA — escanearlo abre la app de enfrente con todo precargado. La imagen muestra seis líneas por columna; el código lleva el resto. Un código de cambio nunca puede confundirse con una copia de seguridad: cada uno rechaza al otro por su nombre.'],
+      zh: ['统计页现在可以生成交换单：一张可分享的图片，展示你在找什么、可以出什么，页脚的二维码承载完整清单——对方扫码即可打开应用并预载全部内容。图片每栏显示六行，其余的都在码里。交换码绝不会被误认为备份：两者会指名拒绝对方。'],
+      it: ['Le statistiche producono ora una scheda di scambio: un’immagine condivisibile di ciò che cerchi e di ciò che offri, con un QR in fondo che porta l’INTERA lista — scansionarlo apre l’app di fronte con tutto precaricato. L’immagine mostra sei righe per colonna; il codice porta il resto. Un codice di scambio non può mai essere scambiato per un backup: ciascuno rifiuta l’altro per nome.'],
+      nl: ['Statistieken maken nu een ruilblad: een deelbare afbeelding van wat je zoekt en wat je biedt, met een QR-code onderaan die de HELE lijst draagt — scannen opent de app aan de overkant met alles vooraf geladen. De afbeelding toont zes regels per kolom; de code draagt de rest. Een ruilcode kan nooit voor een back-up worden aangezien: elk weigert de ander bij naam.'],
+      de: ['Die Statistiken erzeugen jetzt ein Tauschblatt: ein teilbares Bild dessen, was Sie suchen und was Sie bieten, mit einem QR-Code am Fuß, der die GANZE Liste trägt — Scannen öffnet die App gegenüber mit allem vorgeladen. Das Bild zeigt sechs Zeilen pro Spalte; der Code trägt den Rest. Ein Tausch-Code kann nie mit einem Backup verwechselt werden: jeder weist den anderen namentlich zurück.'],
+    },
+  },
+  {
     version: '1.68.0',
     date: '2026-08-18',
     changes: {
