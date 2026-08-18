@@ -29,7 +29,7 @@ import { AUTO_BADGES, badgeTr, CARDS_DB, CARD_TYPES, RARITIES, RARITY_ORDER, RAR
 import { switchView } from './render.js';
 import { autoBadgeUnlocked, saveManualBadges } from './badges-store.js';
 import { evaluateBadgeCondition } from './badge-rules.js';
-import { getTypeData, cardRarity, cardSetComplete, variantRarity } from './storage.js';
+import { getTypeData, cardRarity, variantRarity } from './storage.js';
 
 
 export function _celebrate(tile){
@@ -156,7 +156,6 @@ export function showTierCelebration(card, beforeKey, afterKey){
   if(document.querySelector('.tut-overlay')) return false;   // cas 1 — jamais sur le tour
   if(document.getElementById('tierCele')) return false;      // une seule à la fois
   const rar = RARITIES[afterKey] || {};
-  const setDone = cardSetComplete(card.id);
   const isEternal = afterKey === 'eternal';
   // Le type qui a fait monter : le meilleur possédé au nouveau palier
   // (ordre canonique). Pour un set complété, c'est le set qui monte.
