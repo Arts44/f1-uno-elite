@@ -12,6 +12,7 @@ import {
   sortTypesCanonical
 } from './data.js';
 import { updateStats } from './stats.js';
+import { journalRecord, setJournal, getJournal } from './journal.js';
 import { renderCollection, showToast } from './render.js';
 /* Le store, PAS la vue : storage.js n'a besoin que de l'état persistant
    des badges pour la sauvegarde et sa restauration. Passer par
@@ -134,6 +135,14 @@ export function txBatch(fn){
 export function setTypeData(cardId, typeId, key, value){
   if(!coll[cardId]) coll[cardId]={};
   if(!coll[cardId][typeId]) coll[cardId][typeId]={owned:false,wishlist:false,doubles:false,favorite:false,qty:0};
+  // LE JOURNAL (1.68.0) : chaque changement de QUANTITÉ est consigné —
+  // et setTypeData n'est atteint QUE par des gestes (quickToggle,
+  // changeMoQty, quickAddVariant, undoQuickAdd) : les imports
+  // remplacent `coll` directement (_applyImport), le tutoriel restaure
+  // localStorage brut. Pas de drapeau de suspension : le point
+  // d'accroche fait le garde — tenu par tests/journal.test.js
+  // (« restaurer 300 cartes → journal vide »).
+  if(key==='qty') journalRecord(cardId, typeId, (value||0) - (coll[cardId][typeId].qty||0));
   coll[cardId][typeId][key]=value;
   if(_txDepth === 0){ saveData(); updateStats(); }
 }
@@ -144,7 +153,7 @@ export function setTypeData(cardId, typeId, key, value){
    gagnent avec les badges d'une saison donnée. C'est la liste de
    référence pour l'effacement des données locales et pour l'instantané
    du tutoriel (tutorial.js : tutorialKeys). */
-export const SEASON_KEY_RE = /^f1uno_(owned|badges|auto_badges|history|title|pinned_badge)_\d+$/;
+export const SEASON_KEY_RE = /^f1uno_(owned|badges|auto_badges|history|journal|title|pinned_badge)_\d+$/;
 
 // ── Suppression des données locales de collection (zone danger) ──
 // Efface les clés de saison de TOUTES les saisons (possédées, badges,
@@ -301,13 +310,25 @@ export function collectionSnapshot(include){
   if(include){
     const settings = gatherSettings(include);
     if(settings) snap.settings = settings;
+    /* LE JOURNAL N'ENTRE QUE SUR DEMANDE (include.journal) : export
+       FICHIER et push CLOUD le portent ; le code texte et le QR de
+       sauvegarde ne le portent JAMAIS. Ce n'est pas un oubli à
+       « compléter » : MESURÉ (chiffrage 1.68.0), le journal compressé
+       pèse +1757 caractères à 200 entrées et +3777 à 500 — contre un
+       MAX_CODE_CHARS de 4000 (backup.js). L'inclure tuerait le code et
+       le QR dès ~500 entrées. Si un jour il doit y entrer, il faudra
+       une autre enveloppe, pas ce champ. */
+    if(include.journal){
+      const j = getJournal();
+      if(j.length) snap.journal = j;
+    }
   }
   return snap;
 }
 
 export function exportCollection(){
   if(deniedForViewer()) return ;   // lecture seule : refus même en appel direct
-  const data = collectionSnapshot(backupIncludes());
+  const data = collectionSnapshot({ ...backupIncludes(), journal: true });
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], {type:'application/json'});
   const url = URL.createObjectURL(blob);
@@ -407,6 +428,10 @@ export async function _applyImport(data, mode){
   }
   if(mode==='replace'){
     coll = data.owned || {};
+    // Le journal SUIT sa collection : restauré sur « remplacer »
+    // uniquement. En fusion, le journal local continue — mêler deux
+    // chronologies fabriquerait une histoire qui n'a pas eu lieu.
+    if(Array.isArray(data.journal)) setJournal(data.journal);
     if(data.manualBadges) setManualBadges(data.manualBadges);
     if(data.autoBadges) setAutoBadgeUnlocked(data.autoBadges);
   } else {

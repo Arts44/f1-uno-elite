@@ -39,6 +39,7 @@ export function tutorialKeys(season){
     `f1uno_badges_${season}`,
     `f1uno_auto_badges_${season}`,
     `f1uno_history_${season}`,
+    `f1uno_journal_${season}`,   // les gestes du tour s'y consignent — restaurés avec le reste
     `f1uno_title_${season}`,
     `f1uno_pinned_badge_${season}`,
     'f1uno_changes_since_backup',

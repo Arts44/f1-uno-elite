@@ -27,7 +27,7 @@ const SEASON = 2025;
 
 /* Les six familles scoppées par saison, telles que le code les
    fabrique via _storageKey() ou en gabarit littéral. */
-const SEASON_FAMILIES = ['owned', 'badges', 'auto_badges', 'history', 'title', 'pinned_badge'];
+const SEASON_FAMILIES = ['owned', 'badges', 'auto_badges', 'history', 'journal', 'title', 'pinned_badge'];
 
 /* Clés d'APPAREIL : une seule valeur, toutes saisons confondues.
    Inventaire exhaustif, tenu à la main — le test ci-dessous vérifie
@@ -64,7 +64,7 @@ const DEVICE_KEYS = [
 
 describe('registres de clés — périmètres', () => {
   test('DATA_KEY_RE couvre les quatre familles chiffrées, et rien d\'autre', () => {
-    ['owned', 'badges', 'auto_badges', 'history'].forEach(f => { assert.ok(DATA_KEY_RE.test(`f1uno_${f}_${SEASON}`), f); });
+    ['owned', 'badges', 'auto_badges', 'history', 'journal'].forEach(f => { assert.ok(DATA_KEY_RE.test(`f1uno_${f}_${SEASON}`), f); });
     ['title', 'pinned_badge'].forEach(f => {
       assert.ok(!DATA_KEY_RE.test(`f1uno_${f}_${SEASON}`),
         `${f} n'est pas chiffré : il ne contient qu'un identifiant public`);
@@ -153,7 +153,7 @@ describe('inventaire localStorage — aucune clé hors registre', () => {
     'storage.js', 'badges.js', 'history.js', 'backup.js', 'pin.js',
     'tutorial.js', 'settings-sync.js', 'secure-store.js', 'cloud-auth.js',
     'install.js', 'update.js', 'session.js', 'i18n.js', 'data.js',
-    'render.js', 'stats.js', 'app.js', 'feedback.js',
+    'render.js', 'stats.js', 'app.js', 'feedback.js', 'journal.js',
   ];
 
   test('toute clé f1uno_* du code est classée', () => {

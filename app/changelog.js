@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.68.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['Your collection now keeps a private journal of your real moves — each copy added or removed, with its date. Nothing shows yet: it is groundwork, so a future version can tell the story of your collection (today\'s data can never rebuild the past). It travels in your file backups and cloud sync, stays encrypted like the rest, and never enters QR codes.'],
+      fr: ['Votre collection tient désormais un journal privé de vos vrais gestes — chaque exemplaire ajouté ou retiré, avec sa date. Rien ne s\'affiche encore : c\'est une fondation, pour qu\'une future version raconte l\'histoire de votre collection (les données d\'aujourd\'hui ne peuvent jamais reconstruire le passé). Il voyage dans vos sauvegardes fichier et le cloud, reste chiffré comme le reste, et n\'entre jamais dans les codes QR.'],
+      es: ['Tu colección lleva ahora un diario privado de tus gestos reales — cada ejemplar añadido o retirado, con su fecha. Nada se muestra aún: es una base, para que una futura versión cuente la historia de tu colección (los datos de hoy nunca pueden reconstruir el pasado). Viaja en tus copias de seguridad de archivo y en la nube, permanece cifrado como el resto, y nunca entra en los códigos QR.'],
+      zh: ['您的收藏现在会保留一份私人日志，记录您的真实操作——每次添加或移除的副本及其日期。目前不会显示任何内容：这是基础工作，让未来的版本能够讲述您收藏的故事（今天的数据永远无法重建过去）。它随文件备份和云同步一起保存，与其他数据一样加密，且绝不进入二维码。'],
+      it: ['La tua collezione tiene ora un diario privato dei tuoi gesti reali — ogni copia aggiunta o rimossa, con la sua data. Niente è ancora visibile: è una fondazione, perché una versione futura racconti la storia della tua collezione (i dati di oggi non possono mai ricostruire il passato). Viaggia nei backup su file e nel cloud, resta cifrato come il resto, e non entra mai nei codici QR.'],
+      nl: ['Je collectie houdt nu een privé-logboek bij van je echte handelingen — elk toegevoegd of verwijderd exemplaar, met datum. Er wordt nog niets getoond: het is een fundament, zodat een toekomstige versie het verhaal van je collectie kan vertellen (de data van vandaag kan het verleden nooit reconstrueren). Het reist mee in je bestandsback-ups en cloudsynchronisatie, blijft versleuteld zoals de rest, en komt nooit in QR-codes terecht.'],
+      de: ['Deine Sammlung führt jetzt ein privates Journal deiner echten Handgriffe — jedes hinzugefügte oder entfernte Exemplar, mit Datum. Noch wird nichts angezeigt: Es ist ein Fundament, damit eine künftige Version die Geschichte deiner Sammlung erzählen kann (die heutigen Daten können die Vergangenheit nie rekonstruieren). Es reist in Datei-Backups und Cloud-Sync mit, bleibt wie alles andere verschlüsselt und gelangt nie in QR-Codes.'],
+    },
+  },
+  {
     version: '1.67.0',
     date: '2026-08-18',
     changes: {

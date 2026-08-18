@@ -54,7 +54,7 @@ const ITERATIONS = 310000;
    qu'ils accompagnent — les chiffrer ne cacherait rien de plus.
    Ils appartiennent en revanche à une saison : c'est SEASON_KEY_RE
    (storage.js) qui les couvre pour l'effacement et l'export. */
-export const DATA_KEY_RE = /^f1uno_(owned|badges|auto_badges|history)_/;
+export const DATA_KEY_RE = /^f1uno_(owned|badges|auto_badges|history|journal)_/;
 
 let _key = null;            // CryptoKey for this unlocked session
 let _cache = new Map();     // key -> plaintext string (enc mode only)

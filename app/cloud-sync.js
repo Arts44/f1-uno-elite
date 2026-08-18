@@ -73,7 +73,7 @@ export async function pushSeason(season){
   if(!cfg) throw new Error('not-signed-in');
   _requireOnline();
   const { session, userId } = await _requireSession();
-  const row = buildUpsertRow(userId, season, collectionSnapshot(backupIncludes()));
+  const row = buildUpsertRow(userId, season, collectionSnapshot({ ...backupIncludes(), journal: true }));
   const resp = await cloudFetch(`${cfg.url}/rest/v1/collections?on_conflict=user_id,season`, {
     method: 'POST',
     cache: 'no-store',
