@@ -1433,32 +1433,61 @@ dépend — la noter vaut mieux que la refaire pour rien.
 
 ## 24. Deux bandeaux coexistent sur un profil qui saute plusieurs versions
 
-**Signalé et MESURÉ pendant le diagnostic du bandeau de mise à jour
-(1.76.0), volontairement non corrigé dans ce commit** — il n'a rien à
-voir avec l'intermittence, et l'empiler aurait mélangé deux sujets.
+**Signalé pendant le diagnostic du bandeau de mise à jour (1.76.0),
+volontairement non corrigé dans ce commit** — il n'a rien à voir avec
+l'intermittence, et l'empiler aurait mélangé deux sujets.
 
 Sur un profil dont `f1uno_seen_version` est très en retard (le seed de
 capture porte `1.29.0`), `maybeOfferWhatsNew()` pose `whatsNewBanner`
 au moment même où `_showUpdateBanner()` pose `updateBanner`. Les deux
-utilisent la classe `.install-banner` et occupent la même zone.
+portent la classe `.install-banner update-banner` : même `bottom:150px`,
+même `z-index:401`. Ce n'est pas un empilement, c'est une
+**superposition exacte**.
 
-**Ce que la mesure dit exactement** — c'est la nuance qui a fait
-reporter plutôt que corriger dans l'urgence :
+### Le premier relevé était faux, et c'est l'instrument qui mentait
+
+L'entrée disait ceci, et concluait que le bouton restait atteignable
+donc que le défaut ne relevait pas de la famille « présent mais
+inatteignable » :
 
 ```
 {p: true, a: true, intercepte: 'updateReloadBtn',
  autres: ['whatsNewBanner', 'updateBanner']}
 ```
 
-Le bouton du bandeau de mise à jour **reste atteignable** (`a: true`,
-et l'élément au point visé est bien le bouton lui-même). Ce n'est donc
-PAS la famille « présent mais inatteignable » qui a coûté trois
-occurrences : c'est un défaut de mise en page, pas de fonctionnement.
+**Ce relevé a été pris dans UN SEUL ORDRE D'INSERTION** — celui où le
+bandeau de mise à jour arrive en dernier. Il gagne alors le test de
+survol parce qu'il est le dernier du DOM à `z-index` égal, et le relevé
+dit vrai… sur lui. Il ne dit rien de l'autre.
 
-**Ce qu'il faudrait trancher le jour où on le corrige** : les deux
-bandeaux disent des choses différentes (« une nouvelle version est
-prête » / « voici ce qui a changé depuis votre dernière visite ») et
-l'un rend l'autre presque caduc — après un rechargement, « nouveautés »
-est le seul qui a encore du sens. La correction n'est donc pas de les
-empiler proprement, mais de décider lequel s'efface. Ça se décide avec
-un utilisateur sous les yeux, pas dans un commit de correction de bug.
+Dans l'ORDRE DE PRODUCTION, `maybeOfferWhatsNew()` part depuis
+`initApp()` et `_showUpdateBanner()` arrive après : c'est
+`whatsNewBanner` qui est recouvert. Mesuré sur le bandeau recouvert :
+
+```
+{bandeau: false, bouton: false, fermer: false}
+```
+
+**Intégralement invisible et intégralement inatteignable.** Aucun de
+ses trois points n'est touchable — pas même son ✕. L'entrée relève donc
+bien de **la famille « présent mais inatteignable »**, celle qui a déjà
+coûté trois occurrences ; elle n'en était sortie que par un défaut de
+protocole de mesure. Le nouveau cas est consigné au registre des
+instruments menteurs (CONVENTIONS.md, cas ⑥).
+
+Le sens du défaut change avec l'ordre, pas sa nature : quel que soit
+l'ordre, **un des deux bandeaux est entièrement perdu**.
+
+### Ce qu'il faut trancher le jour où on le corrige
+
+Les deux bandeaux disent des choses différentes — « une nouvelle
+version est prête » / « voici ce qui a changé depuis votre dernière
+visite » — et affichés ensemble ils sont **logiquement
+contradictoires** : l'un annonce une mise à jour à venir, l'autre
+annonce une mise à jour déjà appliquée. Après un rechargement,
+« nouveautés » est le seul qui ait encore du sens.
+
+La correction n'est donc pas de les empiler proprement, mais de décider
+lequel s'efface — ou dans quel ordre ils se succèdent. Ça se décide
+avec un utilisateur sous les yeux, pas dans un commit de correction de
+bug.
