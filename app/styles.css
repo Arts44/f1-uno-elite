@@ -1264,6 +1264,28 @@ body.viewer-mode .mo-type-rows .mqbtn { opacity:0.35;pointer-events:none; }
 .acc-empty-acts .setv-btn{flex:1;min-width:150px;min-height:var(--tap-min);display:inline-flex;align-items:center;justify-content:center;}
 .acc-empty-acts .primary{background:var(--red);color:#fff;border-color:var(--red);}
 
+/* ── L'ACCORD (1.75.0) — l'app calcule, elle n'arbitre pas.
+   Les deux directions partagent les MÊMES classes : aucune n'est
+   présentée comme meilleure, et c'est vérifiable (accord.test.js). */
+.tr-accord{text-align:left;border:1px solid var(--border);border-radius:12px;background:var(--surface2);padding:12px;margin-bottom:10px;}
+.ac-head{display:flex;align-items:baseline;gap:8px;margin-bottom:3px;flex-wrap:wrap;}
+.ac-score{font-family:var(--font-d);font-weight:800;font-size:24px;color:var(--tx1);line-height:1;}
+.ac-verdict{font-size:12.5px;font-weight:700;color:var(--st-owned);}
+.ac-verdict.neutre{color:var(--tx2);}
+.ac-sub{font-size:12px;color:var(--tx2);line-height:1.5;margin-bottom:10px;}
+.ac-sec{margin-bottom:9px;}
+.ac-sec-h{font-family:var(--font-d);font-weight:800;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px;}
+.ac-in .ac-sec-h{color:var(--st-owned);}
+.ac-out .ac-sec-h{color:var(--st-missing);}
+.ac-row{display:flex;align-items:center;gap:7px;font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--border);}
+.ac-row:last-child{border-bottom:none;}
+.ac-row .n{font-family:var(--font-d);font-weight:700;font-size:10.5px;color:var(--tx3);min-width:32px;}
+.ac-row .nm{flex:1;color:var(--tx1);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ac-gain{font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;background:color-mix(in srgb,var(--purple) 18%,transparent);color:var(--purple);white-space:nowrap;}
+.ac-left{font-size:10.5px;color:var(--tx3);white-space:nowrap;}
+.ac-vide{font-size:12.5px;color:var(--tx2);line-height:1.6;}
+.ac-piste{font-size:11.5px;color:var(--tx3);margin-top:7px;line-height:1.5;}
+
 /* ── LA 4e PORTE : LA FICHE REÇUE (1.74.0) ──
    Pastille tant qu'elle n'est pas ouverte, échéance écrite, effacement
    explicite sur une cible de 44 px séparée de l'ouverture. */

@@ -1295,7 +1295,50 @@ couleur, clair et sombre).
 
 ---
 
-## 21. Le recoupement (piste 3c) — REPORTÉ, pas refusé
+## 21. Le recoupement (piste 3c) — ROUVERT et RETENU en version calcul ; la fiche d'accord partageable est REFUSÉE
+
+**Mise à jour du 18/08/2026.** Les trois conditions de réouverture
+écrites ci-dessous sont remplies : la fiche d'échange existe (1.69.0), le
+format `#trade=` est distinct d'une restauration, et surtout la fiche
+reçue est **enregistrée localement** (1.74.0) — l'app a donc les deux
+collections sous la main. Le recoupement n'est plus un collage manuel,
+c'est un calcul sur des données présentes.
+
+**Ce qui est retenu : le CALCUL seul.** L'intersection est du code pur
+(`son offer ∩ mes want`, `mon offer ∩ ses want`), et la prédiction « ce
+que ça fait monter » ne demande **aucun état hypothétique** —
+`variantRarity(carte, type)` est pure, donc comparer sa valeur au
+`cardRarity` courant suffit. C'est cette mesure qui a fait tomber le coût
+de « moyen » à « faible ».
+
+### CE QUI EST REFUSÉ, et pourquoi — pour que ça ne se rejoue pas
+
+**La fiche d'accord partageable** (« ce qui part / ce qui arrive »,
+publiable comme la fiche d'échange) est refusée. Ce n'est pas un oubli
+ni un report : c'est une décision, avec son argument.
+
+L'argument est celui qui a fait refuser deux modules du backlog v2 —
+**quelle fonctionnalité ça débloque, mesurée, et pour quel besoin
+attesté.** Un accord partageable suppose que l'autre personne le
+**rejoue** dans son app : donc un quatrième format, un quatrième
+décodeur, un quatrième chemin de hash, et la question « que se passe-t-il
+si sa collection a changé entre-temps ». Le besoin observé — trois
+personnes s'échangeant des listes à la main dans un fil r/F1Cards —
+s'arrête à « voici l'échange ». **Le protocole d'accord est une
+invention**, et la maquette 3c l'avouait déjà : « il faut un échange
+privé de codes, donc les deux personnes doivent déjà se parler ». Si
+elles se parlent, elles n'ont pas besoin d'un format pour se répondre.
+
+**Condition de réouverture, précise :** quelqu'un qui utilise
+**vraiment** le recoupement et qui demande à répondre **dans l'app** —
+un retour d'usage réel, pas une intuition de symétrie. Tant que la
+demande n'existe pas, « la suite logique » n'est pas un argument.
+
+---
+
+### Le texte d'origine (report), conservé
+
+## 21 bis. Le recoupement — le report initial
 
 **Piste identifiée à l'exploration du tour 3, consignée pour ne pas se
 perdre — et pour ne pas se rejouer sans ses conditions.**

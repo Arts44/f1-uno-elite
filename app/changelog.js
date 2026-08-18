@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.75.0',
+    date: '2026-08-18',
+    changes: {
+      en: ['A trade sheet you receive now shows the actual trade: what would come to you, what would leave, and which card it would move up a tier. No pasting, no extra step — the app already has both collections. It states the numbers and never judges them: an uneven trade is “up to the two of you”, never “unbalanced”, in either direction. When nothing matches it says so plainly, and says why that is normal early on.'],
+      fr: ['Une fiche d’échange reçue montre désormais l’échange lui-même : ce qui vous arriverait, ce qui partirait, et quelle carte monterait d’un palier. Aucun collage, aucune étape en plus — l’app a déjà les deux collections. Elle pose les nombres et ne les juge jamais : un échange inégal est « à voir entre vous », jamais « déséquilibré », dans un sens comme dans l’autre. Quand rien ne correspond, elle le dit simplement, et dit pourquoi c’est normal au début.'],
+      es: ['Una ficha de cambio recibida muestra ahora el cambio en sí: lo que te llegaría, lo que saldría, y qué carta subiría de nivel. Sin pegar nada, sin pasos extra — la app ya tiene ambas colecciones. Expone las cifras y nunca las juzga: un cambio desigual es «a decidir entre ustedes», nunca «desequilibrado», en cualquiera de los dos sentidos. Cuando nada coincide lo dice con claridad, y explica por qué es normal al principio.'],
+      zh: ['收到的交换单现在会直接显示这笔交换：你将得到什么、将送出什么，以及哪张卡会因此升阶。无需粘贴，也没有额外步骤——应用已经掌握了双方的收藏。它只陈述数字，从不评判：数量不对等的交换是「由你们双方决定」，而不是「不平衡」，两个方向都一样。当没有匹配时，它会直说，并说明为什么这在初期很正常。'],
+      it: ['Una scheda di scambio ricevuta mostra ora lo scambio stesso: cosa ti arriverebbe, cosa partirebbe, e quale carta salirebbe di livello. Nessun incollaggio, nessun passaggio in più — l’app ha già entrambe le collezioni. Espone i numeri e non li giudica mai: uno scambio impari è «da vedere tra voi», mai «squilibrato», in un senso come nell’altro. Quando nulla corrisponde lo dice chiaramente, e spiega perché all’inizio è normale.'],
+      nl: ['Een ontvangen ruilblad toont nu de ruil zelf: wat naar jou zou komen, wat zou vertrekken, en welke kaart daardoor een niveau stijgt. Geen plakwerk, geen extra stap — de app heeft beide collecties al. Ze noemt de aantallen en beoordeelt ze nooit: een ongelijke ruil is «aan jullie samen om te bepalen», nooit «uit balans», in beide richtingen. Als er niets matcht zegt ze dat gewoon, en waarom dat in het begin normaal is.'],
+      de: ['Ein erhaltenes Tauschblatt zeigt jetzt den Tausch selbst: was zu dir käme, was ginge, und welche Karte dadurch eine Stufe aufsteigt. Kein Einfügen, kein Zwischenschritt — die App hat beide Sammlungen bereits. Sie nennt die Zahlen und bewertet sie nie: ein ungleicher Tausch heißt «das klärt ihr untereinander», nie «unausgewogen», in beide Richtungen gleich. Wenn nichts passt, sagt sie es klar und erklärt, warum das am Anfang normal ist.'],
+    },
+  },
+  {
     version: '1.74.0',
     date: '2026-08-18',
     changes: {

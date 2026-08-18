@@ -11,7 +11,9 @@
 import { log } from './logger.js';
 import { deniedForViewer } from './session.js';
 import { t, tEsc, setSafeHTML } from './i18n.js';
-import { CARDS_DB, CARD_TYPES } from './data.js';
+import { CARDS_DB, CARD_TYPES, RARITY_ORDER, RARITIES } from './data.js';
+import { accordModel, tradeList } from './collector.js';
+import { cardRarity, variantRarity } from './storage.js';
 import { setInbox, getInbox, peutAfficher, markInboxLue } from './trade-inbox.js';
 import { showToast } from './render.js';
 import { encodeBinary, toSvg, Ecc } from './qrcodegen.js';
@@ -241,7 +243,41 @@ export function buildTradeLink(code){
 function _cardName(id){ const c = CARDS_DB.find(x => x.id === id); return c ? c.name : `#${id}`; }
 function _typeLabelTr(ty){ const k = 'type.' + ty, l = t(k); return l === k ? (CARD_TYPES[ty]?.label || ty) : l; }
 
+/* L'ACCORD (1.75.0) — le recoupement des deux collections.
+   UNE SEULE clé de verdict pour les deux directions : c'est ce qui
+   rend l'impartialité vérifiable (tests/accord.test.js). « À voir
+   entre vous », jamais « déséquilibré ». */
+function _accordHTML(data){
+  const mien = tradeList();
+  const moi = { want: mien.want.map(r => r.id),
+                offer: mien.offer.map(r => [r.id, r.types.map(t => [t.type, t.qty])]) };
+  const a = accordModel(moi, data, { cards: CARDS_DB, rarityOrder: RARITY_ORDER,
+                                     variantRarity, cardRarity });
+  if(a.etat === 'aucun'){
+    return `<div class="ac-head"><span class="ac-score">0 ↔ 0</span>
+        <span class="ac-verdict neutre">${t('tr.ac_none')}</span></div>
+      <div class="ac-vide">${t('tr.ac_none_why')}<div class="ac-piste">${t('tr.ac_none_next')}</div></div>`;
+  }
+  const ligneIn = r => `<div class="ac-row"><span class="n">#${r.id}</span><span class="nm"></span>${
+    r.monte ? `<span class="ac-gain">→ ${t('rar.' + r.monte) || (RARITIES[r.monte] || {}).label || r.monte}</span>` : ''}</div>`;
+  const ligneOut = r => `<div class="ac-row"><span class="n">#${r.id}</span><span class="nm"></span>${
+    r.reste > 0 ? `<span class="ac-left">${tEsc('tr.ac_left', { n: r.reste })}</span>` : ''}</div>`;
+  const html = `
+    <div class="ac-head"><span class="ac-score">${a.nIn} ↔ ${a.nOut}</span>
+      <span class="ac-verdict${a.etat === 'possible' ? '' : ' neutre'}">${
+        t(a.etat === 'possible' ? 'tr.ac_possible' : 'tr.ac_uneven')}</span></div>
+    <div class="ac-sub">${tEsc('tr.ac_they_have', { n: a.nIn })} ${tEsc('tr.ac_you_have', { n: a.nOut })}</div>
+    ${a.nIn ? `<div class="ac-sec ac-in"><div class="ac-sec-h">▲ ${tEsc('tr.ac_in', { n: a.nIn })}</div>
+      ${a.entrant.map(ligneIn).join('')}</div>` : `<div class="ac-piste">${t('tr.ac_nothing_theirs')}</div>`}
+    ${a.nOut ? `<div class="ac-sec ac-out"><div class="ac-sec-h">▼ ${tEsc('tr.ac_out', { n: a.nOut })}</div>
+      ${a.sortant.map(ligneOut).join('')}</div>` : `<div class="ac-piste">${t('tr.ac_nothing_yours')}</div>`}`;
+  return { html, a };
+}
+
 export function _showIncomingTrade(data){
+  const _ac = _accordHTML(data);
+  const _accordBloc = typeof _ac === 'string' ? _ac : _ac.html;
+  const _acData = typeof _ac === 'string' ? null : _ac.a;
   const overlay = document.createElement('div');
   overlay.className = 'import-dialog-overlay';
   const wantRows = data.want.map(id =>
@@ -251,6 +287,7 @@ export function _showIncomingTrade(data){
   setSafeHTML(overlay, `
     <div class="import-dialog tr-in">
       <div class="import-dialog-title">${t('tr.recv')}</div>
+      <div class="tr-accord">${_accordBloc}</div>
       <div class="import-dialog-sub">${tEsc('tools.season', { season: data.season || '?' })}</div>
       ${data.want.length ? `<div class="tr-in-h want">▲ ${t('tools.want')} · ${data.want.length}</div>${wantRows}` : ''}
       ${data.offer.length ? `<div class="tr-in-h offer">▼ ${t('tools.offer')} · ${data.offer.length}</div>${offerRows}` : ''}
@@ -259,6 +296,14 @@ export function _showIncomingTrade(data){
       </div>
     </div>`);
   document.body.appendChild(overlay);
+  // Les noms de cartes sont des DONNÉES : posés en textContent, jamais
+  // interpolés dans un gabarit (règle du dépôt).
+  if(_acData){
+    const noms = [..._acData.entrant, ..._acData.sortant];
+    overlay.querySelectorAll('.ac-row .nm').forEach((el, i) => {
+      if(noms[i]) el.textContent = noms[i].name;
+    });
+  }
   overlay.querySelector('#trInClose').addEventListener('click', () => overlay.remove());
 }
 
