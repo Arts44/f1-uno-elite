@@ -1663,3 +1663,78 @@ chantier de contenu à **sept langues**, qui est déjà consigné hors périmèt
 
 **Condition de réouverture** : la décision éditoriale prise sur le sens des
 deux gestes. C'est elle qui commande, pas l'inverse.
+
+
+---
+
+## 28. « Connexion internet requise » — ⑧ dans le produit, affiché à l'utilisateur
+
+**Trouvé en diagnostiquant une install réelle gelée en 1.60 (n°18), pas
+en cherchant ça. VÉRIFIÉ SUR HEAD, pas seulement sur 1.60 : le défaut
+est intact aujourd'hui.**
+
+Trois issues distinctes de la vérification de mise à jour s'effondrent
+sur un seul message, et ce message **nomme l'internet**
+([app/pin.js:1118-1126](../app/pin.js)) :
+
+```js
+const MSG_KEYS = {
+  uptodate: 'upd.uptodate',
+  found:    'upd.found_msg',
+  offline:  'upd.check_err',      // vraiment hors ligne
+  error:    'upd.check_err',      // ← n'importe quel échec
+  cooldown: 'upd.cooldown',
+  unsupported: 'upd.check_err',   // ← pas de service worker du tout
+};
+```
+
+`upd.check_err` — FR : **« Impossible de vérifier — connexion internet
+requise. »**
+
+### Ce que la mesure a montré
+
+Reproduit en laboratoire, un `sw.js` qui se met à répondre 301 vers une
+autre origine — le cas exact des installs de n°18 :
+
+```
+update() jette   : TypeError « The script resource is behind a
+                   redirect, which is disallowed »
+worker après     : toujours activated
+navigator.onLine : true
+resolveUpdateCheck({error: true, online: true}) → 'error'
+→ affiché : « connexion internet requise »
+```
+
+**Le réseau fonctionne, `navigator.onLine` vaut `true`, et l'app affirme
+à l'utilisateur qu'il n'a pas d'internet.** C'est très exactement ⑧ —
+une ABSENCE conclue sans contrôle positif — sauf qu'ici ce n'est pas un
+harnais qui se trompe, c'est **le produit qui l'affirme à quelqu'un**.
+Un utilisateur qui suit ce message va vérifier son wifi, changer de
+réseau, redémarrer sa box : trois gestes inutiles pour un défaut qui
+n'a rien à voir.
+
+Et sur le chemin AUTOMATIQUE, c'est pire : `_checkForUpdate()` fait
+`_reg.update().catch(() => {})` ([app/update.js:124](../app/update.js)).
+L'échec n'est pas mal nommé, il est **muet**.
+
+### Pourquoi ce n'est pas corrigé ici
+
+Corriger demande de distinguer les trois cas à l'écran, donc d'écrire
+au moins deux messages neufs **dans les sept langues**. C'est le
+chantier de formulation déjà consigné hors périmètre — et **c'en est la
+deuxième pièce grave, après le n°27** (deux ✕ identiques, deux contrats
+opposés). Même famille : le produit dit quelque chose de faux à
+l'utilisateur, et il le dit avec aplomb.
+
+**Condition de réouverture** : la même que n°27 — une décision
+éditoriale sur ce que l'app doit dire quand elle ne sait pas.
+
+### Deux fausses pistes, écartées d'avance
+
+Pour mémoire, parce qu'elles reviendront : rendre le précache **non
+atomique** (`addAll` → `put` un par un) ou **avaler l'échec
+d'installation** (`.catch()` dans `install`) fabriqueraient l'échec B
+mesuré au n°23 — un worker ACTIF avec un cache incomplet, donc une app
+qui se croit prête hors ligne et ne l'est pas. Ce serait échanger un
+défaut borné à ~4,5 minutes contre un défaut **permanent et invisible**.
+Refusé, et pas à rediscuter sans mesure nouvelle.
