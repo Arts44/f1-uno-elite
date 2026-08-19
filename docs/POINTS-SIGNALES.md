@@ -1401,10 +1401,17 @@ données) ; les trois autres non.
 
 ---
 
-## 23. L'installation du service worker en réseau dégradé n'a JAMAIS été mesurée
+## 23. L'installation du service worker en réseau dégradé — MESURÉE le 19/08/2026
 
-**Ce n'est pas un défaut du produit : c'est un trou dans ce qu'on sait,
-et il doit rester visible plutôt que d'être comblé par une estimation.**
+**L'entrée s'appelait « n'a JAMAIS été mesurée » et c'est resté vrai
+deux versions. La campagne a eu lieu le 19/08/2026, avec un bridage
+POSÉ DANS LE SERVEUR — le seul dont on soit certain qu'il atteint aussi
+les requêtes du service worker. Ce qui suit garde l'historique du trou,
+puis ce que la mesure a rendu.**
+
+**Ce n'était pas un défaut du produit : c'était un trou dans ce qu'on
+savait, et il devait rester visible plutôt que d'être comblé par une
+estimation.**
 
 Au diagnostic du bandeau de mise à jour (1.76.0), les trois moments ont
 été chronométrés **en local** : vérification ~5 ms, installation **82 ms
@@ -1427,6 +1434,45 @@ mais pas pour promettre une durée à l'utilisateur.
 ses réponses, ou une mesure contre la production réelle depuis un
 réseau bridé. Décidé de ne pas le faire tant qu'aucune décision n'en
 dépend — la noter vaut mieux que la refaire pour rien.
+
+### CE QUI TIENT APRÈS LA CAMPAGNE — avec les périmètres
+
+Campagne du 19/08/2026. **Régime « 3G lent » = 50 000 octets/s et
+200 ms de latence par requête, bridés DANS LE SERVEUR de test**, profil
+vierge, cache vide, sur le bundle. Tout chiffre ci-dessous porte ce
+périmètre sauf mention contraire.
+
+**L'instrument, contrôlé avant toute mesure de produit** : fenêtre de
+15 s, illimité **2 517,1 Ko** contre **18,2 Ko** à 10 ko/s — facteur
+**138×**. Et les **67** requêtes worker correspondent exactement aux 67
+entrées de `SHELL_ASSETS` : le discriminateur est vérifié, pas supposé.
+
+| ce qui est acquis | mesure | périmètre |
+|---|---|---|
+| **pas d'écran blanc** | écran de langue affiché, 13 boutons, à 5 s, 15 s et 40 s | 3G lent, profil vierge |
+| **`addAll` est atomique** | coupure à 40 % : **0 entrée sur 67**, pas 24 — alors que 24 requêtes worker avaient été servies et **930,7 Ko** transférés | 3G lent |
+| **`reg.update()` n'aggrave pas** | 41,76 s avec, 41,69 s sans → **+0,07 s (+0,17 %)**, A/B vérifié au compteur (2 fetch contre 1) | 3G lent |
+| **le zombie RETARDE, il ne bloque pas** | installation aboutie à **351,5 s** et **353,8 s**, cache **67/67**, malgré un rechargement toutes les 30 s | 3G lent, fenêtre de 600 s, n=2 |
+| **le compteur ne se réarme pas** | recharger toutes les 30 s pendant 10 min n'allonge rien | idem |
+| **poids transféré** | précache **2 031,9 Ko** gzip compris, contre **3 570,9 Ko** sur disque → facteur **1,76** | les 67 entrées |
+| **installation saine** | **41,7 s** jusqu'au worker actif, 67/67 | 3G lent |
+| **captures PWA** | **814,3 Ko**, soit **40,1 %** du précache transféré, demandées par le worker seul (page = 0) | précache |
+
+**UN CHIFFRE PUBLIÉ PUIS RETIRÉ, et il n'a jamais été consigné ici :**
+un bras de mesure avait rapporté « zombie présent → 0 réussite sur 5 ».
+Il était faux — fenêtre d'observation plafonnée à 150 s pour un chemin
+qui demande ~352 s. Le résultat n'était pas « jamais » mais « pas
+encore ». Voir CONVENTIONS.md, cas ⑭.
+
+### CE QUI RESTE INCONNU
+
+**Les durées sur un réseau mobile réel.** Tout ce qui précède vient
+d'un lien bridé en local à 50 ko/s ; aucun seuil de produit ne peut
+être réglé là-dessus. La donnée manquante est une installation
+chronométrée depuis un appareil réel sur un réseau opérateur, profil
+vierge : **durée jusqu'au worker actif, et nombre d'entrées en cache**.
+Deux nombres suffisent. Tant qu'ils manquent, toute correction qui
+demande un SEUIL reste hors d'atteinte.
 
 ### Ce que le défaut NE touche pas : l'usage courant
 

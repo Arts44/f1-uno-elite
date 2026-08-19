@@ -564,3 +564,61 @@ acceptable sans borne. Ce que ce contrat NE dit pas encore à l'utilisateur
 est consigné en POINTS-SIGNALES n°27 : la croix des nouveautés veut dire
 « jamais » là où la croix identique du bandeau de mise à jour veut dire
 « pas maintenant ».
+
+---
+
+## Quatrième chantier refusé : désinscrire le worker « zombie »
+
+**Refusé en 1.77.1**, sur la campagne du n°23 — et refusé pour la même
+raison que les trois précédents : **le bénéfice est mesuré, et il est
+petit ; le réglage, lui, dépend d'un chiffre qu'on n'a pas.**
+
+### Ce qu'elle serait
+
+Dans `initUpdateFlow()` ([app/update.js](../app/update.js)) : détecter
+un `reg.installing` sans contrôleur ni worker actif, attendre un seuil,
+puis `reg.unregister()` suivi d'un nouveau `register()`.
+**~20 lignes, un seul fichier**, aucun nouveau fichier précaché, aucune
+interface, aucune traduction. C'est petit.
+
+### Ce qu'elle économiserait — mesuré
+
+Une installation coupée en cours de route laisse un worker en
+`installing`. Ce qu'on croyait être un blocage n'en est pas un :
+
+| | mesuré |
+|---|---|
+| avec zombie, rechargement toutes les 30 s | aboutit à **351,5 s** et **353,8 s**, cache **67/67** (n=2) |
+| sans zombie | **41,7 s**, cache 67/67 (n=5) |
+
+**Gain réel : ~5 minutes, sur un cas de bord** — il faut que la
+connexion tombe pendant l'installation, ce qui n'arrive qu'une fois par
+première visite ratée. Et pendant ces 5 minutes **l'app fonctionne** :
+seul le hors-ligne manque, l'usage courant n'est pas touché (n°23).
+
+### Ce qu'elle risquerait
+
+**Désinscrire une installation saine mais lente.** Le seuil doit
+séparer une installation qui va aboutir d'un worker qui traîne :
+
+| | |
+|---|---|
+| installation saine, 3G lent bridé en local | 41,8 s |
+| chemin avec zombie | ~352 s |
+
+Un seuil vers 90-120 s les sépare **sur ce lien-là**. Sur un lien plus
+lent que 50 ko/s, une installation saine dépasserait le seuil et on
+tuerait une installation en cours — on remplacerait un retard de 5
+minutes par une boucle de réinstallations. **Le seul paramètre de cette
+correction est exactement le chiffre que n°23 dit manquant depuis le
+début.**
+
+### Condition de réouverture
+
+Une **installation chronométrée sur un réseau mobile réel**, profil
+vierge : durée jusqu'au worker actif et nombre d'entrées en cache. Si
+ces durées montrent qu'un seuil est réglable sans risque — c'est-à-dire
+si l'écart entre bon et mauvais signal reste très inférieur à l'écart
+41,8 s / 352 s —, la correction redevient défendable. Sinon elle reste
+refusée, et c'est la bonne réponse : **une correction dont on ne peut
+pas régler le seul paramètre n'est pas une correction, c'est un pari.**
