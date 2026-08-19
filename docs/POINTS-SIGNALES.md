@@ -1428,6 +1428,28 @@ ses réponses, ou une mesure contre la production réelle depuis un
 réseau bridé. Décidé de ne pas le faire tant qu'aucune décision n'en
 dépend — la noter vaut mieux que la refaire pour rien.
 
+### Ce que le défaut NE touche pas : l'usage courant
+
+Mesuré en même temps que le reste, et c'est ce qui réduit la portée de
+toute l'entrée. Régime 3G lent bridé côté serveur, profil vierge,
+cache vide, état de l'écran relevé pendant que l'installation tourne :
+
+| | ce qui est à l'écran | worker |
+|---|---|---|
+| 5 s | écran de choix de langue, **13 boutons**, non blanc | aucun |
+| 15 s | identique | `installing` |
+| 40 s | identique | `installing` |
+
+**Aucun écran blanc, aucune coquille partielle, aucune attente.** L'app
+est servie par le réseau et reste utilisable pendant que le worker
+installe en tâche de fond. **Une installation lente n'est pas une
+attente pour l'utilisateur** — elle ne coûte que le hors-ligne, et
+seulement tant qu'elle n'a pas abouti.
+
+Conséquence sur la façon de lire cette entrée : le trou de n°23 ne
+concerne **jamais** l'usage courant, uniquement la disponibilité hors
+ligne. Tout chantier qui en sortirait doit être pesé à cette aune-là.
+
 ### Le facteur aggravant redouté : MESURÉ, puis ÉCARTÉ
 
 Cette entrée portait une sous-section « Facteur aggravant ajouté en
