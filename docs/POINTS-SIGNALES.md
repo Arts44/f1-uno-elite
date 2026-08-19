@@ -1155,7 +1155,53 @@ cahier des charges.
 
 ---
 
-## 18. Les PWA installées depuis l'ancienne adresse sont GELÉES sans le dire — et la migration est manuelle
+## 18. Les PWA installées depuis l'ancienne adresse sont GELÉES sans le dire — procédure EXÉCUTÉE et validée
+
+> **CLOS CÔTÉ PROCÉDURE (19/08/2026).** La migration décrite plus bas a
+> été exécutée sur une **install réelle gelée en 1.60** — celle qui
+> affichait « connexion internet requise » alors que le réseau
+> fonctionnait — et elle a fonctionné. Ce n'est plus une procédure
+> supposée, c'est une procédure éprouvée.
+>
+> **CE QUI RESTE VRAI pour d'éventuelles autres installs gelées**, et
+> qui n'a pas bougé :
+>
+> · **aucune correction à distance n'est possible, même en principe.**
+>   Le refus porte sur la REDIRECTION, pas sur le schéma : mesuré,
+>   `update()` jette `TypeError « The script resource is behind a
+>   redirect, which is disallowed »`. Cocher « Enforce HTTPS » ne ferait
+>   que changer la cible en `https://arts44.dev/sw.js` — toujours une
+>   autre origine, toujours refusée. Et tant que le CNAME est en place,
+>   GitHub Pages redirige TOUT `*.github.io` : impossible d'y servir un
+>   SW de démolition.
+>
+> · **« Enforce HTTPS » n'est pas cochable aujourd'hui.** Lu par l'API
+>   GitHub le 19/08/2026 : `https_enforced: false`,
+>   `https_certificate.state: dns_changed` — « Detected a change to DNS
+>   settings. Requesting a new certificate. »
+>
+> · **`http://arts44.dev` répond 200 en clair, sans redirection.**
+>   Troisième origine, `localStorage` distinct, et **aucun service
+>   worker possible** (origine non sécurisée). C'est un piège pour qui
+>   suit un ancien lien ou un signet — d'où la consigne de TAPER
+>   `https://arts44.dev` à la main, jamais de suivre un lien.
+>
+> **RAPPEL À TENIR : revérifier l'état du certificat dans quelques
+> jours.** GitHub dit déjà en redemander un. Dès que
+> `https_certificate.state` passe à `approved`, la case devient
+> cochable — **et c'est une action à faire**, pas une option : elle
+> ferme la troisième origine pour tous les nouveaux visiteurs. Elle ne
+> répare aucune install gelée, et ne les aggrave pas non plus.
+>
+> ```bash
+> gh api repos/Arts44/f1-uno-elite/pages --jq '.https_enforced, .https_certificate.state'
+> ```
+>
+> Le message que voyait l'utilisateur — « Impossible de vérifier —
+> connexion internet requise » alors que `navigator.onLine` vaut
+> `true` — est un défaut distinct, toujours présent, consigné au n°28.
+
+
 
 **Depuis la bascule sur `arts44.dev` (13/08/2026), l'ancienne adresse
 `arts44.github.io/f1-uno-elite/` répond 301.** Une PWA installée avant la

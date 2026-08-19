@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.77.2',
+    date: '2026-08-19',
+    changes: {
+      en: ['Faster first install: the two store-listing screenshots are no longer downloaded up front. They were 40 % of everything the app fetches to work offline, and they are never shown inside the app — the system still gets them when it needs them.'],
+      fr: ['Première installation plus rapide : les deux captures de la fiche d’installation ne sont plus téléchargées d’avance. Elles représentaient 40 % de tout ce que l’app récupère pour fonctionner hors ligne, et elles ne s’affichent jamais dans l’app — le système les récupère quand il en a besoin.'],
+      es: ['Primera instalación más rápida: las dos capturas de la ficha de instalación ya no se descargan por adelantado. Suponían el 40 % de todo lo que la app descarga para funcionar sin conexión, y nunca se muestran dentro de la app — el sistema las obtiene cuando las necesita.'],
+      zh: ['首次安装更快：安装卡片用的两张截图不再提前下载。它们占了应用为离线使用而下载内容的 40 %，而且从不在应用内显示——系统需要时仍会自行获取。'],
+      it: ['Prima installazione più rapida: le due schermate della scheda di installazione non vengono più scaricate in anticipo. Erano il 40 % di tutto ciò che l’app scarica per funzionare offline e non compaiono mai nell’app — il sistema le recupera quando servono.'],
+      nl: ['Snellere eerste installatie: de twee schermafbeeldingen van de installatiekaart worden niet meer vooraf gedownload. Ze waren 40 % van alles wat de app ophaalt om offline te werken en ze verschijnen nooit in de app — het systeem haalt ze op wanneer het ze nodig heeft.'],
+      de: ['Schnellere Erstinstallation: die beiden Screenshots der Installationskarte werden nicht mehr im Voraus geladen. Sie machten 40 % von allem aus, was die App für den Offline-Betrieb herunterlädt, und sie erscheinen nie in der App — das System holt sie, wenn es sie braucht.'],
+    },
+  },
+  {
     version: '1.77.1',
     date: '2026-08-19',
     changes: {

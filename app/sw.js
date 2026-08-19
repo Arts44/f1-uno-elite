@@ -6,7 +6,7 @@
      too many/dynamic, referenced from metadata).
    Bump SW_VERSION on every release to invalidate the old shell.
    ══════════════════════════════════════════════════════════ */
-const SW_VERSION = 'v179';
+const SW_VERSION = 'v180';
 const SHELL_CACHE = `f1uno-shell-${SW_VERSION}`;
 const RUNTIME_CACHE = 'f1uno-runtime';
 
@@ -29,8 +29,19 @@ const SHELL_ASSETS = [
   'fonts/racing-sans-one-400.woff2',
   'icons/icon-192.png',
   'icons/icon-512.png',
-  'screenshots/desktop-collection.png',
-  'screenshots/mobile-collection.png',
+  /* LES DEUX CAPTURES DU MANIFESTE NE SONT PLUS PRECACHEES (1.77.2).
+     Mesure : 814,3 Ko, soit 40,1 % du precache transfere, pour deux
+     images que le produit AFFICHE JAMAIS dans ses ecrans — releve
+     worker=1, page=0 sur chacune. Elles ne servent que a la fiche
+     posee par le systeme au moment de installer, qui les lit depuis
+     manifest.webmanifest.
+     Les retirer ne les rend pas indisponibles : le gestionnaire fetch
+     plus bas sert le meme-origine en cache-first AVEC REPLI RESEAU, et
+     les met en cache au passage. Cest deja ce qui se produit pour tout
+     visiteur dont la fiche apparait avant la fin de installation.
+     NB volontairement SANS APOSTROPHES, comme le bloc plus bas : le
+     test extrait les chaines entre quotes simples, et une apostrophe
+     dans un commentaire lui fabrique une entree fantome. */
   // Production bundle
   'app.bundle.js',
   // Raw ES modules (dev entry point, index-dev.html)
