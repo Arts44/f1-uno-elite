@@ -1428,21 +1428,37 @@ ses réponses, ou une mesure contre la production réelle depuis un
 réseau bridé. Décidé de ne pas le faire tant qu'aucune décision n'en
 dépend — la noter vaut mieux que la refaire pour rien.
 
-### Facteur aggravant ajouté en 1.77.0, connu et NON mesuré
+### Le facteur aggravant redouté : MESURÉ, puis ÉCARTÉ
 
-Le sondage des nouveautés attend `reg.update()` au démarrage
-(`app/update.js`, `DELAI_SONDAGE_MAX_MS`). C'est une **requête
-conditionnelle de plus sur `sw.js` à chaque lancement**, assumée à
-l'écriture pour supprimer un scintillement, et elle tombe exactement
-dans le trou décrit ci-dessus : sur un réseau dégradé, son coût est
-inconnu comme le reste. Elle est bornée à 4000 ms côté produit — les
-nouveautés paraissent quand même — mais **cette borne protège
-l'affichage, pas le démarrage** : la requête, elle, part toujours.
+Cette entrée portait une sous-section « Facteur aggravant ajouté en
+1.77.0, connu et NON mesuré » : le sondage `reg.update()` au démarrage
+coûtait une requête conditionnelle de plus sur `sw.js` à chaque
+lancement, et on la soupçonnait de peser sur un réseau dégradé.
 
-**À intégrer à la campagne quand n°23 sera enfin instrumenté** : mesurer
-le démarrage AVEC et SANS ce sondage, sur le même réseau bridé. Noté
-ici plutôt qu'estimé, pour la même raison que le reste de l'entrée.
+**Elle est retirée, pas nuancée. La mesure la contredit** — 3G lent
+bridé côté serveur (50 ko/s, 200 ms de latence par requête), profil
+vierge, cache vide, sur le bundle :
 
+| | worker actif après | fetch de `sw.js` |
+|---|---|---|
+| **avec** `reg.update()` | **41,76 s** | **2** |
+| **sans** | **41,69 s** | **1** |
+
+**+0,07 s, soit +0,17 %.** L'A/B est vérifié par le compteur de
+requêtes (2 contre 1), donc la substitution a bien pris ; l'écart est
+**sous le bruit** — les octets totaux varient même de 2,7 Ko dans le
+sens inverse. `sw.js` pèse ~2 Ko gzippés contre **2 031,9 Ko** de
+précache transféré.
+
+**CE QU'IL FAUT RETENIR DE LA FAÇON DONT ELLE A ÉTÉ ÉCRITE.** Cette
+sous-section a été consignée **sur commande, sans mesure**, à un
+moment où l'instrument n'existait pas. C'était raisonnable — noter un
+trou vaut mieux que l'ignorer — mais une crainte consignée prend le
+poids d'un fait dès qu'elle est écrite : pendant deux versions, le
+dépôt a porté un « facteur aggravant » qui n'en était pas un.
+**Une crainte se note comme une crainte, avec la mesure qui la
+trancherait écrite à côté, et elle se retire dès que la mesure
+tombe** — la nuancer aurait laissé le soupçon vivre.
 
 ---
 

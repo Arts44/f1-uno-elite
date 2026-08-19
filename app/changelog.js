@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.77.1',
+    date: '2026-08-19',
+    changes: {
+      en: ['Test release for the update and “what’s new” notices — no functional change; it exists so the new bottom-of-screen behaviour can be checked on a real device.'],
+      fr: ['Version de test pour les bandeaux de mise à jour et de nouveautés — aucun changement fonctionnel ; elle existe pour vérifier sur un appareil réel le nouveau comportement du bas de l’écran.'],
+      es: ['Versión de prueba para los avisos de actualización y de novedades — sin cambios funcionales; existe para comprobar en un dispositivo real el nuevo comportamiento de la parte inferior de la pantalla.'],
+      zh: ['用于测试更新提示与更新内容提示的版本——没有功能变化；它的存在是为了在真实设备上验证屏幕底部的新行为。'],
+      it: ['Versione di prova per gli avvisi di aggiornamento e novità — nessun cambiamento funzionale; esiste per verificare su un dispositivo reale il nuovo comportamento della parte bassa dello schermo.'],
+      nl: ['Testversie voor de update- en nieuwtjesmeldingen — geen functionele wijziging; ze bestaat om het nieuwe gedrag onderaan het scherm op een echt toestel te controleren.'],
+      de: ['Testversion für die Update- und Neuigkeiten-Hinweise — keine funktionale Änderung; sie existiert, um das neue Verhalten am unteren Bildschirmrand auf einem echten Gerät zu prüfen.'],
+    },
+  },
+  {
     version: '1.77.0',
     date: '2026-08-19',
     changes: {
