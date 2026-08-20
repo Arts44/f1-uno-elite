@@ -102,7 +102,15 @@ with sync_playwright() as p:
     ctx = nav.new_context(viewport={'width': 390, 'height': 844})
     ctx.add_init_script(init_script('fr', 'dark'))
     pg = ctx.new_page()
-    pg.goto(URL); pg.wait_for_timeout(900)
+    # ATTENDRE UN SIGNAL, PAS UNE DURÉE. Les 900 ms fixes d'ici
+    # suffisaient sur un poste au cache chaud et PAS sur un clone
+    # neuf : le graphe de modules n'était pas prêt, l'import dynamique
+    # de backup.js échouait, et la livraison rendait ROUGE pour une
+    # raison qui n'accusait pas le produit — le miroir exact des faux
+    # verts qu'on traque. On attend que la grille soit rendue. 
+    pg.goto(URL)
+    pg.wait_for_selector('.card', timeout=20000)
+    pg.wait_for_timeout(200)
     # Le bandeau de mise à jour n'est pas toujours là. On TESTE sa
     # présence au lieu d'attraper l'échec du clic : une exception n'est
     # pas un test de présence, et l'avaler masquerait une vraie panne.
