@@ -93,6 +93,58 @@ footer{margin-top:auto;padding-top:56px;display:flex;gap:26px;align-items:center
 footer a{color:var(--tx3);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:1px}
 footer a:hover{color:var(--tx2)}
 footer .sep{opacity:.5}
+
+/* ── LIGNE CINÉTIQUE (1.78.0) ─────────────────────────────────
+   Le texte est DANS LE HTML et se lit d'un tenant sans JS : trois
+   segments inline séparés par des espaces réelles. Le script anime,
+   il ne fabrique rien — et il ne s'exécute pas du tout sous
+   prefers-reduced-motion, ce qui laisse exactement la même ligne.
+
+   « VARIANTS » EST LE MOT DE L'APP, pas un mot choisi ici :
+   `tut.mark_owned_d` dit « Each variant counts on its own »,
+   `set.complete` dit « every variant owned ». Et 998 est le nombre de
+   combinaisons carte × variante — donc d'objets qu'on possède un par
+   un. Le mot et le nombre désignent la même chose. (Un premier jet
+   proposait « 16 variants » : vérifié dans les données, 16 est le
+   nombre de TYPES, et par carte c'est 4, 11, 12 ou 16 — deux cartes
+   sur 101 en ont 16. C'eût été faux.)
+
+   HAUTEUR EN PIXELS, ET LA BONNE RAISON. Un premier relevé annonçait
+   une bascule de l'élément LCP dès 60 px sur un écran de 360×640 : il
+   était UNIQUE, et il était faux. Repris le 20/08/2026, n=3 à chaque
+   palier, écran 360×640 :
+        44 px → shot-desktop   (179 px de capture visibles)
+        60 px → shot-desktop   (163)
+        90 px → shot-desktop   (133)
+       100 px → shot-desktop   (123)
+       110 px → pitch          (113)   ← la bascule est ICI
+       140 px → pitch          ( 83)
+   Le seuil est donc entre 100 et 110 px, mesuré, pas déduit. Au-delà, Cloudflare cesse de chronométrer l'image et son
+   chiffre bougerait pour une raison sans rapport avec la vitesse.
+   44 px reste le choix retenu — 66 px de marge, 179 px de capture
+   visibles à 360×640 — mais c'est un choix de DESSIN, pas la limite
+   physique. Le filet asserte les deux séparément.
+   Et px plutôt que em : une hauteur qui dépend de la police chargée
+   est le piège qu'on vient de payer 25 px sur le CTA.
+
+   AUCUN filter:blur SUR UNE GRANDE SURFACE. Le halo est un
+   radial-gradient, le fondu des bords un mask — deux peintures sans
+   coût de bande passante. Le flou ne touche que les segments voisins,
+   quelques centaines de px², à valeur FIXE par état : seul transform
+   bouge d'une trame à l'autre. Le coût GPU du blur sur mobile n'a pas
+   pu être mesuré depuis un poste de bureau, et un chiffre de
+   laboratoire aurait été pire que pas de chiffre. */
+.kin{height:44px;margin-top:22px;width:100%;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:600;color:var(--tx2);
+  background:radial-gradient(58% 120% at 50% 50%,rgba(255,71,87,.10),transparent 70%);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent);
+  mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent);}
+.kin b{color:var(--red);font-weight:700}
+.kin[data-anime] .kin-piste{display:flex;gap:30px;white-space:nowrap;
+  transition:transform .6s cubic-bezier(.22,.9,.36,1);will-change:transform}
+.kin[data-anime] .kin-seg{filter:blur(2.5px);opacity:.4;transition:filter .6s ease,opacity .6s ease}
+.kin[data-anime] .kin-seg.actif{filter:blur(0);opacity:1;color:var(--tx1)}
 </style>
 </head>
 <body>
@@ -104,6 +156,10 @@ footer .sep{opacity:.5}
   <p class="pitch">Track your F1&nbsp;UNO Élite trading-card collection — <b>offline-first</b>,
   installable, <b>zero dependencies</b>. Owned cards, doubles, wishlist,
   120&nbsp;badges, stats and backups. <b>Seven languages.</b></p>
+
+  <p class="kin" id="kin"><span class="kin-piste"><span class="kin-seg"><b>101</b> cards,</span>
+  <span class="kin-seg"><b>998</b> variants</span>
+  <span class="kin-seg">to collect.</span></span></p>
 
   <a class="cta" href="app/">Open the app</a>
   <div class="hint">Free · no account needed · works offline once loaded</div>
@@ -138,5 +194,40 @@ footer .sep{opacity:.5}
     <span class="sep">·</span>
     <span>Unofficial fan project — not affiliated with F1® or Mattel</span>
   </footer>
+<script>
+/* La ligne cinétique. Rien ici ne CRÉE de texte : si ce script ne
+   tourne pas — JS coupé, erreur, mouvement réduit — la phrase reste
+   celle du HTML, entière et lisible. */
+(() => {
+  const kin = document.getElementById('kin');
+  if (!kin || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const piste = kin.querySelector('.kin-piste');
+  const segs = [...kin.querySelectorAll('.kin-seg')];
+  if (segs.length < 2) return;
+  kin.setAttribute('data-anime', '');
+  let i = 0, dx = 0, minuteur = null;
+  const centrer = () => {
+    const c = kin.getBoundingClientRect(), s = segs[i].getBoundingClientRect();
+    dx += (c.left + c.width / 2) - (s.left + s.width / 2);
+    piste.style.transform = 'translateX(' + Math.round(dx) + 'px)';
+    segs.forEach((e, n) => e.classList.toggle('actif', n === i));
+  };
+  /* On REMESURE quand la police arrive et quand la fenêtre change :
+     les largeurs du repli ne sont pas celles de Space Grotesk, et un
+     centrage calculé sur les mauvaises largeurs reste décalé. */
+  const recentrer = () => { dx = 0; piste.style.transform = 'none';
+    requestAnimationFrame(centrer); };
+  centrer();
+  if (document.fonts) document.fonts.ready.then(recentrer);
+  addEventListener('resize', recentrer, { passive: true });
+  new IntersectionObserver(es => {
+    if (es[0].isIntersecting && !minuteur) {
+      minuteur = setInterval(() => { i = (i + 1) % segs.length; centrer(); }, 2600);
+    } else if (!es[0].isIntersecting && minuteur) {
+      clearInterval(minuteur); minuteur = null;
+    }
+  }).observe(kin);
+})();
+</script>
 </body>
 </html>
