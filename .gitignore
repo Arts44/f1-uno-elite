@@ -30,3 +30,6 @@ _*.css
 # Rapports de couverture : régénérés par « npm run test:cov »,
 # jamais commités (le LCOV est un artefact de mesure, pas une source).
 coverage/
+.obsidian/
+Icon?
+.DS_Store
