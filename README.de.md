@@ -116,7 +116,7 @@ Der Quellcode besteht aus fokussierten **ES-Modulen** hinter einem einzigen Eins
 | Schicht | Module |
 |---|---|
 | Zustand & Daten | `storage.js` (localStorage, saisonbezogen, Migration v1→v2), `data.js`, `history.js` |
-| Oberfläche | `render.js` (Raster, Filter, Kartenansicht), `stats.js`, `badges.js`, `pin.js` (Einstellungen) |
+| Oberfläche | `render.js` (Raster, Kartenansicht), `stats.js`, `badges.js`, `pin.js` (Einstellungen) |
 | Plattform | `sw.js` (Precache), `update.js` (Updates), `install.js`, `secure-store.js` |
 | Optionale Cloud | `cloud-http/auth/sync/ui.js`, `feedback.js`, `settings-sync.js` — alle über rohes REST |
 

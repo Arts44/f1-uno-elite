@@ -116,7 +116,7 @@ De code bestaat uit gerichte **ES-modules** achter één ingangspunt, `app.js`, 
 | Laag | Modules |
 |---|---|
 | Staat en data | `storage.js` (localStorage, per seizoen, migratie v1→v2), `data.js`, `history.js` |
-| Interface | `render.js` (raster, filters, kaartfiche), `stats.js`, `badges.js`, `pin.js` (instellingen) |
+| Interface | `render.js` (raster, kaartfiche), `stats.js`, `badges.js`, `pin.js` (instellingen) |
 | Platform | `sw.js` (precache), `update.js` (updates), `install.js`, `secure-store.js` |
 | Optionele cloud | `cloud-http/auth/sync/ui.js`, `feedback.js`, `settings-sync.js` — alle via kale REST |
 

@@ -116,7 +116,7 @@
 | 层次 | 模块 |
 |---|---|
 | 状态与数据 | `storage.js`（localStorage，按赛季隔离，v1→v2 迁移）、`data.js`、`history.js` |
-| 界面 | `render.js`（网格、筛选、卡牌详情）、`stats.js`、`badges.js`、`pin.js`（设置） |
+| 界面 | `render.js`（网格、卡牌详情）、`stats.js`、`badges.js`、`pin.js`（设置） |
 | 平台 | `sw.js`（预缓存）、`update.js`（更新流程）、`install.js`、`secure-store.js` |
 | 可选云端 | `cloud.js`、`feedback.js`、`settings-sync.js` — 均为纯 REST |
 

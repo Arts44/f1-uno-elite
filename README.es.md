@@ -116,7 +116,7 @@ El código es un conjunto de **módulos ES** enfocados tras un único punto de e
 | Capa | Módulos |
 |---|---|
 | Estado y datos | `storage.js` (localStorage, por temporada, migración v1→v2), `data.js`, `history.js` |
-| Interfaz | `render.js` (cuadrícula, filtros, ficha de carta), `stats.js`, `badges.js`, `pin.js` (ajustes) |
+| Interfaz | `render.js` (cuadrícula, ficha de carta), `stats.js`, `badges.js`, `pin.js` (ajustes) |
 | Plataforma | `sw.js` (precache), `update.js` (actualizaciones), `install.js`, `secure-store.js` |
 | Nube opcional | `cloud-http/auth/sync/ui.js`, `feedback.js`, `settings-sync.js` — todos en REST puro |
 
