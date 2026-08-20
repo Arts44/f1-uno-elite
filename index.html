@@ -25,10 +25,42 @@ if(/^#(backup|trade|access_token|error)=/.test(location.hash)) location.replace(
 <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "501224c0ce304706981d65c879845d20"}'></script><!-- End Cloudflare Web Analytics -->
 <style>
 @font-face{font-family:'Space Grotesk';src:url('app/fonts/space-grotesk-var.woff2') format('woff2');font-weight:300 700;font-display:swap;}
+/* ── FACE DE REPLI AJUSTÉE — le CTA ne bouge plus au chargement ──
+   LE DÉFAUT MESURÉ : CLS 0,1929 sur mobile, un seul décalage à 51 ms
+   qui poussait « Open the app » de y=259 à y=284. Vingt-cinq pixels
+   sous le doigt de quelqu'un qui vise l'unique bouton de la page.
+
+   LA CAUSE N'ÉTAIT PAS CELLE QU'ON CROYAIT. On a d'abord soupçonné le
+   lockup et ses métriques verticales : mesuré, il ne bouge PAS d'un
+   pixel (h=49,6 avant et après). C'est `.pitch` qui gagne +24,8 px,
+   soit exactement une ligne de 1,55 × 16 px — Space Grotesk est plus
+   large que la police système, et le paragraphe passe de quatre lignes
+   à cinq quand elle arrive. Le décalage est HORIZONTAL d'origine.
+   Donc ni ascent-override ni descent-override n'y pouvaient rien :
+   c'est `size-adjust` qui compte, sur une face de REPLI, pour que le
+   repli s'enroule sur le même nombre de lignes.
+
+   LES VALEURS SONT MESURÉES, pas devinées : largeur moyenne au canvas
+   à 1000 px sur l'alphabet complet, Space Grotesk 0,5837 contre
+   0,5491 pour le repli → 106,3 %. Les métriques verticales suivent le
+   repli (0,967 / 0,211). Une variante calculée sur la seule phrase du
+   pitch donnait 115,8 % et un CLS de 0,0101 — moins bon. On a gardé
+   le chiffre mesuré, pas celui qui semblait plus pertinent.
+
+   RÉSULTAT : mobile 0,1929 → 0,0033 · desktop 0,0672 → 0,0010.
+
+   DÉGRADATION SÛRE, vérifiée : si aucune des polices locales n'existe,
+   la face ne se charge pas, la pile retombe sur system-ui et le CLS
+   revient à 0,1929 — exactement la valeur d'avant. Le correctif ne
+   peut jamais faire pire que de ne rien faire. Mesuré sur macOS ;
+   Android et Windows n'ont pas été éprouvés et retombent, au pire,
+   sur le comportement actuel. */
+@font-face{font-family:'Space Grotesk repli';src:local('Helvetica Neue'),local('Arial');
+  size-adjust:106.3%;ascent-override:96.7%;descent-override:21.1%;line-gap-override:0%;}
 :root{--bg:#100E0F;--surface:#1A1719;--border:#2E2A2C;--tx1:#F3F0F1;--tx2:#A5A0A2;--tx3:#8A8487;--red:#FF4757;--red-deep:#E8002D}
 *{margin:0;box-sizing:border-box}
 html{color-scheme:dark}
-body{background:var(--bg);color:var(--tx1);font-family:'Space Grotesk',system-ui,sans-serif;
+body{background:var(--bg);color:var(--tx1);font-family:'Space Grotesk','Space Grotesk repli',system-ui,sans-serif;
      min-height:100dvh;display:flex;flex-direction:column;align-items:center;
      padding:clamp(24px,6vh,64px) 20px 28px}
 /* ── lockup : MÊMES valeurs que la source styles.css ── */

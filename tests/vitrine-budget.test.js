@@ -23,6 +23,28 @@
      · + favicon 5 Ko ≈ 104 Ko au pire
    Soit ~16 Ko de marge sur le plafond. Confortable, pas large :
    une capture de plus le crève.
+
+   ── DEUX RÉSERVES SUR TOUS LES CHIFFRES DE CE FICHIER ──
+
+   ① LE LOCAL NE DIT RIEN DU TERRAIN. Mesuré le 19/08/2026 : LCP
+   local 108 ms sur mobile 390, contre 5 091 ms au P90 mesuré par
+   Cloudflare sur du trafic réel. FACTEUR 47. Aucune décision de
+   performance ne se prend sur le local seul ; une mesure locale ne
+   vaut qu'en AVANT/APRÈS sur la même machine, jamais comme un
+   chiffre absolu. C'est le cas ① du registre des instruments
+   menteurs — la condition de rendu n'est pas celle du terrain.
+
+   ② LE BEACON N'A PAS ÉTÉ MESURÉ. L'environnement de mesure n'a pas
+   d'accès à cloudflareinsights.com : le relevé a compté 0,0 Ko pour
+   lui. Le total est donc « hors beacon » par ACCIDENT autant que par
+   choix, et le poids réel vu par un visiteur est celui-ci PLUS le
+   beacon, dont on ne connaît pas la taille. À redire partout où ces
+   chiffres sont cités.
+
+   ── MESURE DU 19/08/2026, après le correctif de décalage ──
+     · mobile 390  : 74,5 Ko · LCP 48 ms · CLS 0,0033
+     · desktop 1280: 100,9 Ko · LCP 32 ms · CLS 0,0010
+   Le CLS valait 0,1929 en mobile avant la face de repli ajustée.
    ══════════════════════════════════════════════════════════ */
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';

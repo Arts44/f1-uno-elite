@@ -34,16 +34,30 @@ npm run lint
 
 if [ "$LENTS" = "1" ]; then
   echo "── filets navigateur ──"
-  # Le serveur local que les filets attendent, monté et démonté ici :
-  # trois fois, un filet a échoué parce que le serveur d'une session
-  # précédente était tombé — un ROUGE qui n'accusait pas le produit.
+  # Les serveurs locaux que les filets attendent, montés et démontés
+  # ici : trois fois, un filet a échoué parce que le serveur d'une
+  # session précédente était tombé — un ROUGE qui n'accusait pas le
+  # produit.
+  #
+  # DEUX PORTS, ET C'EST UN DÉFAUT RATTRAPÉ : ce script ne montait que
+  # le 8123, alors que trois filets sur cinq interrogent le 8124. Ils
+  # passaient parce qu'un serveur lancé à la main traînait sur la
+  # machine — sur un poste propre, la livraison aurait échoué au
+  # premier filet, et pour une raison qui n'aurait rien eu à voir avec
+  # le produit. Exactement ce que le commentaire ci-dessus prétendait
+  # avoir corrigé. Unifier les ports serait mieux ; monter les deux est
+  # ce qui rend la parade vraie tout de suite.
   python3 -m http.server 8123 > /dev/null 2>&1 &
   SRV=$!
-  trap 'kill $SRV 2>/dev/null || true' EXIT
+  python3 -m http.server 8124 > /dev/null 2>&1 &
+  SRV2=$!
+  trap 'kill $SRV $SRV2 2>/dev/null || true' EXIT
   sleep 2
   python3 verify_tutorial.py
   python3 verify_qr.py
   python3 verify_trade_inbox.py
+  python3 verify_zone.py
+  python3 verify_vitrine.py
   echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $(git rev-parse HEAD 2>/dev/null || echo '-')" > "$TRACE"
 else
   echo "── filets navigateur SAUTÉS (LENTS=0) ──"
