@@ -23,6 +23,34 @@ cd "$(dirname "$0")/.."
 TRACE=".git/derniere-livraison"
 LENTS=${LENTS:-1}          # LENTS=0 pour un commit de documentation seule
 
+# ══ GARDE D'ÉTAT DE POSTE ══════════════════════════════════
+# TROIS MANQUES EXPOSÉS PAR DEUX CLONES : pas de hook pre-push (les
+# hooks ne sont pas versionnés), pas de node_modules (esbuild
+# introuvable), et Biome qui échouait sur un coffre Obsidian présent
+# sur le disque. Chacun produisait un échec obscur au milieu de la
+# livraison. On les nomme AVANT, avec la commande qui répare.
+#
+# CE QUE CE GARDE N'EST PAS : une parade versionnée. Il vit dans le
+# script, donc il ne protège que les livraisons qui passent par lui —
+# un `git push` direct depuis un poste neuf ne voit rien. C'est
+# assumé : core.hooksPath aurait eu l'air de résoudre ça et ne l'aurait
+# pas fait (config LOCALE, elle ne voyage pas avec le clone, et elle
+# désactive les hooks tiers). Voir docs/V2-REFACTOR.md, cinquième refus.
+manque() { echo "LIVRAISON REFUSÉE — $1"; echo "   $2"; exit 1; }
+[ -x .git/hooks/pre-push ] || manque "le hook pre-push est absent (les hooks ne sont pas versionnés)." \
+  "bash scripts/installer-hooks.sh"
+[ -d node_modules ] || manque "node_modules est absent : esbuild et Biome sont introuvables." \
+  "npm ci"
+python3 -c "import playwright" 2>/dev/null || manque "le module Python playwright est absent." \
+  "pip3 install --user playwright && python3 -m playwright install chromium"
+python3 -c "import cv2" 2>/dev/null || manque "OpenCV est absent : verify_qr.py ne peut pas décoder." \
+  "pip3 install --user opencv-python-headless numpy"
+python3 -c "from playwright.sync_api import sync_playwright as s
+p=s().start(); b=p.chromium.launch(); b.close(); p.stop()" 2>/dev/null \
+  || manque "le binaire de navigateur de Playwright est absent ou périmé." \
+     "python3 -m playwright install chromium"
+echo "── état du poste : hook, dépendances, navigateur ✓ ──"
+
 echo "── build ──"
 npm run build
 

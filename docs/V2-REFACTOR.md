@@ -622,3 +622,48 @@ si l'écart entre bon et mauvais signal reste très inférieur à l'écart
 41,8 s / 352 s —, la correction redevient défendable. Sinon elle reste
 refusée, et c'est la bonne réponse : **une correction dont on ne peut
 pas régler le seul paramètre n'est pas une correction, c'est un pari.**
+
+---
+
+## Cinquième chantier refusé : `core.hooksPath` vers un dossier versionné
+
+**Refusé en 1.78.0.** Deux clones successifs ont montré qu'un poste neuf
+n'a **aucun** hook `pre-push` : les hooks ne sont pas versionnés, et la
+parade anti-push-cassé ne protégeait que les postes où quelqu'un avait
+pensé à lancer `scripts/installer-hooks.sh`.
+
+`core.hooksPath` pointant vers `scripts/hooks/` a l'air de résoudre
+exactement ça : le dossier serait dans le dépôt, donc dans le clone.
+
+**Trois faits le disqualifient, et le premier suffit :**
+
+1. **`core.hooksPath` est une configuration LOCALE.** Elle vit dans
+   `.git/config`, pas dans l'arbre. **Elle ne voyage pas avec le
+   clone.** Il faudrait toujours lancer une commande une fois par
+   poste — exactement ce qu'on voulait supprimer. Le problème n'est pas
+   résolu, il est déplacé et renommé.
+2. Elle **désactive tous les autres hooks** du poste, y compris ceux
+   posés par des outils tiers.
+3. Et c'est le plus dangereux : elle donnerait **l'illusion d'une
+   parade versionnée**. Un dossier `scripts/hooks/` visible dans le
+   dépôt laisse croire que la protection voyage. C'est très exactement
+   le défaut décrit au cas ⑯ — une protection qui n'existe que sur le
+   poste de son auteur — réintroduit sous un meilleur nom.
+
+**Ce qui a été fait à la place** : un garde d'état de poste en tête de
+`livrer.sh`, qui refuse avec la commande à lancer. Sa limite est écrite
+dans le script et dans CONVENTIONS : il protège une livraison, pas un
+poste neuf.
+
+**À noter, parce que c'est la leçon du refus** : la proposition venait
+du mainteneur, qui l'aurait prise sans vérifier que la configuration
+est locale. Une option qui porte le mot « path » dans un fichier de
+dépôt n'est pas pour autant versionnée — c'est le genre de vérification
+qui coûte une commande et évite une fausse sécurité.
+
+### Condition de réouverture
+
+Un mécanisme qui voyage RÉELLEMENT avec le clone : un `npm prepare`
+qui installe les hooks à l'`npm ci` en ferait partie, puisque le dépôt
+exige déjà `npm ci` pour construire. À chiffrer le jour où un
+deuxième poste travaille sur le dépôt — aujourd'hui il n'y en a qu'un.
