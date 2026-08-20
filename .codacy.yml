@@ -171,6 +171,62 @@ exclude_paths:
 #     Les trois détecteurs restent ARMÉS : ils doivent continuer de
 #     crier si un vrai secret est commité un jour.
 #
+#
+#     ┌──────────────────────────────────────────────────────────┐
+#     │ SI VOUS VOYEZ ENCORE CETTE ISSUE : ELLE EST CONNUE.      │
+#     │ La question a été instruite le 20/08/2026. Aucune des    │
+#     │ sorties faciles n'est bonne — ne la reprenez pas à zéro. │
+#     └──────────────────────────────────────────────────────────┘
+#
+#     CE QUI A ÉTÉ ÉTABLI. Le marquage « faux positif » de cette
+#     ligne a été refait deux fois sans prendre. Mais les TROIS
+#     détecteurs ci-dessus visent la MÊME ligne, et Codacy n'en
+#     rapporte qu'UN : les deux marquages Semgrep ont pris et
+#     TIENNENT. Seul Trivy_secret revient, avec un resultDataId
+#     STABLE d'un relevé à l'autre (131529630764) — donc ce n'est
+#     pas non plus la réouverture-par-déplacement décrite plus bas
+#     pour cloud-auth.js:34. L'anomalie est LOCALE à cette
+#     occurrence Trivy, elle n'est ni du dépôt ni de la ligne.
+#     C'est le marquage de CETTE occurrence qu'il faut reprendre.
+#
+#     LES TROIS SORTIES FACILES, ET POURQUOI AUCUNE N'EST PRISE.
+#
+#       A · exclure 'app/cloud-config.js' via exclude_paths.
+#           Marcherait — exclude_paths sort le chemin de TOUTE
+#           l'analyse, tous outils confondus ; c'est même le seul
+#           levier que ce fichier ait sur Trivy. REFUSÉE, et c'est
+#           l'option la plus coûteuse des trois : le fichier fait
+#           24 lignes dont 21 de commentaire, et ce commentaire dit
+#           « PASTE YOUR TWO VALUES BELOW » puis « NEVER put the
+#           service_role key here ». C'est L'ENDROIT LE PLUS
+#           SUSCEPTIBLE DU DÉPÔT DE RECEVOIR UN VRAI SECRET. On y
+#           éteindrait les trois détecteurs sur la seule ligne qui
+#           leur donne une raison d'exister. Le dernier endroit où
+#           éteindre un détecteur, pas le premier.
+#
+#       B · décocher le pattern Trivy_secret.
+#           REFUSÉE. Impossible au niveau du dépôt (voir A. plus
+#           haut : un pattern imposé par un standard ne se décoche
+#           ni par l'interface du dépôt ni par la CLI) : il
+#           faudrait le standard d'organisation #164497, donc TOUS
+#           les dépôts qui s'en servent. Coût : plus aucune
+#           détection de secret Trivy sur les 177 fichiers
+#           analysés, workflows compris. C'est mot pour mot ce que
+#           l'encadré ci-dessus interdit.
+#
+#       C · un fichier .trivyignore (chemin + règle).
+#           Portée idéale, mais NON VÉRIFIÉE : le support d'un
+#           fichier de configuration natif est PAR OUTIL chez
+#           Codacy, et il n'a pas été établi que Trivy en fasse
+#           partie. Piste, pas solution. À instruire avant tout
+#           essai — et si elle marche, elle ne couvre que Trivy,
+#           pas les deux Semgrep.
+#
+#     EN ATTENDANT, L'ISSUE RESTE OUVERTE ET C'EST LE BON ÉTAT.
+#     Une issue connue, documentée et justifiée coûte une ligne de
+#     rapport ; un détecteur éteint coûte le jour où un vrai
+#     service_role sera collé deux lignes plus bas.
+#
 #   · .github/workflows/keep-supabase-awake.yml:53 — LA MÊME clé anon,
 #     en clair dans le workflow qui réveille Supabase. Elle y déclenche
 #     les trois mêmes détecteurs. Elle est en clair DÉLIBÉRÉMENT : la
