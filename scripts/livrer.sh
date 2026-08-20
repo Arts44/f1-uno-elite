@@ -47,12 +47,33 @@ if [ "$LENTS" = "1" ]; then
   # le produit. Exactement ce que le commentaire ci-dessus prétendait
   # avoir corrigé. Unifier les ports serait mieux ; monter les deux est
   # ce qui rend la parade vraie tout de suite.
-  python3 -m http.server 8123 > /dev/null 2>&1 &
-  SRV=$!
-  python3 -m http.server 8124 > /dev/null 2>&1 &
-  SRV2=$!
-  trap 'kill $SRV $SRV2 2>/dev/null || true' EXIT
-  sleep 2
+  # ET ON VÉRIFIE QUE LE SERVEUR QUI RÉPOND EST LE NÔTRE. Mesuré :
+  # si le port est déjà pris, `http.server` meurt aussitôt, `set -e` ne
+  # le voit pas — c'est une tâche de fond — et le serveur DÉJÀ EN PLACE
+  # continue de répondre. Les filets tournaient alors contre un autre
+  # arbre, parfois un autre dépôt, et rendaient vert ou rouge sans que
+  # ça parle du produit. Deux contrôles : le processus est vivant, ET
+  # ce qui sort du port est identique à l'octet au fichier local.
+  PIDS=""
+  trap 'kill $PIDS 2>/dev/null || true' EXIT
+  for PORT in 8123 8124; do
+    python3 -m http.server "$PORT" > /dev/null 2>&1 &
+    PIDS="$PIDS $!"
+    sleep 1
+    if ! kill -0 ${PIDS##* } 2>/dev/null; then
+      echo "LIVRAISON REFUSÉE — le port $PORT est déjà pris."
+      echo "   Un serveur d'une autre session répondrait à la place, et"
+      echo "   les filets mesureraient un autre arbre que celui-ci."
+      echo "   Ferme-le :  lsof -ti:$PORT | xargs kill"
+      exit 1
+    fi
+    if ! curl -sf "http://localhost:$PORT/index.html" | cmp -s - index.html; then
+      echo "LIVRAISON REFUSÉE — le port $PORT ne sert pas CE dépôt."
+      echo "   Le processus est vivant mais son contenu ne correspond pas."
+      exit 1
+    fi
+  done
+  sleep 1
   python3 verify_tutorial.py
   python3 verify_qr.py
   python3 verify_trade_inbox.py
