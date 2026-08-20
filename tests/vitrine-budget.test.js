@@ -11,18 +11,64 @@
    poids, et la prochaine capture ajoutée aurait ramené le
    problème en silence.
 
-   LE PLAFOND : 120 Ko hors beacon Cloudflare (exception nommée,
+   LE PLAFOND : 112 Ko hors beacon Cloudflare (exception nommée,
    documentée dans les 7 README — et l'ironie mérite d'être
    notée : le seul script externe de la page est précisément ce
    qui a permis de découvrir qu'elle était lente).
 
-   LA MESURE DU JOUR, pour qu'on sache dans six mois si 120 était
-   une marge confortable ou une limite atteinte de justesse :
-     · mobile 390 px  :  73 Ko  (la seconde image n'est PAS transférée)
-     · desktop 1280 px:  99 Ko  (les deux images)
-     · + favicon 5 Ko ≈ 104 Ko au pire
-   Soit ~16 Ko de marge sur le plafond. Confortable, pas large :
-   une capture de plus le crève.
+   ══ L'UNITÉ A CHANGÉ LE 21/08/2026, LE JOUR OÙ CE TEST A ROUGI ══
+
+   Il faut le dire dans cet ordre, pour que le prochain puisse juger
+   au lieu de faire confiance : ce test comptait les octets SUR
+   DISQUE, il est passé au rouge en ajoutant un fond animé à la
+   vitrine (120,1 Ko contre 120), et c'est CE JOUR-LÀ qu'on a
+   regardé l'unité. Un instrument qu'on corrige le jour où il gêne
+   mérite d'être relu de près ; voici de quoi le faire.
+
+   LA MESURE QUI TRANCHE, prise sur la production, pas déduite :
+
+       curl -I -H 'Accept-Encoding: gzip' https://arts44.dev/index.html
+       → content-encoding: gzip
+       → content-length: 6681
+
+   6 681 octets, quand le même fichier en pesait 14 433 sur disque.
+   GitHub Pages sert le HTML compressé : le visiteur ne télécharge
+   JAMAIS les octets que ce test comptait. Le facteur est de 2,26 sur
+   index.html — c'est la même famille d'écart que les 3 570 Ko sur
+   disque contre 2 031 Ko transférés du précache (facteur 1,76), déjà
+   payée une fois.
+
+   Les quatre autres actifs restent comptés sur disque : webp, woff2
+   et ico sont DÉJÀ compressés, gzip ne leur reprend rien et le
+   serveur ne les recompresse pas.
+
+   POURQUOI 112 ET PAS 120 REPORTÉ. Changer l'unité sans redécider le
+   nombre se serait offert 12,4 Ko que personne n'a accordés — 120
+   avait été fixé contre des octets de disque, il ne veut rien dire
+   contre des octets transférés. Le nombre est reconstruit :
+
+     · pire cas mesuré ce jour (desktop, les deux captures) : 107,6 Ko
+     · réserve : 4 Ko, soit DEUX blocs de commentaire de calibrage au
+       tarif mesuré ici même (le fond animé en a coûté 2,0 Ko gzippés).
+       C'est le vrai moteur de croissance de ce fichier : dans ce
+       dépôt, chaque correctif emporte sa mesure.
+     · total : 112 Ko, soit 4,4 Ko de marge.
+
+   C'est VOLONTAIREMENT plus serré que les 16 Ko d'avant. Une marge
+   étroite force la prochaine addition à être une décision — trimer,
+   ou redécider le nombre avec un argument — et c'est exactement ce
+   qui vient de se produire ici, avec un bon résultat.
+
+   CE QUE CE PLAFOND NE COUVRE PAS : le code de la séquence complète,
+   chargé seulement au clic, n'entre pas dans le chargement initial et
+   n'est donc pas compté. S'il devenait chargé d'office, il faudrait
+   redécider ce nombre — pas l'ignorer.
+
+   LA MESURE DU JOUR, pour qu'on sache dans six mois si 112 était une
+   marge confortable ou une limite atteinte de justesse :
+     · mobile 390 px  :  76 Ko  (la seconde image n'est PAS transférée)
+     · desktop 1280 px: 102 Ko  (les deux images)
+     · pire cas du test (somme, index.html gzippé) : 107,6 Ko
 
    ── DEUX RÉSERVES SUR TOUS LES CHIFFRES DE CE FICHIER ──
 
@@ -49,28 +95,59 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, statSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 
 const ROOT = new URL('../', import.meta.url);
 const ko = p => statSync(new URL(p, ROOT)).size / 1024;
+/* index.html se compte GZIPPÉ — voir l'en-tête : c'est ce que le
+   serveur envoie. Les autres actifs sont déjà compressés. */
+const koGzip = p => gzipSync(readFileSync(new URL(p, ROOT)), { level: 9 }).length / 1024;
 const htmlBrut = readFileSync(new URL('index.html', ROOT), 'utf8');
 /* Les commentaires sont RETIRÉS avant analyse : un commentaire qui
    mentionne une balise en fabriquerait une fausse — le dépôt a déjà
    payé ce piège sur le plancher de --card-h. */
 const html = htmlBrut.replace(/<!--[\s\S]*?-->/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
 
-export const BUDGET_VITRINE_KO = 120;
-/* Mesuré le 18/08/2026 sur le transfert RÉEL (Playwright, en-têtes
+export const BUDGET_VITRINE_KO = 112;
+/* Mesuré le 21/08/2026 sur le transfert RÉEL (Playwright, en-têtes
    content-length), pas sur la somme des fichiers du dépôt. */
-const MESURE_DU_JOUR = { mobile: 73, desktop: 99 };
+const MESURE_DU_JOUR = { mobile: 76, desktop: 102 };
 
-describe('budget de la vitrine — 120 Ko hors beacon', () => {
+/* Le pire cas : desktop, les deux captures, index.html tel qu'il est
+   servi. Une seule définition, utilisée par l'assertion ET par son
+   contrôle négatif — sinon le contrôle éprouve un autre calcul que
+   celui qui garde le dépôt. */
+const pireCas = (supplementKo = 0) =>
+  koGzip('index.html') + ko('screenshots/vitrine-grid.webp')
+  + ko('screenshots/vitrine-badges.webp') + ko('app/fonts/space-grotesk-var.woff2')
+  + ko('app/favicon.ico') + supplementKo;
+
+describe('budget de la vitrine — 112 Ko transférés, hors beacon', () => {
   test('le pire cas (desktop : les deux images) tient sous le plafond', () => {
-    const poids = ko('index.html') + ko('screenshots/vitrine-grid.webp')
-      + ko('screenshots/vitrine-badges.webp') + ko('app/fonts/space-grotesk-var.woff2')
-      + ko('app/favicon.ico');
+    const poids = pireCas();
     assert.ok(poids <= BUDGET_VITRINE_KO,
       `la vitrine pèse ${poids.toFixed(1)} Ko, plafond ${BUDGET_VITRINE_KO} Ko — `
       + `mesure du jour : ${MESURE_DU_JOUR.desktop} Ko desktop, ${MESURE_DU_JOUR.mobile} Ko mobile`);
+  });
+
+  /* CONTRÔLE NÉGATIF — SEUIL DÉCLARÉ (㉒).
+     Le garde doit savoir voir rouge. On injecte 8 Ko d'actif.
+     Pourquoi 8 : la marge mesurée le 21/08/2026 est de 4,4 Ko
+     (107,6 contre 112) ; 8 Ko la dépasse sans ambiguïté, et reste en
+     dessous de la plus petite capture réelle (26,4 Ko), donc le
+     contrôle représente une addition PLAUSIBLE et pas une caricature.
+     À REVÉRIFIER si la marge change : si le pire cas descendait sous
+     104 Ko, 8 Ko ne suffiraient plus à crever le plafond et ce
+     contrôle deviendrait vert sans rien prouver — c'est précisément
+     le cas ㉒ qui l'a fait écrire. */
+  test('CONTRÔLE NÉGATIF : 8 Ko d’actif en plus doivent crever le plafond', () => {
+    const marge = BUDGET_VITRINE_KO - pireCas();
+    assert.ok(marge < 8,
+      `la marge est de ${marge.toFixed(1)} Ko : 8 Ko d’injection ne crèvent plus le `
+      + `plafond, ce contrôle ne prouve plus rien — relire le seuil déclaré au-dessus`);
+    assert.ok(pireCas(8) > BUDGET_VITRINE_KO,
+      `8 Ko injectés donnent ${pireCas(8).toFixed(1)} Ko et le plafond de `
+      + `${BUDGET_VITRINE_KO} tient encore — le garde ne voit pas rouge`);
   });
 
   test('l’image LCP reste sous 60 Ko — c’est elle que Cloudflare chronomètre', () => {

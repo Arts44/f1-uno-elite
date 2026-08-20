@@ -75,12 +75,43 @@ if(/^#(backup|trade|access_token|error)=/.test(location.hash)) location.replace(
    éprouvés et retombent, au pire, sur le comportement actuel. */
 @font-face{font-family:'Space Grotesk repli';src:local('Helvetica Neue'),local('Arial');
   size-adjust:105%;ascent-override:96.7%;descent-override:21.1%;line-gap-override:0%;}
+/* ── FOND ANIMÉ — la forme B, choisie parce qu'elle est la seule
+   MESURÉE à ne pas déplacer l'élément LCP. Un canvas inséré DANS LE
+   FLUX fait basculer le LCP de shot-desktop vers pitch sur cinq
+   fenêtres sur six dès 280 px de haut, et sur les six dès 360 px
+   (n=3 par case). Ici la hauteur de mise en page est NULLE : rien
+   n'est poussé, la capture garde son aire visible, le CTA garde sa
+   position — et il n'a jamais besoin d'être « rendu cliquable », il
+   n'a jamais cessé de l'être puisqu'il n'est pas dans le canvas.
+
+   L'EMPILEMENT EST ÉCRIT, PAS SUPPOSÉ. Un enfant en z-index:-1 se
+   peindrait derrière le fond de `body` — donc invisible, et un filet
+   qui ne regarde que le LCP validerait un canvas qui ne peint rien.
+   Le canvas est donc à z-index:0 et TOUT le reste passe à
+   position:relative;z-index:1. `position:relative` sans décalage ne
+   déplace rien : vérifié au CLS.
+
+   LA BANDE DE TEXTE EST PROTÉGÉE PAR UN MASQUE, pas par un flou. Le
+   masque ne coûte rien en bande passante et ne touche à aucune grande
+   surface. SES BORNES SONT MESURÉES, pas choisies : sur 520 px, le
+   lockup occupe 51→100 px et le pitch 126→201. Une première version
+   partait de `transparent` à 0 % et montait droit vers 42 % — donc
+   23 % d'opacité DÉJÀ sous le lockup et 92 % sous le bas du pitch.
+   Le masque s'appliquait, il protégeait simplement la mauvaise bande.
+   Il tient maintenant zéro jusqu'à 36 % (187 px) et n'atteint le plein
+   qu'à 60 % (312 px), soit sous le CTA — qui est opaque. */
+#fond{position:absolute;top:0;left:0;width:100%;height:520px;z-index:0;
+  pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg,transparent 36%,#000 60%,#000 86%,transparent);
+  mask-image:linear-gradient(180deg,transparent 36%,#000 60%,#000 86%,transparent);}
 :root{--bg:#100E0F;--surface:#1A1719;--border:#2E2A2C;--tx1:#F3F0F1;--tx2:#A5A0A2;--tx3:#8A8487;--red:#FF4757;--red-deep:#E8002D}
 *{margin:0;box-sizing:border-box}
 html{color-scheme:dark}
 body{background:var(--bg);color:var(--tx1);font-family:'Space Grotesk','Space Grotesk repli',system-ui,sans-serif;
      min-height:100dvh;display:flex;flex-direction:column;align-items:center;
      padding:clamp(24px,6vh,64px) 20px 28px}
+body{position:relative}
+body > *:not(#fond){position:relative;z-index:1}
 /* ── lockup : MÊMES valeurs que la source styles.css ── */
 .lockup{display:inline-flex;flex-direction:column;gap:0.16em;line-height:1;white-space:nowrap;font-size:clamp(40px,7vw,56px)}
 .lk-top{display:flex;align-items:baseline;gap:0.22em}
@@ -212,6 +243,163 @@ footer .sep{opacity:.5}
     <span class="sep">·</span>
     <span>Unofficial fan project — not affiliated with F1® or Mattel</span>
   </footer>
+<script>
+/* ══ LE MOTEUR DE PARTICULES — écrit UNE FOIS, pour le fond et pour
+   la séquence complète qui viendra. Il est exposé sur `window.__f1`
+   pour que la surcouche, chargée seulement au clic, le réutilise sans
+   en embarquer une seconde copie.
+
+   CE QU'IL FAIT : 998 particules — le nombre de variantes du set, pas
+   un nombre rond choisi pour faire joli — que des DISPOSITIONS placent.
+   Une disposition prend un indice et rend {x,y,w,h,o,rouge}. Le moteur
+   interpole entre deux dispositions, avec un décalage par particule
+   pour que la transition respire au lieu de bouger d'un bloc.
+
+   CE QU'IL NE FAIT PAS ENCORE : l'échantillonnage hors écran des
+   silhouettes (casque, tracé, trophée, QR). Aucune des dispositions
+   du fond n'en a besoin, et l'écrire ici serait du code sans emploi
+   ni contrôle. Le contrat des dispositions est déjà celui qu'une
+   silhouette échantillonnée rendra — la couture est prête, la pièce
+   viendra avec ce qui la consomme. */
+(() => {
+  /* LE CANVAS EST CRÉÉ ICI, pas écrit dans le HTML. Sans JS il
+     n'existe donc pas du tout — ni élément vide, ni surface
+     transparente : le hero est exactement celui d'avant. Il est
+     absolu, donc l'insérer ne pousse rien (vérifié au CLS). */
+  const cv = document.createElement('canvas');
+  if (!cv.getContext) return;
+  cv.id = 'fond'; cv.setAttribute('aria-hidden', 'true');
+  document.body.insertBefore(cv, document.body.firstChild);
+  const ctx = cv.getContext('2d');
+
+  const N = 998, CARTES = 101, POSSEDEES = 72;
+  const DUREE = 12000;          /* ms — voir la note de durée plus bas */
+
+  let W = 0, H = 0;
+  const dimensionner = () => {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const b = cv.getBoundingClientRect();
+    W = b.width; H = b.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+
+  /* Une graine fixe : le fond est le MÊME à chaque chargement. Un
+     Math.random() donnerait une page qui ne se reproduit pas, donc
+     une capture de contrôle qui ne se compare pas. */
+  let graine = 424242;
+  const alea = () => (graine = (graine * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+  const P = Array.from({ length: N }, () => ({ a: alea(), b: alea() }));
+
+  /* ── DISPOSITIONS ── */
+  /* Le mur : les 998 variantes, une par cellule. */
+  const mur = i => {
+    const col = Math.max(20, Math.round(Math.sqrt(N * (W / H))));
+    const lig = Math.ceil(N / col), cw = W / col, ch = H / lig;
+    return { x: (i % col + .5) * cw, y: ((i / col | 0) + .5) * ch,
+             w: cw * .58, h: ch * .62, o: 1, rouge: false };
+  };
+  /* La grille : 101 cartes, 72 tenues. Les 897 autres sortent du champ. */
+  const grille = i => {
+    if (i >= CARTES) return { x: W / 2, y: H * 1.2, w: 2, h: 2, o: 0, rouge: false };
+    const col = Math.max(7, Math.min(14, Math.round(W / 46)));
+    const lig = Math.ceil(CARTES / col), cw = W / (col + 1), ch = H / (lig + 1);
+    return { x: (i % col + 1) * cw, y: ((i / col | 0) + 1) * ch,
+             w: cw * .253, h: ch * .297, o: i < POSSEDEES ? 1 : .34, rouge: i < POSSEDEES };
+  };
+  /* L'état d'entrée : dispersé, d'où le mur se rassemble. */
+  const poussiere = (i, p) => ({ x: p.a * W, y: p.b * H, w: 2, h: 2, o: 0, rouge: false });
+
+  const adoucir = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const borne = t => t < 0 ? 0 : t > 1 ? 1 : t;
+  const entre = (a, b, t) => a + (b - a) * t;
+
+  /* Le scénario : rassemblement, tenue, dérive vers la grille, repos.
+     Deux dispositions et non quatre — un anneau ou un tracé de circuit
+     deviennent une FIGURE, et une figure derrière un lockup se regarde.
+     Le mur et la grille restent des TEXTURES : on les voit sans les
+     lire, ce qui est exactement le contrat d'un fond. */
+  /* LA TRAVERSÉE EST COURTE, ET C'EST UNE CORRECTION MESURÉE À L'ŒIL.
+     Une première version morphait sur 5 s (5200 → 10200) : l'état
+     intermédiaire, où les particules sont dispersées entre les deux
+     dispositions, occupait le milieu de la séquence et lisait comme du
+     BRUIT — ni mur, ni grille, une poussière sans propos. On tient donc
+     le mur plus longtemps et on traverse vite : 1,8 s au lieu de 5. La
+     durée totale ne bouge pas, le coût par trame non plus. */
+  const PLANS = [[0, 1800, poussiere, mur], [1800, 6800, mur, mur],
+                 [6800, 8600, mur, grille], [8600, DUREE, grille, grille]];
+
+  const dessiner = t => {
+    ctx.clearRect(0, 0, W, H);
+    let k = 0;
+    for (let j = 0; j < PLANS.length; j++) if (t >= PLANS[j][0]) k = j;
+    const [d0, d1, de, vers] = PLANS[k];
+    const u = adoucir(borne((t - d0) / (d1 - d0)));
+    /* DEUX PASSES, une par teinte. Affecter fillStyle 998 fois par
+       trame coûte plus que la géométrie elle-même ; on trie au lieu
+       de basculer. */
+    for (let passe = 0; passe < 2; passe++) {
+      /* LE ROUGE N'EST PAS CELUI DE LA MARQUE, et c'est délibéré. À
+         saturation pleine (#FF4757), le fond disputait l'attention aux
+         deux seuls éléments rouges qui portent l'action : le CTA et le
+         « UNO » du lockup. Une brique désaturée les laisse devant.
+         Les blocs sont à 55 % de leur taille d'origine pour la même
+         raison, mesurée autrement : assez gros, on les COMPTE ; la
+         grille doit se sentir sans se dénombrer.
+         Delta mesuré sous la ligne cinétique, contre une page sans
+         canvas : 2,59/255 en moyenne avant, 0,54 après. */
+      ctx.fillStyle = passe ? 'rgba(150,46,54,.20)' : 'rgba(243,240,241,.08)';
+      for (let i = 0; i < N; i++) {
+        const p = P[i], A = de(i, p), B = vers(i, p);
+        const uu = adoucir(borne((u - p.a * .22) / .78));
+        const rouge = uu > .5 ? B.rouge : A.rouge;
+        if (!!passe !== rouge) continue;
+        const o = entre(A.o, B.o, uu);
+        if (o <= .02) continue;
+        const w = entre(A.w, B.w, uu), h = entre(A.h, B.h, uu);
+        ctx.globalAlpha = o;
+        ctx.fillRect(entre(A.x, B.x, uu) - w / 2, entre(A.y, B.y, uu) - h / 2, w, h);
+      }
+    }
+    ctx.globalAlpha = 1;
+  };
+
+  dimensionner();
+
+  /* TROIS RAISONS DE NE PAS ANIMER, et une seule image dans les trois.
+     · mouvement réduit : la demande est « pas de mouvement », pas
+       « pas d'image » — retirer le fond donnerait une page différente
+       de celle que tout le monde voit, ce qui n'est pas ce qu'on
+       nous demande. On peint l'état de repos, une fois.
+     · onglet caché au chargement : rien ne doit tourner, et
+       requestAnimationFrame ne se déclencherait de toute façon pas.
+       On peint l'état de repos pour que la page soit la même au
+       retour, sans jamais avoir animé.
+     · fin de la séquence : la boucle S'ARRÊTE. Elle ne tourne pas à
+       vide derrière un hero — 12 s à 60 Hz, c'est ~720 trames, et
+       au coût mesuré (0,60 ms de médiane sur poste de bureau) environ
+       0,4 s de calcul au total, une fois par chargement. */
+  const repos = () => dessiner(DUREE);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      document.visibilityState !== 'visible') { repos(); return; }
+
+  let t0 = null;
+  const trame = ts => {
+    if (t0 === null) t0 = ts;
+    const t = ts - t0;
+    dessiner(Math.min(t, DUREE));
+    if (t < DUREE) requestAnimationFrame(trame);
+  };
+  requestAnimationFrame(trame);
+
+  /* Le redimensionnement REPEINT l'état de repos au lieu de relancer :
+     rejouer la séquence à chaque rotation d'écran serait une animation
+     qu'on n'a pas demandée. */
+  addEventListener('resize', () => { dimensionner(); repos(); }, { passive: true });
+
+  window.__f1 = { N, alea, adoucir, borne, entre, particules: P };
+})();
+</script>
 <script>
 /* La ligne cinétique. Rien ici ne CRÉE de texte : si ce script ne
    tourne pas — JS coupé, erreur, mouvement réduit — la phrase reste

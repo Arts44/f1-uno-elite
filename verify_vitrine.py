@@ -100,7 +100,7 @@ FENETRES = [('mobile 320', 320, 568), ('mobile 360', 360, 560),
 # zone de contenu une fois la barre du navigateur deduite.
 FENETRES_LCP = [('390x844', 390, 844), ('375x667', 375, 667),
                 ('360x640', 360, 640), ('360x560', 360, 560),
-                ('320x568', 320, 568)]
+                ('320x568', 320, 568), ('320x844', 320, 844)]
 KIN_MAX_PX = 44
 PHRASE = '101 cards, 998 variants to collect.'
 LCP_ATTENDU = 'shot-desktop'
@@ -139,8 +139,21 @@ def sans_js(br, remplace=None):
     el = pg.locator('#kin')
     texte = ' '.join(el.inner_text().split()) if el.count() else ''
     hauteur = round(el.bounding_box()['height']) if el.count() else 0
+    # LE HERO ENTIER, pas seulement la phrase. Le fond anime est une
+    # amelioration progressive : sans script, la page doit etre celle
+    # d'avant lui — et le canvas ne doit pas meme EXISTER, puisqu'il
+    # est cree par le script et non ecrit dans le HTML.
+    hero = pg.evaluate("""() => {
+        const vu = s => { const e = document.querySelector(s);
+            if (!e) return null; const b = e.getBoundingClientRect();
+            return b.width > 0 && b.height > 0 ? Math.round(b.height) : 0; };
+        const cta = document.querySelector('.cta');
+        return {lockup: vu('.lockup'), pitch: vu('.pitch'), cta: vu('.cta'),
+                cta_href: cta ? cta.getAttribute('href') : null,
+                shots: vu('.shots'), canvas: !!document.getElementById('fond')};
+    }""")
     c.close()
-    return {'texte': texte, 'hauteur': hauteur}
+    return {'texte': texte, 'hauteur': hauteur, 'hero': hero}
 
 
 def charger(br, w, h, css='', police=True, lourd=False, remplace=None, retard_police=0):
@@ -178,6 +191,42 @@ def charger(br, w, h, css='', police=True, lourd=False, remplace=None, retard_po
     v = pg.evaluate(VITALS)
     c.close()
     return {**v, 'ko': round(octets['n'] / 1024, 1)}
+
+
+# CONTROLE NEGATIF DU FOND — on remet le canvas DANS LE FLUX. Seuil
+# declare (㉒) : mesure du 21/08/2026, n=3 par case. Un canvas insere
+# dans le flux JUSTE AVANT LE CTA fait basculer l element LCP de
+# shot-desktop vers pitch sur cinq fenetres sur six des 280 px de haut,
+# et sur les six des 360 px. Insere EN TETE de body, comme ici, il en
+# fait basculer CINQ sur six a 360 px — 390x844 resiste, il a le plus
+# d aire de capture visible. Le seuil depend donc aussi du point
+# d insertion, pas seulement de la hauteur : c est la meme regle que
+# pour la ligne cinetique, l aire visible de la capture face au pitch.
+# Le controle est tenu pour valide si AU MOINS UNE fenetre bascule ;
+# s il n en fait basculer aucune, il ne prouve plus rien et le dit.
+FOND_DANS_LE_FLUX = ("#fond{position:absolute;top:0;left:0;width:100%;height:520px;z-index:0;",
+                     "#fond{position:static;display:block;width:100%;height:360px;z-index:0;")
+
+
+def charger_fond(br, controle):
+    """Le canvas peint-il quelque chose ? Question distincte de « la page
+    a-t-elle bouge ». Le controle retire le script du fond."""
+    html = (ROOT / 'index.html').read_text()
+    if controle:
+        html = html.replace("cv.id = 'fond';", "return;")
+    c = br.new_context(viewport={'width': 390, 'height': 844})
+    pg = c.new_page()
+    pg.route('**/index.html', lambda route: route.fulfill(
+        status=200, content_type='text/html; charset=utf-8', body=html))
+    pg.goto(URL, wait_until='load')
+    pg.wait_for_timeout(1500)
+    r = pg.evaluate("""() => { const cv = document.getElementById('fond');
+        if (!cv) return {present: false, peints: 0};
+        const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+        let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++;
+        return {present: true, peints: n}; }""")
+    c.close()
+    return r
 
 
 def main():
@@ -222,11 +271,63 @@ def main():
                 echecs.append('%s : element LCP = %s, attendu %s — Cloudflare ne chronometre plus'
                               ' la meme chose' % (nom, v['el_lcp'] or '(aucun)', LCP_ATTENDU))
 
+        # ⑥ LE FOND ANIME — DEUX ASSERTIONS, PAS UNE.
+        # Que l'element LCP n'ait pas bouge ne prouve RIEN sur le fond :
+        # un canvas qui ne peint pas laisse exactement la meme page. Le
+        # piege est concret — un enfant en z-index:-1 se peint derriere
+        # le fond de `body`, donc invisible, et toutes les assertions
+        # LCP/CLS restent vertes. On compte donc les pixels non
+        # transparents du canvas.
+        fond = charger_fond(br, CONTROLE)
+        print('  %-14s canvas %s · pixels peints %s'
+              % ('fond', 'present' if fond['present'] else 'ABSENT', fond['peints']))
+        # L assertion tourne DANS LES DEUX MODES : sous --controle la page
+        # est sabotee (le script ne cree plus le canvas), donc elle doit
+        # rougir. Une assertion qu on desarme pendant le controle ne prouve
+        # rien — c est le contraire d un controle negatif.
+        if not fond['present']:
+            echecs.append('le canvas de fond est absent — le script ne l a pas cree')
+        elif fond['peints'] < 1000:
+            echecs.append('le canvas de fond ne peint que %d pixels — un fond qui ne'
+                          ' peint rien laisse toutes les autres assertions vertes'
+                          % fond['peints'])
+
+        # CONTROLE NEGATIF ⑥ — le canvas remis DANS LE FLUX. On rejoue
+        # l assertion LCP REELLE sur une page ou le canvas pousse la
+        # capture : elle doit tomber aux six fenetres.
+        if CONTROLE:
+            bascules = 0
+            for nom, w, h2 in FENETRES_LCP:
+                v = charger(br, w, h2, remplace=FOND_DANS_LE_FLUX,
+                            retard_police=RETARD_POLICE_MS)
+                if v['el_lcp'] != LCP_ATTENDU:
+                    bascules += 1
+                    echecs.append('%s : canvas dans le flux, element LCP = %s au lieu de %s'
+                                  % (nom, v['el_lcp'] or '(aucun)', LCP_ATTENDU))
+            print('  %-14s canvas dans le flux : %d/%d fenetres basculent'
+                  % ('controle', bascules, len(FENETRES_LCP)))
+            if bascules == 0:
+                echecs.append('controle negatif : le canvas dans le flux n a fait basculer'
+                              ' AUCUNE fenetre — le controle ne prouve plus rien')
+
         phrase_off = ('<span class="kin-piste">', '<span class="kin-piste" hidden>') if CONTROLE else None
         nojs = sans_js(br, remplace=phrase_off)
         print('  %-14s sans JS : %d px · %s' % ('390x844', nojs['hauteur'], nojs['texte'] or '(vide)'))
         if nojs['texte'] != PHRASE:
             echecs.append('sans JS : la phrase lue est %r, attendu %r' % (nojs['texte'], PHRASE))
+        h = nojs['hero']
+        print('  %-14s sans JS : lockup %s · pitch %s · CTA %s (%s) · captures %s · canvas %s'
+              % ('390x844', h['lockup'], h['pitch'], h['cta'], h['cta_href'], h['shots'],
+                 'PRESENT' if h['canvas'] else 'absent'))
+        for cle in ('lockup', 'pitch', 'cta', 'shots'):
+            if not h[cle]:
+                echecs.append('sans JS : %s absent ou de hauteur nulle — le hero doit etre'
+                              ' celui d avant le fond anime' % cle)
+        if h['cta_href'] != 'app/':
+            echecs.append('sans JS : le CTA pointe vers %r, attendu %r' % (h['cta_href'], 'app/'))
+        if h['canvas']:
+            echecs.append('sans JS : le canvas de fond EXISTE — il doit etre cree par le'
+                          ' script, pas ecrit dans le HTML')
 
         lourd = charger(br, 390, 844, lourd=CONTROLE)
         print('  %-14s %.1f Ko' % ('actif lourd', lourd['ko']))

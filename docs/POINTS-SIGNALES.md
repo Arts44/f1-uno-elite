@@ -1830,3 +1830,99 @@ mesuré au n°23 — un worker ACTIF avec un cache incomplet, donc une app
 qui se croit prête hors ligne et ne l'est pas. Ce serait échanger un
 défaut borné à ~4,5 minutes contre un défaut **permanent et invisible**.
 Refusé, et pas à rediscuter sans mesure nouvelle.
+
+---
+
+## 29. Trois filets sur cinq n'ont jamais été vus rouges — chantier OUVERT, non écrit
+
+**Le fait, relevé le 21/08/2026 en auditant les contrôles négatifs :**
+`verify_vitrine.py` et `verify_zone.py` ont un mode `--controle` ;
+**`verify_qr.py`, `verify_tutorial.py` et `verify_trade_inbox.py` n'ont
+aucun contrôle négatif.** Trois gardes sur cinq n'ont donc jamais été
+observés en train de rougir — ils sont *supposés* savoir voir le défaut
+qu'ils prétendent surveiller.
+
+C'est la maison qui exige un contrôle négatif sur tout garde neuf, et
+qui ne l'a pas exigé rétroactivement sur les siens. **Un garde qu'on n'a
+pas vu échouer n'a pas été vérifié** : la phrase est écrite en tête de
+`verify_zone.py`, elle vaut pour les trois autres.
+
+**Ce que ça coûte de ne rien faire.** Ces trois filets tournent à chaque
+livraison et rendent vert. Rien ne prouve que ce vert soit gagné — c'est
+exactement ⑱ (vert sur un chemin jamais emprunté) à l'échelle du
+harnais, et non plus d'une assertion.
+
+**Ce qu'il faudra écrire**, un contrôle par filet, chacun avec son seuil
+déclaré à côté (㉒) :
+
+| filet | contrôle plausible, à mesurer avant d'être écrit |
+|---|---|
+| `verify_qr.py` | densité rendue sous le plancher (le bug de 1.71.0), ou charge corrompue d'un octet |
+| `verify_tutorial.py` | une étape dont la cible est retirée du DOM |
+| `verify_trade_inbox.py` | à instruire — le filet n'a pas été relu pour ce point |
+
+**Pourquoi ce n'est pas fait ici** : trois contrôles écrits d'un coup,
+sans mesurer d'abord ce que chacun doit provoquer, produiraient trois
+contrôles calibrés au jugé — la faute que ㉒ vient de consigner.
+
+**Condition de fermeture** : les trois contrôles écrits ET vus rouges,
+chacun avec la valeur produit sur laquelle il s'appuie écrite à côté.
+
+---
+
+## 30. Codacy n'était pas joignable depuis la session du 21/08/2026
+
+La convention « vérification Codacy après push, comptes avant/après »
+n'a pas pu être tenue pour le commit `23165e7` : **l'outil Codacy
+n'était pas disponible dans la session** — présent quelques heures plus
+tôt, absent ensuite. Aucun compte n'a été relevé, et aucun n'a été
+inventé.
+
+**Dernier relevé connu**, `ab89cb1` : 1 issue (`Trivy_secret` sur
+`app/cloud-config.js:23`, instruite dans `.codacy.yml`), LOC 12 164,
+177 fichiers, complexes 41 %, couverture 72 %.
+
+**À faire au prochain push où l'outil est présent** : relever les
+comptes et les comparer à `ab89cb1` — en déclarant que l'intervalle
+couvre DEUX commits (`957610b` et `23165e7`) et non un seul, sans quoi
+la comparaison attribuerait à un commit ce que deux ont produit (⑦).
+**Si l'outil ne revient pas**, le dire plutôt que de laisser croire que
+la vérification a eu lieu.
+
+---
+
+## 31. Le vrai budget de la vitrine est dans les deux captures — chantier OUVERT, non fait
+
+**Le fait, relevé le 21/08/2026** en passant le plafond aux octets
+transférés : sur les 107,6 Ko du pire cas, **70,7 Ko sont les deux
+captures** — `vitrine-grid.webp` 44,3 Ko et `vitrine-badges.webp`
+26,4 Ko. Soit **66 %**. Le reste : la police 21,8 Ko, le HTML servi
+gzippé 10,0 Ko, le favicon 5,1 Ko.
+
+Autrement dit : **discuter du poids du HTML, c'est discuter de 9 % du
+budget.** Deux blocs de commentaire pèsent 2 Ko ; une capture en pèse
+vingt fois plus. Le jour où la vitrine doit vraiment maigrir, c'est là
+qu'il faut aller, et nulle part ailleurs.
+
+**Ce qui n'est PAS su, et qu'il faudra mesurer avant de toucher quoi
+que ce soit :**
+
+- `vitrine-grid.webp` est l'**élément LCP** — celui que Cloudflare
+  chronomètre à 5 091 ms au P90. La réduire touche directement au
+  chiffre qui a justifié tout ce chantier ; l'améliorer serait le gain
+  le plus direct disponible, et l'abîmer, la régression la plus visible.
+- Aucune mesure de qualité perçue n'a été faite : ni AVIF, ni un autre
+  niveau de compression webp, ni un redimensionnement à la taille
+  réellement rendue (1520 px de source pour ~220 px de rendu mobile,
+  facteur 7 — c'est le suspect le plus gros et le moins vérifié).
+- `vitrine-badges.webp` est **masquée sous 720 px** et déjà en `lazy` :
+  elle ne pèse que sur le desktop. Le pire cas du test la compte, un
+  visiteur mobile non.
+
+**Condition de fermeture** : une mesure avant/après sur la même
+machine, l'élément LCP inchangé, et un jugement sur l'image elle-même
+— pas seulement sur le nombre d'octets.
+
+**Ce qui interdit de le bâcler** : le plafond de 112 Ko a 4,4 Ko de
+marge. Une capture retravaillée peut en rendre dix fois plus, mais
+peut aussi dégrader la seule image que le visiteur regarde.
