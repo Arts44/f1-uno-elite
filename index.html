@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>F1 UNO Élite — Collection Tracker</title>
-<meta name="description" content="Track your F1 UNO Élite trading-card collection — offline-first, installable, zero dependencies. 120 badges, stats, backups, seven languages.">
+<meta name="description" content="Track your F1 UNO Élite trading-card collection: offline-first, zero dependencies, seven languages. Owned cards, doubles, wishlist, 120 badges, stats, backups.">
 <link rel="icon" href="app/favicon.ico" sizes="48x48">
 <script>
 /* AVANT TOUT LE RESTE — les fragments émis quand l'app vivait à la
@@ -26,37 +26,55 @@ if(/^#(backup|trade|access_token|error)=/.test(location.hash)) location.replace(
 <style>
 @font-face{font-family:'Space Grotesk';src:url('app/fonts/space-grotesk-var.woff2') format('woff2');font-weight:300 700;font-display:swap;}
 /* ── FACE DE REPLI AJUSTÉE — le CTA ne bouge plus au chargement ──
-   LE DÉFAUT MESURÉ : CLS 0,1929 sur mobile, un seul décalage à 51 ms
-   qui poussait « Open the app » de y=259 à y=284. Vingt-cinq pixels
-   sous le doigt de quelqu'un qui vise l'unique bouton de la page.
+   LE DÉFAUT : CLS 0,1929 sur mobile, un seul décalage qui poussait
+   « Open the app » de 25 px sous le doigt de qui vise l'unique bouton
+   de la page.
 
-   LA CAUSE N'ÉTAIT PAS CELLE QU'ON CROYAIT. On a d'abord soupçonné le
-   lockup et ses métriques verticales : mesuré, il ne bouge PAS d'un
-   pixel (h=49,6 avant et après). C'est `.pitch` qui gagne +24,8 px,
-   soit exactement une ligne de 1,55 × 16 px — Space Grotesk est plus
-   large que la police système, et le paragraphe passe de quatre lignes
-   à cinq quand elle arrive. Le décalage est HORIZONTAL d'origine.
-   Donc ni ascent-override ni descent-override n'y pouvaient rien :
-   c'est `size-adjust` qui compte, sur une face de REPLI, pour que le
-   repli s'enroule sur le même nombre de lignes.
+   LA CAUSE EST HORIZONTALE, et ce n'est pas celle qu'on a d'abord
+   prescrite. Le lockup ne bouge pas d'un pixel (mesuré, 49,6 px avant
+   et après) : c'est `.pitch` qui gagne exactement une ligne, parce que
+   Space Grotesk est plus LARGE que la police système. Ni
+   ascent-override ni descent-override n'y pouvaient donc rien — seul
+   `size-adjust`, sur une face de REPLI, fait que le repli s'enroule
+   sur le même nombre de lignes.
 
-   LES VALEURS SONT MESURÉES, pas devinées : largeur moyenne au canvas
-   à 1000 px sur l'alphabet complet, Space Grotesk 0,5837 contre
-   0,5491 pour le repli → 106,3 %. Les métriques verticales suivent le
-   repli (0,967 / 0,211). Une variante calculée sur la seule phrase du
-   pitch donnait 115,8 % et un CLS de 0,0101 — moins bon. On a gardé
-   le chiffre mesuré, pas celui qui semblait plus pertinent.
+   ET L'ENROULEMENT EST UNE FONCTION EN MARCHES, PAS UNE PROPORTION.
+   C'est le fait qui gouverne le choix : il ne suffit pas d'approcher
+   la largeur moyenne de la vraie police, il faut tomber dans
+   l'intervalle où AUCUNE largeur d'écran ne change de compte de
+   lignes. La première valeur, 106,3 %, venait d'une largeur moyenne
+   mesurée au canvas ; elle était juste en principe et débordait de
+   0,3 point — jamais éprouvée sous 360 px, elle rendait SIX lignes à
+   320 px là où la vraie police en fait cinq. CLS 0,1352 à 320×568 et
+   0,0960 à 320×844, en production, le défaut même qu'on croyait
+   corrigé.
 
-   RÉSULTAT : mobile 0,1929 → 0,0033 · desktop 0,0672 → 0,0010.
+   L'INTERVALLE, mesuré par balayage de 100 à 122 % au dixième, hauteur
+   du pitch comparée repli/chargée à huit fenêtres (320×568, 320×844,
+   360×560, 360×640, 375×667, 390×844, 768×900, 1280×800) :
 
-   DÉGRADATION SÛRE, vérifiée : si aucune des polices locales n'existe,
-   la face ne se charge pas, la pile retombe sur system-ui et le CLS
-   revient à 0,1929 — exactement la valeur d'avant. Le correctif ne
-   peut jamais faire pire que de ne rien faire. Mesuré sur macOS ;
-   Android et Windows n'ont pas été éprouvés et retombent, au pire,
-   sur le comportement actuel. */
+       ≤ 103,8 %          → le repli s'enroule sur MOINS de lignes (390)
+       104,0 % à 106,0 %  → même compte partout      ← intervalle sûr
+       ≥ 106,2 %          → SIX lignes à 320 px
+
+   105 % est le milieu : un point de marge de chaque côté. Une valeur
+   unique suffit de 320 à 1280 — une media query aurait ajouté un
+   second point de calibrage à tenir pour zéro gain mesuré.
+   RÉSULTAT à 320×568 : CLS 0,1352 → 0,0031, CTA immobile (d=0).
+   Contrôle négatif rejoué : remise à 106,3 %, le CLS remonte à 0,1352
+   et le CTA reprend ses 24 px de saut.
+
+   REFAIRE CE CALIBRAGE si le texte du pitch change : l'intervalle sûr
+   dépend de ce qui s'enroule, pas seulement de la police.
+
+   DÉGRADATION SÛRE, vérifiée : si aucune police locale n'existe, la
+   face ne se charge pas, la pile retombe sur system-ui et le CLS
+   revient à sa valeur d'avant correctif — 0,1363 avec le pitch actuel,
+   n=3, variance nulle. Le correctif ne peut jamais faire pire que de
+   ne rien faire. Mesuré sur macOS ; Android et Windows n'ont pas été
+   éprouvés et retombent, au pire, sur le comportement actuel. */
 @font-face{font-family:'Space Grotesk repli';src:local('Helvetica Neue'),local('Arial');
-  size-adjust:106.3%;ascent-override:96.7%;descent-override:21.1%;line-gap-override:0%;}
+  size-adjust:105%;ascent-override:96.7%;descent-override:21.1%;line-gap-override:0%;}
 :root{--bg:#100E0F;--surface:#1A1719;--border:#2E2A2C;--tx1:#F3F0F1;--tx2:#A5A0A2;--tx3:#8A8487;--red:#FF4757;--red-deep:#E8002D}
 *{margin:0;box-sizing:border-box}
 html{color-scheme:dark}
@@ -153,9 +171,9 @@ footer .sep{opacity:.5}
     <span class="lk-bar" aria-hidden="true"></span>
   </span>
 
-  <p class="pitch">Track your F1&nbsp;UNO Élite trading-card collection — <b>offline-first</b>,
-  installable, <b>zero dependencies</b>. Owned cards, doubles, wishlist,
-  120&nbsp;badges, stats and backups. <b>Seven languages.</b></p>
+  <p class="pitch">Track your F1&nbsp;UNO Élite trading-card collection:
+  <b>offline-first</b>, installable, <b>zero dependencies</b>.
+  <b>Seven languages.</b></p>
 
   <p class="kin" id="kin"><span class="kin-piste"><span class="kin-seg"><b>101</b> cards,</span>
   <span class="kin-seg"><b>998</b> variants</span>

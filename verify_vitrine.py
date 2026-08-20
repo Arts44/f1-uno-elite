@@ -14,7 +14,7 @@ CE QU'IL VÉRIFIE, par ordre d'importance :
      le chargement — unique conversion de la page — et c'est
      l'assertion qui compte. Le CLS n'en est que la consequence
      chiffree.
-  ② CLS < 0,1 aux deux fenetres — POLICE RETARDEE DE 900 ms.
+  ② CLS < 0,1 aux QUATRE fenetres — POLICE RETARDEE DE 900 ms.
      Sans ce retard, la mesure ne mesure rien : en local le woff2 arrive
      AVANT le premier rendu (15-56 ms contre 20-76 ms de FCP), donc
      aucun echange de police, donc aucun decalage a observer. Le chiffre
@@ -29,7 +29,7 @@ CE QU'IL VÉRIFIE, par ordre d'importance :
      qui ne vaut qu'en avant/apres sur la meme machine.
 
   ⑤ LA LIGNE CINETIQUE : hauteur <= 44 px, element LCP inchange aux
-     trois fenetres mobiles, et la phrase COMPLETE sans JS. Le script
+     CINQ fenetres mobiles, et la phrase COMPLETE sans JS. Le script
      anime, il ne fabrique pas.
 
 CONTROLES NEGATIFS (--controle), les cinq vus rouges :
@@ -39,9 +39,16 @@ CONTROLES NEGATIFS (--controle), les cinq vus rouges :
     la valeur d'avant correctif. C'est LUI qui garantit que le
     correctif ne peut jamais faire pire que de ne rien faire.
   · ligne portee a 110 px           -> l'element LCP doit basculer sur
-    `pitch` a 360x640. 110 et pas 60 : un premier releve annoncait la
-    bascule des 60 px, refait n=3 elle ne s'y produit pas. Le seuil
-    mesure est entre 100 (shot-desktop) et 110 (pitch).
+    `pitch`, et c'est 320x568 qui le montre. LE CONTROLE A DEJA CHANGE
+    DE FENETRE UNE FOIS : il visait 360x640, ou le seuil valait 107 +/- 1
+    tant que le pitch faisait cinq lignes ; le pitch passe a trois, ce
+    seuil est parti au-dela de 150 px et le controle ne prouvait plus
+    rien la. Seuils remesures n=3 sur le fichier actuel :
+        320x568 : bascule entre 60 et 72 px   <- ce que 110 eprouve
+        360x560 : bascule entre 128 et 136 px
+        360x640 : pas de bascule jusqu'a 150 px
+    Un controle negatif se recalibre quand la page change, sinon il
+    devient un vert de plus.
   · phrase retiree du HTML          -> le controle sans JS doit tomber.
 
     python3 -m http.server 8124        # a la racine du depot
@@ -63,12 +70,37 @@ CLS_MAX = 0.1
 # 900 ms : c'est la valeur d'AVANT correctif, ligne cinetique comprise.
 # Elle valait 0,1929 avant que la ligne existe — le contenu au-dessus du
 # CTA a change, donc la fraction d'ecran deplacee aussi.
-CLS_AVANT_CORRECTIF = 0.1867
+# REMESUREE a 0,1363 quand le pitch est passe de cinq lignes a trois :
+# c'est le MEME defaut sur MOINS de contenu deplace. Les deux chiffres
+# ne se comparent pas, leurs perimetres different — pitch long contre
+# pitch court. n=3, variance nulle.
+CLS_AVANT_CORRECTIF = 0.1363
 RETARD_POLICE_MS = 900
-FENETRES = [('mobile 390', 390, 844), ('desktop 1280', 1280, 800)]
-# L'element LCP se verifie sur les trois fenetres mobiles : c'est a
-# 360x640 que la bascule se produit, pas sur les plus grandes.
-FENETRES_LCP = [('390x844', 390, 844), ('375x667', 375, 667), ('360x640', 360, 640)]
+# LE JEU DE FENETRES D'UN FILET EST LUI-MEME UNE HYPOTHESE.
+# Celui-ci a longtemps ete 390 + 1280, et il rendait VERT pendant que le
+# CTA sautait de 25 px a 320 px de large : la face de repli avait ete
+# calibree a 375/390 et debordait en dessous. Le filet ne mentait pas,
+# il ne regardait pas la ou le defaut vivait. 320x568 et 360x560 sont
+# entres ici le 21/08/2026 pour cette raison, et la question a se poser
+# devant tout filet est desormais : QUELLE fenetre ne teste-t-il pas ?
+FENETRES = [('mobile 320', 320, 568), ('mobile 360', 360, 560),
+            ('mobile 390', 390, 844), ('desktop 1280', 1280, 800)]
+# L'element LCP se verifie sur les fenetres MOBILES, et le seuil de
+# bascule depend de la fenetre — il n'est pas une propriete de la page.
+# Mesure du 20/08/2026, n=3 par palier, pitch a cinq lignes :
+#     390x844 : aucune bascule jusqu'a 110 px de contenu insere
+#     375x667 : aucune bascule jusqu'a 110 px
+#     360x640 : bascule a 107 +/- 1 px  (106 -> shot, 108 -> pitch)
+#     360x600 : bascule entre 64 et 72 px
+#     360x560 : DEJA bascule a 44 px
+# La variable reelle n'est pas une hauteur absolue mais l'AIRE VISIBLE
+# de la capture comparee a celle du pitch : raccourcir le pitch recule
+# le seuil (a trois lignes, la bascule a 360x560 part au-dela de 128 px).
+# 360x560 est ici parce qu'un ecran annonce 360x640 offre ~560 px de
+# zone de contenu une fois la barre du navigateur deduite.
+FENETRES_LCP = [('390x844', 390, 844), ('375x667', 375, 667),
+                ('360x640', 360, 640), ('360x560', 360, 560),
+                ('320x568', 320, 568)]
 KIN_MAX_PX = 44
 PHRASE = '101 cards, 998 variants to collect.'
 LCP_ATTENDU = 'shot-desktop'
@@ -183,8 +215,8 @@ def main():
             if v['kin_h'] is None:
                 echecs.append('%s : la ligne #kin est absente' % nom)
             elif v['kin_h'] > KIN_MAX_PX:
-                echecs.append('%s : ligne %d px, plafond de DESSIN %d — la bascule LCP mesuree'
-                              ' est entre 100 et 110 px, l assertion suivante la couvre'
+                echecs.append('%s : ligne %d px, plafond de DESSIN %d — la bascule LCP depend'
+                              ' de la fenetre (60-72 px a 320x568), l assertion suivante la couvre'
                               % (nom, v['kin_h'], KIN_MAX_PX))
             if v['el_lcp'] != LCP_ATTENDU:
                 echecs.append('%s : element LCP = %s, attendu %s — Cloudflare ne chronometre plus'
