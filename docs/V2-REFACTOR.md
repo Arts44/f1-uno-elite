@@ -667,3 +667,51 @@ Un mécanisme qui voyage RÉELLEMENT avec le clone : un `npm prepare`
 qui installe les hooks à l'`npm ci` en ferait partie, puisque le dépôt
 exige déjà `npm ci` pour construire. À chiffrer le jour où un
 deuxième poste travaille sur le dépôt — aujourd'hui il n'y en a qu'un.
+
+---
+
+## Sixième chantier refusé : une face de repli calibrée pour Roboto
+
+**Refusé le 21/08/2026.** Le correctif de décalage de la vitrine ne
+protège que les systèmes où `local('Helvetica Neue')` trouve une face.
+Android n'en a pas ; il a Roboto. L'idée qui vient naturellement est
+d'ajouter une seconde `@font-face`, nommée à part, pointant vers
+`local('Roboto')` avec **sa propre** `size-adjust`.
+
+**Le mécanisme n'est pas en cause — il a été vérifié et il marche.**
+Deux faces nommées séparément, empilées dans la pile de polices : celle
+dont la source est introuvable est sautée, la suivante prend la main
+avec sa valeur. Mesuré aux largeurs rendues, sans ambiguïté.
+
+**Ce qui le disqualifie est le NOMBRE, et la manière de l'obtenir.**
+
+Pour calibrer, il faudrait Roboto sur ce poste. On l'installerait, on
+balaierait, on obtiendrait un intervalle sûr — **et cet intervalle
+vaudrait pour LE FICHIER installé, pas pour celui d'Android.** Les
+points d'enroulement dépendent des chasses du fichier de police :
+Android 12 et suivants livrent Roboto en **police variable**, les
+versions diffèrent d'une version d'Android à l'autre, et un
+`size-adjust` réglé au dixième sur un fichier et appliqué à un autre
+est **exactement la recette de la branche à 0,3598** — celle qui rend
+le correctif cinquante-sept fois pire que de ne rien faire.
+
+Autrement dit : on fabriquerait, en croyant corriger Android, la panne
+précise qu'on vient d'écarter en retirant `local('Arial')`. Et on la
+fabriquerait avec la même confiance, tirée de la même sorte de mesure
+faite au mauvais endroit.
+
+**Il y a pire encore** : on ne sait même pas si `local('Roboto')` trouve
+une face sur Android Chrome. On calibrerait donc peut-être une face qui
+ne se charge jamais — un travail inutile — ou, pire, une face qui se
+charge sur autre chose.
+
+### Condition de réouverture
+
+Un **appareil Android ou un émulateur**, pour répondre à la seule
+question binaire qui reste : `local()` trouve-t-il une face sur Android
+Chrome, et laquelle exactement. Avec cette réponse, et seulement avec
+elle, la face Roboto redevient discutable — calibrée sur le fichier que
+l'appareil porte réellement, et vérifiée sur lui.
+
+Sans elle, **ce n'est pas un correctif, c'est un pari sur les chasses
+d'un fichier qu'on n'a jamais ouvert.**

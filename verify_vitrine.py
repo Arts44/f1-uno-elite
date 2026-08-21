@@ -32,7 +32,7 @@ CE QU'IL VÉRIFIE, par ordre d'importance :
      CINQ fenetres mobiles, et la phrase COMPLETE sans JS. Le script
      anime, il ne fabrique pas.
 
-CONTROLES NEGATIFS (--controle), les cinq vus rouges :
+CONTROLES NEGATIFS (--controle), tous vus rouges :
   · face de repli retiree           -> le CLS doit remonter
   · actif lourd injecte             -> le plafond doit crever
   · local() introuvable             -> le CLS doit revenir a 0,1929,
@@ -50,6 +50,11 @@ CONTROLES NEGATIFS (--controle), les cinq vus rouges :
     Un controle negatif se recalibre quand la page change, sinon il
     devient un vert de plus.
   · phrase retiree du HTML          -> le controle sans JS doit tomber.
+  · face pointee vers une police PRESENTE mais NON calibree (Verdana)
+    -> le CLS doit EXPLOSER. C'est la branche que rien n'eprouvait, et
+    dont l'absence avait fait ecrire en ligne que le correctif « ne
+    peut jamais faire pire que de ne rien faire ». Mesure : 0,3598 a
+    360x560 contre 0,0063 sans aucun repli.
 
     python3 -m http.server 8124        # a la racine du depot
     python3 verify_vitrine.py [--controle]
@@ -239,8 +244,13 @@ def main():
         # seconde ne retirait rien, et le controle rendait vert sur une
         # page inchangee. Premiere version ecrite ici, corrigee sur
         # mesure.
-        LOCAL_VRAI = "src:local('Helvetica Neue'),local('Arial');"
+        LOCAL_VRAI = "src:local('Helvetica Neue');"
         LOCAL_FAUX = "src:local('Police Absente 42');"
+        # LA BRANCHE QUI N AVAIT JAMAIS ETE EPROUVEE : une police
+        # PRESENTE mais dont les chasses ne sont pas celles du
+        # calibrage. Verdana est sur tous les postes de mesure et
+        # affiche un rapport de 95,6 % contre les 105 % reglees.
+        LOCAL_AUTRE = "src:local('Verdana');"
 
         for nom, w, h in FENETRES:
             repli = charger(br, w, h, css=sans_repli, police=False)
@@ -343,6 +353,26 @@ def main():
             if abs(degrade['cls'] - CLS_AVANT_CORRECTIF) > 0.02:
                 echecs.append('degradation : CLS %.4f, attendu ~%.4f — le correctif ne degrade plus comme avant'
                               % (degrade['cls'], CLS_AVANT_CORRECTIF))
+
+            # CONTROLE NEGATIF ⑦ — LA BRANCHE MAL CALIBREE.
+            # SEUIL DECLARE (㉒) : mesure du 21/08/2026, face pointee
+            # vers Verdana en gardant size-adjust 105 %, CLS 0,3598 a
+            # 360x560 contre 0,0063 sans aucun repli — cinquante-sept
+            # fois pire que de ne rien faire. On exige donc que le CLS
+            # DEPASSE 0,20 : au-dessus du plafond de 0,10 sans etre
+            # colle a la valeur mesuree, qui depend de la police
+            # presente sur le poste.
+            # CE CONTROLE EXISTE PARCE QUE SON ABSENCE A PRODUIT UNE
+            # AFFIRMATION FAUSSE EN LIGNE : « le correctif ne peut
+            # jamais faire pire que de ne rien faire » etait tire d un
+            # controle qui n eprouvait QUE la branche inerte (㉔).
+            mal = charger(br, 360, 560, remplace=(LOCAL_VRAI, LOCAL_AUTRE),
+                          retard_police=RETARD_POLICE_MS)
+            print('  %-14s CLS %.4f (doit DEPASSER 0,20)' % ('repli decale', mal['cls']))
+            if mal['cls'] <= 0.20:
+                echecs.append('branche mal calibree : CLS %.4f seulement — soit Verdana est'
+                              ' absente de ce poste, soit le filet ne sait plus voir le cas'
+                              ' ou la face se charge sur les mauvaises chasses' % mal['cls'])
         br.close()
 
     if echecs:

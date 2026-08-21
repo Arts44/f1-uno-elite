@@ -67,13 +67,40 @@ if(/^#(backup|trade|access_token|error)=/.test(location.hash)) location.replace(
    REFAIRE CE CALIBRAGE si le texte du pitch change : l'intervalle sûr
    dépend de ce qui s'enroule, pas seulement de la police.
 
-   DÉGRADATION SÛRE, vérifiée : si aucune police locale n'existe, la
-   face ne se charge pas, la pile retombe sur system-ui et le CLS
-   revient à sa valeur d'avant correctif — 0,1363 avec le pitch actuel,
-   n=3, variance nulle. Le correctif ne peut jamais faire pire que de
-   ne rien faire. Mesuré sur macOS ; Android et Windows n'ont pas été
-   éprouvés et retombent, au pire, sur le comportement actuel. */
-@font-face{font-family:'Space Grotesk repli';src:local('Helvetica Neue'),local('Arial');
+   DEUX BRANCHES, ET UNE SEULE EST SÛRE. Il faut les nommer, parce
+   qu'une version de ce commentaire affirmait « le correctif ne peut
+   jamais faire pire que de ne rien faire » — et c'est MESURÉ FAUX.
+
+   · BRANCHE INERTE — aucune police locale ne correspond : la
+     @font-face ne charge pas, la famille est sautée, la pile retombe
+     sur system-ui et le CLS revient exactement à sa valeur d'avant
+     correctif (0,1363 avec le pitch actuel, n=3, variance nulle).
+     Là, et là seulement, le correctif ne peut pas faire pire.
+
+   · BRANCHE MAL CALIBRÉE — une police locale correspond, mais ses
+     chasses ne sont pas celles sur lesquelles le 105 % a été réglé.
+     Le correctif devient actif et NUISIBLE. Mesuré en pointant la
+     face vers Verdana en gardant 105 % : CLS 0,3598 à 360×560 contre
+     0,0063 sans aucun repli. CINQUANTE-SEPT FOIS PIRE que de ne rien
+     faire, et quatre fois au-dessus du seuil « Poor ».
+
+   D'OÙ UNE SEULE SOURCE : local('Helvetica Neue'). local('Arial') a
+   été RETIRÉ le 21/08/2026. Arial affiche un rapport de largeur de
+   109,0 % contre un intervalle sûr mesuré de 104,0 – 106,0 : le
+   correctif y était peut-être déjà mal calibré, et personne ne l'avait
+   éprouvé. Face à l'incertitude on prend la branche dont on CONNAÎT le
+   pire — l'inerte, bornée au défaut d'origine — plutôt que celle dont
+   le pire vaut 0,3598. Windows, qui n'a qu'Arial des deux, perd donc
+   un correctif qui n'avait jamais été vérifié chez lui.
+
+   COMMENT LA PHRASE FAUSSE EST NÉE, parce que c'est instructif : un
+   contrôle négatif prouvait « local() introuvable → retour à la valeur
+   d'avant, à l'identique ». Le contrôle était juste. La GARANTIE qu'on
+   en a tirée couvrait une branche qu'il n'avait jamais empruntée. Et
+   la phrase a ensuite été étendue à Android et Windows sans qu'aucun
+   des deux n'ait été éprouvé — la mesure ne portait que sur macOS.
+   Registre des instruments menteurs, cas ㉔. */
+@font-face{font-family:'Space Grotesk repli';src:local('Helvetica Neue');
   size-adjust:105%;ascent-override:96.7%;descent-override:21.1%;line-gap-override:0%;}
 /* ── FOND ANIMÉ — la forme B, choisie parce qu'elle est la seule
    MESURÉE à ne pas déplacer l'élément LCP. Un canvas inséré DANS LE
@@ -383,11 +410,47 @@ footer .sep{opacity:.5}
   if (matchMedia('(prefers-reduced-motion: reduce)').matches ||
       document.visibilityState !== 'visible') { repos(); return; }
 
+  /* Compteur d'images : chargé SEULEMENT si l'URL porte `?fps=1`, donc
+     le chargement normal ne paie ni octet ni requête. Le pourquoi et
+     le comment sont dans fps.js, à côté du code qu'ils décrivent. */
+  let mesure = null;
+  if (location.search.indexOf('fps=1') > -1) {
+    import('./fps.js').then(m => { mesure = m.compteur(); }).catch(() => {});
+  }
+
+  /* ══ NON MESURÉ SUR APPAREIL MOBILE — DÉCISION ASSUMÉE ═══════════
+     Ce fond est en ligne SANS avoir jamais tourné sur un téléphone.
+     Il n'y avait aucun appareil disponible le jour où il est parti
+     (POINTS-SIGNALES n°32). On le garde, et on l'écrit ici plutôt que
+     de le retirer par prudence ou de le laisser passer en silence.
+
+     CE QUI REND LE PARI RAISONNABLE :
+     · 998 rectangles pleins par trame, 0,50 ms de médiane — et cette
+       mesure est prise en rastérisation LOGICIELLE (--disable-gpu),
+       donc dans le cas défavorable. Un GPU mobile fait mieux que ça
+       sur des rectangles opaques sans filtre ni ombre ;
+     · la boucle S'ARRÊTE à 12 s : le pire cas est BORNÉ. Même mauvais,
+       il ne dure pas la session — c'est ce qui sépare ce fond d'une
+       animation d'ambiance permanente ;
+     · sous mouvement réduit, l'état de repos est peint une fois, sans
+       aucune boucle.
+
+     CE QUE ÇA NE GARANTIT PAS, et il faut le lire aussi : RIEN NE DIT
+     QU'IL NE BÉGAIE PAS. Les trois points ci-dessus sont une
+     plausibilité, pas une mesure. Un bégaiement ne se déduit pas d'un
+     coût moyen — c'est une rafale, et une rafale ne se voit que sur
+     l'appareil qui la produit.
+
+     À VÉRIFIER dès qu'un appareil est disponible (fin septembre 2026),
+     avec le compteur d'images : ajouter `?fps=1` à l'URL. La ligne qui
+     tranche est `serie max`, la plus longue suite de trames perdues
+     d'affilée — 0 ou 1, rien de perceptible ; 3 et plus, ça bégaie. */
   let t0 = null;
   const trame = ts => {
     if (t0 === null) t0 = ts;
     const t = ts - t0;
     dessiner(Math.min(t, DUREE));
+    if (mesure) mesure(ts, t >= DUREE);
     if (t < DUREE) requestAnimationFrame(trame);
   };
   requestAnimationFrame(trame);

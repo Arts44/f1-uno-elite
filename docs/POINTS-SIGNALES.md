@@ -1913,8 +1913,43 @@ que ce soit :**
   le plus direct disponible, et l'abîmer, la régression la plus visible.
 - Aucune mesure de qualité perçue n'a été faite : ni AVIF, ni un autre
   niveau de compression webp, ni un redimensionnement à la taille
-  réellement rendue (1520 px de source pour ~220 px de rendu mobile,
-  facteur 7 — c'est le suspect le plus gros et le moins vérifié).
+  réellement rendue.
+
+**⚠️ CORRECTION DU 21/08/2026 — « facteur 7 » ÉTAIT FAUX.** Cette
+entrée a d'abord annoncé « 1520 px de source pour ~220 px de rendu
+mobile, facteur 7 », et ce chiffre est parti dans un message de commit.
+Il comparait la LARGEUR de la source à la HAUTEUR du rendu. Mesuré
+correctement, source contre rendu × densité de pixels :
+
+| fenêtre | rendu CSS | densité | pixels nécessaires | source | facteur |
+|---|---|---|---|---|---|
+| 390×844 | 350×220 | ×2 | 700×440 | 1520×950 | **2,2** |
+| 390×844 | 350×220 | ×3 | 1050×660 | 1520×950 | **1,4** |
+| 1280×800 | 760×476 | ×2 | 1520×952 | 1520×950 | **1,0** |
+
+**La source n'est pas surdimensionnée : elle est calibrée pour le
+desktop en ×2, où elle tombe juste au pixel près.** Le surplus n'existe
+que sur mobile, et il vaut 2,2 en linéaire — pas 7. Et
+`vitrine-badges.webp` est logée à la même enseigne : 400×866 de source
+pour 200×431 rendus en ×2, soit **exactement la bonne taille**.
+
+**Ce que ça change pour le chantier** : il n'y a PAS de gras à retirer
+d'un simple redimensionnement. Le seul gain structurel est un
+`srcset` avec une variante mobile de la grille — et il ne fera **rien**
+pour le pire cas du test, qui est le chemin desktop.
+
+### Ce que coûterait le chantier, chiffré
+
+| piste | gain attendu | où il tombe | ce qu'il faut mesurer avant |
+|---|---|---|---|
+| `srcset` + variante ~1050 px de la grille | ~20 Ko | **mobile seulement** | que l'élément LCP reste `shot-desktop` et que les octets déterministes de `capture_screenshots.py` le restent pour la nouvelle variante |
+| AVIF en `<source>` avant le webp | ~15 % des deux images, à confirmer | mobile ET desktop, donc sur le plafond | la qualité perçue, à l'œil et pas au nombre — c'est la seule image que le visiteur regarde |
+| recompression webp plus agressive | inconnu | les deux | idem : jugement sur l'image, pas sur les octets |
+
+**Ordre défendable** : AVIF d'abord — c'est le seul qui touche le pire
+cas du test, donc le plafond —, `srcset` ensuite pour le mobile. Aucun
+appareil n'est nécessaire (n°32 ne bloque pas ce chantier), mais un
+jugement à l'œil sur l'image l'est.
 - `vitrine-badges.webp` est **masquée sous 720 px** et déjà en `lazy` :
   elle ne pèse que sur le desktop. Le pire cas du test la compte, un
   visiteur mobile non.
@@ -1926,3 +1961,277 @@ machine, l'élément LCP inchangé, et un jugement sur l'image elle-même
 **Ce qui interdit de le bâcler** : le plafond de 112 Ko a 4,4 Ko de
 marge. Une capture retravaillée peut en rendre dix fois plus, mais
 peut aussi dégrader la seule image que le visiteur regarde.
+
+---
+
+## 32. Une PWA mobile développée sans appareil mobile — ce que ça borne
+
+**Le fait, au 21/08/2026** : il n'y a **aucun appareil mobile** à
+disposition. Un iPhone 16 Pro Max arrive **fin septembre / début
+octobre 2026**. Tout ce qui suit attend cette date, et rien de ce qui
+suit ne peut être affirmé d'ici là.
+
+Ce n'est pas une anecdote de contexte, c'est une **borne sur ce que le
+dépôt a le droit de dire**. Le harnais est bon — Playwright, sept
+langues, six fenêtres, contrôles négatifs — mais il tourne sur un poste
+de bureau qui simule des tailles d'écran. **Une fenêtre de 390×844
+n'est pas un téléphone** : pas le même GPU, pas la même mémoire, pas la
+même pile réseau, pas de doigt, pas de Safari iOS.
+
+**La seule mesure de terrain dont ce dépôt dispose** est celle de
+Cloudflare Web Analytics sur du trafic réel — LCP 5 091 ms au P90,
+contre 108 ms en local, facteur 47. Elle dit que l'écart existe ; elle
+ne dit rien de précis sur aucun des points ci-dessous.
+
+### Ce qui attend un appareil, et ce que la mesure déciderait
+
+| | ce qui est en suspens | ce que la mesure déciderait |
+|---|---|---|
+| **① n°23** | installation du service worker sur un réseau mobile réel : durée jusqu'au worker actif, nombre d'entrées mises en cache sur 67 | **Le quatrième refus du backlog.** La correction du zombie a un seul paramètre — le seuil qui sépare une installation saine d'un blocage — et c'est exactement ce chiffre. Sans lui, la correction est un pari, pas une correction |
+| **② le fond animé (B)** | coût par trame et **bégaiement** sur GPU mobile. L'instrument est écrit et attend : `?fps=1` | Garder tel quel · réduire les 998 rectangles · raccourcir les 12 s · retirer le fond. La ligne qui tranchera est `serie max` : une rafale se voit, des trames lentes éparpillées non |
+| **③ la ligne cinétique** | coût GPU du `filter: blur` sur les segments voisins. Écrit noir sur blanc dans `index.html` : « n'a pas pu être mesuré depuis un poste de bureau, et un chiffre de laboratoire aurait été pire que pas de chiffre » | Garder le flou, ou le remplacer par une baisse d'opacité seule |
+| **④ le chemin d'installation iOS** | `beforeinstallprompt` **n'existe pas** sur Safari. Le bandeau d'installation, son texte et son moment n'ont jamais été vus sur un iPhone | Si la consigne affichée aux utilisateurs iOS est juste. C'est la famille du n°18 : un message faux, affiché avec aplomb |
+| **⑤ le geste tactile** | `app/app.js:255` ferme le modal sur un glissé vers le bas. **Aucun test du dépôt n'émet un vrai événement tactile** — `page.mouse.click` ne déclenche ni `touchstart` ni `touchend` | Si le geste marche, et s'il entre en conflit avec le défilement du modal. Aujourd'hui, personne ne le sait |
+| **⑥ l'haptique** | `navigator.vibrate(30)` dans `badge-toasts.js`, avec un `catch` pour iOS qui n'a pas l'API. Le chemin Android n'a jamais tourné sur un appareil | Garder la vibration ou la retirer. Un `catch` prouve qu'on a prévu l'absence, pas que la présence fonctionne |
+| **⑦ l'isolement du stockage en PWA iOS** | `cloud-auth.js` choisit le code à usage unique plutôt que le lien magique **parce que** « les PWA iOS ne partagent pas localStorage avec Safari ». C'est un comportement de plateforme **lu, pas observé ici** | Si le choix d'authentification repose sur un fait ou sur une croyance |
+| **⑧ la face de repli hors macOS** | `size-adjust: 105 %` est calibré avec `local('Helvetica Neue'), local('Arial')`. Sur Android, aucune des deux n'est une face installée | **instruit le 21/08/2026, voir la section ci-dessous.** Il reste UNE question, et elle est plus étroite qu'annoncé |
+
+### ⑧ instruit — ce qui est réparable, ce qui ne l'est pas
+
+**Instruit le 21/08/2026, sans appareil.** La conclusion n'est pas
+celle qu'on craignait, et elle est plus inquiétante sur un point.
+
+**① LA COUVERTURE EST PROBABLEMENT PLUS LARGE QUE « macOS » — et ce
+mot « probablement » est à sa place.** Ce qui est MESURÉ : sur ce poste,
+dans Chromium, `local('Helvetica Neue')` et `local('Arial')` résolvent,
+et le correctif tient — CLS ≤ 0,0039, CTA immobile aux six fenêtres.
+Ce qui est INFÉRÉ, et n'a été vérifié sur aucun de ces systèmes : Arial
+est livrée avec Windows et iOS, Helvetica Neue avec iOS, donc la
+résolution devrait s'y faire de la même manière. **Inférence, pas
+mesure** : iOS Safari est un autre moteur, avec sa propre configuration
+de polices, et rien ici ne l'a éprouvé.
+Sous cette réserve, la zone de doute la plus probable se réduit à
+**Android** (et à Linux sans msttcorefonts) — mais la formule honnête
+reste : le correctif est prouvé sur UN système, plausible sur deux
+autres, inconnu sur le quatrième.
+
+**② LES POLICES D'ANDROID NE SONT PAS ICI, et c'est vérifié, pas
+supposé.** Détection par mesure de largeur au canvas, avec contrôle
+négatif (`Police Absente 42` rend la même largeur que les absentes) :
+
+    Roboto · Noto Sans · Droid Sans · Roboto Condensed  →  ABSENTES
+
+Impossible, donc, de calibrer contre elles sur ce poste.
+
+**③ LE 105 % NE VAUT QUE POUR LA FAMILLE SUR LAQUELLE IL A ÉTÉ
+MESURÉ — et l'écart entre familles écrase l'intervalle sûr.** Rapport
+mesuré entre la largeur de Space Grotesk et celle de quatorze familles
+présentes, sur la phrase du pitch à 100 px :
+
+| famille | rapport | | famille | rapport |
+|---|---|---|---|---|
+| Verdana | **95,6 %** | | Georgia | 106,5 % |
+| Lucida Grande | 97,3 % | | Helvetica Neue | 107,9 % |
+| Geneva | 99,5 % | | Arial · Helvetica | 109,0 % |
+| Trebuchet MS | 105,2 % | | Tahoma | 109,6 % |
+| Avenir Next · Futura | 106,0 % | | Optima | 110,1 % |
+| | | | Times New Roman | 115,6 % |
+| | | | Gill Sans | **116,6 %** |
+
+**L'écart entre familles fait 21 points. L'intervalle sûr en fait
+DEUX** (104,0 – 106,0). Aucun nombre unique ne peut servir deux
+familles dont les métriques diffèrent de plus de deux points — et ici
+elles diffèrent de vingt et un. À noter aussi : le rapport de largeur
+n'est **pas** la réponse, seulement un indicateur — pour Helvetica Neue
+il annonce 107,9 % alors que l'intervalle mesuré est 104,0 – 106,0.
+C'est exactement l'erreur qui avait produit le 106,3 % défaillant à
+320 px. **Le nombre se mesure par balayage d'enroulement, il ne se
+calcule pas.**
+
+**④ LA GARANTIE « JAMAIS PIRE QUE DE NE RIEN FAIRE » EST FAUSSE EN
+GÉNÉRAL.** C'est la trouvaille de cette instruction, et elle contredit
+une phrase écrite dans `index.html`. Elle n'est vraie que dans la
+branche où la face **ne se charge pas**. Si `local()` résout vers une
+police dont les métriques ne sont pas celles du calibrage, le correctif
+devient actif et nuisible. Mesuré en pointant la face vers Verdana en
+gardant 105 % :
+
+| fenêtre | ① en ligne | ② aucun repli (« ne rien faire ») | ③ repli MAL calibré |
+|---|---|---|---|
+| 320×568 | 0,0031 | 0,0050 | **0,0979** |
+| 320×844 | 0,0039 | 0,0159 | **0,0725** |
+| 360×560 | 0,0027 | 0,0063 | **0,3598** |
+| 360×640 | 0,0024 | 0,0059 | **0,3337** |
+| 375×667 | 0,0019 | 0,0057 | 0,0184 |
+| 390×844 | 0,0029 | 0,1351 | 0,0071 |
+
+**0,3598 contre 0,0063 : cinquante-sept fois pire que de ne rien
+faire**, et quatre fois au-dessus du seuil « Poor » des Core Web
+Vitals. Sources du décalage : `.shots` de 15 px et la ligne de 26 px —
+le CTA, lui, ne bouge pas.
+
+**⑤ DEUX BRANCHES POUR ANDROID, ET C'EST LAQUELLE QUI EST INCONNUE :**
+
+- **branche inerte** — `local('Arial')` ne correspond à aucune face
+  installée : la `@font-face` échoue, la famille est sautée, la pile
+  retombe sur `system-ui`. Comportement **mesuré** ici, et sans danger ;
+- **branche nuisible** — Android fait correspondre la demande à Roboto :
+  le 105 %, calibré sur Helvetica Neue, s'applique à des métriques qui
+  ne sont pas les siennes. C'est le cas ③ du tableau.
+
+**C'est tout ce qui reste à trancher.** Pas « le correctif marche-t-il
+sur Android » mais : **`local('Arial')` trouve-t-il une face sur Android
+Chrome ?** Une question binaire, de plateforme, pas de métrique.
+
+**⑥ UNE FACE PAR FAMILLE EST POSSIBLE — le mécanisme est vérifié.**
+Plusieurs `@font-face` nommées séparément, chacune avec SA valeur,
+empilées dans la pile de polices : celle dont la source est
+introuvable est sautée, la suivante prend la main avec sa propre
+`size-adjust`. Vérifié en mesurant les largeurs rendues :
+
+    @font-face{font-family:'repliA';src:local(<absente>);size-adjust:105%}
+    @font-face{font-family:'repliB';src:local('Verdana');size-adjust:95.6%}
+    body{font-family:'Space Grotesk','repliA','repliB',system-ui,…}
+    → repliA rend la largeur de la police par défaut (famille sautée)
+    → repliB rend Verdana × 0,956 (sa valeur appliquée)
+
+**Le blocage n'est donc pas le mécanisme, c'est le NOMBRE** : personne
+ici ne peut mesurer l'intervalle sûr de Roboto.
+
+**⑦ VÉRIFIER SANS APPAREIL — ce qui existe et ce qui n'existe pas.**
+Cherché, et voici honnêtement l'état :
+
+| route | ce qu'elle règle | ce qu'elle ne règle pas |
+|---|---|---|
+| **installer le vrai fichier Roboto** sur ce poste | l'intervalle sûr de Roboto, **et c'est valable pour Android** : les points d'enroulement dépendent des chasses du FICHIER, pas du système | l'aliasing. Et il faudrait la bonne version — Android 12+ livre Roboto en police variable |
+| **émulateur Android** (Android Studio) | **les deux** : le vrai Chrome sur la vraie configuration de polices d'Android | lourd à installer ; reste un émulateur pour ce qui touche au GPU (mais pas pour les polices) |
+| drapeau de substitution de polices dans Chromium | — | **il n'en existe pas sur macOS.** `fontconfig` est propre à Linux, et Playwright n'offre aucune émulation de polices. Vérifié |
+| conteneur Linux + fontconfig avec Roboto seul | approche l'aliasing d'Android | ce n'est ni Android ni son Chrome |
+
+**Ce pour quoi un appareil (ou l'émulateur) reste nécessaire, très
+précisément** : savoir si `local('Arial')` et `local('Helvetica Neue')`
+trouvent une face sur Android Chrome. **Rien d'autre.** Si la réponse
+est non, le correctif est simplement inerte là-bas et il n'y a rien à
+faire. Si elle est oui, il faut soit une face Roboto calibrée à part,
+soit retirer `local('Arial')` de la source pour forcer la branche
+inerte — et ce second remède, lui, ne demande aucune mesure.
+
+### ⑧ tranché le 21/08/2026 — `local('Arial')` retiré
+
+**Décision : une seule source, `local('Helvetica Neue')`.** Mesuré aux
+six fenêtres avant et après : **macOS ne perd rien** — CLS identique au
+bruit près (0,0019 à 0,0039), CTA immobile, élément LCP inchangé.
+
+**Les trois raisons, dans l'ordre où elles pèsent :**
+
+1. **Ce qu'on perd n'est pas vérifié.** Arial affiche un rapport de
+   largeur de **109,0 %** contre un intervalle sûr mesuré de
+   **104,0 – 106,0**. Le correctif y était peut-être déjà mal calibré,
+   et personne ne l'avait éprouvé sur un système où Arial est la seule
+   des deux présentes.
+2. **L'asymétrie des pires cas.** Branche inerte : le défaut d'origine,
+   **borné**, connu, mesuré. Branche mal calibrée : **0,3598**. Face à
+   l'incertitude, on prend la branche dont on connaît le pire.
+3. **Ça rend la garantie vraie.** Avec une source unique dont la
+   présence implique le bon calibrage, « jamais pire que de ne rien
+   faire » redevient une phrase défendable — là où elle était fausse.
+
+### Ce que ça NE répare pas
+
+**Android garde le défaut d'origine.** Retirer Arial le rend *honnête*,
+pas *corrigé*. La valeur qui l'attend là-bas est celle d'avant
+correctif : **CLS 0,1351 à 390×844**, au-dessus du seuil de 0,10 et
+dans la zone « Needs Improvement » des Core Web Vitals. Le CTA n'y
+bouge pas — c'est `.shots` et la ligne qui sautent — mais le chiffre
+est réel et il reste.
+
+**Windows perd le correctif.** Arial y est la seule des deux polices
+citées. **Et il n'y était pas vérifié** : aucune mesure n'a jamais été
+faite sur Windows, ni avant ni après. On ne retire donc pas un
+correctif prouvé, on retire une supposition — mais il faut le dire,
+parce que la supposition était peut-être juste.
+
+### LA QUESTION D'OCTOBRE — à poser sur `Helvetica Neue`, pas sur Arial
+
+**Retirer `local('Arial')` a fermé une porte sur deux.** Chrome Android
+fait couramment correspondre les noms classiques vers la police
+système : **`local('Helvetica Neue')` peut résoudre vers Roboto
+exactement comme `local('Arial')` l'aurait fait.** Si c'est le cas, la
+branche mal calibrée est intacte sur Android, avec la seule source qui
+reste.
+
+**La question à poser en octobre est donc celle-ci, et pas l'ancienne :**
+
+> **`local('Helvetica Neue')` trouve-t-il une face sur Android Chrome,
+> et laquelle ?**
+
+Poser l'ancienne — celle qui parlait d'Arial — reviendrait à mesurer
+dans deux mois une source qui n'existe plus dans le fichier.
+
+**Protocole, trois lignes, sur l'appareil ou l'émulateur :**
+
+1. Charger une page qui déclare `@font-face{font-family:'sonde';
+   src:local('Helvetica Neue');size-adjust:100%}` et mesurer au canvas
+   la largeur d'une phrase en `'sonde'` puis en `serif`. **Largeurs
+   égales → aucune face trouvée, branche inerte, rien à faire.**
+2. Si elles diffèrent, la face existe : mesurer le rapport
+   Space Grotesk / sonde sur la phrase du pitch, puis balayer
+   `size-adjust` par pas de 0,2 point et relever l'intervalle où le
+   pitch s'enroule sur le même nombre de lignes qu'avec la vraie
+   police, aux six fenêtres. **L'intervalle contient-il 105 % ?**
+3. Relever le CLS de la vitrine réelle sur l'appareil, aux mêmes six
+   fenêtres, police retardée. **C'est le chiffre qui tranche** : s'il
+   dépasse 0,10, la source doit sauter comme Arial vient de le faire.
+
+**⑧-bis — LA BRANCHE ÉNUMÉRÉE, DONC LE CONTRÔLE À ÉCRIRE (㉔).** La
+proposition « `local('Helvetica Neue')` ne résout pas sur Android, donc
+la branche y est inerte » **n'a jamais été éprouvée**. Par la parade
+㉔, elle ne se range pas dans les réserves d'un commentaire : c'est un
+**contrôle à écrire** dès qu'un appareil existe — l'étape 1 du
+protocole ci-dessus, qui doit rendre un verdict, pas une impression.
+Tant que ce contrôle n'existe pas, la garantie « jamais pire que de ne
+rien faire » vaut **pour macOS**, où elle est mesurée, et pour aucun
+autre système.
+
+### Ce que ça change dans la manière d'écrire
+
+Tant que cette entrée est ouverte, **toute affirmation de performance ou
+de gestuelle mobile porte sa réserve**, dans le code comme dans les
+messages de commit. Un chiffre de laboratoire n'est pas interdit : il
+est interdit **sans son étiquette**. La formule qui a été retenue dans
+`index.html` reste la bonne : *un chiffre de laboratoire aurait été
+pire que pas de chiffre.*
+
+**Condition de levée** : appareil disponible, fin septembre 2026. La
+campagne se fera dans l'ordre ① ② ⑤ — le réseau d'abord parce qu'il
+débloque un refus, le fond ensuite parce que l'instrument est déjà
+écrit, le geste tactile ensuite parce que personne ne sait s'il marche.
+
+---
+
+## 33. La séquence d'intro complète (D) — REPORTÉE, pas refusée
+
+**Reportée le 21/08/2026**, à la même date que le n°32.
+
+D est écrite dans son détail : quatorze plans, vingt secondes, surcouche
+plein écran ouverte au clic, freeze final, code chargé seulement à la
+demande. Le storyboard a été corrigé sur les données réelles du dépôt —
+les trois cartes Hamilton, le 44 qui vient de `driverNumbers`, les douze
+variantes et non seize, les cinq crans de rareté avec leurs
+déclencheurs, 33 badges sur 120 et non 41.
+
+**Pourquoi elle attend** : vingt secondes d'animation sur canvas qu'on
+ne peut pas mesurer sur mobile, ce serait bâtir sur du sable. Le fond
+animé — douze secondes, 998 rectangles, une seule disposition à la
+fois — est déjà en attente de vérification (n°32 ②). D est le même
+moteur poussé **quatorze fois plus loin en formes et deux fois plus
+longtemps**, avec des silhouettes échantillonnées que le fond n'utilise
+même pas encore.
+
+**L'ordre est donc contraint, et c'est le bon** : mesurer B sur
+appareil, en tirer ce que le moteur supporte, puis écrire D dans cette
+limite. L'inverse produirait une séquence à retailler après coup, ou
+pire, à défendre.
+
+**Condition de levée** : n°32 ② mesuré — le fond animé vu tourner sur
+un appareil réel, avec sa `serie max`.
