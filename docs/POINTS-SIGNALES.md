@@ -2235,3 +2235,110 @@ pire, à défendre.
 
 **Condition de levée** : n°32 ② mesuré — le fond animé vu tourner sur
 un appareil réel, avec sa `serie max`.
+
+---
+
+## 34. La consigne d'installation iOS n'a jamais été vue fonctionner — famille du n°18
+
+**Relevé le 21/08/2026** en instruisant le n°32 ④.
+
+`beforeinstallprompt` **n'existe pas sur Safari**, ni sur macOS ni sur
+iOS. Le dépôt le sait et le dit ([app/install.js:6](../app/install.js)).
+Le chemin iOS ne passe donc jamais par un bouton d'installation :
+`installInstructionKey('ios')` rend `install.ins_ios`, et l'app affiche
+une **consigne manuelle**, traduite dans les sept langues :
+
+> *In Safari: tap Share (the square with an arrow), then “Add to Home
+> Screen”.*
+
+**Personne n'a jamais vu cette phrase à l'écran d'un iPhone**, ni suivi
+le geste qu'elle décrit sur l'appareil, ni vérifié que les libellés
+cités correspondent à ceux d'iOS aujourd'hui. Elle est écrite, traduite,
+livrée — et non éprouvée.
+
+### Pourquoi c'est la famille du n°18, et pas un simple manque de test
+
+Le n°18 et le n°28 partagent une forme : **le produit AFFIRME quelque
+chose à l'utilisateur, avec aplomb, et l'affirmation peut être fausse.**
+Ici l'app ne se contente pas d'échouer en silence : elle donne une
+marche à suivre. Si un libellé a changé, si le partage n'est pas là où
+elle le dit, ou si le visiteur est dans Chrome iOS plutôt que Safari,
+elle envoie quelqu'un chercher un bouton qui n'est pas à cet endroit.
+**Trois gestes inutiles pour une consigne que personne n'a vérifiée** —
+la formule est celle du n°28, et elle s'applique mot pour mot.
+
+### Ce qui est vérifiable sans appareil, et qui l'a été
+
+- la détection de plateforme part de l'agent utilisateur, plus
+  `maxTouchPoints` pour iPadOS qui se présente comme un Macintosh
+  ([app/install.js:36](../app/install.js)) ;
+- l'état « déjà installée » repose sur `navigator.standalone`, propre à
+  Safari iOS ;
+- la clé i18n rendue pour `ios` est bien `install.ins_ios`, et les sept
+  traductions existent.
+
+**Rien de tout cela ne dit que la consigne est juste.** Elles disent que
+le bon texte sort ; pas que le texte est bon.
+
+### Ce qu'il faut faire en octobre, précisément
+
+1. ouvrir la vitrine puis l'app dans **Safari iOS**, sans installer :
+   la consigne apparaît-elle, et à quel moment ?
+2. **suivre le geste décrit, mot pour mot**, et noter les libellés
+   réels du menu de partage. S'ils diffèrent, ce sont sept traductions
+   à reprendre ;
+3. ouvrir la même page dans **Chrome iOS** : la consigne dit « Dans
+   Safari », mais est-ce suffisant pour quelqu'un qui n'y est pas ?
+4. une fois installée, vérifier que `navigator.standalone` bascule et
+   que le bandeau d'installation cesse de s'afficher.
+
+**Condition de fermeture** : les quatre points exécutés sur un iPhone,
+et les libellés confrontés à ceux d'iOS.
+
+---
+
+## 35. Aucun test du dépôt n'émet un événement tactile
+
+**Relevé le 21/08/2026** en instruisant le n°32 ⑤.
+
+`app/app.js:255` ferme le modal sur un glissé vers le bas :
+`touchstart` mémorise `clientY`, `touchend` compare, et au-delà de
+**80 px** de descente le modal se ferme. Les deux écouteurs sont
+`{passive:true}`.
+
+**Ce code n'a jamais été exercé.** Vérifié en cherchant dans tout le
+dépôt : aucun filet n'ouvre de contexte `has_touch`, aucun n'appelle
+`tap()`, aucun ne dispatche `touchstart` ou `touchend`. Les filets
+cliquent avec `page.mouse.click`, **qui ne produit aucun événement
+tactile** — c'est le cousin du cas ⑨, où `element.click()` court-circuit
+ait la couche qu'on prétendait tester. Le `tap()` que porte
+`capture_demos.py` est un **curseur dessiné pour une démonstration
+vidéo**, pas un geste injecté.
+
+### Ce que la mesure déciderait
+
+- **le geste marche-t-il ?** 80 px sur un écran de 568 px de haut, c'est
+  14 % de la hauteur : franchi facilement, peut-être trop ;
+- **entre-t-il en conflit avec le défilement ?** Le modal défile. Un
+  glissé vers le bas dans un contenu déjà en haut fait descendre le
+  doigt sans que rien ne bouge — et le modal se ferme. Un utilisateur
+  qui essaie de remonter dans une fiche longue perdrait sa fiche. C'est
+  le défaut le plus probable, et aucun test d'état ne peut le voir : il
+  vit dans le geste, donc dans la transition (voir la règle des défauts
+  de transition dans CONVENTIONS) ;
+- **le seuil de 80 px est-il le bon ?** Il n'a été ni mesuré ni comparé
+  à quoi que ce soit.
+
+### Ce qui est faisable sans appareil, et ne l'a pas été
+
+Playwright sait ouvrir un contexte avec `has_touch=True` et dispatcher
+de vrais `touchstart`/`touchend`. **Ce n'est pas un appareil**, et ça ne
+dira rien du confort du geste ni du conflit avec le défilement réel —
+mais ça dirait au moins si le chemin s'exécute, si le seuil se
+déclenche, et si le modal se ferme. **C'est un filet à écrire, et il ne
+demande rien qu'on n'ait pas** : à rapprocher du n°29, les trois filets
+sans contrôle négatif.
+
+**Condition de fermeture** : le chemin exercé par un test tactile, ET le
+geste essayé sur un appareil pour le conflit avec le défilement — les
+deux, parce qu'ils ne répondent pas à la même question.
