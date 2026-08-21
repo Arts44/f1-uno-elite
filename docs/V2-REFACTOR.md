@@ -779,3 +779,50 @@ par exemple une notation obligatoire pour toute mesure — mais ce serait
 une contrainte sur chaque ligne écrite, pas un garde, et son coût
 d'adoption n'a pas été chiffré. **Rouvrir demande ce chiffrage-là,
 pas une meilleure expression régulière.**
+
+---
+
+## Huitième chantier refusé : changer l'encodeur webp des captures
+
+**Refusé le 21/08/2026.** Le webp des captures de la vitrine sort de
+`cv2.imwrite(..., IMWRITE_WEBP_QUALITY, 80)`. OpenCV n'est pas un
+encodeur d'images fait pour ça, et l'idée d'y substituer `cwebp -m 6`
+— ou Pillow, qui produit les mêmes octets **au bit près** — semblait
+gratuite : le pire cas du budget est le chemin webp, celui que le
+plafond de 112 Ko garde avec une marge étroite, et c'est le seul
+endroit où l'AVIF n'apporte rien.
+
+**Une première mesure donnait −17 % d'octets à fidélité égale ou
+meilleure. Elle était fausse, et la faute mérite d'être lue avant les
+chiffres.**
+
+Tous les candidats étaient encodés **depuis le JPEG**, et la référence
+de la mesure **était ce JPEG** — tandis que le fichier en place venait
+du **PNG de capture**. Il portait une génération de perte de plus, que
+la mesure lui comptait comme un défaut de qualité. Biais chiffré, même
+encodeur et même réglage, seule la source changeant : **+0,5 dB sur la
+grille, +2,0 dB sur les badges**. C'est le cas ㉕ du registre.
+
+### Les chiffres à LIGNÉE ÉGALE — référence : l'image en mémoire
+
+| candidat | grille | badges |
+|---|---|---|
+| **`cv2` q80 (en place)** | 45 374 o · **43,7 dB** | 27 126 o · **35,7 dB** |
+| Pillow / `cwebp -m 6` q80 | 44 120 o · 43,0 dB | 26 302 o · 35,6 dB |
+| Pillow / `cwebp -m 6` q75 | 37 686 o · 42,0 dB | 22 536 o · 35,0 dB |
+
+**L'encodeur en place est le plus fidèle des trois.** Les deux
+candidats achètent 3 à 17 % d'octets contre 0,1 à 1,0 dB — un échange,
+pas un gain. Et l'échange va dans le mauvais sens pour ce chantier :
+il paierait en fidélité sur **la seule image que le visiteur regarde**,
+pour desserrer une contrainte qui, l'AVIF en place, ne serre plus que
+les navigateurs anciens.
+
+### Condition de réouverture
+
+**Une mesure à lignée égale montrant un gain réel** — c'est-à-dire des
+octets en moins à fidélité au moins constante, tous les termes encodés
+depuis la même source et comparés à une référence qui n'est dans la
+lignée d'aucun. Un meilleur réglage de qualité n'est pas un gain : il
+déplace le curseur sur la même courbe. Ce qui rouvrirait le dossier,
+c'est un encodeur qui déplace **la courbe**.

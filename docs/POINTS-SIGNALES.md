@@ -1903,6 +1903,42 @@ relevé**, et rien d'autre.
 **Si l'outil ne revient pas**, le dire plutôt que de laisser croire que
 la vérification a eu lieu.
 
+### CE QUI EST DÉJÀ PERDU — ce n'est pas un retard, c'est une perte
+
+À sept commits d'écart, **la prochaine comparaison ne pourra attribuer
+un delta à aucun changement précis.** Elle dira « la somme de sept
+commits a produit tel écart », ce qui ne trace aucune régression. Ce
+n'est pas un retard de relevé, c'est une perte de traçabilité, et elle
+est **déjà consommée** — relever demain ne la récupère pas.
+
+### DEUXIÈME BORNE, prise le 21/08/2026 à `05ae3f8`
+
+Un point de référence unique, sans mécanisme et sans rien à entretenir.
+Il ne remplace pas Codacy : il donne une continuité partielle, mesurée
+par des outils qui, eux, sont là.
+
+    npm run test:cov
+
+| | à `05ae3f8` |
+|---|---|
+| tests | 1 213 · 242 suites · 0 échec |
+| couverture **lignes** | **72,21 %** (11 194 / 15 502) |
+| couverture **branches** | **85,14 %** (1 713 / 2 012) |
+| couverture fonctions | 65,86 % |
+| fichiers instrumentés | 44 |
+
+**Périmètre déclaré (⑦)** : ce sont les modules chargés par les tests
+Node, hors `tests/**`, bundle, traductions, données embarquées et
+`cloud-config.js` — donc **pas** le périmètre de Codacy, qui comptait
+12 164 LOC sur 177 fichiers. Les deux ne se comparent pas ; celui-ci se
+compare à lui-même, au prochain relevé.
+
+**Pourquoi ni un fichier de suivi ni une note par commit** : une trace
+tenue à la main dépend de la mémoire de celui qui livre — le mode de
+défaillance que ⑰ a démontré trois fois — et **une trace incomplète qui
+ressemble à une série est pire qu'une absence**, parce qu'on la lit
+comme une tendance.
+
 ---
 
 ## 31. Le vrai budget de la vitrine est dans les deux captures — chantier OUVERT, non fait
@@ -2421,3 +2457,58 @@ rien de :
 
 **Condition de fermeture** : les trois points ci-dessus, sur un
 appareil. Le premier volet — le chemin exercé — est **fait**.
+
+---
+
+## 36. L'AVIF servi est moins fidèle que le webp qu'il précède — accepté, BORNÉ
+
+**Décision du 21/08/2026.** Les captures de la vitrine sont servies en
+AVIF d'abord, webp en repli. L'AVIF est encodé **depuis le JPEG**, donc
+en deuxième génération de perte, alors que le webp vient du PNG de
+capture. Mesuré contre le vrai maître :
+
+| | webp servi en repli | AVIF servi en premier |
+|---|---|---|
+| grille | 45 392 o · **43,7 dB** | 35 836 o · **43,1 dB** |
+| badges | 27 042 o · **35,7 dB** | 23 713 o · **34,4 dB** |
+
+**Plus petit, et légèrement moins fidèle** — pour les navigateurs qui
+lisent l'AVIF, c'est-à-dire la majorité. Le message de commit `05ae3f8`
+annonce l'inverse ; la correction est écrite dans
+[`capture_screenshots.py`](../capture_screenshots.py), là où le défaut
+vit, puisqu'un message poussé ne s'amende pas.
+
+### Pourquoi on laisse
+
+1. **0,6 à 1,3 dB** sur des images jugées **indiscernables à taille de
+   rendu réelle**. Régression réelle, invisible.
+2. Le retrait coûterait **12,6 Ko** et ferait **deux allers-retours
+   publics sur le même fichier en deux jours**.
+3. Le défaut est documenté à l'endroit où quelqu'un le rencontrera.
+
+### LA BORNE, qui fait la décision
+
+Cette décision vaut **jusqu'à la régénération des captures, et pas
+au-delà**. C'est elle qui distingue une régression *différée* d'une
+régression *acceptée* — sans elle, les trois raisons ci-dessus
+justifieraient de ne jamais corriger.
+
+**Ce qui la lève** : régénérer les captures et encoder les trois
+formats depuis l'image en mémoire. Mesuré sur une régénération d'essai,
+l'AVIF passerait alors à **30 011 o · 47,8 dB** et **19 997 o ·
+42,5 dB** — plus petit ET franchement plus fidèle, régression effacée
+et 9,5 Ko gagnés au passage.
+
+**Ce qui la fait rouvrir** : la régénération n'a pas eu lieu. Il faut
+alors trancher entre régénérer et **retirer les deux
+`<source type="image/avif">` de `index.html`** — pas continuer.
+
+**Ce qui bloque aujourd'hui** : la régénération change aussi **ce qui
+est montré**. Écart mesuré entre les captures en ligne et celles
+régénérées : 1,4 % des pixels au-delà de 12/255 sur la grille, 3,9 %
+sur les badges. Ce n'est pas bloquant en soi, mais **c'est un jugement
+de contenu, pas de compression**, et il n'a pas encore été rendu.
+
+**Aucun chemin depuis le disque ne raccourcit ce chemin** : mesuré,
+encoder l'AVIF depuis le webp plutôt que depuis le JPEG donne 42,8 dB
+sur la grille et 35,0 sur les badges — toujours sous le webp lui-même.

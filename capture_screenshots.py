@@ -596,9 +596,52 @@ with sync_playwright() as p:
         comparables, il rend 44,0 dB pour 32,8 Ko là où avifenc rend
         48,2 dB pour 35,8 Ko. Le même format, un encodeur moins bon.
 
+        POURQUOI `avifenc` ET PAS Pillow, MALGRÉ LA DÉPENDANCE EXTERNE.
+        Pillow sait écrire les deux formats et il est déjà installé. Sur
+        le WEBP il égale `cwebp -m 6` À L'OCTET PRÈS ; sur l'AVIF, à
+        réglages comparables, il rend 44,0 dB pour 32,8 Ko là où avifenc
+        rend 48,2 dB pour 35,8 Ko. C'est ce fait-là qui justifie le
+        binaire, et lui seul — ne pas unifier sur Pillow pour simplifier.
+
         DÉTERMINISME vérifié : deux encodages successifs de la même source
         donnent le même condensé. C'est la règle de ce fichier — mêmes
         octets à chaque exécution.
+
+        ⚠️ CORRECTION DU MESSAGE DE COMMIT `05ae3f8`, qui est poussé et ne
+        peut plus être amendé. Il annonce « plus petit ET plus fidèle » :
+        LA SECONDE MOITIÉ EST FAUSSE, et elle l'est pour les navigateurs
+        qui lisent l'AVIF, c'est-à-dire la majorité. La mesure de départ
+        comparait des candidats encodés depuis le JPEG à une référence qui
+        ÉTAIT ce JPEG, en face d'un webp encodé depuis le PNG de capture —
+        la référence n'était pas à égale distance des deux termes
+        (registre ㉕). Refait contre le vrai maître :
+
+            grille   webp 45 392 o · 43,7 dB   AVIF servi 35 836 o · 43,1 dB
+            badges   webp 27 042 o · 35,7 dB   AVIF servi 23 713 o · 34,4 dB
+
+        L'AVIF servi est donc PLUS PETIT et LÉGÈREMENT MOINS FIDÈLE que
+        le webp qu'il précède. Cause : il est encodé depuis le JPEG, donc
+        deuxième génération de perte, quand le webp est première
+        génération. Le format n'est pas en cause — encodé depuis l'image
+        EN MÉMOIRE, l'AVIF rend 30 011 o à 47,8 dB et 19 997 o à 42,5 dB,
+        soit plus petit ET franchement plus fidèle.
+        AUCUN CHEMIN DEPUIS LE DISQUE NE RATTRAPE ÇA : mesuré, passer par
+        le webp plutôt que par le JPEG donne 42,8 dB sur la grille et
+        35,0 sur les badges — toujours sous le webp lui-même. La
+        correction passe par une REGÉNÉRATION des captures, pas par un
+        changement de source.
+
+        DÉCISION DU 21/08/2026 — LES SOURCES AVIF RESTENT, ET C'EST BORNÉ.
+        Trois raisons : l'écart vaut 0,6 à 1,3 dB sur des images jugées
+        indiscernables à taille de rendu réelle — régression réelle,
+        invisible ; le retrait coûterait 12,6 Ko et ferait deux
+        allers-retours publics sur le même fichier en deux jours ; et le
+        défaut est documenté ici, là où il vit.
+        LA BORNE FAIT LA DÉCISION : elle vaut JUSQU'À LA RÉGÉNÉRATION des
+        captures, et pas au-delà. Si la régénération n'a pas eu lieu, ce
+        n'est plus une régression différée, c'est une régression acceptée
+        — et il faut alors rouvrir : soit régénérer, soit retirer les
+        deux <source type="image/avif"> de index.html. Suivi au n°36.
         """
         import shutil, subprocess
         if not shutil.which('avifenc'):
