@@ -2207,6 +2207,33 @@ Tant que ce contrôle n'existe pas, la garantie « jamais pire que de ne
 rien faire » vaut **pour macOS**, où elle est mesurée, et pour aucun
 autre système.
 
+### ⑨ — LE JUGEMENT SUR L'AVIF N'A ÉTÉ PORTÉ QUE SUR UN SUPPORT
+
+**Ajouté le 21/08/2026.** L'AVIF q60 remplace le webp comme première
+source des deux captures. Le choix a été tranché **à l'œil, sur un
+écran de bureau**, où les trois candidats — webp actuel, AVIF q60,
+AVIF q50 — sont indiscernables à la taille de rendu réelle.
+
+**Ce n'est pas éprouvé sur écran mobile, ni en forte luminosité.** Et
+l'artefact typique de l'AVIF — la **perte de texture dans les dégradés
+sombres** — est précisément celui qui se voit mal dans ces conditions
+et qui saute aux yeux dans d'autres. L'app est sombre de bout en bout ;
+la capture de la grille est faite d'aplats sombres et de dégradés de
+livrée. C'est le contenu le plus exposé à cet artefact.
+
+**Ce n'est pas bloquant, et il faut dire pourquoi** : le repli webp
+existe pour les navigateurs sans AVIF, et q60 est **mesuré plus fidèle
+au master que le webp qu'il remplace** (48,2 dB contre 43,8 à la taille
+de rendu). Le risque n'est donc pas de dégrader par rapport à
+l'existant — c'est de ne pas avoir regardé l'image là où elle se
+regarde.
+
+**À faire en octobre** : ouvrir la vitrine sur l'appareil, à pleine
+luminosité et en plein jour, et regarder les dégradés de livrée des
+trois premières cartes. Si la texture y est mangée, redescendre à
+q70 — mesuré à 47,3 Ko, plus gros que le webp actuel, ce qui
+annulerait le gain mais pas la fidélité.
+
 ### Ce que ça change dans la manière d'écrire
 
 Tant que cette entrée est ouverte, **toute affirmation de performance ou

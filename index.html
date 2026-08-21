@@ -244,8 +244,21 @@ footer .sep{opacity:.5}
     <!-- LCP : fetchpriority="high" l'avance dans la file du navigateur,
          width/height gardent le zéro décalage de mise en page. Les
          variantes sortent de capture_screenshots.py — mêmes octets à
-         chaque exécution, vérifié sur les deux formats. -->
+         chaque exécution, vérifié sur les trois formats.
+
+         L'AVIF PASSE DEVANT LE WEBP, et le repli webp RESTE. L'ordre des
+         <source> est l'ordre de préférence : le premier type reconnu
+         gagne. Un navigateur sans AVIF — Safari iOS avant 16.4 —
+         retombe sur le webp sans qu'une ligne de script s'en mêle.
+         MESURÉ à la taille de rendu, écart à la source JPEG : le webp
+         actuel rend 43,8 dB pour 45,4 Ko, l'AVIF q60 rend 48,2 dB pour
+         35,8 Ko. Plus petit ET plus fidèle — ce n'est pas un compromis.
+         LE PLAFOND NE BOUGE PAS POUR AUTANT : il modélise le PIRE cas,
+         donc le chemin webp, et celui-là est inchangé à 109,6 Ko. Le
+         gain de 12,6 Ko tombe sur le chemin moderne, qui n'était pas
+         contraint. C'est délibéré, voir capture_screenshots.py. -->
     <picture class="pic-desktop">
+      <source srcset="screenshots/vitrine-grid.avif" type="image/avif">
       <source srcset="screenshots/vitrine-grid.webp" type="image/webp">
       <img class="shot-desktop" src="screenshots/vitrine-grid.jpg" width="1520" height="950"
            fetchpriority="high" decoding="async"
@@ -256,6 +269,7 @@ footer .sep{opacity:.5}
          la sortent du chemin critique — le transfert réel est MESURÉ en
          conditions mobile, pas déduit de la présence de l'attribut. -->
     <picture class="pic-mobile">
+      <source srcset="screenshots/vitrine-badges.avif" type="image/avif">
       <source srcset="screenshots/vitrine-badges.webp" type="image/webp">
       <img class="shot-mobile" src="screenshots/vitrine-badges.jpg" width="400" height="866"
            loading="lazy" decoding="async"

@@ -121,9 +121,12 @@ new Promise(res => {
   setTimeout(() => {
     const r = document.querySelector('.cta').getBoundingClientRect();
     const k = document.getElementById('kin');
+    const s = document.querySelector('.shot-desktop');
     res({lcp: Math.round(lcp), cls: Math.round(cls * 10000) / 10000,
          cta_y: Math.round(r.y), cta_h: Math.round(r.height), el_lcp: el,
-         kin_h: k ? Math.round(k.getBoundingClientRect().height) : null});
+         kin_h: k ? Math.round(k.getBoundingClientRect().height) : null,
+         lcp_src: s ? (s.currentSrc || '').split('/').pop() : null,
+         lcp_prio: s ? (s.fetchPriority || s.getAttribute('fetchpriority') || '') : null});
   }, 3000);
 })
 """
@@ -277,7 +280,8 @@ def main():
         kin_haut = ".kin{height:110px!important}" if CONTROLE else ''
         for nom, w, h in FENETRES_LCP:
             v = charger(br, w, h, css=kin_haut, retard_police=RETARD_POLICE_MS)
-            print('  %-14s ligne %s px · element LCP %s' % (nom, v['kin_h'], v['el_lcp']))
+            print('  %-14s ligne %s px · element LCP %s · charge %s · prio %s'
+                  % (nom, v['kin_h'], v['el_lcp'], v['lcp_src'], v['lcp_prio']))
             if v['kin_h'] is None:
                 echecs.append('%s : la ligne #kin est absente' % nom)
             elif v['kin_h'] > KIN_MAX_PX:
@@ -287,6 +291,18 @@ def main():
             if v['el_lcp'] != LCP_ATTENDU:
                 echecs.append('%s : element LCP = %s, attendu %s — Cloudflare ne chronometre plus'
                               ' la meme chose' % (nom, v['el_lcp'] or '(aucun)', LCP_ATTENDU))
+            # LE <picture> A DEUX SOURCES DEPUIS LE 21/08/2026. Ajouter une
+            # source change ce que le preloader decouvre : ce n'est pas
+            # acquis, on le mesure. Deux assertions distinctes, parce que
+            # deux choses peuvent casser separement — le FORMAT choisi et
+            # la PRIORITE de chargement de l'element LCP.
+            if not (v['lcp_src'] or '').endswith('.avif'):
+                echecs.append('%s : l element LCP charge %r — Chromium sait lire l AVIF, la'
+                              ' source doit etre choisie. Ordre des <source> ou fichier absent ?'
+                              % (nom, v['lcp_src']))
+            if v['lcp_prio'] != 'high':
+                echecs.append('%s : fetchpriority de l element LCP = %r, attendu "high" — l ajout'
+                              ' d une source l a deplace ou efface' % (nom, v['lcp_prio']))
 
         # ⑥ LE FOND ANIME — DEUX ASSERTIONS, PAS UNE.
         # Que l'element LCP n'ait pas bouge ne prouve RIEN sur le fond :

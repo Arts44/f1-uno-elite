@@ -575,6 +575,45 @@ with sync_playwright() as p:
     # jamais d'une compression manuelle, qui dériverait. Les captures du
     # README ne changent pas : ce sont des sorties EN PLUS.
     # ══════════════════════════════════════════════════════════
+    def _avif(source_jpg, sortie_avif):
+        """AVIF q60, encodé par `avifenc`. Trois choses valent d'être dites.
+
+        POURQUOI q60 ET PAS PLUS BAS. Mesuré le 21/08/2026 à la TAILLE DE
+        RENDU (350x220 et 200x431, en x2), écart à la source JPEG :
+            webp actuel  45 392 o · PSNR 43,8 dB
+            AVIF q60     35 836 o · PSNR 48,2 dB   ← retenu
+            AVIF q50     27 122 o · PSNR 46,1 dB
+        q50 économise 14,7 Ko de plus — MAIS ces octets tombent sur le
+        chemin des navigateurs modernes, qui n'est PAS le chemin contraint :
+        le plafond de 112 Ko modélise le PIRE cas, celui du repli webp, et
+        aucune quantité d'AVIF ne le fait bouger. q50 paierait donc en
+        fidélité une économie qui ne desserre rien. q60 est le plus fidèle
+        des trois candidats ET déjà 21 % plus léger que l'existant.
+        NE PAS DESCENDRE LA QUALITÉ en croyant gagner quelque chose.
+
+        POURQUOI `avifenc` ET PAS Pillow. Pillow sait écrire de l'AVIF et
+        il est déjà installé — mais mesuré à qualité et vitesse
+        comparables, il rend 44,0 dB pour 32,8 Ko là où avifenc rend
+        48,2 dB pour 35,8 Ko. Le même format, un encodeur moins bon.
+
+        DÉTERMINISME vérifié : deux encodages successifs de la même source
+        donnent le même condensé. C'est la règle de ce fichier — mêmes
+        octets à chaque exécution.
+        """
+        import shutil, subprocess
+        if not shutil.which('avifenc'):
+            raise SystemExit(
+                "\nCAPTURES NON GÉNÉRÉES — `avifenc` est absent.\n"
+                "  La vitrine sert l'AVIF en premier ; le produire est\n"
+                "  obligatoire, pas optionnel. Sans lui les deux <source>\n"
+                "  pointeraient vers des fichiers périmés.\n\n"
+                "    brew install libavif\n\n"
+                "(Outil de génération hors dépôt, comme Playwright et\n"
+                "OpenCV — voir docs/CONVENTIONS.md.)")
+        subprocess.run(['avifenc', '-q', '60', '-s', '4',
+                        str(source_jpg), str(sortie_avif)],
+                       check=True, capture_output=True)
+
     def variante_vitrine(nom_src_fn, sortie, largeur_cible, theme='dark', w=800, h=500):
         """Capture PNG en mémoire, redimensionne, encode en WebP + JPEG."""
         import cv2, numpy as np
@@ -593,6 +632,7 @@ with sync_playwright() as p:
         # aplats sombres de l'app ne commencent à baver.
         cv2.imwrite(str(SHOTS / (sortie + '.webp')), img, [cv2.IMWRITE_WEBP_QUALITY, 80])
         cv2.imwrite(str(SHOTS / (sortie + '.jpg')), img, [cv2.IMWRITE_JPEG_QUALITY, 82])
+        _avif(SHOTS / (sortie + '.jpg'), SHOTS / (sortie + '.avif'))
         return img.shape[1], img.shape[0]
 
     def _badges_mobile(pg):

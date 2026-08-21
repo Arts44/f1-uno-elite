@@ -64,6 +64,22 @@
    n'est donc pas compté. S'il devenait chargé d'office, il faudrait
    redécider ce nombre — pas l'ignorer.
 
+   ══ L'AVIF NE COMPTE PAS ICI, ET C'EST VOULU (21/08/2026) ══
+
+   Les deux captures ont désormais une variante AVIF, servie en premier
+   par le <picture>. Ce test continue de sommer les fichiers WEBP, et il
+   ne faut pas le « corriger » : le plafond modélise le PIRE cas, celui
+   du visiteur dont le navigateur ne lit pas l'AVIF — Safari iOS avant
+   16.4, notamment. Ce visiteur télécharge exactement ce qu'il
+   téléchargeait avant, et c'est lui que le plafond protège.
+
+   LE GAIN DU CHEMIN MODERNE, noté à côté sans y toucher :
+     · pire cas, chemin webp          109,6 Ko  ← ce que ce test mesure
+     · chemin AVIF q60                 97,0 Ko  (marge 15,0)
+   Descendre le plafond sur le chemin moderne le retirerait à celui qui
+   en a le plus besoin. La décision a été prise le 21/08/2026 et elle
+   n'est pas un oubli.
+
    LA MESURE DU JOUR, pour qu'on sache dans six mois si 112 était une
    marge confortable ou une limite atteinte de justesse :
      · mobile 390 px  :  76 Ko  (la seconde image n'est PAS transférée)
