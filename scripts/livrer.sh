@@ -103,6 +103,7 @@ if [ "$LENTS" = "1" ]; then
   done
   sleep 1
   python3 verify_tutorial.py
+  python3 verify_touch.py
   python3 verify_qr.py
   python3 verify_trade_inbox.py
   python3 verify_zone.py

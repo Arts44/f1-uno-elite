@@ -47,6 +47,12 @@ def parcours(nav, depart, nom):
 
     franchies = franchir_premier_lancement(pg)
     # LE PARCOURS DOIT AVOIR EU LIEU — sinon le test ne prouve rien.
+    # SEUIL DECLARE (㉒) : DEUX etapes de premier lancement au moins.
+    # Le parcours vierge en compte plusieurs (accueil, configuration) ;
+    # en rencontrer moins de deux signifie que le profil n'etait pas
+    # vierge, donc que le test s'est deroule sur un etat qu'il ne
+    # pretendait pas eprouver. A REPRENDRE si le parcours de premier
+    # lancement change de nombre d'etapes.
     if len(franchies) < 2:
         ECHECS.append(f'{nom} : le premier lancement n\'a pas été rencontré '
                       f'(étapes franchies : {franchies or "aucune"}) — '

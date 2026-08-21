@@ -258,6 +258,13 @@ def main():
             print('  %-14s CTA repli y=%d h=%d · charge y=%d h=%d · CLS %.4f · LCP %d ms · %.1f Ko'
                   % (nom, repli['cta_y'], repli['cta_h'], plein['cta_y'], plein['cta_h'],
                      plein['cls'], plein['lcp'], plein['ko']))
+            # SEUIL DECLARE (㉒) : tolerance de 1 px sur la position ET la
+            # hauteur du CTA. Ce n'est pas une marge de confort, c'est
+            # l'arrondi : les rectangles sont arrondis a l'entier avant
+            # comparaison, deux mesures identiques peuvent differer d'une
+            # unite. A 2 px on laisserait passer un vrai deplacement ; a 0
+            # on rougirait sur l'arrondi. Valeurs observees en fonctionnement
+            # normal : ecart de 0 sur y, de 0 a 1 sur h.
             if abs(repli['cta_y'] - plein['cta_y']) > 1 or abs(repli['cta_h'] - plein['cta_h']) > 1:
                 echecs.append('%s : le CTA bouge — y %d->%d, h %d->%d'
                               % (nom, repli['cta_y'], plein['cta_y'], repli['cta_h'], plein['cta_h']))
@@ -295,6 +302,13 @@ def main():
         # est sabotee (le script ne cree plus le canvas), donc elle doit
         # rougir. Une assertion qu on desarme pendant le controle ne prouve
         # rien — c est le contraire d un controle negatif.
+        # SEUIL DECLARE (㉒) : 1000 pixels non transparents. Le fond en
+        # peint 89 166 au repos, mesure du 21/08/2026 ; le plancher est
+        # donc a moins de 2 % du releve. Il ne cherche pas a valider le
+        # dessin, seulement a separer « peint » de « ne peint rien » — un
+        # canvas vide en rend 0. A REPRENDRE si le fond devient beaucoup
+        # plus discret : le plancher doit rester tres en dessous de ce que
+        # le fond peint reellement.
         if not fond['present']:
             echecs.append('le canvas de fond est absent — le script ne l a pas cree')
         elif fond['peints'] < 1000:
@@ -350,6 +364,14 @@ def main():
             degrade = charger(br, 390, 844, remplace=(LOCAL_VRAI, LOCAL_FAUX),
                               retard_police=RETARD_POLICE_MS)
             print('  %-14s CLS %.4f (attendu ~%.4f)' % ('local() faux', degrade['cls'], CLS_AVANT_CORRECTIF))
+            # SEUIL DECLARE (㉒) : tolerance de 0,02 autour de
+            # CLS_AVANT_CORRECTIF. La valeur de reference vaut 0,1363,
+            # mesuree n=3 a variance nulle ; la tolerance couvre le bruit
+            # d'une machine plus lente, pas un changement de comportement.
+            # Un ecart superieur signifie que la degradation n'est plus la
+            # meme — soit le correctif protege moins, soit il protege trop,
+            # et les deux valent d'etre vus. A REPRENDRE si le texte du
+            # pitch change : la reference bouge avec ce qui s'enroule.
             if abs(degrade['cls'] - CLS_AVANT_CORRECTIF) > 0.02:
                 echecs.append('degradation : CLS %.4f, attendu ~%.4f — le correctif ne degrade plus comme avant'
                               % (degrade['cls'], CLS_AVANT_CORRECTIF))

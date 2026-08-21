@@ -1873,19 +1873,33 @@ chacun avec la valeur produit sur laquelle il s'appuie écrite à côté.
 ## 30. Codacy n'était pas joignable depuis la session du 21/08/2026
 
 La convention « vérification Codacy après push, comptes avant/après »
-n'a pas pu être tenue pour le commit `23165e7` : **l'outil Codacy
-n'était pas disponible dans la session** — présent quelques heures plus
-tôt, absent ensuite. Aucun compte n'a été relevé, et aucun n'a été
-inventé.
+n'a pas pu être tenue depuis le 21/08/2026 : **l'outil Codacy n'est pas
+disponible dans la session** — présent quelques heures plus tôt, absent
+depuis, sur trois pushs consécutifs. Aucun compte n'a été relevé, et
+aucun n'a été inventé.
 
 **Dernier relevé connu**, `ab89cb1` : 1 issue (`Trivy_secret` sur
 `app/cloud-config.js:23`, instruite dans `.codacy.yml`), LOC 12 164,
 177 fichiers, complexes 41 %, couverture 72 %.
 
-**À faire au prochain push où l'outil est présent** : relever les
-comptes et les comparer à `ab89cb1` — en déclarant que l'intervalle
-couvre DEUX commits (`957610b` et `23165e7`) et non un seul, sans quoi
-la comparaison attribuerait à un commit ce que deux ont produit (⑦).
+**LA BORNE, PAS LA LISTE.** Une énumération de commits dans un document
+se périme au push suivant — celle qui tenait ici a vécu deux jours et
+en nommait deux quand il y en avait cinq. On note donc **la borne
+basse**, qui ne bouge pas :
+
+> Dernier relevé Codacy : **`ab89cb1`**.
+
+**À faire au prochain push où l'outil est présent** : recalculer
+l'intervalle **à ce moment-là**, avec
+
+    git log --oneline ab89cb1..HEAD
+
+puis relever les comptes et les comparer à ceux de `ab89cb1` **en
+déclarant le nombre de commits que l'intervalle couvre** (⑦) — sans
+quoi la comparaison attribue à un commit ce que N ont produit. Une fois
+le relevé fait, **remplacer la borne basse ci-dessus par le commit
+relevé**, et rien d'autre.
+
 **Si l'outil ne revient pas**, le dire plutôt que de laisser croire que
 la vérification a eu lieu.
 
@@ -2297,7 +2311,7 @@ et les libellés confrontés à ceux d'iOS.
 
 ---
 
-## 35. Aucun test du dépôt n'émet un événement tactile
+## 35. ~~Aucun test du dépôt n'émet un événement tactile~~ — VOLET 1 FAIT (21/08/2026), le geste fonctionne
 
 **Relevé le 21/08/2026** en instruisant le n°32 ⑤.
 
@@ -2339,6 +2353,44 @@ déclenche, et si le modal se ferme. **C'est un filet à écrire, et il ne
 demande rien qu'on n'ait pas** : à rapprocher du n°29, les trois filets
 sans contrôle négatif.
 
-**Condition de fermeture** : le chemin exercé par un test tactile, ET le
-geste essayé sur un appareil pour le conflit avec le défilement — les
-deux, parce qu'ils ne répondent pas à la même question.
+### MESURÉ le 21/08/2026 — le chemin s'exécute, et le seuil discrimine
+
+**Le filet existe : [`verify_touch.py`](../verify_touch.py)**, entré
+dans `scripts/livrer.sh` dans le même changement. Contexte `has_touch`,
+injection par **CDP `Input.dispatchTouchEvent`** — la même couche
+d'entrée qu'un vrai doigt, et non des `TouchEvent` fabriqués en JS, qui
+ne prouveraient que la réponse du gestionnaire à ce qu'on lui donne
+(cas ⑨). n=3, stable :
+
+| | |
+|---|---|
+| `#modalCloseBtn` ferme la fiche | **oui** — le câblage a eu lieu, donc l'écouteur tactile est attaché |
+| glissé de **60 px** (sous le seuil de 80) | **ne ferme pas** |
+| glissé de **120 px** | **ferme** |
+
+**Le geste fonctionne.** Il n'y a pas de défaut en production.
+
+**ET LE PREMIER VERDICT DISAIT L'INVERSE — c'était l'instrument.** Une
+sonde antérieure rapportait que rien ne fermait la fiche, bouton
+compris. Elle lisait `getComputedStyle(mo).display`, alors que `.mo`
+est `display:flex` **en permanence** : l'ouverture se porte sur la
+classe `.open`. Elle mesurait une constante. Trois `False` sur trois
+mécanismes indépendants — la signature exacte que ㉓ décrit, disponible
+depuis deux jours et non appliquée. Consigné là-bas.
+
+### Ce que ce filet N'ÉTABLIT PAS (㉔)
+
+Il dit que le chemin s'exécute et que le seuil discrimine. Il ne dit
+rien de :
+
+- **le confort du geste** — 80 px sur un écran de 568 px, c'est 14 % de
+  la hauteur, et aucun chiffre ne dit si c'est bien choisi ;
+- **le conflit avec le défilement** — `.modal` est `overflow-y:auto`, et
+  le cas qui inquiète reste le **glissé vers le bas dans une fiche déjà
+  en haut**, qui fermerait ce qu'on voulait remonter. Ce filet ne
+  l'éprouve pas ;
+- **un doigt réel sur iOS** — les `touchMove` sont réguliers, sans
+  inertie, dans un Chromium de bureau.
+
+**Condition de fermeture** : les trois points ci-dessus, sur un
+appareil. Le premier volet — le chemin exercé — est **fait**.

@@ -315,6 +315,12 @@ def parcourir(page):
             # sur-place qui tranche.
             if suivant:
                 surplace += 1
+                # SEUIL DECLARE (㉒) : trois tours sans progression. Un
+                # seul ne suffit pas — `_runStep()` attend parfois sa cible
+                # et un tour de boucle passe legitimement sans avancer.
+                # Trois est le premier compte ou l'attente cesse d'etre une
+                # explication plausible. Non mesure : choisi, et declare
+                # comme choisi.
                 if surplace >= 3:
                     ECHECS.append(f'tour bloqué à l’étape « {avant} · {titre} » : '
                                   f'« Suivant » cliqué 3 fois sans progression')

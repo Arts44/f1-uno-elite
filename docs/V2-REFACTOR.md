@@ -715,3 +715,67 @@ l'appareil porte réellement, et vérifiée sur lui.
 
 Sans elle, **ce n'est pas un correctif, c'est un pari sur les chasses
 d'un fichier qu'on n'a jamais ouvert.**
+
+---
+
+## Septième chantier refusé : un garde qui traque les nombres non étiquetés
+
+**Refusé le 21/08/2026.** Le cas ⑰ du registre — *un relevé unique
+durci en contrainte, et la contrainte se met à voyager* — a récidivé
+trois fois en une semaine. La conclusion tirée sur place était juste :
+**une parade qui échoue trois fois n'est plus une parade, c'est un
+rappel** ; il faut un mécanisme. La question est de savoir lequel.
+
+**L'idée refusée** : un garde qui repère, dans les commentaires de code
+et dans la documentation, un nombre présenté comme une mesure sans
+mention de `n` ni de conditions.
+
+### Ce que ça donnerait, mesuré sur le dépôt
+
+| corpus | nombres | sans étiquette | |
+|---|---|---|---|
+| commentaires de `app/*.js` | 357 | 295 | 83 % |
+| `docs/*.md` | 1 175 | 821 | 70 % |
+| commentaires des filets | 154 | 89 | 58 % |
+| **total** | | **≈ 1 205 cris** | |
+
+**Variante étroite**, limitée aux nombres portant une unité (`ms`, `px`,
+`Ko`, `%`, `fps`, `Hz`) : **179 cris**. Dix fois moins, et toujours
+inutilisable — les exemples disent pourquoi : `320 px` est une largeur
+d'écran, `1.47` un numéro de version, `2025` une saison, `67 px` une
+hauteur mesurée. **Sur quatre exemples, un seul est une mesure.**
+
+### Le motif du refus
+
+**La différence entre une mesure et un fait est dans la phrase, pas
+dans le nombre.** Aucune expression régulière ne distingue « le CTA
+saute de 25 px » de « la vitrine tient à 320 px de large ». Les trois
+propriétés que ⑰ demande de repérer — qu'un nombre soit une mesure,
+qu'il soit unique plutôt que reproduit, qu'il ait VOYAGÉ depuis un
+autre document — ne sont pas lisibles par une machine.
+
+**Et c'est ⑲ retourné.** Le cas ⑲ dit qu'un faux ROUGE use la confiance
+dans un garde aussi sûrement qu'un faux vert. Un garde qui crie 179
+fois le jour de sa naissance serait désarmé dans la semaine, et son
+désarmement coûterait plus que son absence : il resterait dans le
+dépôt, éteint, à donner l'illusion qu'une règle est tenue. C'est
+exactement le défaut de ⑯ sous un autre nom.
+
+### Ce qui est fait à la place, et qui est accepté
+
+Le **garde des seuils déclarés** — `tests/seuils-declares.test.js`. Il
+ne regarde que le code Python des filets, exige la mention
+`SEUIL DECLARE` dans le bloc de commentaire attaché à toute comparaison
+à un littéral non nul, et il porte sur **sept** occurrences, pas 1 205.
+Il a une raison d'être qu'aucune variante large n'a : **㉒ EXIGE déjà le
+seuil déclaré, et rien ne le vérifiait.** Une règle que rien ne vérifie
+est précisément ce qui a échoué trois fois.
+
+### Condition de réouverture
+
+Une manière de distinguer, sans lire la phrase, un nombre-mesure d'un
+nombre-fait. Une convention d'écriture rendrait la chose décidable —
+par exemple une notation obligatoire pour toute mesure — mais ce serait
+une contrainte sur chaque ligne écrite, pas un garde, et son coût
+d'adoption n'a pas été chiffré. **Rouvrir demande ce chiffrage-là,
+pas une meilleure expression régulière.**
