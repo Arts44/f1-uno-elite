@@ -114,7 +114,7 @@ const VARIANTES = [
 ];
 
 const ROSSO = '#FF2800';          /* rosso corsa — la couleur de l'écurie */
-const ROUGE = '#FF4757', INK = '#F3F0F1', GRIS = '#5A5A66', OR = '#FFD166';
+const ROUGE = '#FF4757', INK = '#F3F0F1', GRIS = '#8A8A98', OR = '#FFD166';
 
 /* LA COLLECTION DE L'AUTRE COLLECTIONNEUR est tirée d'un hachage
    stable — pas d'un aléa, sinon le plan changerait à chaque ouverture
@@ -784,7 +784,7 @@ export function ouvrir(declencheur, options = {}) {
       }
       const q = S[i], allume = q[1] <= g.bas && q[1] >= g.seuil;
       return { x: q[0], y: q[1], w: U() * .017, h: U() * .017,
-               o: allume ? 1 : .55, tint: allume ? OR : '#8A8A98' };
+               o: allume ? 1 : .55, tint: allume ? OR : GRIS };
     },
     spa:     i => silhouette('spa', dSpa, 900, U() * .016, INK)(i),
     phone:   i => {

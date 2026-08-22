@@ -13,21 +13,21 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **39 points au total. Huit sont OUVERTS** — c'est ce qu'on vient chercher
+> **40 points au total. Huit sont OUVERTS** — c'est ce qu'on vient chercher
 > ici, donc c'est ce que cet en-tête liste :
 >
 > | № | Ouvert parce que |
 > |---|---|
 > | 29 | Trois filets sur cinq n'ont jamais été vus rouges — non écrit |
-> | 30 | Codacy injoignable depuis le 21/08/2026 — borne `ab89cb1` |
 > | 31 | Le vrai budget de la vitrine est dans les deux captures — non fait |
 > | 32 | PWA mobile développée sans appareil mobile — ce que ça borne |
 > | 33 | Séquence d'intro complète (D) — REPORTÉE, pas refusée |
 > | 34 | Consigne d'installation iOS jamais vue fonctionner — famille du n°18 |
 > | 36 | AVIF moins fidèle que le webp qu'il précède — accepté, BORNÉ |
 > | 38 | `verify_touch.py` rougit à tort sous `livrer.sh` — remède nommé, non écrit |
+> | 40 | La trace de livraison ne peut pas prouver ce qu'elle affirme — remède A chiffré, non écrit |
 >
-> Les trente autres sont corrigés, mesurés ou tranchés, et conservés avec leur
+> Les trente-deux autres sont corrigés, mesurés ou tranchés, et conservés avec leur
 > diagnostic. Reste une hypothèse non mesurée notée au n°12 §C : ce que voit
 > l'utilisateur quand le quota Resend est atteint.
 >
@@ -1890,7 +1890,7 @@ chacun avec la valeur produit sur laquelle il s'appuie écrite à côté.
 
 ---
 
-## 30. Codacy n'était pas joignable depuis la session du 21/08/2026
+## 30. ~~Codacy n'était pas joignable depuis la session du 21/08/2026~~ — OUTIL REVENU le 22/08/2026
 
 La convention « vérification Codacy après push, comptes avant/après »
 n'a pas pu être tenue depuis le 21/08/2026 : **l'outil Codacy n'est pas
@@ -1898,23 +1898,39 @@ disponible dans la session** — présent quelques heures plus tôt, absent
 depuis, sur trois pushs consécutifs. Aucun compte n'a été relevé, et
 aucun n'a été inventé.
 
-**Dernier relevé connu**, `ab89cb1` : 1 issue (`Trivy_secret` sur
+**Relevé précédent**, `ab89cb1` (20/08) : 1 issue (`Trivy_secret` sur
 `app/cloud-config.js:23`, instruite dans `.codacy.yml`), LOC 12 164,
 177 fichiers, complexes 41 %, couverture 72 %.
+
+**Relevé du 22/08/2026 sur `49164b5`** — l'outil a répondu, analyse
+terminée : **2 issues** (0,15 / kLoC), couverture 72 %, complexes 40 %,
+duplication 4 %. **L'intervalle couvre 12 commits** (`ab89cb1..49164b5`),
+donc aucun de ces chiffres n'est imputable à un commit en particulier.
+
+Les deux issues :
+- `Trivy_secret` sur `app/cloud-config.js:23` — **la même occurrence
+  qu'au relevé précédent**, `resultDataId 131529630764`, identique à
+  celui instruit dans `.codacy.yml` le 20/08. Faux positif connu : c'est
+  la clé `anon` publique de Supabase, publique par conception (règle 7).
+  Rien à reprendre, l'instruction tient ;
+- `UnusedCode` sur `intro.js:117` — `GRIS` assigné jamais utilisé.
+  **NOUVELLE**, et hors périmètre : `intro.js` est un fichier de séquence
+  non suivi par git. Signalée, non corrigée — elle sera traitée avec la
+  séquence.
 
 **LA BORNE, PAS LA LISTE.** Une énumération de commits dans un document
 se périme au push suivant — celle qui tenait ici a vécu deux jours et
 en nommait deux quand il y en avait cinq. On note donc **la borne
 basse**, qui ne bouge pas :
 
-> Dernier relevé Codacy : **`ab89cb1`**.
+> Dernier relevé Codacy : **`49164b5`**.
 
 **À faire au prochain push où l'outil est présent** : recalculer
 l'intervalle **à ce moment-là**, avec
 
-    git log --oneline ab89cb1..HEAD
+    git log --oneline 49164b5..HEAD
 
-puis relever les comptes et les comparer à ceux de `ab89cb1` **en
+puis relever les comptes et les comparer à ceux de `49164b5` **en
 déclarant le nombre de commits que l'intervalle couvre** (⑦) — sans
 quoi la comparaison attribue à un commit ce que N ont produit. Une fois
 le relevé fait, **remplacer la borne basse ci-dessus par le commit
@@ -2762,3 +2778,59 @@ Une valeur qui a cessé d'être vraie sans que rien ne le signale — mais
 mieux relire : c'est de **n'avoir qu'une source**. L'origine canonique
 devrait être une constante unique, importée par les deux `fillText`,
 pas deux littéraux indépendants.
+
+---
+
+## 40. La trace de livraison ne peut pas prouver ce qu'elle affirme — par construction
+
+`scripts/livrer.sh` écrit `.git/derniere-livraison` avec **le SHA de `HEAD`
+au moment où il tourne**. Dans le flux normal — livrer, commiter, pousser —
+`HEAD` à cet instant est le commit **d'avant**. La trace ne correspondra donc
+**jamais** au commit poussé.
+
+### Ce qui est [mesuré]
+
+Livraison du 22/08/2026 : `livrer.sh` termine en vert, écrit
+`2026-08-22T21:36:09Z 1e74e3d…`. Le commit créé ensuite est `49164b5`. Au
+`git push`, le hook affiche :
+
+> AVERTISSEMENT : les filets navigateur n'ont pas tourné sur CE commit.
+
+C'est **exact au sens de la trace, et faux au sens du contenu** : les six
+filets ont tourné sur l'arbre de travail identique, octet pour octet, à celui
+qui a été commité. Rien n'avait changé entre les deux.
+
+### Pourquoi c'est ⑲ appliqué à un garde de traçabilité
+
+Ce n'est pas un cas limite qu'on rencontrerait de temps en temps : c'est la
+construction. **L'avertissement tombe à chaque livraison normale.** Un
+avertissement systématiquement faux se fait ignorer — et le jour où les filets
+n'auront vraiment pas tourné, la même ligne s'affichera et ne dira plus rien à
+personne. Le garde s'use lui-même.
+
+### Deux remèdes CHIFFRÉS, non écrits
+
+**A · Lier la trace au CONTENU plutôt qu'au SHA.** `git stash create` — ou un
+hash de l'index — produit un identifiant de l'arbre indépendant du commit. La
+trace enregistrerait cet identifiant ; le hook recalculerait le même sur
+`HEAD^{tree}` et comparerait. **~20 min** (une ligne dans `livrer.sh`, une dans
+le hook, un contrôle négatif).
+
+**B · Déplacer l'écriture de la trace après le commit.** Impossible en l'état :
+`livrer.sh` se termine AVANT que le commit existe. Il faudrait fusionner
+livraison et commit dans une seule commande, ou faire écrire la trace par un
+hook `post-commit` qui n'aurait aucun moyen de savoir si les filets ont tourné.
+**Écarté : déplace le problème sans le résoudre.**
+
+**C'est A qui tient.**
+
+### Ce que A n'exercerait PAS — ㉔
+
+A prouverait que **l'arbre mesuré est l'arbre commité**. Il ne prouverait
+**rien sur la fraîcheur** : un arbre livré il y a trois semaines, recommité
+sans modification, passerait le contrôle. Il faudrait y adjoindre une borne de
+temps — non chiffrée ici, et probablement inutile tant que la livraison suit
+le commit de quelques minutes.
+
+**Non écrit délibérément** : le corriger pendant le chantier qui l'a découvert
+mélangerait le garde et ce qu'il garde.
