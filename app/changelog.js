@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.77.3',
+    date: '2026-08-22',
+    changes: {
+      en: ['If you shared a profile card before this version, the address printed at the bottom of that image no longer leads to the app. Anyone who types it lands on an old page that never updates. Share a fresh card to replace it — the new one carries the right address.'],
+      fr: ['Si vous avez partagé une carte de profil avant cette version, l’adresse imprimée en bas de l’image ne mène plus à l’app. Qui la saisit tombe sur une ancienne page qui ne se met jamais à jour. Partagez une nouvelle carte pour la remplacer — celle-ci porte la bonne adresse.'],
+      es: ['Si compartiste una tarjeta de perfil antes de esta versión, la dirección impresa al pie de esa imagen ya no lleva a la app. Quien la escriba acabará en una página antigua que nunca se actualiza. Comparte una tarjeta nueva para reemplazarla — esta lleva la dirección correcta.'],
+      zh: ['如果你在此版本之前分享过个人卡片，图片底部印着的网址已不再指向本应用。输入它的人会进入一个永远不会更新的旧页面。请重新分享一张卡片来替换——新卡片上的网址是正确的。'],
+      it: ['Se hai condiviso una scheda profilo prima di questa versione, l’indirizzo stampato in fondo a quell’immagine non porta più all’app. Chi lo digita finisce su una vecchia pagina che non si aggiorna mai. Condividi una scheda nuova per sostituirla — questa riporta l’indirizzo giusto.'],
+      nl: ['Heb je vóór deze versie een profielkaart gedeeld, dan leidt het adres onderaan die afbeelding niet meer naar de app. Wie het intypt komt op een oude pagina die nooit wordt bijgewerkt. Deel een nieuwe kaart om hem te vervangen — daarop staat het juiste adres.'],
+      de: ['Wenn Sie vor dieser Version eine Profilkarte geteilt haben, führt die unten auf dem Bild gedruckte Adresse nicht mehr zur App. Wer sie eintippt, landet auf einer alten Seite, die sich nie aktualisiert. Teilen Sie eine neue Karte als Ersatz — darauf steht die richtige Adresse.'],
+    },
+  },
+  {
     version: '1.77.2',
     date: '2026-08-19',
     changes: {
