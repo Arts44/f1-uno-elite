@@ -182,21 +182,53 @@ Les trois modes, du moins au plus restrictif :
 | `user-invocable-only` | masqué | par `/nom` | oui |
 | `off` | masqué | non | oui |
 
-**14 skills en `name-only`** (tout le bloc design sauf `frontend-design`, seul invoqué) :
-`banner-design`, `brand`, `brutalist-skill`, `design`, `design-system`, `gpt-tasteskill`,
-`image-to-code-skill`, `impeccable`, `minimalist-skill`, `redesign-skill`, `stitch-skill`,
-`taste-skill`, `ui-styling`, `ui-ux-pro-max`.
+**17 skills en `name-only`** — tout le bloc design sauf `frontend-design` (seul invoqué),
+plus trois skills d'orchestration sans usage actuel :
+`banner-design`, `brand`, `brutalist-skill`, `design`, `design-system`,
+`dispatching-parallel-agents`, `gpt-tasteskill`, `image-to-code-skill`, `impeccable`,
+`minimalist-skill`, `redesign-skill`, `stitch-skill`, `subagent-driven-development`,
+`taste-skill`, `ui-styling`, `ui-ux-pro-max`, `writing-skills`.
 
-**`[mesuré]`** Listing avant : 8 970 car. ≈ **2 242 tokens** par tour (33 skills).
-Descriptions retirées : 5 596 car. ≈ 1 399 tokens. Noms nus conservés : ≈ 42 tokens.
-**Gain net ≈ 1 356 tokens par tour**, soit une réduction de 60 % du listing.
+`dispatching-parallel-agents` et `subagent-driven-development` servent à du travail parallèle
+qui n'a pas lieu ici ; `writing-skills` ne sert que pour écrire ses propres skills — il sera
+invoqué explicitement ce jour-là.
 
-**`[à vérifier au prochain démarrage]`** Le contrôle négatif joué dans la session de
-configuration est un **faux positif** : le listing y avait été construit avant l'écriture de
-`skillOverrides`, donc l'invocation a réussi sous l'ancienne configuration. La vérification
-valable consiste à invoquer l'un des quatorze **dans une session neuve** et à confirmer qu'il
-se charge. Si l'un devient inatteignable, retirer son entrée — une configuration qui ment sur
-ce qui est disponible est pire qu'une suppression.
+**`[mesuré]`** Trajectoire complète du listing, par tour :
+
+| État | Skills | Coût |
+|---|---:|---:|
+| Départ | 42 | ≈ 3 343 tokens |
+| Après les 9 suppressions | 33 | ≈ 2 242 tokens |
+| Après `name-only` sur 17 | 33 | **≈ 901 tokens** |
+
+Descriptions masquées : 5 884 car. ≈ 1 471 tokens. Noms nus conservés : 239 car. ≈ 59 tokens.
+16 skills pleinement visibles : 3 367 car. ≈ 841 tokens.
+**Gain total ≈ 2 442 tokens par tour, soit 74 % du listing de départ** — dont 1 412 obtenus
+sans rien détruire.
+
+### 7.2 — Le faux positif : quand l'instrument de mesure est périmé
+
+Après avoir écrit `skillOverrides`, l'assistant a invoqué `minimalist-skill` pour vérifier que
+le mode `name-only` laissait le skill atteignable. **Le skill a répondu intégralement.** Le
+test semblait concluant. Il ne valait rien.
+
+**Pourquoi :** le listing des skills est construit **au démarrage de la session**. La session
+qui a écrit la configuration avait donc été initialisée *avant* cette écriture. L'invocation a
+réussi sous l'**ancien** état, pas sous le nouveau. Le test mesurait la configuration qu'il
+était censé remplacer.
+
+**La règle générale :** un test qui vérifie l'effet d'un changement de configuration ne vaut
+rien s'il tourne dans la session qui a précédé ce changement. **L'état de la session est un
+instrument, et il était périmé.** C'est le cas d'école de « soupçonner l'instrument avant le
+produit » : le résultat était juste, la mesure était fausse, et un faux positif sur ce point
+aurait laissé croire qu'une configuration cassée était saine.
+
+**La parade :** toute vérification d'un changement de configuration se joue **dans une session
+neuve**.
+
+**`[à vérifier — session neuve]`** Invoquer l'un des 17 skills en `name-only` et confirmer
+qu'il se charge. S'il devient inatteignable, retirer son entrée : une configuration qui ment
+sur ce qui est disponible est pire qu'une suppression.
 
 ---
 
