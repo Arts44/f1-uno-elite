@@ -66,7 +66,37 @@ import time
 from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent
+import traceback
+
 CONTROLE = '--controle' in sys.argv
+
+# ══ LE REGISTRE DES CONTROLES JOUES ════════════════════════════════
+# UN CONTROLE QUI NE S EXECUTE PAS DOIT ETRE AUSSI BRUYANT QU UN
+# CONTROLE QUI ROUGIT. Vecu le 22/08/2026 : chiffres_du_seed() importait
+# capture_seed.py, qui lit sys.argv[1] au chargement — sous --controle il
+# levait un ValueError, et les TROIS DERNIERS controles negatifs (actif
+# lourd, local() introuvable, branche mal calibree) n ont plus ete joues
+# du tout. Le mode rendait quand meme une liste de rouges — celle des
+# quatre premiers — et rien ne distinguait « quatre controles rouges »
+# de « sept controles rouges ». Un mode de controle qui perd la moitie
+# de ses controles en silence ne controle plus rien.
+#
+# On compte donc ce qui a ETE JOUE, et on exige le compte exact. Le
+# registre est independant du VERDICT de chaque controle : un controle
+# joue qui ne rougit pas est deja signale par sa propre assertion.
+CONTROLES = [
+    'repli retire', 'ligne 110 px', 'canvas dans le flux', 'sans JS masque',
+    'actif lourd', 'local() faux', 'repli decale',
+]
+JOUES = []
+
+
+def joue(nom):
+    """Marque un controle negatif comme EXECUTE. A appeler au point ou
+    son assertion est evaluee, jamais avant : ce qu on compte, c est
+    l assertion atteinte, pas l intention de l atteindre."""
+    assert nom in CONTROLES, 'controle inconnu : ' + nom
+    JOUES.append(nom)
 URL = 'http://localhost:8124/index.html'
 BEACON = 'cloudflareinsights.com'
 PLAFOND_KO = 120
@@ -322,6 +352,8 @@ def main():
                 echecs.append('%s : CLS %.4f, plafond %.2f' % (nom, plein['cls'], CLS_MAX))
             if plein['ko'] > PLAFOND_KO:
                 echecs.append('%s : %.1f Ko transferes, plafond %d Ko' % (nom, plein['ko'], PLAFOND_KO))
+        if CONTROLE:
+            joue('repli retire')
 
         # ⑤ LA LIGNE CINETIQUE
         kin_haut = ".kin{height:110px!important}" if CONTROLE else ''
@@ -329,6 +361,8 @@ def main():
             v = charger(br, w, h, css=kin_haut, retard_police=RETARD_POLICE_MS)
             print('  %-14s ligne %s px · element LCP %s · charge %s · prio %s'
                   % (nom, v['kin_h'], v['el_lcp'], v['lcp_src'], v['lcp_prio']))
+            if CONTROLE and nom == FENETRES_LCP[-1][0]:
+                joue('ligne 110 px')
             if v['kin_h'] is None:
                 echecs.append('%s : la ligne #kin est absente' % nom)
             elif v['kin_h'] > KIN_MAX_PX:
@@ -383,6 +417,7 @@ def main():
         # l assertion LCP REELLE sur une page ou le canvas pousse la
         # capture : elle doit tomber aux six fenetres.
         if CONTROLE:
+            joue('canvas dans le flux')
             bascules = 0
             for nom, w, h2 in FENETRES_LCP:
                 v = charger(br, w, h2, remplace=FOND_DANS_LE_FLUX,
@@ -440,6 +475,8 @@ def main():
         phrase_off = ('<span class="kin-piste">', '<span class="kin-piste" hidden>') if CONTROLE else None
         nojs = sans_js(br, remplace=phrase_off)
         print('  %-14s sans JS : %d px · %s' % ('390x844', nojs['hauteur'], nojs['texte'] or '(vide)'))
+        if CONTROLE:
+            joue('sans JS masque')
         if nojs['texte'] != PHRASE:
             echecs.append('sans JS : la phrase lue est %r, attendu %r' % (nojs['texte'], PHRASE))
         h = nojs['hero']
@@ -500,6 +537,8 @@ def main():
 
         lourd = charger(br, 390, 844, lourd=CONTROLE)
         print('  %-14s %.1f Ko' % ('actif lourd', lourd['ko']))
+        if CONTROLE:
+            joue('actif lourd')
         if CONTROLE and lourd['ko'] <= PLAFOND_KO:
             echecs.append('controle negatif : l actif lourd n a pas creve le plafond (%.1f Ko)' % lourd['ko'])
 
@@ -517,6 +556,7 @@ def main():
             # meme — soit le correctif protege moins, soit il protege trop,
             # et les deux valent d'etre vus. A REPRENDRE si le texte du
             # pitch change : la reference bouge avec ce qui s'enroule.
+            joue('local() faux')
             if abs(degrade['cls'] - CLS_AVANT_CORRECTIF) > 0.02:
                 echecs.append('degradation : CLS %.4f, attendu ~%.4f — le correctif ne degrade plus comme avant'
                               % (degrade['cls'], CLS_AVANT_CORRECTIF))
@@ -536,6 +576,7 @@ def main():
             mal = charger(br, 360, 560, remplace=(LOCAL_VRAI, LOCAL_AUTRE),
                           retard_police=RETARD_POLICE_MS)
             print('  %-14s CLS %.4f (doit DEPASSER 0,20)' % ('repli decale', mal['cls']))
+            joue('repli decale')
             if mal['cls'] <= 0.20:
                 echecs.append('branche mal calibree : CLS %.4f seulement — soit Verdana est'
                               ' absente de ce poste, soit le filet ne sait plus voir le cas'
@@ -551,5 +592,35 @@ def main():
     return 0
 
 
+def bilan_controles():
+    """LE BILAN SE REND HORS DE main(), ET C EST LE CONTROLE NEGATIF DU
+    GARDE QUI L A EXIGE. Ecrit a la fin de main(), il ne survivait pas au
+    cas qu il est justement cense couvrir : en rejouant la panne du
+    22/08 — chiffres_du_seed() qui leve un ValueError — le script mourait
+    AVANT le bilan, et le mode --controle rendait une trace Python sans
+    jamais dire qu il avait perdu trois controles. Un garde qui disparait
+    avec ce qu il garde ne garde rien. Il vit donc ici, appele quoi qu il
+    arrive."""
+    manquants = [c for c in CONTROLES if c not in JOUES]
+    print('\nCONTROLES NEGATIFS JOUES : %d/%d' % (len(JOUES), len(CONTROLES)))
+    for c in CONTROLES:
+        print('   %s %s' % ('joue  ' if c in JOUES else 'ABSENT', c))
+    if not manquants:
+        return 0
+    print('\n' + '!' * 64)
+    print('CONTROLE(S) NON JOUE(S) : ' + ', '.join(manquants))
+    print('Le mode --controle n a pas exerce ce qu il pretend exercer :')
+    print('un controle qui ne s execute pas est un controle qui ment.')
+    print('!' * 64)
+    return 1
+
+
 if __name__ == '__main__':
-    sys.exit(main())
+    try:
+        code = main()
+    except BaseException:
+        traceback.print_exc()
+        code = 1
+    if CONTROLE:
+        code = bilan_controles() or code
+    sys.exit(code)

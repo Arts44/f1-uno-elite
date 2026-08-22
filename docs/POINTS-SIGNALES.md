@@ -13,23 +13,28 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **40 points au total. Huit sont OUVERTS** — c'est ce qu'on vient chercher
-> ici, donc c'est ce que cet en-tête liste :
+> **41 entrées : 40 défauts et 1 référence. DOUZE défauts sont OUVERTS** —
+> c'est ce qu'on vient chercher ici, donc c'est ce que cet en-tête liste :
 >
-> | № | Ouvert parce que |
+> | № | Ouvert |
 > |---|---|
-> | 29 | Trois filets sur cinq n'ont jamais été vus rouges — non écrit |
-> | 31 | Le vrai budget de la vitrine est dans les deux captures — non fait |
-> | 32 | PWA mobile développée sans appareil mobile — ce que ça borne |
-> | 33 | Séquence d'intro complète (D) — REPORTÉE, pas refusée |
-> | 34 | Consigne d'installation iOS jamais vue fonctionner — famille du n°18 |
-> | 36 | AVIF moins fidèle que le webp qu'il précède — accepté, BORNÉ |
-> | 38 | `verify_touch.py` rougit à tort sous `livrer.sh` — remède nommé, non écrit |
-> | 40 | La trace de livraison ne peut pas prouver ce qu'elle affirme — remède A chiffré, non écrit |
+> | 18 | Les PWA installées depuis l'ancienne adresse sont GELÉES sans le dire |
+> | 21 | Le recoupement (piste 3c) |
+> | 24 | Deux bandeaux coexistent sur un profil qui saute plusieurs versions |
+> | 27 | Deux ✕ identiques, deux contrats opposés |
+> | 29 | Trois filets sur cinq n'ont jamais été vus rouges |
+> | 31 | Le vrai budget de la vitrine est dans les deux captures |
+> | 32 | Une PWA mobile développée sans appareil mobile |
+> | 33 | La séquence d'intro complète (D) |
+> | 34 | La consigne d'installation iOS n'a jamais été vue fonctionner |
+> | 36 | L'AVIF servi est moins fidèle que le webp qu'il précède |
+> | 38 | Les filets navigateur rougissent à tort sous livrer.sh |
+> | 40 | La trace de livraison ne peut pas prouver ce qu'elle affirme |
 >
-> Les trente-deux autres sont corrigés, mesurés ou tranchés, et conservés avec leur
-> diagnostic. Reste une hypothèse non mesurée notée au n°12 §C : ce que voit
-> l'utilisateur quand le quota Resend est atteint.
+> Les 28 autres défauts sont corrigés, mesurés ou tranchés, et conservés avec
+> leur diagnostic. Le n°19 n'est pas un défaut : c'est le mode d'emploi du SW
+> de démolition, hors décompte. Reste une hypothèse non mesurée notée au
+> n°12 §C : ce que voit l'utilisateur quand le quota Resend est atteint.
 >
 > ⚠ **Cette liste se recompte à la main à chaque ajout.** Aucun test ne peut la
 > vérifier aujourd'hui, et le barré du titre ne suffit pas : sur les 39 entrées,
@@ -43,6 +48,8 @@
 ---
 
 ## 1. Deux champs de données inertes
+
+<!-- état: fermé · type: défaut -->
 
 Même famille : un champ qui existe dans les données, que tout lecteur
 suppose utilisé, et que le code ignore complètement. **Le premier est
@@ -123,6 +130,8 @@ gestes** (`essai-a`, `essai-b`) uniquement pour le satisfaire.
 
 ## 2. ~~Fuite inter-saisons des badges~~ — CORRIGÉ (`662b505`, 1.52.1)
 
+<!-- état: fermé · type: défaut -->
+
 > **Les deux `else` sont en place** ([`badges.js`](../badges.js) →
 > `loadManualBadges()`), avec un commentaire qui dit pourquoi ils ne
 > sont pas cosmétiques — c'est exactement le genre de ligne qu'un
@@ -171,6 +180,8 @@ bascule de saison, indépendamment du multi-saisons.
 ---
 
 ## 3. ~~Fichier de cartes partiel — 23 badges se débloquent trop tôt~~ — CORRIGÉ
+
+<!-- état: fermé · type: défaut -->
 
 > **Deux verrous, pas un.** Le total ne vient plus du fichier chargé
 > mais de `metadata.seasons[].cardCount`, une valeur **déclarée** ; et
@@ -232,6 +243,8 @@ inatteignables tant que le fichier est incomplet, ce qui est honnête.
 
 ## 4. ~~Un émoji oublié par la passe de 1.31.0~~ — CORRIGÉ (1.59.4)
 
+<!-- état: fermé · type: défaut -->
+
 > **Le diagnostic ci-dessous était faux sur son point le plus précis, et
 > la mesure l'a montré.** Il affirmait que l'émoji « n'apparaît qu'en
 > français, par accident », parce que `data-i18n` l'écrasait au premier
@@ -279,6 +292,8 @@ pas emporté avec lui.
 ---
 
 ## 5. ~~Les marqueurs de coin sont muets pour un lecteur d'écran~~ — CORRIGÉ (1.59.5)
+
+<!-- état: fermé · type: défaut -->
 
 > **Le correctif prescrit ici n'aurait rien corrigé, et la mesure l'a
 > montré avant qu'une ligne soit écrite.** Le point demandait deux clés
@@ -356,6 +371,8 @@ ajout discret au coin d'un autre commit.
 
 ## 6. ~~`cloudDeleteSeason()` renvoie `true` même quand rien n'a été supprimé~~ — CORRIGÉ
 
+<!-- état: fermé · type: défaut -->
+
 > **`Prefer: return=representation`**, le même en-tête que `pushSeason()`
 > utilise déjà : PostgREST renvoie alors les lignes supprimées, donc leur
 > nombre. La fonction renvoie ce nombre.
@@ -407,6 +424,8 @@ distinction.
 ---
 
 ## 7. ~~La grille se reconstruit entièrement au retour sur Collection~~ — CORRIGÉ (1.59.6), diagnostic redressé
+
+<!-- état: fermé · type: défaut -->
 
 > **La prémisse était fausse, et c'est la mesure qui l'a dit.** Les 101
 > tuiles sont marquées avant le changement de vue et retrouvées intactes
@@ -488,6 +507,8 @@ survécu jusqu'à ce qu'un script la compte image par image.
 
 ## 8. ~~Les captures ne sont reproductibles qu'à l'œil~~ — CORRIGÉ
 
+<!-- état: fermé · type: défaut -->
+
 **Deux exécutions du même script donnent désormais 0 fichier différent
 sur 52.** Avant : 42.
 
@@ -538,6 +559,8 @@ jour où une régénération montrera 3 fichiers modifiés, ce sera parce que
 ---
 ## 9. ~~Le plancher de hauteur de tuile n'a pas été reconfirmé~~ — MESURÉ (sur le CSS de 1.59.4)
 
+<!-- état: fermé · type: défaut -->
+
 > **Refait sur le CSS définitif, et le chiffre de la maquette est
 > réfuté.** La mesure d'origine avait échoué faute de méthode : on
 > surchargeait `--card-h` et on lisait la hauteur de la GRILLE, qui ne
@@ -582,6 +605,8 @@ jour où une régénération montrera 3 fichiers modifiés, ce sera parce que
 ---
 
 ## 10. ~~`.login-box` fait 380 px de large, en dur~~ — CORRIGÉ (1.52.3)
+
+<!-- état: fermé · type: défaut -->
 
 Passée en `width:min(380px, 100vw - 24px)` avec un remplissage
 `clamp(20px, 6vw, 48px)`. Mesuré après : à 320 px la boîte fait 287 et
@@ -629,6 +654,8 @@ ajustement.
 ---
 
 ## 11. ~~Le « 0 fichier différent » du gel était vrai une fois, pas toujours~~ — CORRIGÉ
+
+<!-- état: fermé · type: défaut -->
 
 **Trouvé en régénérant les captures après un autre chantier**, et c'est le
 réflexe du dépôt qui l'a attrapé : *avant d'attribuer une différence à un
@@ -704,6 +731,8 @@ décalée d'un seul niveau échoue.
 ---
 
 ## 12. ~~Bascule vers `arts44.dev`~~ — FAITE le 13/08/2026
+
+<!-- état: fermé · type: défaut -->
 
 > **Les trois textes ont bougé ensemble**, et c'est le test de couplage
 > qui l'a garanti plutôt que la vigilance : en changeant l'expéditeur
@@ -916,6 +945,8 @@ vérifié.
 
 ## 13. ~~`app_version` et `lang` entrent dans l'e-mail de notification sans échappement~~ — CORRIGÉ
 
+<!-- état: fermé · type: défaut -->
+
 > **Corrigé dans la base d'abord, puis re-extrait dans `db/`** — l'ordre
 > compte : corriger le fichier sans corriger le serveur aurait produit un
 > schéma versionné qui ne décrit plus rien.
@@ -989,6 +1020,8 @@ safe_lang := replace(replace(replace(coalesce(new.lang,'?'), '&','&amp;'), '<','
 
 ## 14. L'invitation peut s'afficher une fois à quelqu'un qui a DÉJÀ écrit — décision assumée
 
+<!-- état: fermé · type: défaut -->
+
 **Le contrat dit** : l'invitation ne s'adresse qu'à qui n'a jamais envoyé
 d'avis. **L'implémentation tient ça pour l'avenir** — le premier envoi
 réussi appelle `reviewOff()` et éteint tout, définitivement.
@@ -1021,6 +1054,8 @@ revoit jamais.
 ---
 
 ## 15. ~~L'export de liste d'échange devient faisable~~ — FERMÉ (18/08/2026, 1.66.0) : Copier · Partager sur la liste d'échange
+
+<!-- état: fermé · type: défaut -->
 
 **Fermé par le chantier « stats renversées »** : `fmtTrade()` a ses
 appelants — les boutons Copier (presse-papiers) et Partager (fichier
@@ -1060,6 +1095,8 @@ fonctionnalité — il a enlevé la raison de ne pas la coder.
 ---
 
 ## 16. ~~Les débordements de bulle du tutoriel ne sont vérifiés qu'en français~~ — FERMÉ (17/08/2026) : mesuré ×7, la prémisse est réfutée
+
+<!-- état: fermé · type: défaut -->
 
 **Ce n'est pas une limite de méthode, c'est un trou.** La distinction
 compte : une limite de méthode se documente et on passe ; un trou se
@@ -1119,6 +1156,8 @@ des tailles — à instruire séparément si ce trou se met à coûter.
 
 ## 17. ~~Le projecteur du tutoriel n'éclaire que la moitié du geste d'ajout rapide~~ — CORRIGÉ (1.60.4, commit 5a15368)
 
+<!-- état: fermé · type: défaut -->
+
 **Le diagnostic d'origine était faux, et la mesure l'a corrigé.** Première
 lecture : « la pastille `+` est excentrée, le script n'y arrive pas au
 centre du projecteur ». Mesuré : le centre du projecteur (46 px) **tombe
@@ -1176,6 +1215,8 @@ cahier des charges.
 ---
 
 ## 18. Les PWA installées depuis l'ancienne adresse sont GELÉES sans le dire — procédure EXÉCUTÉE et validée
+
+<!-- état: ouvert · type: défaut -->
 
 > **CLOS CÔTÉ PROCÉDURE (19/08/2026).** La migration décrite plus bas a
 > été exécutée sur une **install réelle gelée en 1.60** — celle qui
@@ -1282,6 +1323,8 @@ l'ancienne entrée.
 
 ## 19. Le SW de démolition — la preuve qu'il fonctionne, à refaire à chaque déplacement de l'app
 
+<!-- état: sans objet · type: référence -->
+
 **Contexte (1.62.0).** L'app a quitté la racine pour `/app/`, la racine
 devenant une page vitrine (qui porte la seule ressource externe du
 dépôt — le compteur Cloudflare, exception nommée dans
@@ -1319,6 +1362,8 @@ avant/après. Ce point est le mode d'emploi.
 ---
 
 ## 20. ~~Le casque « masse » — prouvé, NON déployé, en réserve~~ — CLASSÉ (17/08/2026), la réserve ne sera pas déployée
+
+<!-- état: fermé · type: défaut -->
 
 **Contexte (1.63.0).** Le casque au trait (SVG Repo, CC0 — 
 https://www.svgrepo.com/svg/172725/f1-helmet, licence vérifiée sur la
@@ -1362,6 +1407,8 @@ couleur, clair et sombre).
 ---
 
 ## 21. Le recoupement (piste 3c) — ROUVERT et RETENU en version calcul ; la fiche d'accord partageable est REFUSÉE
+
+<!-- état: ouvert · type: défaut -->
 
 **Mise à jour du 18/08/2026.** Les trois conditions de réouverture
 écrites ci-dessous sont remplies : la fiche d'échange existe (1.69.0), le
@@ -1435,6 +1482,8 @@ qu'un échange demande.
 
 ## 22. Les états vides de la piste 3a — UN retenu, trois refusés
 
+<!-- état: fermé · type: défaut -->
+
 **Le fragment retenu (1.70.0)** : l'écran Compte, tant qu'aucune
 sauvegarde n'a jamais été faite. Il dit une chose vraie et actionnable —
 la collection vit sur cet appareil, donc vider le navigateur l'efface —
@@ -1468,6 +1517,8 @@ données) ; les trois autres non.
 ---
 
 ## 23. L'installation du service worker en réseau dégradé — MESURÉE le 19/08/2026
+
+<!-- état: fermé · type: défaut -->
 
 **L'entrée s'appelait « n'a JAMAIS été mesurée » et c'est resté vrai
 deux versions. La campagne a eu lieu le 19/08/2026, avec un bridage
@@ -1598,6 +1649,8 @@ tombe** — la nuancer aurait laissé le soupçon vivre.
 
 ## 24. Deux bandeaux coexistent sur un profil qui saute plusieurs versions
 
+<!-- état: ouvert · type: défaut -->
+
 **Signalé pendant le diagnostic du bandeau de mise à jour (1.76.0),
 volontairement non corrigé dans ce commit** — il n'a rien à voir avec
 l'intermittence, et l'empiler aurait mélangé deux sujets.
@@ -1662,6 +1715,8 @@ bug.
 
 ## 25. Éteint à l'œil, pleinement cliquable — la famille INVERSE
 
+<!-- état: fermé · type: défaut -->
+
 **Trouvé en comblant la dernière case de la carte de la zone basse
 (1.77.0), pas cherché.** La question posée était « le bandeau
 d'installation peut-il coexister avec le tutoriel ? ». La réponse est
@@ -1710,6 +1765,8 @@ surcouche future. Réouverture le jour où un deuxième voile apparaît.
 
 ## 26. `maybeOfferWhatsNew()` n'avait aucun garde de moment
 
+<!-- état: fermé · type: défaut -->
+
 **Défaut TROUVÉ AVANT la refonte de la zone basse, consigné pour que
 la trace ne disparaisse pas dans le commit qui le corrige.**
 
@@ -1737,6 +1794,8 @@ personne ne pose une surcouche sans passer par elle.
 ---
 
 ## 27. Deux ✕ identiques, deux contrats opposés — la pièce la plus grave du chantier de formulation
+
+<!-- état: ouvert · type: défaut -->
 
 **Trouvé en cherchant une borne de fréquence, pas en cherchant ça. Antérieur
 à la refonte de la zone basse ; 1.77.0 ne l'a ni créé ni corrigé.**
@@ -1780,6 +1839,8 @@ deux gestes. C'est elle qui commande, pas l'inverse.
 ---
 
 ## 28. « Connexion internet requise » — ⑧ dans le produit, affiché à l'utilisateur
+
+<!-- état: fermé · type: défaut -->
 
 **Trouvé en diagnostiquant une install réelle gelée en 1.60 (n°18), pas
 en cherchant ça. VÉRIFIÉ SUR HEAD, pas seulement sur 1.60 : le défaut
@@ -1855,6 +1916,8 @@ Refusé, et pas à rediscuter sans mesure nouvelle.
 
 ## 29. Trois filets sur cinq n'ont jamais été vus rouges — chantier OUVERT, non écrit
 
+<!-- état: ouvert · type: défaut -->
+
 **Le fait, relevé le 21/08/2026 en auditant les contrôles négatifs :**
 `verify_vitrine.py` et `verify_zone.py` ont un mode `--controle` ;
 **`verify_qr.py`, `verify_tutorial.py` et `verify_trade_inbox.py` n'ont
@@ -1890,94 +1953,147 @@ chacun avec la valeur produit sur laquelle il s'appuie écrite à côté.
 
 ---
 
-## 30. ~~Codacy n'était pas joignable depuis la session du 21/08/2026~~ — OUTIL REVENU le 22/08/2026
+## 30. ~~Codacy n'était pas joignable~~ — **L'OUTIL N'A JAMAIS ÉTÉ ABSENT**
 
-La convention « vérification Codacy après push, comptes avant/après »
-n'a pas pu être tenue depuis le 21/08/2026 : **l'outil Codacy n'est pas
-disponible dans la session** — présent quelques heures plus tôt, absent
-depuis, sur trois pushs consécutifs. Aucun compte n'a été relevé, et
-aucun n'a été inventé.
+<!-- état: fermé · type: défaut -->
 
-**Relevé précédent**, `ab89cb1` (20/08) : 1 issue (`Trivy_secret` sur
-`app/cloud-config.js:23`, instruite dans `.codacy.yml`), LOC 12 164,
-177 fichiers, complexes 41 %, couverture 72 %.
+**Ce point a longtemps dit le contraire de ce qui s'est passé, et le
+titre barré ci-dessus est la correction. On n'efface pas l'historique :
+ce qui a été affirmé est reproduit plus bas, et ce qui était vrai
+au même moment est mis en face.**
 
-**Relevé du 22/08/2026 sur `49164b5`** — l'outil a répondu, analyse
-terminée : **2 issues** (0,15 / kLoC), couverture 72 %, complexes 40 %,
-duplication 4 %. **L'intervalle couvre 12 commits** (`ab89cb1..49164b5`),
-donc aucun de ces chiffres n'est imputable à un commit en particulier.
+### Ce qui a été affirmé
 
-Les deux issues :
-- `Trivy_secret` sur `app/cloud-config.js:23` — **la même occurrence
-  qu'au relevé précédent**, `resultDataId 131529630764`, identique à
-  celui instruit dans `.codacy.yml` le 20/08. Faux positif connu : c'est
-  la clé `anon` publique de Supabase, publique par conception (règle 7).
-  Rien à reprendre, l'instruction tient ;
-- `UnusedCode` sur `intro.js:117` — `GRIS` assigné jamais utilisé.
-  **NOUVELLE**, et hors périmètre : `intro.js` est un fichier de séquence
-  non suivi par git. Signalée, non corrigée — elle sera traitée avec la
-  séquence.
+Sur **six tours** répartis sur deux jours, il a été conclu et écrit que
+« l'outil Codacy n'est pas disponible dans la session », qu'il était
+« présent quelques heures plus tôt, absent depuis ». Aucun compte n'a
+été relevé. La conclusion a ensuite été **inscrite ici**, où elle a
+produit un mécanisme : la borne basse, la règle de recalcul de
+l'intervalle, et une deuxième borne locale prise le 21/08 à `05ae3f8`.
 
-**LA BORNE, PAS LA LISTE.** Une énumération de commits dans un document
-se périme au push suivant — celle qui tenait ici a vécu deux jours et
-en nommait deux quand il y en avait cinq. On note donc **la borne
-basse**, qui ne bouge pas :
+### Ce qui était vrai au même moment
 
-> Dernier relevé Codacy : **`49164b5`**.
+Codacy **analysait chaque jour**, sans interruption, y compris les deux
+jours déclarés injoignables :
 
-**À faire au prochain push où l'outil est présent** : recalculer
-l'intervalle **à ce moment-là**, avec
+| commit | jour | issues | LOC |
+|---|---|---|---|
+| `4cdf88b` | 22/08 | 1 | 12 953 |
+| `abb77fb` | 21/08 | 1 | 12 225 |
+| `32b9dc4` | 20/08 | 1 | 12 218 |
+| `7818335` | 19/08 | 0 | 11 910 |
+| `aa6e483` | 18/08 | 0 | 11 912 |
+| `0bec034` | 17/08 | 0 | 10 757 |
+| `22d446b` | 16/08 | 0 | 10 703 |
 
-    git log --oneline 49164b5..HEAD
+**La perte de traçabilité annoncée comme « déjà consommée » n'a jamais
+eu lieu.** Le tableau ci-dessus est exactement la série que l'entrée
+disait perdue : elle était disponible tout du long, à une requête de
+distance.
 
-puis relever les comptes et les comparer à ceux de `49164b5` **en
-déclarant le nombre de commits que l'intervalle couvre** (⑦) — sans
-quoi la comparaison attribue à un commit ce que N ont produit. Une fois
-le relevé fait, **remplacer la borne basse ci-dessus par le commit
-relevé**, et rien d'autre.
+### LA CAUSE — trois erreurs superposées, toutes vérifiées dans les traces
 
-**Si l'outil ne revient pas**, le dire plutôt que de laisser croire que
-la vérification a eu lieu.
+**① Un `which` qui répond « not found » dans un shell et trouve le
+binaire dans un autre.** Dans la MÊME session, `which codacy` a rendu
+`codacy not found`, puis plus tard `/opt/homebrew/bin/codacy`, deux
+fois. Le PATH n'est pas le même d'une invocation à l'autre selon que le
+profil est chargé ou non. Le premier résultat a servi de preuve
+d'absence ; les suivants n'ont pas été rapprochés de lui.
 
-### CE QUI EST DÉJÀ PERDU — ce n'est pas un retard, c'est une perte
+**② Un `ls ~/.codacy` non nul lu comme « pas d'identifiants ».** La
+commande était `ls -la ~/.codacy/ 2>/dev/null && echo présent || echo
+absent` — elle a rendu « absent ». Plus tard dans la même session,
+`ls ~/.codacy/` a listé `credentials`. **Le répertoire existait.** Un
+`ls` qui échoue pour une raison qui n'est pas l'inexistence (droits,
+bac à sable, stderr avalé par `2>/dev/null`) devient indiscernable d'un
+répertoire absent — c'est ⑤ appliqué à `ls`.
 
-À sept commits d'écart, **la prochaine comparaison ne pourra attribuer
-un delta à aucun changement précis.** Elle dira « la somme de sept
-commits a produit tel écart », ce qui ne trace aucune régression. Ce
-n'est pas un retard de relevé, c'est une perte de traçabilité, et elle
-est **déjà consommée** — relever demain ne la récupère pas.
+**③ `CODACY_API_TOKEN` absent de l'environnement, lu comme « pas
+d'accès ».** C'était vrai et sans conséquence : la CLI lit ses
+identifiants dans `~/.codacy/credentials`, et **l'API HTTP publique du
+dépôt ne demande aucun jeton du tout**. Vérifié le 22/08 :
 
-### DEUXIÈME BORNE, prise le 21/08/2026 à `05ae3f8`
+    curl -s "https://app.codacy.com/api/v3/analysis/organizations/gh/\
+    Arts44/repositories/f1-uno-elite/commit-statistics?days=30"
+    → http 200, toute la série
 
-Un point de référence unique, sans mécanisme et sans rien à entretenir.
-Il ne remplace pas Codacy : il donne une continuité partielle, mesurée
-par des outils qui, eux, sont là.
+**Ce que ces trois erreurs ont en commun, et c'est là le vrai défaut :
+aucune n'est un test de l'OUTIL. Ce sont trois tests de PRÉCONDITIONS
+— le binaire est-il là, le jeton est-il là, le répertoire est-il là —
+dont l'échec a été converti en « l'outil est absent » sans qu'un seul
+appel réel soit tenté.** Un appel réel aurait réussi n'importe lequel
+des six tours, y compris sans binaire et sans jeton.
 
-    npm run test:cov
+**Ce qui n'est PAS établi** : pourquoi le PATH diffère entre deux
+invocations d'une même session. L'hypothèse est un shell non-login
+selon le mode d'exécution ; elle n'a pas été éprouvée, et elle n'a pas
+besoin de l'être pour que la parade tienne — la parade ne dépend pas de
+la cause du symptôme ①.
 
-| | à `05ae3f8` |
+### LA PARADE
+
+**Ne jamais conclure à l'absence d'un outil depuis une précondition.
+Toujours depuis un APPEL qui échoue.** Et quand plusieurs chemins mènent
+au même service — CLI locale, API HTTP —, l'échec de l'un ne dit rien
+de l'autre : ici l'API n'a jamais eu besoin de ce qui manquait.
+
+### Ma part et la vôtre
+
+**Ma part** : six tours, aucun contrôle positif, et une conclusion
+inscrite en documentation où elle est devenue une prémisse pour la
+suite. C'est ⑧ dans sa forme la plus coûteuse — voir le registre.
+
+**Votre part, et elle est réelle** : la consigne récurrente était
+« si l'outil est encore absent, dis-le ». Elle demandait **une
+déclaration, pas une vérification**. Formulée ainsi, elle acceptait
+l'absence comme un état possible à rapporter au lieu d'exiger qu'on
+l'éprouve — et elle a donc reconduit l'erreur cinq fois après la
+première. La formulation qui aurait cassé la boucle est **« montre
+l'appel qui échoue »**.
+
+### CE QUI RESTE UTILE, ET CE QUI A ÉTÉ CONSTRUIT POUR RIEN
+
+**La borne + recalcul de l'intervalle au moment du relevé (⑦) reste
+juste**, et pour une raison indépendante de tout ceci : entre deux
+relevés il y a N commits, et attribuer un delta à un seul est faux quel
+que soit N. Cette règle survit à la correction.
+
+**La deuxième borne locale prise à `05ae3f8` a été construite pour un
+problème inexistant.** Elle répondait à « Codacy est parti, il nous faut
+une continuité de repli » — or il n'était pas parti. Elle n'est pas
+nuisible : `npm run test:cov` mesure un périmètre que Codacy ne mesure
+pas, et se compare à elle-même. Mais **elle n'a pas été décidée pour
+cette raison-là**, et si elle doit être gardée il faut la re-justifier
+sur ce qu'elle apporte vraiment, pas sur une panne qui n'a pas eu lieu.
+
+| | à `05ae3f8` (21/08) |
 |---|---|
 | tests | 1 213 · 242 suites · 0 échec |
-| couverture **lignes** | **72,21 %** (11 194 / 15 502) |
-| couverture **branches** | **85,14 %** (1 713 / 2 012) |
+| couverture lignes | 72,21 % (11 194 / 15 502) |
+| couverture branches | 85,14 % (1 713 / 2 012) |
 | couverture fonctions | 65,86 % |
 | fichiers instrumentés | 44 |
 
-**Périmètre déclaré (⑦)** : ce sont les modules chargés par les tests
-Node, hors `tests/**`, bundle, traductions, données embarquées et
-`cloud-config.js` — donc **pas** le périmètre de Codacy, qui comptait
-12 164 LOC sur 177 fichiers. Les deux ne se comparent pas ; celui-ci se
-compare à lui-même, au prochain relevé.
+**Périmètre déclaré (⑦)** : modules chargés par les tests Node, hors
+`tests/**`, bundle, traductions, données embarquées et
+`cloud-config.js`. **Pas** le périmètre de Codacy (12 953 LOC). Les deux
+ne se comparent pas.
 
-**Pourquoi ni un fichier de suivi ni une note par commit** : une trace
-tenue à la main dépend de la mémoire de celui qui livre — le mode de
-défaillance que ⑰ a démontré trois fois — et **une trace incomplète qui
-ressemble à une série est pire qu'une absence**, parce qu'on la lit
-comme une tendance.
+### Le relevé courant
+
+> Dernier relevé Codacy : **`4cdf88b`** — 1 issue, dette 15, LOC 12 953.
+> Intervalle recalculé au moment du relevé : **13 commits** depuis
+> `ab89cb1`.
+
+La seule issue est `Trivy_secret` sur `app/cloud-config.js:23` : la clé
+`anon` publique de Supabase, publique par conception, instruite dans
+`.codacy.yml`. Faux positif connu, rien à reprendre.
 
 ---
 
 ## 31. Le vrai budget de la vitrine est dans les deux captures — chantier OUVERT, non fait
+
+<!-- état: ouvert · type: défaut -->
 
 **Le fait, relevé le 21/08/2026** en passant le plafond aux octets
 transférés : sur les 107,6 Ko du pire cas, **70,7 Ko sont les deux
@@ -2051,6 +2167,8 @@ peut aussi dégrader la seule image que le visiteur regarde.
 ---
 
 ## 32. Une PWA mobile développée sans appareil mobile — ce que ça borne
+
+<!-- état: ouvert · type: défaut -->
 
 **Le fait, au 21/08/2026** : il n'y a **aucun appareil mobile** à
 disposition. Un iPhone 16 Pro Max arrive **fin septembre / début
@@ -2324,6 +2442,8 @@ débloque un refus, le fond ensuite parce que l'instrument est déjà
 
 ## 33. La séquence d'intro complète (D) — REPORTÉE, pas refusée
 
+<!-- état: ouvert · type: défaut -->
+
 **Reportée le 21/08/2026**, à la même date que le n°32.
 
 D est écrite dans son détail : quatorze plans, vingt secondes, surcouche
@@ -2352,6 +2472,8 @@ un appareil réel, avec sa `serie max`.
 ---
 
 ## 34. La consigne d'installation iOS n'a jamais été vue fonctionner — famille du n°18
+
+<!-- état: ouvert · type: défaut -->
 
 **Relevé le 21/08/2026** en instruisant le n°32 ④.
 
@@ -2411,6 +2533,8 @@ et les libellés confrontés à ceux d'iOS.
 ---
 
 ## 35. ~~Aucun test du dépôt n'émet un événement tactile~~ — VOLET 1 FAIT (21/08/2026), le geste fonctionne
+
+<!-- état: fermé · type: défaut -->
 
 **Relevé le 21/08/2026** en instruisant le n°32 ⑤.
 
@@ -2498,6 +2622,8 @@ appareil. Le premier volet — le chemin exercé — est **fait**.
 
 ## 36. L'AVIF servi est moins fidèle que le webp qu'il précède — accepté, BORNÉ
 
+<!-- état: ouvert · type: défaut -->
+
 **Décision du 21/08/2026.** Les captures de la vitrine sont servies en
 AVIF d'abord, webp en repli. L'AVIF est encodé **depuis le JPEG**, donc
 en deuxième génération de perte, alors que le webp vient du PNG de
@@ -2552,6 +2678,8 @@ sur la grille et 35,0 sur les badges — toujours sous le webp lui-même.
 ---
 
 ## 37. Le casque a été retiré de la séquence d'intro — et il n'est pas réouvrable avec ce moteur
+
+<!-- état: fermé · type: défaut -->
 
 **Retiré le 22/08/2026.** C'était le **plan d'ouverture** : une
 silhouette de casque de pilote en particules, 1,45 s, la première chose
@@ -2614,6 +2742,8 @@ Ce qui EST mesuré, c'est que **ce moteur-ci ne peut pas la rendre**.
 ---
 
 ## 38. Les filets navigateur rougissent à tort sous `livrer.sh` — attentes à durée fixe
+
+<!-- état: ouvert · type: défaut -->
 
 **Chantier ouvert, non corrigé.** Ce n'est pas un défaut du produit : le
 geste tactile fonctionne, le filet le prouve, et il l'a prouvé encore
@@ -2729,6 +2859,8 @@ charge délibérément.
 
 ## 39. ~~L'adresse morte était imprimée sur la carte de profil partagée~~ — CORRIGÉ le 22/08/2026
 
+<!-- état: fermé · type: défaut -->
+
 Le même jour où `docs/CONVENTIONS.md` §1 était corrigé pour cesser de
 pointer vers `arts44.github.io/f1-uno-elite`, le code portait la même
 adresse morte à un endroit que personne ne relit : **`app/profile-card.js:89`,
@@ -2783,6 +2915,8 @@ pas deux littéraux indépendants.
 
 ## 40. La trace de livraison ne peut pas prouver ce qu'elle affirme — par construction
 
+<!-- état: ouvert · type: défaut -->
+
 `scripts/livrer.sh` écrit `.git/derniere-livraison` avec **le SHA de `HEAD`
 au moment où il tourne**. Dans le flux normal — livrer, commiter, pousser —
 `HEAD` à cet instant est le commit **d'avant**. La trace ne correspondra donc
@@ -2834,3 +2968,77 @@ le commit de quelques minutes.
 
 **Non écrit délibérément** : le corriger pendant le chantier qui l'a découvert
 mélangerait le garde et ce qu'il garde.
+
+---
+
+## 41. ~~Le mode `--controle` avait perdu trois de ses sept contrôles~~ — CORRIGÉ, avec son garde
+
+<!-- état: fermé · type: défaut -->
+
+**Trouvé le 22/08/2026 en préparant le récapitulatif d'avant push.**
+`verify_vitrine.py --controle` levait un `ValueError` en plein milieu :
+`chiffres_du_seed()` importe `capture_seed.py`, qui lit
+`int(sys.argv[1])` **au chargement** pour choisir la saison. Importé
+depuis le filet, il héritait donc de *nos* arguments, et `--controle`
+n'est pas un entier.
+
+**Un module importé ne doit jamais lire les arguments de celui qui
+l'importe.** Corrigé en neutralisant `sys.argv` le temps de l'import.
+
+### Ce que ça coûtait, et depuis quand
+
+Les **trois derniers contrôles négatifs** — actif lourd, `local()`
+introuvable, branche mal calibrée — **n'étaient plus joués du tout**
+depuis l'ajout de `chiffres_du_seed()`. Et le mode rendait quand même
+une liste de rouges : celle des quatre premiers. **Rien ne distinguait
+« quatre contrôles rouges » de « sept contrôles rouges ».**
+
+C'est la forme la plus sournoise du défaut d'instrument : le mode ne
+plantait pas *silencieusement*, il laissait une trace Python en fin de
+sortie — après le rapport, là où on ne lit plus.
+
+### LE GARDE AJOUTÉ
+
+`CONTROLES` liste les sept par leur nom, `joue(nom)` les marque **au
+point où leur assertion est évaluée** — jamais avant : ce qu'on compte
+est l'assertion atteinte, pas l'intention de l'atteindre. En fin de
+course le mode déclare son compte :
+
+    CONTROLES NEGATIFS JOUES : 7/7
+       joue   repli retire
+       joue   ligne 110 px
+       ...
+
+et si le compte diffère, il crache un encadré `!!!!` nommant les
+manquants et rend un code non nul. **Un contrôle qui ne s'exécute pas
+est maintenant aussi bruyant qu'un contrôle qui rougit.**
+
+### LE CONTRÔLE NÉGATIF DU GARDE — et ce qu'il a corrigé
+
+**Il n'a pas confirmé le garde, il l'a réfuté du premier coup.** En
+rejouant la panne exacte (rendre à `capture_seed` un `sys.argv` pollué),
+le script mourait **avant** le bilan : le garde disparaissait avec ce
+qu'il gardait, et la sortie était une trace Python sans un mot sur les
+quatre contrôles perdus.
+
+Le bilan a donc été sorti de `main()` : il vit dans `bilan_controles()`,
+appelé depuis `__main__` **quoi qu'il arrive**, exception comprise. Le
+contrôle rejoué rend alors :
+
+    CONTROLES NEGATIFS JOUES : 3/7
+       joue   repli retire · ligne 110 px · canvas dans le flux
+       ABSENT sans JS masque · actif lourd · local() faux · repli decale
+
+**SEUIL DÉCLARÉ (㉒)** : sept, la longueur de `CONTROLES`. Ce n'est pas
+un seuil mesuré, c'est un inventaire — il doit être mis à jour à la main
+quand un contrôle est ajouté, et l'`assert nom in CONTROLES` de `joue()`
+fait échouer tout de suite un nom qui n'y figure pas.
+
+### Ce que ce garde N'EXERCE PAS (㉔)
+
+Il compte des contrôles **atteints**, pas des contrôles **justes**. Un
+contrôle qui s'exécute, ne rougit pas, et dont l'assertion serait mal
+écrite passerait pour joué — c'est l'assertion elle-même qui doit le
+dire, et c'est un autre travail. Il ne dit rien non plus des filets
+**sans** mode `--controle` : `verify_qr.py`, `verify_zone.py` et
+`verify_tutorial.py` n'ont toujours aucun contrôle négatif (n°29).
