@@ -2512,3 +2512,119 @@ de contenu, pas de compression**, et il n'a pas encore été rendu.
 **Aucun chemin depuis le disque ne raccourcit ce chemin** : mesuré,
 encoder l'AVIF depuis le webp plutôt que depuis le JPEG donne 42,8 dB
 sur la grille et 35,0 sur les badges — toujours sous le webp lui-même.
+
+---
+
+## 37. Le casque a été retiré de la séquence d'intro — et il n'est pas réouvrable avec ce moteur
+
+**Retiré le 22/08/2026.** C'était le **plan d'ouverture** : une
+silhouette de casque de pilote en particules, 1,45 s, la première chose
+que voyait quelqu'un qui cliquait sur le lien. Le « 44 » a pris sa
+place, avec son texte (« One card » / « Lewis Hamilton · #031 ·
+Scuderia Ferrari HP »), et la séquence est passée de quatorze à treize
+plans.
+
+### La raison, et ce qu'elle n'est pas
+
+Ce n'est **pas** un problème de densité, et c'est ce qui rend le
+retrait légitime plutôt que paresseux. Le défaut de densité existait —
+le rapport pixels-sondés / points-demandés valait **8,0** pour le
+casque, bien au-dessus du seuil de lisibilité mesuré à **~5** — et il a
+été corrigé : après le passage de la résolution du sondage de 220 à
+128 px, le casque tombait à **1,7**, le meilleur rapport des huit
+formes.
+
+**Corrigé, le trait était net et continu. La forme lisait toujours
+« boucle avec une visière ».** Une silhouette qui demande un effort
+d'interprétation ne tient pas deux secondes, et celle-là passait la
+première.
+
+### Il n'est PAS réouvrable avec ce moteur
+
+**C'est une correction de ce qui était écrit ici la première fois.** La
+condition annoncée était « un dessin de casque REMPLI plutôt que TRACÉ »
+— une masse fermée avec la visière en creux, parce qu'un contour de
+casque ressemble à tous les contours de masses fermées.
+
+**Cette condition est contradictoire avec la mesure du même jour.**
+Remplir une surface fait exploser le rapport pixels/points. C'est
+exactement le défaut corrigé le même jour sur deux autres formes :
+
+| forme | rempli | tracé |
+|---|---|---|
+| « 44 » | 5,1 — masse grumeleuse | **4,05 — net** |
+| trophée | masse grise floue barrée d'une bande jaune | **1,97 — net** |
+
+Sur une surface pleine, **des points assez nombreux pour la remplir
+n'existent pas** : le budget est de 998 particules pour toute la
+séquence, et il faudrait les multiplier par cinq pour une seule forme.
+
+**Donc la condition juste est : pas avec ce moteur.** Rouvrir le casque
+demanderait un rendu qui ne passe pas par des particules — un tracé
+vectoriel, une image — ou rien. On ne garde pas dans le dépôt une
+condition de réouverture dont la mesure a montré qu'elle produit le
+défaut qu'on venait de corriger ailleurs.
+
+### Ce qui n'a PAS été établi
+
+Que la version remplie se lirait, **si un autre moteur permettait de la
+rendre**. Le diagnostic « il manque au contour un signe distinctif »
+reste une hypothèse sur la cause, pas une mesure — elle n'a coûté aucun
+essai, le plan a été retiré avant de la tester, parce qu'un plan
+d'ouverture qui ne tient pas ne se garde pas pendant qu'on cherche.
+
+Ce qui EST mesuré, c'est que **ce moteur-ci ne peut pas la rendre**.
+
+---
+
+## 38. `verify_touch.py` rougit à tort sous `livrer.sh` — attente fixe, machine chargée
+
+**Chantier ouvert, non corrigé.** Ce n'est pas un défaut du produit : le
+geste tactile fonctionne, le filet le prouve, et il l'a prouvé encore
+le jour où il a rougi.
+
+### Les deux occurrences, avec leur contexte
+
+Le 22/08/2026, pendant le chantier de la séquence d'intro — un chantier
+qui ne touche **que la vitrine**, alors que ce filet mesure **l'app** :
+
+| | attente | délai | contexte |
+|---|---|---|---|
+| 1 | `wait_for_selector('.card', state='attached')` | 40 s dépassées | juste après un rendu Playwright de treize captures |
+| 2 | `wait_for_selector('.card')` (visible) | 20 s dépassées | juste après un second rendu de treize captures |
+| 3 | `wait_for_selector('.card', state='attached')` | 40 s dépassées | juste après une planche comparative de quatre variantes |
+
+**Troisième occurrence le 22/08/2026 au soir**, même signature, même
+chantier vitrine. Trois faux rouges en une journée : la fragilité n'est
+pas anecdotique, elle est systématique dès que la machine travaille.
+
+**Vert en solo les deux fois, et vert au relancement propre** (ports
+libérés, rien d'autre en cours). Les deux attentes — celle sur
+`attached` et celle sur `visible` — ont expiré chacune une fois : ce
+n'est pas un sélecteur en particulier, c'est le temps de chargement de
+l'app sur une machine occupée.
+
+### Pourquoi ça compte : c'est ⑲ en train de se reproduire
+
+⑲ dit qu'un faux rouge est plus coûteux qu'un rouge tardif, parce qu'il
+apprend à ne pas croire le filet. **Un filet qui rougit à tort sous
+`livrer.sh` finira par être ignoré** — et le jour où il aura raison,
+personne ne le lira. C'est le même mécanisme qui a produit ⑲ sur
+`verify_qr.py` (attente fixe de 900 ms sur un cache froid).
+
+### Le remède, nommé et NON écrit
+
+Le même que pour `verify_qr.py` : **attendre un signal, pas une durée.**
+La carte existe quand l'app a fini de rendre sa grille ; c'est cet
+événement-là qu'il faut attendre, pas un délai censé le couvrir.
+
+**Non écrit délibérément** : le corriger au milieu d'un chantier vitrine
+aurait mélangé deux sujets, et un filet qu'on modifie en même temps que
+ce qu'il mesure ne mesure plus rien.
+
+### Ce qui n'est PAS établi
+
+Que la charge machine soit la seule cause. C'est l'hypothèse que les
+faits soutiennent — deux expirations sous charge, aucune au repos, sur
+deux attentes différentes. Elle n'a pas été éprouvée en reproduisant la
+charge délibérément.

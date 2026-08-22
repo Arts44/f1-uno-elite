@@ -237,6 +237,53 @@ def charger_fond(br, controle):
     return r
 
 
+def chiffres_du_seed():
+    """LES NOMBRES DE LA SEQUENCE VIENNENT DU JEU DE DEMO — provenance
+    declaree (㉒). intro.js affiche « 72 of 101 » au-dessus de captures
+    qui montrent 72/101 : les deux doivent sortir du MEME seed, sinon la
+    page se contredit dans le meme ecran.
+    On EXECUTE capture_seed.py — c est du Python, il tourne ici, et c est
+    la seule maniere de comparer a la SOURCE plutot qu a une copie.
+    A REPRENDRE si le seed change de composition.
+
+    ⚠️ ON NEUTRALISE sys.argv LE TEMPS DE L IMPORT. capture_seed.py est
+    AUSSI un script en ligne de commande : au chargement il lit
+    `int(sys.argv[1])` pour la saison. Importe depuis ici, il heritait
+    donc de NOS arguments — et `--controle` le faisait planter avec un
+    ValueError. Consequence : le mode --controle est reste CASSE depuis
+    l ajout de cette fonction, et les trois derniers controles negatifs
+    (actif lourd, local() introuvable, branche mal calibree) n ont plus
+    ete joues du tout, sans que rien ne le signale autrement qu une
+    trace en fin de sortie. Un module importe ne doit jamais lire les
+    arguments de celui qui l importe."""
+    argv = sys.argv
+    try:
+        sys.argv = [argv[0]]
+        import capture_seed as cs
+    finally:
+        sys.argv = argv
+    o = cs.build_owned()
+    tenues = [c for c, ts in o.items()
+              if any(e.get('owned') and (e.get('qty') or 0) > 0 for e in ts.values())]
+    doubles = sum(1 for c, ts in o.items() if any(e.get('doubles') for e in ts.values()))
+    wishlist = sum(1 for c, ts in o.items() if any(e.get('wishlist') for e in ts.values()))
+    ham = [c for c in cs.CARDS if c['id'] == '031'][0]
+    return {
+        'CARTES': len(cs.CARDS),
+        'POSSEDEES': len(tenues),
+        'MANQUANTES': len(cs.CARDS) - len(tenues),
+        'WISHLIST': wishlist,
+        'DOUBLES': doubles,
+        'BADGES_OK': sum(1 for v in cs.AUTO_BADGES.values() if v)
+                     + sum(1 for v in cs.MANUAL_BADGES.values() if v),
+        'VARIANTES_031': len(ham['types']),
+        # LE TOTAL DES VARIANTES N ETAIT PAS DANS LE JEU COMPARE, et c est
+        # exactement pour ca qu un « 923 across 101 cards » a pu passer :
+        # la constante N de intro.js n etait confrontee a rien.
+        'N': sum(len(c['types']) for c in cs.CARDS),
+    }
+
+
 def main():
     echecs = []
     with sync_playwright() as p:
@@ -350,6 +397,46 @@ def main():
                 echecs.append('controle negatif : le canvas dans le flux n a fait basculer'
                               ' AUCUNE fenetre — le controle ne prouve plus rien')
 
+        # ⑦ LES NOMBRES DE LA SEQUENCE CONTRE LE SEED, a la source
+        import re as _re
+        src_intro = (ROOT / 'intro.js').read_text()
+        attendus = chiffres_du_seed()
+        lus = {}
+        for cle in attendus:
+            m = _re.search(r'\b' + cle + r' = (\d+)', src_intro)
+            lus[cle] = int(m.group(1)) if m else None
+        print('  %-14s %s' % ('nombres', ' · '.join('%s=%s' % (k, lus[k]) for k in attendus)))
+        for k in attendus:
+            if lus[k] != attendus[k]:
+                echecs.append('intro.js : %s vaut %r, le seed en donne %r — la sequence'
+                              ' contredirait la capture affichee sous elle'
+                              % (k, lus[k], attendus[k]))
+
+        # LE NOMBRE AFFICHE, PAS SEULEMENT LA CONSTANTE. Le plan du mur
+        # anime un compteur de 12 a 998 ; une capture prise a mi-course
+        # affichait « 923 across 101 cards » et ressemblait a une donnee
+        # fausse. Ce n en etait pas une, mais rien ne verifiait la valeur
+        # d ARRIVEE. SEUIL DECLARE (㉒) : le plan « mur » court de 3,20 a
+        # 5,00 s, le compteur monte de 3,30 a 4,00 s. ON LIT A 4,20 s,
+        # C EST-A-DIRE AU MILIEU DU PLAN — l instant exact ou une capture
+        # est prise. Marge : 200 ms apres la fin de la montee, 800 ms
+        # avant la bascule. Lire plus tard ne prouverait rien : sur les
+        # plans suivants le compteur est force a N par le code.
+        c2 = br.new_context(viewport={'width': 390, 'height': 844})
+        pg2 = c2.new_page()
+        pg2.goto(URL, wait_until='load')
+        pg2.wait_for_timeout(1200)
+        pg2.click('#voir')
+        pg2.wait_for_timeout(4200)
+        cnt = pg2.evaluate("""() => { const e = document.getElementById('cnt');
+            return e ? e.textContent.trim() : null; }""")
+        c2.close()
+        print('  %-14s compteur du mur = %s' % ('nombre anime', cnt))
+        if cnt != str(attendus['N']):
+            echecs.append('le compteur du plan « mur » affiche %r au lieu de 998 —'
+                          ' soit il n a pas fini de monter, soit il monte vers le'
+                          ' mauvais nombre' % cnt)
+
         phrase_off = ('<span class="kin-piste">', '<span class="kin-piste" hidden>') if CONTROLE else None
         nojs = sans_js(br, remplace=phrase_off)
         print('  %-14s sans JS : %d px · %s' % ('390x844', nojs['hauteur'], nojs['texte'] or '(vide)'))
@@ -368,6 +455,48 @@ def main():
         if h['canvas']:
             echecs.append('sans JS : le canvas de fond EXISTE — il doit etre cree par le'
                           ' script, pas ecrit dans le HTML')
+
+        # ⑧ LA SEQUENCE D INTRO — trois choses, et la troisieme est un
+        # controle permanent, pas un mode.
+        c = br.new_context(viewport={'width': 390, 'height': 844})
+        pg = c.new_page()
+        req = []
+        pg.on('request', lambda r: req.append(r.url))
+        pg.goto(URL, wait_until='load')
+        pg.wait_for_timeout(2200)
+        avant = len([u for u in req if 'intro.js' in u])
+        # LE GARDE DOIT SAVOIR COUPER. On force un begaiement et on exige
+        # que la sequence saute au plan final — lockup et CTA visibles,
+        # pas un ecran vide. Un garde qu on n a pas vu couper n a pas ete
+        # verifie. SEUIL DECLARE (㉒) : la coupure reelle se decide sur
+        # trois sauts consecutifs avant 2 s ; ici on court-circuite la
+        # detection, ce qui eprouve le CHEMIN de coupure, pas le seuil.
+        pg.evaluate("() => { document.getElementById('voir').onclick = null;"
+                    " import('./intro.js').then(m => m.ouvrir("
+                    " document.getElementById('voir'), {forcerCoupure: true})); }")
+        pg.wait_for_timeout(2600)
+        etat = pg.evaluate("""() => { const o = document.querySelector('.intro');
+            if (!o) return null;
+            const f = o.querySelector('.intro-fin');
+            return {coupe: o.dataset.coupe || '0', final: f.classList.contains('on'),
+                    cta: !!f.querySelector('.cta'),
+                    beats: o.querySelectorAll('.intro-beat.on').length}; }""")
+        apres = len([u for u in req if 'intro.js' in u])
+        c.close()
+        print('  %-14s intro.js au chargement %d · apres coupure forcee %s'
+              % ('sequence', avant, etat))
+        if avant != 0:
+            echecs.append('intro.js est charge par la page d accueil (%d requete(s)) —'
+                          ' il ne doit l etre qu au clic' % avant)
+        if apres != 1:
+            echecs.append('intro.js : %d requete(s) apres le clic, attendu 1' % apres)
+        if not etat or etat['coupe'] != '1':
+            echecs.append('le garde n a pas coupe malgre un begaiement force —'
+                          ' un garde qu on n a pas vu couper n a pas ete verifie')
+        elif not etat['final'] or not etat['cta'] or etat['beats']:
+            echecs.append('coupure : plan final=%s cta=%s beats restants=%s — l utilisateur'
+                          ' doit voir le lockup et le bouton, pas un ecran vide'
+                          % (etat['final'], etat['cta'], etat['beats']))
 
         lourd = charger(br, 390, 844, lourd=CONTROLE)
         print('  %-14s %.1f Ko' % ('actif lourd', lourd['ko']))

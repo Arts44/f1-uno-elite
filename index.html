@@ -102,6 +102,33 @@ if(/^#(backup|trade|access_token|error)=/.test(location.hash)) location.replace(
    Registre des instruments menteurs, cas ㉔. */
 @font-face{font-family:'Space Grotesk repli';src:local('Helvetica Neue');
   size-adjust:105%;ascent-override:96.7%;descent-override:21.1%;line-gap-override:0%;}
+/* ── LE LIEN VERS LA SÉQUENCE ────────────────────────────────────
+   Les styles de la SURCOUCHE ne sont pas ici : ils voyagent avec
+   intro.js et ne sont injectés qu'à l'ouverture. Mesuré : les laisser
+   dans cette feuille coûtait 0,7 Ko gzippés à chaque visiteur, sur un
+   plafond dont il ne restait que 0,6 Ko de marge. Ils sont inutiles
+   tant que personne n'a cliqué, et le module les porte sans requête
+   supplémentaire. */
+/* LE LIEN VIT DANS LE PIED DE PAGE, SOUS LES CAPTURES, ET C'EST UNE
+   CONTRAINTE MESURÉE — pas un choix de dessin, et pas le premier essai.
+
+   Sur sa propre ligne sous le CTA, il ajoutait ~40 px : assez pour
+   faire basculer l'élément LCP de shot-desktop vers pitch à 320×568,
+   où il ne reste que ~120 px de capture visible. Le filet l'a vu au
+   premier passage.
+   Fondu dans la ligne du `.hint`, il ne coûtait plus qu'un repli de
+   texte — mais ce repli n'est pas le même une fois la police chargée :
+   CLS 0,1035 à 360×560, un bloc de 18 px qui descend au moment de
+   l'échange. Mesuré, tracé jusqu'à sa source.
+
+   SOUS LES CAPTURES, il ne peut plus rien déplacer de ce qui compte :
+   tout ce qui décide du LCP et du CLS est au-dessus de lui. La
+   contrainte « la page d'accueil ne bouge pas d'un pixel » ne fléchit
+   pas pour un lien ; c'est le lien qui déménage. */
+.voir{font-size:13px;color:var(--tx3);background:none;border:0;
+  padding:0;cursor:pointer;font:inherit;font-size:13px;text-decoration:underline;
+  text-underline-offset:3px;text-decoration-color:var(--border)}
+.voir:hover,.voir:focus-visible{color:var(--tx1);text-decoration-color:var(--red)}
 /* ── FOND ANIMÉ — la forme B, choisie parce qu'elle est la seule
    MESURÉE à ne pas déplacer l'élément LCP. Un canvas inséré DANS LE
    FLUX fait basculer le LCP de shot-desktop vers pitch sur cinq
@@ -138,7 +165,15 @@ body{background:var(--bg);color:var(--tx1);font-family:'Space Grotesk','Space Gr
      min-height:100dvh;display:flex;flex-direction:column;align-items:center;
      padding:clamp(24px,6vh,64px) 20px 28px}
 body{position:relative}
-body > *:not(#fond){position:relative;z-index:1}
+/* ⚠️ CETTE RÈGLE ÉCRASE `position` SUR TOUT ENFANT DIRECT DE body.
+   Elle existe pour passer le contenu du hero AU-DESSUS du canvas de
+   fond. Piège payé une fois : la surcouche d'intro, ajoutée en enfant
+   de body avec `position:fixed`, s'est retrouvée en `relative` — donc
+   dans le flux, sans contenu propre puisque ses enfants sont absolus,
+   donc de taille 0×0 et invisible. La spécificité de ce sélecteur
+   (un id via `:not(#fond)`) bat n'importe quelle classe.
+   TOUTE SURCOUCHE PLEIN ÉCRAN AJOUTÉE PLUS TARD DOIT ÊTRE EXCLUE ICI. */
+body > *:not(#fond):not(.intro){position:relative;z-index:1}
 /* ── lockup : MÊMES valeurs que la source styles.css ── */
 .lockup{display:inline-flex;flex-direction:column;gap:0.16em;line-height:1;white-space:nowrap;font-size:clamp(40px,7vw,56px)}
 .lk-top{display:flex;align-items:baseline;gap:0.22em}
@@ -164,8 +199,16 @@ body > *:not(#fond){position:relative;z-index:1}
 .pic-desktop{flex:1 1 auto;min-width:0;max-width:760px}
 .pic-mobile{width:200px;flex:0 0 auto}
 @media(max-width:720px){.pic-mobile{display:none}.shots{margin-top:40px}}
-footer{margin-top:auto;padding-top:56px;display:flex;gap:26px;align-items:center;
+/* `flex-wrap` ET la ligne propre du lien : mesuré à 375 px, quatre
+   éléments côte à côte débordaient la fenêtre par la droite — la
+   mention « Unofficial fan project » sortait de l'écran. Le pied
+   n'avait jamais eu de repli ; il en a un maintenant, et le lien vers
+   la séquence prend sa propre ligne au lieu de serrer les trois
+   autres. Vu dans le navigateur, pas déduit du CSS. */
+footer{margin-top:auto;padding-top:56px;display:flex;gap:12px 26px;align-items:center;
+       flex-wrap:wrap;justify-content:center;text-align:center;width:100%;
        font-size:13px;color:var(--tx3)}
+footer .voir{flex-basis:100%;margin-bottom:6px}
 footer a{color:var(--tx3);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:1px}
 footer a:hover{color:var(--tx2)}
 footer .sep{opacity:.5}
@@ -278,6 +321,7 @@ footer .sep{opacity:.5}
   </div>
 
   <footer>
+    <button class="voir" id="voir" type="button">See the set in 20 seconds</button>
     <a href="https://github.com/Arts44/f1-uno-elite">GitHub</a>
     <span class="sep">·</span>
     <a href="https://ko-fi.com/arts44">Support the developer</a>
@@ -475,6 +519,17 @@ footer .sep{opacity:.5}
   addEventListener('resize', () => { dimensionner(); repos(); }, { passive: true });
 
   window.__f1 = { N, alea, adoucir, borne, entre, particules: P };
+
+  /* La séquence complète vit dans intro.js et n'est chargée QU'AU CLIC :
+     la page d'accueil ne paie ni octet ni requête pour un film que
+     personne n'a demandé. Sous mouvement réduit, `direct` mène droit au
+     plan final — pas une séquence accélérée, l'état de fin. */
+  const voir = document.getElementById('voir');
+  if (voir) voir.addEventListener('click', () => {
+    import('./intro.js').then(m => m.ouvrir(voir, {
+      direct: matchMedia('(prefers-reduced-motion: reduce)').matches,
+    })).catch(() => {});
+  });
 })();
 </script>
 <script>

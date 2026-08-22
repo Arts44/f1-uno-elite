@@ -80,6 +80,28 @@
    en a le plus besoin. La décision a été prise le 21/08/2026 et elle
    n'est pas un oubli.
 
+   ══ LA MARGE EST À 1,0 Ko — ET ELLE A DÉJÀ SERVI (22/08/2026) ══
+
+   LA PROCHAINE ADDITION À LA VITRINE DEVRA SOIT ÉLAGUER, SOIT ROUVRIR
+   CE NOMBRE. Et rouvrir serait la TROISIÈME révision en trois jours :
+   120 → 112 le 21/08 en passant des octets de disque aux octets
+   transférés, puis une reconduction le 22. Une troisième demanderait
+   un argument plus solide que les deux précédentes — la première
+   corrigeait une unité fausse, la seconde ne bougeait rien. Une
+   révision qui ne ferait que loger la dernière addition n'en est pas
+   une : c'est le plafond qui suit le code au lieu de le contraindre.
+
+   CE QUE LA MARGE ÉTROITE VIENT DE PRODUIRE, dès le premier essai.
+   La séquence d'intro apportait ses styles de surcouche dans
+   index.html : 0,7 Ko gzippés payés par CHAQUE visiteur, pour des
+   règles inutiles tant que personne n'a cliqué. La marge tombait à
+   0,6 Ko. Ils ont déménagé dans intro.js, qui les injecte à
+   l'ouverture — zéro octet au chargement, zéro requête de plus.
+   Sans la marge étroite, ils seraient restés là où ils étaient, et
+   personne n'aurait regardé. C'est exactement ce que la note du 21/08
+   annonçait : « une marge étroite force la prochaine addition à être
+   une décision ». Elle l'a forcée au premier essai.
+
    LA MESURE DU JOUR, pour qu'on sache dans six mois si 112 était une
    marge confortable ou une limite atteinte de justesse :
      · mobile 390 px  :  76 Ko  (la seconde image n'est PAS transférée)

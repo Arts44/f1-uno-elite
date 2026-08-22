@@ -9,7 +9,8 @@
         "http.server",
         "8123"
       ],
-      "port": 8123
+      "port": 8123,
+      "autoPort": false
     },
     {
       "name": "f1-uno-elite-8124",
@@ -19,7 +20,8 @@
         "http.server",
         "8124"
       ],
-      "port": 8124
+      "port": 8124,
+      "autoPort": false
     }
   ]
 }
