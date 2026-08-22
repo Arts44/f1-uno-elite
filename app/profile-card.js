@@ -86,7 +86,7 @@ export async function shareProfileCard(){
   });
   // pied
   x.fillStyle = sub; x.font = '500 26px system-ui';
-  x.fillText('arts44.github.io/f1-uno-elite', W / 2, H - 90);
+  x.fillText('arts44.dev', W / 2, H - 90);
 
   const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
   if(!blob) return;

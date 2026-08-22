@@ -13,12 +13,32 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **Aucun point ouvert.** Tous corrigés, mesurés ou tranchés, et tous
-> conservés avec leur diagnostic : 1a, 1b, 2, 3, 4, 5, 6, 7, 8,
-> 9, 10, 11, 12, 13, 14, et le n°15 — longtemps piste ouverte — fermé
-> en 1.66.0 par le partage de la liste d'échange. Reste une hypothèse
-> non mesurée, notée au n°12 §C : ce que voit l'utilisateur quand le
-> quota Resend est atteint.
+> **39 points au total. Huit sont OUVERTS** — c'est ce qu'on vient chercher
+> ici, donc c'est ce que cet en-tête liste :
+>
+> | № | Ouvert parce que |
+> |---|---|
+> | 29 | Trois filets sur cinq n'ont jamais été vus rouges — non écrit |
+> | 30 | Codacy injoignable depuis le 21/08/2026 — borne `ab89cb1` |
+> | 31 | Le vrai budget de la vitrine est dans les deux captures — non fait |
+> | 32 | PWA mobile développée sans appareil mobile — ce que ça borne |
+> | 33 | Séquence d'intro complète (D) — REPORTÉE, pas refusée |
+> | 34 | Consigne d'installation iOS jamais vue fonctionner — famille du n°18 |
+> | 36 | AVIF moins fidèle que le webp qu'il précède — accepté, BORNÉ |
+> | 38 | `verify_touch.py` rougit à tort sous `livrer.sh` — remède nommé, non écrit |
+>
+> Les trente autres sont corrigés, mesurés ou tranchés, et conservés avec leur
+> diagnostic. Reste une hypothèse non mesurée notée au n°12 §C : ce que voit
+> l'utilisateur quand le quota Resend est atteint.
+>
+> ⚠ **Cette liste se recompte à la main à chaque ajout.** Aucun test ne peut la
+> vérifier aujourd'hui, et le barré du titre ne suffit pas : sur les 39 entrées,
+> **18 titres sont barrés, 21 ne le sont pas — mais 13 de ces 21 sont clos**,
+> leur clôture étant écrite en prose dans le corps (`CORRIGÉ`, `FERMÉ`, `résolu`,
+> `accepté`, `BORNÉ`). Un compteur de titres non barrés annoncerait **21 points
+> ouverts au lieu de 8**. Rendre l'en-tête vérifiable demanderait un marqueur
+> d'état lisible par machine sur les 39 entrées — les 13 concernées sont les
+> n° 1, 14, 18, 19, 21 à 28, et 37.
 
 ---
 
@@ -2577,7 +2597,7 @@ Ce qui EST mesuré, c'est que **ce moteur-ci ne peut pas la rendre**.
 
 ---
 
-## 38. `verify_touch.py` rougit à tort sous `livrer.sh` — attente fixe, machine chargée
+## 38. Les filets navigateur rougissent à tort sous `livrer.sh` — attentes à durée fixe
 
 **Chantier ouvert, non corrigé.** Ce n'est pas un défaut du produit : le
 geste tactile fonctionne, le filet le prouve, et il l'a prouvé encore
@@ -2593,10 +2613,70 @@ qui ne touche **que la vitrine**, alors que ce filet mesure **l'app** :
 | 1 | `wait_for_selector('.card', state='attached')` | 40 s dépassées | juste après un rendu Playwright de treize captures |
 | 2 | `wait_for_selector('.card')` (visible) | 20 s dépassées | juste après un second rendu de treize captures |
 | 3 | `wait_for_selector('.card', state='attached')` | 40 s dépassées | juste après une planche comparative de quatre variantes |
+| 4 | `verify_qr.py` · `wait_for_selector('#svTradeSheet')` | 6 s dépassées | juste après une planche comparative |
 
-**Troisième occurrence le 22/08/2026 au soir**, même signature, même
-chantier vitrine. Trois faux rouges en une journée : la fragilité n'est
-pas anecdotique, elle est systématique dès que la machine travaille.
+**QUATRE FAUX ROUGES EN UNE JOURNÉE, ET LE QUATRIÈME ÉLARGIT LE
+CHANTIER.** Les trois premiers visaient `verify_touch.py` ; le quatrième
+est tombé dans **`verify_qr.py`** — le filet qui a produit ⑲ en premier
+lieu, sur exactement le même mécanisme. **Ce n'est donc pas un filet
+fragile, c'est une classe d'attente fragile**, et le titre de ce point
+sous-estimait le périmètre.
+
+### Le périmètre réel, compté
+
+Sur les six filets navigateur du dépôt :
+
+| | nombre |
+|---|---|
+| `wait_for_selector(..., timeout=…)` — attente d'un élément, plafonnée | **10** |
+| `wait_for_timeout(…)` — sommeil sec, aucun signal attendu | **24** |
+| total des attentes à durée fixe | **34** |
+
+Les dix premières sont les seules qui aient rougi : elles attendent un
+signal réel mais avec un plafond calibré sur une machine au repos. Les
+vingt-quatre autres sont plus dangereuses **dans l'autre sens** — un
+sommeil trop court ne rougit pas, il mesure trop tôt et rend un vert
+qui ne prouve rien.
+
+### Le remède, chiffré
+
+**Le principe : attendre un signal, pas une durée.** Le signal existe
+déjà dans chaque cas ; c'est le plafond qui est arbitraire.
+
+| lot | ce que ça coûte | ce que ça rend |
+|---|---|---|
+| les 10 `wait_for_selector` plafonnés | **~10 lignes** : porter le plafond de 6/20/40 s à 60 s, et le déclarer (㉒) comme « borne de sécurité, pas seuil de mesure » | supprime les quatre faux rouges observés |
+| les 24 `wait_for_timeout` | **~50 à 70 lignes** : chacun devient un `wait_for_function` sur la condition qu'il attendait implicitement — élément peint, requête terminée, classe posée | supprime les verts prématurés, non observés à ce jour |
+
+**Le premier lot est le vrai chantier** : dix lignes, zéro changement de
+sémantique, et il éteint le symptôme qui apprend à ignorer le filet.
+Le second est plus long et n'a aucun défaut constaté à son actif — il
+se décide séparément.
+
+### Ce que ce remède N'EXERCERAIT PAS (㉔)
+
+**Relever un plafond ne prouve rien de neuf.** Le filet exercerait
+exactement les mêmes chemins qu'aujourd'hui ; il cesserait simplement
+de mentir sous charge. En particulier :
+
+- il **ne détecterait pas** une régression qui rend l'app réellement
+  lente : un chargement passé de 2 s à 45 s deviendrait vert. Le plafond
+  de 60 s est une borne de sécurité contre un blocage, pas une mesure de
+  performance — et **rien dans ce dépôt ne mesure le temps de chargement
+  de l'app** ;
+- il **n'exercerait rien** des vingt-quatre sommeils secs, qui restent
+  le trou le plus large ;
+- il **ne dirait rien** de la cause : voir ci-dessous.
+
+### Ce qui n'est PAS établi
+
+**Que la charge machine soit la seule cause.** C'est l'hypothèse que les
+faits soutiennent — quatre expirations, toutes juste après un rendu
+Playwright lourd, aucune au repos, sur trois attentes différentes dans
+deux filets différents. **Elle n'a jamais été éprouvée en reproduisant
+la charge exprès.** Tant qu'elle ne l'est pas, « machine chargée » reste
+une corrélation observée quatre fois, pas une cause démontrée — et le
+remède ci-dessus soigne le symptôme sans qu'on sache ce qu'on soigne.
 
 **Vert en solo les deux fois, et vert au relancement propre** (ports
 libérés, rien d'autre en cours). Les deux attentes — celle sur
@@ -2628,3 +2708,57 @@ Que la charge machine soit la seule cause. C'est l'hypothèse que les
 faits soutiennent — deux expirations sous charge, aucune au repos, sur
 deux attentes différentes. Elle n'a pas été éprouvée en reproduisant la
 charge délibérément.
+
+---
+
+## 39. ~~L'adresse morte était imprimée sur la carte de profil partagée~~ — CORRIGÉ le 22/08/2026
+
+Le même jour où `docs/CONVENTIONS.md` §1 était corrigé pour cesser de
+pointer vers `arts44.github.io/f1-uno-elite`, le code portait la même
+adresse morte à un endroit que personne ne relit : **`app/profile-card.js:89`,
+en pied de la carte de profil que l'utilisateur PARTAGE.**
+
+### Pourquoi personne ne l'avait vue
+
+Parce qu'elle est **dessinée, pas écrite**. C'est un `fillText()` sur un
+canvas : elle n'apparaît dans aucun rendu HTML, aucun lien cliquable,
+aucune revue de gabarit. On ne la voit qu'en générant une carte et en
+lisant le pied de l'image.
+
+**Le même fichier avait déjà été corrigé à moitié** : ligne 207,
+`x.fillText('arts44.dev', …)` — la bonne adresse. Ligne 89, l'ancienne.
+Quelqu'un a mis à jour une occurrence et manqué l'autre, sans que rien
+ne le signale.
+
+### Pourquoi c'est plus grave que les six défauts de documentation
+
+Une erreur de documentation reste dans le dépôt. Celle-ci **quitte
+l'app** : l'image part dans un fil, une capture, une conversation. Qui
+lit l'adresse et la tape arrive sur l'origine qui répond 301 — et si
+cette personne installe la PWA depuis là, elle tombe exactement dans le
+n°18, gel permanent inclus.
+
+### Ce qui est [mesuré]
+
+- `app/profile-card.js:89` portait `arts44.github.io/f1-uno-elite` ;
+- **le bundle livré la portait aussi** (`app/app.bundle.js`, 1 occurrence) ;
+- `profile-card.js` est dans `SHELL_ASSETS` de `app/sw.js` : précaché,
+  donc `SW_VERSION` devait être incrémenté — fait, `v180` → `v181` ;
+- balayage de tous les artefacts sortants (canvas, QR, code de
+  sauvegarde, manifeste, meta, gabarits d'e-mail) : **aucune autre
+  occurrence**. Les deux qui restent sont volontaires — le n°18 qui la
+  cite, et l'allowlist de `tests/no-external-resources.test.js`.
+
+### Ce qui n'est PAS établi
+
+Combien de cartes portant l'adresse morte ont déjà été partagées, et si
+quelqu'un a installé la PWA depuis l'origine gelée à cause de l'une
+d'elles. Rien ne le mesure et rien ne peut le mesurer a posteriori.
+
+### La leçon, qui est ⑦ sous une autre forme
+
+Une valeur qui a cessé d'être vraie sans que rien ne le signale — mais
+**dupliquée**, et corrigée à un seul endroit. La parade n'est pas de
+mieux relire : c'est de **n'avoir qu'une source**. L'origine canonique
+devrait être une constante unique, importée par les deux `fillText`,
+pas deux littéraux indépendants.
