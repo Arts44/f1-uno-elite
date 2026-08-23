@@ -31,7 +31,7 @@
 > | 38 | Les filets navigateur rougissent à tort sous livrer.sh |
 > | 40 | La trace de livraison ne peut pas prouver ce qu'elle affirme |
 > | 42 | Les 63 variables inutilisées restent invisibles avant push |
-> | 43 | Deux sessions éditant la même doc fusionnent sans conflit |
+> | 43 | Deux sessions : la doc fusionne sans conflit, le push publie l'autre |
 >
 > Les 28 autres défauts sont corrigés, mesurés ou tranchés, et conservés avec
 > leur diagnostic. Le n°19 n'est pas un défaut : c'est le mode d'emploi du SW
@@ -3183,7 +3183,7 @@ coûterait plus que les 63.
 
 ---
 
-## 43. Deux sessions éditant la même doc fusionnent SANS conflit — et l'incohérence ne se voit pas
+## 43. Deux sessions sur le même dépôt : le contenu fusionne sans conflit, et les opérations « locales » ne le sont pas
 
 <!-- état: ouvert · type: défaut -->
 
@@ -3267,11 +3267,116 @@ classe entière, y compris les incohérences d'une session seule.
 **③ maintenant, ④ ensuite, ni ① ni ②.** ③ est gratuit et couvre le cas
 observé. ④ est le seul garde mécanique qui ne dépend de personne.
 
+### LE PÉRIMÈTRE EST PLUS LARGE QUE LE CONTENU : PUBLIER LE TRAVAIL DE L'AUTRE
+
+**Deuxième occurrence, le 23/08/2026, sur l'HISTORIQUE git cette fois.**
+Un `git push` depuis cette session a emporté `dc27aa7` et `33dd076` —
+deux commits de l'autre session, faits localement et **non poussés**.
+Rien n'est perdu : ils étaient complets, et ils sont en ligne.
+
+Mais ce n'était pas à cette session de les publier, et **git n'offre
+aucun moyen de pousser son propre commit sans pousser ses ancêtres.**
+Dès que deux sessions commitent sur la même branche, la première qui
+pousse publie tout ce que l'autre a commité avant elle.
+
+**CE QUE ÇA REND DIFFICILE — et c'est le vrai coût, pas le push :**
+l'autre session croit son travail **local**. Elle le trouvera poussé
+sans l'avoir décidé, donc :
+
+- elle ne peut plus le réécrire (amend, rebase, découpage en deux
+  commits) sans réécrire l'historique publié ;
+- si elle comptait le relire avant publication, la relecture arrive
+  après coup ;
+- et rien ne l'en avertit : `git status` dira simplement « up to date ».
+
+### LA MÊME FAMILLE : `git stash` DANS UN DÉPÔT PARTAGÉ
+
+**Fait, vu, et réparé le 23/08/2026 dans la même session.** Pour
+éprouver un hook, un `git stash push --include-untracked` a été lancé
+dans le dépôt vivant. **Le stash prend le travail en vol de l'AUTRE
+session et le fait disparaître de son arbre de travail** — fichiers
+modifiés et fichiers non suivis compris. L'autre session, si elle avait
+écrit à ce moment-là, aurait vu ses fichiers revenir à `HEAD` sans
+explication ; et un `git stash pop` ultérieur peut échouer, ou fusionner
+dans un état qui n'est plus celui d'origine.
+
+Ici le mal a été nul — leur travail venait d'être commité — mais
+**c'est un coup de chance, pas une précaution** : rien n'avait été
+vérifié avant de lancer la commande.
+
+**LE POINT COMMUN DES TROIS CAS (contenu, push, stash) : une opération
+qu'on croit LOCALE a un effet CHEZ QUELQU'UN D'AUTRE.** `stash`, `push`,
+`checkout --`, `reset --hard`, `clean` : aucune ne demande confirmation,
+aucune ne mentionne l'autre session, et toutes agissent sur un arbre
+partagé. **Parade immédiate : éprouver un hook ou une commande
+destructive dans un CLONE JETABLE** — `git clone --no-hardlinks . /tmp/bac`
+— jamais dans le dépôt vivant. C'est ce qui a été fait pour les huit cas
+du hook `pre-commit`, après l'incident.
+
+### LE CONTRÔLE RÉTROSPECTIF — fait le 23/08/2026
+
+**Question posée : l'incohérence s'est-elle déjà produite en silence ?**
+Un contrôleur a rejoué CHAQUE état historique des trois fichiers les
+plus exposés et lui a appliqué ses invariants.
+
+**Fait de structure, et il change la question : ce dépôt ne contient
+AUCUNE fusion.** L'historique est linéaire sur toute sa longueur. Le
+risque ne passe donc jamais par un merge git — il passe par des commits
+CONSÉCUTIFS sur un fichier partagé, ce qui est plus discret encore.
+
+| fichier | états rejoués | incohérents |
+|---|---|---|
+| `docs/POINTS-SIGNALES.md` | 58 | **0** |
+| `docs/CONVENTIONS.md` | 43 | **0** |
+| `app/translations.js` | 71 | **2** |
+
+**Les deux cas de `translations.js`, et ils ne sont PAS de la
+concurrence.** Le 04/07/2026, 13 clés (`bk.*`, `s.bk*`) présentes en
+`en` et `fr`, absentes des cinq autres langues. Ouvert à 13:35 par
+`7d73337`, refermé à 14:32 par `c1e3b0b` — **57 minutes, deux commits
+intermédiaires, même auteur, séquentiel, corrigé sans que personne ne
+le signale.** C'est le motif « j'ajoute une fonctionnalité, je traduis
+au commit suivant », pas deux sessions qui se marchent dessus.
+
+### CE QUE CE CONTRÔLE NE PROUVE PAS — et c'est la moitié du résultat
+
+**① Les invariants n'existaient pas pendant presque toute la période.**
+Sur `POINTS-SIGNALES.md`, les marqueurs `<!-- état · type -->` et
+l'en-tête chiffré n'existent que depuis le 22-23/08 : **3 commits sur
+58**. Pour les 55 autres, le contrôleur ne pouvait vérifier que les
+numéros dupliqués ou manquants. **La classe qui a réellement cassé ce
+jour-là — le compte d'en-tête — était invérifiable sur 95 % de
+l'historique.** Sur `CONVENTIONS.md`, le registre existe dans 31 états
+sur 59 : 52 %.
+
+**② La fenêtre multi-session est minuscule.** Le travail à deux
+sessions est attesté les 22 et 23/08 seulement, soit **6 commits** sur
+`POINTS-SIGNALES.md`, **4** sur `CONVENTIONS.md`, **0** sur
+`translations.js`. Les 58 + 43 + 71 états rejoués couvrent donc
+massivement une période où le risque n'existait pas.
+
+**En clair : le zéro sur les deux docs est un zéro sur la mauvaise
+période, mesuré avec des invariants qui n'existaient pas encore.** Il ne
+réfute pas l'hypothèse d'une incohérence silencieuse passée — il dit
+seulement qu'on n'en trouve pas de trace là où on sait regarder.
+
+**③ Le contrôleur a lui-même dû être corrigé deux fois** avant de rendre
+un chiffre : il accusait d'abord 43 états sur 43 sur `CONVENTIONS.md`
+(il confondait le registre avec une énumération locale `① ②`, et les
+Hard Rules avec la Definition of Done), et il ne voyait que 11 des 71
+états de `translations.js` (fichier déplacé, `--follow` manquant).
+**Un détecteur qui accuse 100 % de l'historique se trompe, il ne
+découvre pas.** Chaque contrôleur a ensuite été éprouvé sur quatre
+états volontairement faux, dont le cas réel du 22/08.
+
 ### CE QUI N'EST PAS ÉTABLI
 
-Que ce soit arrivé **plus d'une fois**. Un seul cas est constaté, et il a
-été rattrapé. Les chiffres d'exposition ci-dessus disent que l'occasion
-est fréquente — ils ne disent pas que le défaut s'est produit
-silencieusement ailleurs. **Personne n'a relu les fusions passées de ces
-fichiers pour le vérifier**, et c'est précisément ce qu'un défaut
-silencieux rend difficile.
+Que l'incohérence de contenu soit arrivé **plus d'une fois**. Un seul
+cas est constaté (22/08), et un test l'a rattrapé. Le contrôle
+rétrospectif ci-dessus n'en trouve pas d'autre **mais ne peut pas en
+trouver** sur la période qui compte, faute d'invariants à l'époque.
+
+Ce qui EST établi, en revanche : les deux autres formes — publier le
+travail non poussé de l'autre, et lui retirer son travail en vol par un
+`stash` — se sont produites **le même jour, dans la même session**, et
+aucune des deux n'aurait laissé de trace vérifiable après coup.
