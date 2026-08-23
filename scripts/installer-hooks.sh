@@ -21,11 +21,28 @@ if ! npm run lint > /tmp/prepush-lint.log 2>&1; then
   echo "PUSH REFUSÉ — lint rouge :"; tail -5 /tmp/prepush-lint.log; exit 1
 fi
 TRACE=".git/derniere-livraison"
-HEAD_SHA=$(git rev-parse HEAD)
-if [ -f "$TRACE" ] && grep -q "$HEAD_SHA" "$TRACE"; then
-  echo "pre-push : filets navigateur passés sur ce commit ✓"
+# On compare l'ARBRE, pas le SHA du commit. livrer.sh tourne AVANT le
+# commit : son HEAD est celui d'avant, et le SHA ne correspondait donc
+# jamais au commit poussé — le garde avertissait à chaque livraison
+# correcte (POINTS-SIGNALES n°40). L'arbre, lui, est le même des deux
+# côtés tant que rien de SUIVI n'a bougé entre livrer.sh et le commit.
+#
+# SEUIL (㉒) : ce garde AVERTIT, il ne bloque pas. L'asymétrie est
+# délibérée — un commit qui ne touche que de la documentation n'a pas à
+# jouer les filets navigateur, et le lui interdire ferait contourner le
+# hook par --no-verify, ce qui coûterait aussi les tests et le lint.
+#
+# CE QU'IL N'EXERCE PAS (㉔) : rien sur la FRAÎCHEUR. Un arbre livré il
+# y a trois semaines, recommité inchangé, passe ce garde en silence.
+# Il répond à « les filets ont-ils vu CE contenu ? », jamais à
+# « les ont-ils vus RÉCEMMENT ? ». Y adjoindre une borne de temps n'a
+# pas été chiffré, et paraît inutile tant que la livraison suit le
+# commit de quelques minutes.
+HEAD_TREE=$(git rev-parse "HEAD^{tree}" 2>/dev/null)
+if [ -f "$TRACE" ] && [ -n "$HEAD_TREE" ] && grep -q "$HEAD_TREE" "$TRACE"; then
+  echo "pre-push : filets navigateur passés sur cet arbre ✓"
 else
-  echo "AVERTISSEMENT : les filets navigateur n'ont pas tourné sur CE commit."
+  echo "AVERTISSEMENT : les filets navigateur n'ont pas tourné sur CE contenu."
   echo "   Lance scripts/livrer.sh, ou assume-le si le commit ne touche que la doc."
 fi
 echo "pre-push : vert."

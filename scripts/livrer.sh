@@ -139,7 +139,28 @@ if [ "$LENTS" = "1" ]; then
   python3 verify_trade_inbox.py
   python3 verify_zone.py
   python3 verify_vitrine.py
-  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $(git rev-parse HEAD 2>/dev/null || echo '-')" > "$TRACE"
+  # La trace porte l'ARBRE mesuré, pas le SHA de HEAD. HEAD au moment
+  # où ce script tourne est le commit d'AVANT — dans le flux normal
+  # (livrer, commiter, pousser) il ne correspond JAMAIS au commit
+  # poussé, donc le hook avertissait à chaque livraison correcte. Un
+  # avertissement systématiquement faux se fait ignorer, et le jour où
+  # les filets n'auront vraiment pas tourné, la même ligne ne dira plus
+  # rien à personne (POINTS-SIGNALES n°40).
+  #
+  # `git stash create` rend l'arbre des modifications SUIVIES — les
+  # fichiers non suivis n'y entrent pas, mesuré : une session qui
+  # travaille en parallèle avec ses propres brouillons ne déclenche
+  # rien. C'est ce qui empêche le correctif de ⑲ de réintroduire ⑲.
+  #
+  # LE REPLI `${_S:-HEAD}` N'EST PAS UNE PRÉCAUTION DE STYLE. Sur un
+  # arbre PROPRE, `git stash create` ne rend RIEN. Sans ce repli, le
+  # hash serait vide et le garde avertirait à chaque livraison depuis
+  # un état propre — c'est-à-dire dans le cas NOMINAL de la convention
+  # « livrer.sh vert depuis un état propre ». Le correctif aurait été
+  # pire que le défaut. Trouvé en cherchant un cas limite, pas en
+  # écrivant : ce genre de ligne ne se relit pas, il se teste.
+  _S=$(git stash create 2>/dev/null)
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $(git rev-parse "${_S:-HEAD}^{tree}" 2>/dev/null || echo '-')" > "$TRACE"
 else
   echo "── filets navigateur SAUTÉS (LENTS=0) ──"
 fi
