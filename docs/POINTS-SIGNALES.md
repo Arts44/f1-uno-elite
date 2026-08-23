@@ -3380,3 +3380,40 @@ Ce qui EST établi, en revanche : les deux autres formes — publier le
 travail non poussé de l'autre, et lui retirer son travail en vol par un
 `stash` — se sont produites **le même jour, dans la même session**, et
 aucune des deux n'aurait laissé de trace vérifiable après coup.
+
+### LE PÉRIMÈTRE DU CHANTIER, QUAND IL PARTIRA
+
+**Ce point s'appelle « deux sessions », et c'est la CONDITION, pas le
+sujet.** Deux sessions peuvent coexister toute une journée sans rien
+casser tant qu'elles ne touchent pas le même contenu. Le sujet est plus
+étroit et plus dur : **le même contenu édité deux fois, sans qu'aucun des
+deux côtés ne voie l'autre.** Partir de « les deux sessions » ferait
+chercher une parade au mauvais endroit — un verrou de session, une
+convention de créneaux — alors que le défaut vit dans la superposition
+des écritures.
+
+**Et le périmètre s'est déjà réduit d'un côté.** Le cas *documentation*
+est maintenant partiellement paré : `tests/points-signales.test.js`
+compare l'en-tête aux marqueurs et **a déjà attrapé une désynchronisation
+réelle** — une 41ᵉ entrée ajoutée par l'autre session pendant que
+celle-ci écrivait, dont l'en-tête ne savait rien. Ce n'est pas une parade
+complète (elle ne voit que les comptes, pas le contenu des entrées), mais
+elle transforme un défaut silencieux en test rouge.
+
+**Ce qui reste sans filet, c'est le CODE édité en double.** Aucun test ne
+compare deux éditions concurrentes d'un module : elles fusionnent, ou
+l'une écrase l'autre au prochain `git add`, et rien ne le dit. C'est de
+là que le chantier doit partir.
+
+**Un cas mesuré le 23/08/2026, à verser au dossier.** Le remède du n°40
+venait d'être écrit ; `livrer.sh` a mesuré l'arbre de travail COMPLET —
+scripts modifiés **et** `docs/CONVENTIONS.md`, `docs/POINTS-SIGNALES.md`
+que l'autre session éditait au même moment. Le commit fait ensuite ne
+portait que les scripts. **L'arbre commité n'était donc PAS l'arbre
+livré** : une combinaison jamais mesurée. Le garde tout neuf l'a vu et a
+averti — correctement. Dix-sept secondes plus tard, l'autre session
+commitait les documents, et l'arbre redevenait celui de la trace. Deux
+enseignements : le garde du n°40 attrape **aussi** le commit partiel d'un
+arbre livré, ce qui n'était pas son but affiché ; et une livraison faite
+pendant qu'une autre session écrit mesure un arbre que personne ne
+commitera tel quel.
