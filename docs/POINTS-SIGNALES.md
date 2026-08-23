@@ -13,7 +13,7 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **41 entrées : 40 défauts et 1 référence. DOUZE défauts sont OUVERTS** —
+> **43 entrées : 42 défauts et 1 référence. QUATORZE défauts sont OUVERTS** —
 > c'est ce qu'on vient chercher ici, donc c'est ce que cet en-tête liste :
 >
 > | № | Ouvert |
@@ -30,6 +30,8 @@
 > | 36 | L'AVIF servi est moins fidèle que le webp qu'il précède |
 > | 38 | Les filets navigateur rougissent à tort sous livrer.sh |
 > | 40 | La trace de livraison ne peut pas prouver ce qu'elle affirme |
+> | 42 | Les 63 variables inutilisées restent invisibles avant push |
+> | 43 | Deux sessions éditant la même doc fusionnent sans conflit |
 >
 > Les 28 autres défauts sont corrigés, mesurés ou tranchés, et conservés avec
 > leur diagnostic. Le n°19 n'est pas un défaut : c'est le mode d'emploi du SW
@@ -2097,12 +2099,24 @@ relevés il y a N commits, et attribuer un delta à un seul est faux quel
 que soit N. Cette règle survit à la correction.
 
 **La deuxième borne locale prise à `05ae3f8` a été construite pour un
-problème inexistant.** Elle répondait à « Codacy est parti, il nous faut
-une continuité de repli » — or il n'était pas parti. Elle n'est pas
-nuisible : `npm run test:cov` mesure un périmètre que Codacy ne mesure
-pas, et se compare à elle-même. Mais **elle n'a pas été décidée pour
-cette raison-là**, et si elle doit être gardée il faut la re-justifier
-sur ce qu'elle apporte vraiment, pas sur une panne qui n'a pas eu lieu.
+problème inexistant** — elle répondait à « Codacy est parti, il nous faut
+une continuité de repli », or il n'était pas parti. **Elle est gardée,
+avec une justification neuve, et ce n'est pas un vestige :**
+
+**Codacy et `npm run test:cov` ne mesurent pas le même périmètre, et
+avoir les deux permet de voir LEQUEL bouge quand un chiffre change.**
+Codacy compte 12 993 LOC sur l'ensemble du dépôt livré au navigateur, y
+compris ce qu'aucun test Node ne charge ; `test:cov` compte 15 502
+lignes instrumentées sur 44 fichiers, soit la tranche « sans
+navigateur ». Un écart qui apparaît chez l'un et pas chez l'autre **dit
+où il est né** : chez Codacy seul, il vient de code que les tests
+n'atteignent pas ; chez `test:cov` seul, d'un module testé dont la
+couverture a bougé sans que l'analyse statique s'en émeuve ; chez les
+deux, du volume. **Une seule mesure ne peut pas faire cette distinction,
+et c'est elle qui a de la valeur** — pas la redondance.
+
+C'est aussi pour cela que les deux ne se comparent JAMAIS l'une à
+l'autre : chacune se compare à elle-même, d'un relevé au suivant.
 
 | | à `05ae3f8` (21/08) |
 |---|---|
@@ -3103,3 +3117,161 @@ contrôle qui s'exécute, ne rougit pas, et dont l'assertion serait mal
 dire, et c'est un autre travail. Il ne dit rien non plus des filets
 **sans** mode `--controle` : `verify_qr.py`, `verify_zone.py` et
 `verify_tutorial.py` n'ont toujours aucun contrôle négatif (n°29).
+
+---
+
+## 42. Les 63 variables inutilisées — voie A prise, passe groupée REFUSÉE
+
+<!-- état: ouvert · type: défaut -->
+
+`noUnusedVariables` rend **63 avertissements sur 24 fichiers**. La règle
+n'était armée nulle part, et la classe de défaut n'était donc trouvable
+qu'**après le push**, par Codacy — c'est ce qui est arrivé le 22/08 avec
+`GRIS` devenu orphelin dans `intro.js`.
+
+Concentration : `tutorial.js` 12 · `cloud-auth.js` 6 · `backup.js` 5 ·
+`render.js` 5 · `cloud-sync.js` 4 — **32 des 63 dans cinq fichiers**.
+
+### VOIE A — FAITE : armer sur les fichiers du commit
+
+`scripts/livrer.sh` lance maintenant `biome --only=noUnusedVariables`
+sur la sortie de `git diff --name-only HEAD -- '*.js' '*.mjs'`. Tout
+orphelin **introduit** est vu avant le push.
+
+**Deux défauts trouvés par son contrôle négatif, tous deux fatals au
+garde :**
+
+1. la liste passait par une variable dépliée — `$MODIFIES`. **zsh ne
+   découpe pas une variable non quotée** : biome recevait un seul
+   argument, espace de fin compris, et rendait « No such file or
+   directory ». Un rouge, mais pas celui qu'on croit. Elle passe par
+   `xargs` ;
+2. **biome classe `noUnusedVariables` en AVERTISSEMENT et rend 0.** Le
+   contrôle nommait correctement la variable orpheline **et laissait
+   passer la livraison**. Il faut `--error-on-warnings`.
+
+Contrôle négatif final, avec le drapeau : orphelin introduit → **code 1**
+et le nom cité cinq fois ; orphelin retiré → **code 0**.
+
+### VOIE B — REFUSÉE : purger les 63 puis armer partout
+
+**L'argument, et il est le vrai motif du refus : une purge en masse de
+variables inutilisées efface le SYMPTÔME d'un défaut au lieu du défaut.**
+Une variable calculée et jamais lue est parfois un reste de refactor —
+et parfois le signe qu'un résultat qu'on devait utiliser ne l'est pas.
+Les deux se ressemblent exactement dans un rapport de lint. Juger 63 fois
+« oubli ou bug ? » dans une passe dédiée, sans le contexte du travail qui
+a produit chaque cas, c'est se donner 63 occasions de choisir la mauvaise
+réponse — et la mauvaise réponse ici est **silencieuse**.
+
+**LA CONDITION, et elle n'a pas d'échéance** : fichier par fichier, **à
+l'occasion d'un travail sur ce fichier**, quand quelqu'un a la tête dans
+ce code et peut dire si la variable manque à quelque chose. Jamais en
+passe groupée, jamais « pour faire tomber le compteur ».
+
+### CE QUI RESTE INVISIBLE, ET C'EST ASSUMÉ
+
+**Les 63 existants ne sont vus par aucun garde local.** Ils ne le seront
+qu'en passant par Codacy après push, ou le jour où leur fichier est
+retouché. Un fichier auquel on ne touche pas peut donc pourrir sans que
+rien ne le dise.
+
+C'est le prix de ne pas armer la règle partout : armée sur les 138
+fichiers, elle rendrait `livrer.sh` rouge en permanence — **et un garde
+rouge en permanence est un garde qu'on apprend à contourner**, ce qui
+coûterait plus que les 63.
+
+---
+
+## 43. Deux sessions éditant la même doc fusionnent SANS conflit — et l'incohérence ne se voit pas
+
+<!-- état: ouvert · type: défaut -->
+
+**Vécu le 22/08/2026, pendant l'écriture même de ce document.**
+`docs/POINTS-SIGNALES.md` a été modifié par une autre session Claude
+Code pendant que celle-ci le réécrivait : le marqueur d'état que je
+venais d'écrire pour le n°30 avait changé à la relecture, et le
+compteur de l'en-tête était passé à 41 sans que j'y touche.
+
+### Pourquoi c'est PIRE que le cas du bundle
+
+| | `app.bundle.js` | une doc partagée |
+|---|---|---|
+| ce que git montre | un conflit sur une ligne minifiée de 300 Ko | **rien** |
+| pourquoi | une seule ligne, tout le monde la touche | deux sections éloignées fusionnent proprement |
+| ce qu'on obtient | un refus visible, illisible mais bruyant | **un fichier cohérent en apparence et faux en contenu** |
+
+Un bundle en conflit **arrête** quelqu'un. Une doc éditée à deux endroits
+différents **ne s'arrête pas** : git fusionne, et le résultat porte deux
+récits qui ne se connaissent pas — un compteur d'en-tête écrit pour 41
+entrées au-dessus d'une liste qui en a 42, une entrée déclarée fermée
+dans un paragraphe et ouverte dans un autre.
+
+**Ici, un test l'a rattrapé** (`tests/points-signales.test.js`, qui
+compare les comptes annoncés aux marqueurs `<!-- état · type -->`).
+**Par chance : il vérifie le COMPTE, pas la PROVENANCE.** Deux sessions
+qui ajoutent chacune une entrée et incrémentent chacune le compteur de
+un donnent un compte juste et un document faux.
+
+### L'EXPOSITION, MESURÉE
+
+Fichiers touchés par **au moins deux commits le même jour**, sur les
+trente derniers jours — c'est la fenêtre où deux sessions se croisent :
+
+| fichier | commits/jour cumulés | jours à ≥ 2 commits | garde |
+|---|---|---|---|
+| `app/app.bundle.js(.map)` | 109 | 9 | hook `pre-commit` (fait) |
+| `app/sw.js` | 103 | 9 | tests de précache |
+| `app/changelog.js` | 78 | 8 | — |
+| `app/styles.css` | 61 | 7 | 8 tests le lisent |
+| **`docs/POINTS-SIGNALES.md`** | **57** | **10** | comptes seulement |
+| `README.md` | 40 | 5 | `readme-parity` |
+| **`docs/CONVENTIONS.md`** | **39** | **7** | **aucun** |
+| `translations.js` | 38 | 6 | **aucun** |
+| `README.{fr,de,es,it,nl}.md` | ~36 chacun | 4 | `readme-parity` |
+
+**`docs/POINTS-SIGNALES.md` est le fichier le plus exposé du dépôt** :
+dix jours sur trente avec au moins deux commits, plus que le bundle.
+`CONVENTIONS.md` et `translations.js` viennent ensuite **sans aucun
+garde de cohérence interne**.
+
+### LES TROIS PARADES, CHIFFRÉES
+
+**① Verrou de fichier** — un `.lock` posé/retiré autour de l'écriture.
+~30 lignes. **Rejeté** : rien ne le retire si la session meurt, et un
+verrou orphelin bloque le dépôt jusqu'à intervention manuelle. On
+échangerait un défaut silencieux contre un blocage bruyant et fréquent.
+
+**② Propriété par session** — une convention écrite : une session
+annonce les fichiers doc qu'elle va écrire, l'autre s'abstient. **0
+ligne de code**, mais **elle dépend de la mémoire de deux agents qui ne
+se lisent pas** — exactement le mode de défaillance que ⑰ a démontré
+trois fois. Utile comme discipline, nulle comme garde.
+
+**③ Relecture avant écriture** — `git fetch && git status` juste avant
+d'écrire, et **relire le fichier depuis le disque immédiatement avant de
+le remplacer** plutôt que de travailler sur une copie lue dix minutes
+plus tôt. ~4 lignes de discipline, aucune infrastructure. **C'est la
+seule des trois qui aurait attrapé le cas réel** : ma copie de
+`POINTS-SIGNALES.md` datait d'avant la modification de l'autre session.
+
+**④ Ce qui protège vraiment : des tests de cohérence interne, fichier
+par fichier.** `points-signales.test.js` a fonctionné — imparfaitement,
+mais il a rougi. Le même schéma pour `CONVENTIONS.md` (les cases du
+registre sont-elles numérotées sans trou ? les renvois `n°N` pointent-ils
+vers une entrée existante ?) coûterait **~40 lignes** et rattraperait la
+classe entière, y compris les incohérences d'une session seule.
+
+### RECOMMANDATION
+
+**③ maintenant, ④ ensuite, ni ① ni ②.** ③ est gratuit et couvre le cas
+observé. ④ est le seul garde mécanique qui ne dépend de personne.
+
+### CE QUI N'EST PAS ÉTABLI
+
+Que ce soit arrivé **plus d'une fois**. Un seul cas est constaté, et il a
+été rattrapé. Les chiffres d'exposition ci-dessus disent que l'occasion
+est fréquente — ils ne disent pas que le défaut s'est produit
+silencieusement ailleurs. **Personne n'a relu les fusions passées de ces
+fichiers pour le vérifier**, et c'est précisément ce qu'un défaut
+silencieux rend difficile.

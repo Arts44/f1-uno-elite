@@ -59,6 +59,41 @@
    ou redécider le nombre avec un argument — et c'est exactement ce
    qui vient de se produire ici, avec un bon résultat.
 
+   ══ LA MARGE EST À 0,80 Ko. LA PROCHAINE ADDITION ÉLAGUE D'ABORD ══
+   (mesuré le 22/08/2026 : pire cas 111,20 Ko sur 112)
+
+   Ce n'est plus une formule, c'est l'état du fichier. La séquence
+   d'intro a coûté 1,27 Ko gzippés à index.html — le bouton, le
+   chargeur de quatre lignes, les styles du lien, l'exclusion `.intro`
+   de la règle d'empilement, le repli du pied de page — et la marge est
+   passée de 2,08 à 0,80 Ko.
+
+   INVENTAIRE DE CE QUI EST DISPONIBLE, s'il faut vraiment de la place.
+   Les commentaires font 18,8 Ko bruts sur 31,4 — 29 blocs de commentaire
+   CSS/JS et 5 blocs de commentaire HTML. TOUT retirer rendrait 8,91 Ko gzippés : 13,58 → 4,68,
+   marge à 9,71 Ko. Les six plus gros, mesurés isolément :
+
+     face de repli ajustée (le CTA ne bouge plus)   4 133 o → 2 265 o gz
+     ligne cinétique (1.78.0)                       2 298 o → 1 345 o gz
+     fond animé — la forme B                        1 522 o →   963 o gz
+     non mesuré sur appareil mobile (assumé)        1 515 o →   955 o gz
+     LCP : fetchpriority, width/height              1 040 o →   653 o gz
+     le moteur de particules                          971 o →   620 o gz
+
+   ⚠️ LA RÉSERVE, ET ELLE PASSE DEVANT L'INVENTAIRE. Ces blocs sont ce
+   que ce dépôt appelle du travail. Celui de 2,3 Ko sur la face de repli
+   porte l'intervalle sûr mesuré [104 %, 106 %] qui a produit
+   `size-adjust: 105 %`, et la raison pour laquelle `local('Arial')` a
+   été retiré — une garantie « jamais pire » qui était fausse d'une
+   branche. Le déplacer dans docs/ le sépare de la ligne qu'il explique,
+   et CE DÉPÔT A DÉJÀ PAYÉ PLUSIEURS FOIS le prix d'un réglage dont la
+   raison vivait ailleurs.
+
+   DÉCISION PRISE LE 22/08/2026 : on ne déplace rien. 3,6 Ko — ce que
+   rendraient les deux plus gros blocs — ne valent pas de couper le lien
+   entre un réglage et sa mesure. L'inventaire ci-dessus est là pour que
+   la prochaine décision soit chiffrée, pas pour être exécuté.
+
    CE QUE CE PLAFOND NE COUVRE PAS : le code de la séquence complète,
    chargé seulement au clic, n'entre pas dans le chargement initial et
    n'est donc pas compté. S'il devenait chargé d'office, il faudrait

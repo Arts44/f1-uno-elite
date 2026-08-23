@@ -60,6 +60,37 @@ npm test
 echo "── lint ──"
 npm run lint
 
+# ── VARIABLES INUTILISÉES, SUR LES FICHIERS DE CE TRAVAIL SEULEMENT ──
+# `npm run lint` n'arme que noUndeclaredVariables et noUnusedImports.
+# noUnusedVariables rend 63 avertissements sur les 138 fichiers du dépôt,
+# presque tous antérieurs — l'armer partout rendrait `livrer.sh` rouge en
+# permanence, donc ignoré. On l'arme donc SUR CE QU'ON VIENT D'ÉCRIRE.
+# Pourquoi ça vaut la peine : le 22/08/2026, `GRIS` est devenu orphelin
+# dans intro.js, aucun test n'a bronché, et c'est CODACY qui l'a signalé
+# APRÈS le push. Cette classe de défaut n'était trouvable qu'en ligne.
+# CE QUE ÇA N'EXERCE PAS (㉔) : les 63 existants restent invisibles, et
+# un fichier qu'on ne touche pas peut pourrir sans que rien ne le dise.
+# C'est assumé — voir le refus de la passe groupée dans POINTS-SIGNALES.
+# ⚠️ LA LISTE PASSE PAR xargs, PAS PAR UNE VARIABLE DÉPLIÉE. Écrite
+# `npx biome … $MODIFIES`, elle marche sous bash et CASSE sous zsh : zsh
+# ne découpe pas une variable non quotée, biome recevait donc UN seul
+# argument « intro.js » espace compris et rendait « No such file or
+# directory » — un ROUGE, mais pas celui qu'on croit. Le contrôle
+# négatif l'a vu du premier coup : il attendait le nom d'une variable
+# orpheline et a lu une erreur d'entrée/sortie.
+LISTE_JS="$(mktemp)"
+git diff --name-only --diff-filter=ACM HEAD -- '*.js' '*.mjs' > "$LISTE_JS" 2>/dev/null || true
+if [ -s "$LISTE_JS" ]; then
+  echo "── variables inutilisées ($(wc -l < "$LISTE_JS" | tr -d ' ') fichier(s) de ce travail) ──"
+  # `--error-on-warnings` N'EST PAS DÉCORATIF : biome classe
+  # noUnusedVariables en AVERTISSEMENT et rend 0. Sans ce drapeau, le
+  # contrôle nommait bien la variable orpheline… et laissait passer la
+  # livraison. Deuxième chose que le contrôle négatif a attrapée ici.
+  xargs npx --no-install biome lint --error-on-warnings \
+        --only=correctness/noUnusedVariables < "$LISTE_JS"
+fi
+rm -f "$LISTE_JS"
+
 if [ "$LENTS" = "1" ]; then
   echo "── filets navigateur ──"
   # Les serveurs locaux que les filets attendent, montés et démontés
