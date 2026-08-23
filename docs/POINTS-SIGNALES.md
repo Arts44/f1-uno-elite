@@ -36,6 +36,44 @@
 > de démolition, hors décompte. Reste une hypothèse non mesurée notée au
 > n°12 §C : ce que voit l'utilisateur quand le quota Resend est atteint.
 >
+> ### Le vocabulaire des marqueurs
+>
+> Chaque entrée porte, juste sous son titre, un marqueur lisible par machine :
+> `<!-- état: … · type: … -->`. Les deux champs sont **fermés** — toute autre
+> valeur fait tomber `tests/points-signales.test.js`. Ils répondent à deux
+> questions distinctes, et c'est pour cela qu'ils ne sont pas un seul champ.
+>
+> **`type` — de quelle NATURE est cette entrée ?**
+>
+> | valeur | signifie |
+> |---|---|
+> | `défaut` | quelque chose ne va pas, ou n'allait pas : un bogue, une mesure fausse, une décision à prendre, une contrainte qui borne le travail. C'est le cas par défaut. |
+> | `référence` | ce n'est pas un problème mais un **mode d'emploi** : une procédure à rejouer, un savoir-faire consigné. Hors du décompte des défauts. |
+>
+> **`état` — où en est cette entrée ?**
+>
+> | valeur | signifie |
+> |---|---|
+> | `ouvert` | du travail reste à faire, ou une décision reste à prendre. C'est ce que l'en-tête liste. |
+> | `fermé` | corrigé, mesuré, ou tranché — y compris **refusé** avec sa raison écrite. Un refus assumé est clos, pas ouvert. |
+> | `sans objet` | réservé à `type: référence`, qui n'a pas d'avancement. |
+>
+> **Pourquoi deux champs et pas un.** Une valeur `référence` glissée dans
+> `état` en ferait un fourre-tout : le n°19 n'est pas à un autre stade
+> d'avancement, il est d'une autre nature. Et une liste d'exclusions au lieu
+> d'un champ `type` **serait** un champ `type`, simplement implicite et non
+> documenté — elle se serait cassée dès la deuxième entrée non-défaut.
+>
+> **Cas limites déjà rencontrés, et leur tranchant :**
+> - le n°30 a porté un temps `type: erreur de diagnostic, pas défaut d'outil`.
+>   Une erreur de diagnostic **est** un défaut — celui du diagnostic. La
+>   nuance appartient au titre, pas au marqueur. Un vocabulaire fermé sans
+>   définition écrite se rouvre au premier cas limite : ces lignes existent
+>   pour ça ;
+> - le n°32 (aucun appareil mobile à disposition) reste `défaut` : une
+>   contrainte qui borne ce qu'on peut vérifier se comporte comme un point
+>   ouvert dont il faut tenir compte, pas comme un mode d'emploi.
+>
 > ⚠ **Cette liste se recompte à la main à chaque ajout.** Aucun test ne peut la
 > vérifier aujourd'hui, et le barré du titre ne suffit pas : sur les 39 entrées,
 > **18 titres sont barrés, 21 ne le sont pas — mais 13 de ces 21 sont clos**,
@@ -2081,13 +2119,36 @@ ne se comparent pas.
 
 ### Le relevé courant
 
-> Dernier relevé Codacy : **`4cdf88b`** — 1 issue, dette 15, LOC 12 953.
-> Intervalle recalculé au moment du relevé : **13 commits** depuis
-> `ab89cb1`.
+> Dernier relevé Codacy : **`dc27aa7`** (23/08/2026) — **1 issue**
+> (0,08 / kLoC), couverture 72 %, complexes 40 %, duplication 4 %.
+> Intervalle recalculé au moment du relevé : **2 commits** depuis la
+> borne précédente `4cdf88b`.
 
-La seule issue est `Trivy_secret` sur `app/cloud-config.js:23` : la clé
-`anon` publique de Supabase, publique par conception, instruite dans
-`.codacy.yml`. Faux positif connu, rien à reprendre.
+**Avant / après.** Relevé du 22/08 sur `49164b5` : **2 issues**
+(0,15 / kLoC). Relevé du 23/08 sur `dc27aa7` : **1 issue** (0,08 / kLoC).
+L'écart tient à `4cdf88b`, qui a supprimé le `GRIS` orphelin d'`intro.js`.
+Les trois autres métriques n'ont pas bougé. **L'intervalle entre les deux
+relevés couvre 3 commits** — aucun de ces chiffres n'est imputable à un
+commit isolé (⑦).
+
+La seule issue restante est `Trivy_secret` sur `app/cloud-config.js:23` :
+la clé `anon` publique de Supabase, publique par conception, instruite
+dans `.codacy.yml`. Faux positif connu, `resultDataId 131529630764`
+inchangé depuis le 20/08, rien à reprendre.
+
+### Ce que la borne raconte maintenant
+
+Le mécanisme ne change pas ; **sa raison d'être, si.** Il n'a jamais servi
+à rattraper l'absence d'un outil — cette absence n'a pas eu lieu. Il sert
+à ce dont ce point manquait vraiment : **savoir jusqu'où le dernier relevé
+fait foi.** Un relevé sans borne ne dit pas ce qu'il couvre ; avec borne,
+n'importe qui reprend le fil sans redemander.
+
+**À faire au prochain relevé** : recalculer l'intervalle *à ce moment-là*,
+avec `git log --oneline dc27aa7..HEAD`, déclarer le nombre de commits
+couverts, comparer aux chiffres ci-dessus, puis **remplacer la borne par
+le commit relevé**. Ne pas énumérer les commits — une liste écrite se
+périme au push suivant, c'est ce qui a été appris ici.
 
 ---
 
