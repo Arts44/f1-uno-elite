@@ -2893,6 +2893,35 @@ de mentir sous charge. En particulier :
 
 ### ⚠️ CORRECTION DU 24/08/2026 — LA CAUSE N'ÉTAIT PAS CELLE-CI
 
+### CE QUE CE CAS APPREND, AU-DELÀ DE LUI
+
+**L'hypothèse était DÉCLARÉE non éprouvée dans cette entrée, et elle a
+quand même servi de fondement à un chantier.** C'est écrit trois
+sections plus bas, mot pour mot : « l'hypothèse n'a jamais été éprouvée
+en reproduisant la charge exprès ». Elle a porté **trois tours et dix
+lignes de correctif** avant que quelqu'un aille mesurer.
+
+**UNE RÉSERVE ÉCRITE NE PROTÈGE DE RIEN SI PERSONNE NE LA LIT COMME UNE
+CONDITION D'ARRÊT.** Écrite au bas d'une entrée, entre deux paragraphes
+qui, eux, affirment, elle finit par ressembler à une **prudence de
+style** — la formule d'humilité qu'on ajoute par habitude et que le
+lecteur saute. Elle a été lue, d'ailleurs : elle n'a pas arrêté le
+chantier pour autant.
+
+**Ce qui aurait arrêté le chantier** : que la réserve soit une
+**question à répondre avant d'ouvrir**, pas une note à côté. « Avant
+d'écrire le remède, éprouver la cause » se place en TÊTE d'un chantier,
+au même rang que le chiffrage — pas en bas, au rang des nuances.
+
+**LES DEUX PARTS.** La mienne : j'ai écrit la réserve et j'ai quand même
+proposé le remède au tour suivant, sans jamais proposer de l'éprouver.
+**Celle du demandeur, et elle est réelle** : le chantier a été validé
+*en lisant cette réserve*, et le remède demandé **sans demander qu'on
+éprouve d'abord la cause**. **Deuxième fois cette semaine** — après le
+correctif CLS, où `ascent-override` avait été prescrit avant que la
+cause soit mesurée (⑮). Le motif est le même des deux côtés : **la
+réserve est lue, comprise, et ne change pas la décision.**
+
 **Tout ce qui suit sur « la machine chargée » était une hypothèse, et
 elle est fausse.** Une autre session a mesuré la vraie cause, sur
 40 requêtes concurrentes — la charge que Playwright produit avec ses
@@ -3005,6 +3034,73 @@ une métrique insensible à l'hôte — et ce n'est plus 6 lignes.
 ASSERTER.** ~6 lignes qui impriment le temps à chaque livraison, sans
 seuil, pour qu'une dérive se voie à la lecture. Non fait, non décidé.
 
+### 🔬 LE SECOND LOT A-T-IL LIEU D'ÊTRE ? — mesuré le 24/08/2026
+
+**Question posée** : maintenant que la vraie cause des faux rouges est
+connue et corrigée, les sommeils secs posaient-ils vraiment un problème,
+ou héritaient-ils du même diagnostic erroné ?
+
+**LE COMPTAGE D'ABORD : 21, dont 3 dans `verify_vitrine.py`.** Sur les
+18 restants, 13 attendent une condition NOMMABLE (un sélecteur, un état,
+une valeur en stockage) et 5 attendent quelque chose qui ne s'exprime
+pas autrement qu'en temps — prouver une absence, laisser une mise en
+page se stabiliser, ou un instant de mesure déclaré.
+
+**L'EXPÉRIENCE.** Dans un clone jetable, les 18 sommeils ont été rendus
+paramétrables par un facteur, puis les cinq filets rejoués :
+
+| facteur | résultat |
+|---|---|
+| **1,0** (témoin) | 5 filets sur 5 verts |
+| **0,0** — *tous les sommeils supprimés* | **4 filets sur 5 verts** |
+
+**Un seul filet a bronché** : `verify_tutorial.py`, sur une assertion
+qui NOMME le défaut (« le halo ne suit pas le menu de variantes »).
+
+**ISOLATION** : tous les sommeils du tutoriel à zéro **sauf** celui du
+menu de variantes (400 ms, ligne 303) → **vert, 0 échec**. Donc **17
+des 18 sommeils secs ne portent rien du tout** : les supprimer
+entièrement ne change aucun verdict.
+
+**LA MARGE DU SEUL QUI PORTE**, par bissection reproductible :
+
+| durée | 3 passes |
+|---|---|
+| 100 ms | **rouge 3/3** |
+| 120 ms | vert |
+| 160 ms, 200 ms | vert |
+| **400 ms (valeur en place)** | vert |
+
+La condition demande **100 à 120 ms**, le sommeil en donne 400 :
+**marge 3,3× à 4×**.
+
+### LA RÉPONSE : C'EST UNE INQUIÉTUDE DE PRINCIPE
+
+**Aucun cas observé de vert prématuré dû à un sommeil sec.** Ni dans le
+registre, ni dans cette liste : la seule entrée sur une attente fixe est
+⑲, et c'est un faux **ROUGE**. La phrase « ils mesurent trop tôt et
+rendent un vert qui ne prouve rien » était **ma** formulation d'un
+risque, jamais une observation.
+
+**Et le seul sommeil qui porte quelque chose échoue BRUYAMMENT quand il
+est trop court** : le filet nomme le défaut au lieu de passer au vert.
+C'est le contraire exact du mode de défaillance redouté.
+
+**⚠️ CE QUE CETTE EXPÉRIENCE NE PEUT PAS MONTRER, et c'est sa limite
+principale.** Un sommeil qui laisse quelque chose se stabiliser **avant
+une assertion qui ne vérifie pas ce quelque chose** passera au vert
+qu'on le supprime ou non. Les deux cas — « le sommeil était inutile » et
+« l'assertion est trop faible pour voir » — sont **indiscernables ici**.
+« 17 sur 18 ne portent rien » et « un vert prématuré se cache quelque
+part » restent compatibles. Le chercher demanderait de reprendre chaque
+assertion, pas chaque sommeil — **et ce serait un autre chantier que le
+second lot.**
+
+**CE QUE ÇA DIT DU SECOND LOT** : 50 à 70 lignes pour remplacer 17
+sommeils qui ne protègent rien de mesurable, et 1 qui a 3,3× de marge et
+qui rougit franchement quand on la lui retire. **Le rapport ne penche
+pas en sa faveur.**
+
 ### Ce qui n'est PAS établi
 
 **Que la charge machine soit la seule cause.** C'est l'hypothèse que les
@@ -3047,6 +3143,55 @@ deux attentes différentes. Elle n'a pas été éprouvée en reproduisant la
 charge délibérément.
 
 ---
+
+### LA CAUSE, MESURÉE LE 23/08/2026 : LA FILE D'ACCEPTATION DU SERVEUR
+
+**Le premier lot relevait les bornes. Il masquait un défaut d'INSTRUMENT.**
+
+Le serveur local que `livrer.sh` monte pour ses filets refusait des
+connexions sous la charge de Playwright. Mesure sur **40 requêtes
+concurrentes** contre `index.html` — la charge que produisent les contextes
+parallèles d'un filet :
+
+| Serveur | Résultat |
+|---|---|
+| `python3 -m http.server` | **6 OK / 34 ÉCHECS** |
+| `ThreadingHTTPServer` seul | **12 OK / 28 ÉCHECS** |
+| l'un **ou** l'autre + `request_queue_size = 128` | **40 OK / 0 ÉCHEC** |
+
+La cause est `request_queue_size = 5`, le défaut de `TCPServer` : le backlog
+de `listen()` ne retient que cinq connexions en attente d'`accept()`, et
+au-delà le noyau refuse en `ECONNREFUSED` tant que la boucle n'a pas repris
+la main. **Les refus arrivent en 0,0 s** — ce sont des refus immédiats,
+jamais des expirations. C'est le signe qui distingue ce défaut d'une app
+trop lente.
+
+**Ce que ça explique.** Les cinq faux rouges du 22-23/08, tous relevés
+« juste après un rendu Playwright lourd » et jamais au repos, sont
+cohérents avec un serveur qui refuse sous charge — bien plus qu'avec des
+attentes calibrées trop court. Relever les bornes de 5-40 s à 60 s
+n'a pas corrigé la cause : ça a donné au serveur le temps de se
+dégager, ce qui **fait disparaître le symptôme sans traiter le défaut**.
+
+**Le threading seul est un remède INSUFFISANT** : 28 échecs sur 40. Il
+avait été proposé comme correctif avant la mesure ; sans elle, un
+correctif qui ne corrige pas serait parti. C'est ⑤ appliqué à un remède :
+on vérifie que la parade marche, on ne la déduit pas de la cause.
+
+Corrigé dans `scripts/livrer.sh` par le commit `b49fbd6`.
+
+### CE QUI RESTE OUVERT ICI
+
+Les 24 attentes en durée fixe des six filets n'ont pas été traitées. Trois
+conversions sur `verify_vitrine.py` existent hors dépôt, **non commitées et
+non attribuées** : le filet passe seul mais la livraison complète a échoué
+trois fois sur quatre avec elles, et une fois sur une sans elles. Les
+échantillons sont trop petits pour conclure, et le point d'échec
+s'exécutait AVANT toute conversion. Rien n'est établi sur ce lien : il
+n'est donc pas écrit ici.
+
+Trois bornes ont aussi échappé au premier lot : `verify_qr.py:227` (10 s),
+`verify_touch.py:132` (20 s), `verify_tutorial.py:405` (15 s).
 
 ## 39. ~~L'adresse morte était imprimée sur la carte de profil partagée~~ — CORRIGÉ le 22/08/2026
 
@@ -3568,6 +3713,44 @@ qui sort du port au fichier local, octet par octet**. C'est ce garde-là
 qui empêche le cas ⑯ — un serveur d'un autre dépôt qui répond à la
 place et fait mesurer un autre arbre. Toute évolution du montage des
 serveurs doit le conserver.
+
+### 📮 À TRANSMETTRE À LA SESSION QUI TIENT `scripts/livrer.sh`
+
+**Trois points, vérifiés sur le fichier au commit `b49fbd6`.**
+
+**① LE MESSAGE DE REFUS PRESCRIT LE GESTE DANGEREUX.** Ligne 157 :
+
+    echo "   Ferme-le :  lsof -ti:$PORT | xargs kill"
+
+C'est exactement le réflexe qu'on vient de nommer comme destructeur.
+Il est juste pour un serveur résiduel, **il détruit une livraison en
+cours** — 219 s de travail, sans laisser trace de ce qu'il a détruit.
+**Un garde qui prescrit de tuer le travail d'autrui est pire qu'un
+garde muet** : le garde muet laisse hésiter, celui-ci donne un ordre.
+Ce message doit changer en même temps que le reste.
+
+**② CE QU'IL FAUDRAIT DIRE À LA PLACE**, ~8 lignes : distinguer
+« un serveur traîne » de « quelqu'un livre en ce moment » (un `pgrep`
+sur le vrai processus suffit à trancher), puis proposer le bon geste —
+attendre le PORT, pas un nom de processus :
+
+    until ! lsof -nP -iTCP:$PORT -sTCP:LISTEN >/dev/null 2>&1; do sleep 20; done
+
+⚠️ **Ne pas écrire `pgrep -f "scripts/livrer.sh"` dans l'attente** : la
+ligne de commande du shell qui exécute l'attente contient la chaîne
+cherchée, donc le garde se voit lui-même et n'en sort jamais. Testé,
+dix minutes perdues.
+
+**③ SI DES PORTS DYNAMIQUES SONT ENVISAGÉS — le comptage.** **Six
+filets** codent un port en dur, pas quatre :
+
+| port | filets |
+|---|---|
+| 8123 | `verify_qr.py`, `verify_touch.py` |
+| 8124 | `verify_zone.py`, `verify_tutorial.py`, `verify_trade_inbox.py`, `verify_vitrine.py` |
+
+Un port variable demande de toucher **les six**, plus le passage du
+numéro choisi à chacun. Ce n'est plus 8 lignes.
 
 **CHIFFRAGE — `livrer.sh` peut le dire lui-même, et ça coûte moins
 qu'une règle qu'on lit une fois.** Le script détecte DÉJÀ le port pris

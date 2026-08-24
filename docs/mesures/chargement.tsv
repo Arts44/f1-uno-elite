@@ -3,3 +3,25 @@
 2026-08-24T11:08:37	0.327	4.70	verify_touch/premiere-carte
 2026-08-24T11:14:27	0.491	9.71	verify_touch/premiere-carte
 2026-08-24T11:33:17	0.290	3.58	verify_touch/premiere-carte
+2026-08-24T13:08:36	0.189	6.82	verify_touch/premiere-carte
+#
+# ══ RUPTURE DE RÉGIME — b49fbd6, 2026-08-24T13:10 ═════════════════
+# AU-DESSUS : relevés pris AVANT le correctif de la file d'acceptation
+# du serveur local (request_queue_size 5 → 128). Mesuré sur 40 requêtes
+# concurrentes, le serveur d'avant rendait 6 OK / 34 ECHECS, celui
+# d'après 40 OK / 0 ECHEC — les refus arrivant en 0,0 s.
+# Un relevé pris pendant que le serveur refusait des sous-ressources ne
+# mesure PAS le temps de chargement de l'app : il mesure un chemin
+# dégradé. Les quatre de 11h valent 0,290 à 0,491 s ; ceux de 13h,
+# 0,189 et 0,155 s.
+# ⚠️ LA LIGNE EST POSÉE SUR L'HEURE DU COMMIT, PAS SUR CELLE DU
+# CORRECTIF. Le relevé de 13:08:36 est daté 2 min avant b49fbd6 et se
+# trouve donc au-dessus, mais le correctif était déjà dans l'arbre de
+# travail (non commité) depuis un moment : il a probablement tourné
+# AVEC. Son 0,189 s le suggère. Dans le doute, ne pas le compter dans
+# l'une ni dans l'autre série.
+# NE PAS CALCULER DE MÉDIANE À CHEVAL SUR CETTE LIGNE.
+# ══════════════════════════════════════════════════════════════════
+#
+2026-08-24T13:15:25	0.155	3.58	verify_touch/premiere-carte
+2026-08-24T13:43:14	0.225	14.53	verify_touch/premiere-carte
