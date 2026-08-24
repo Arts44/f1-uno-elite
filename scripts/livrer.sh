@@ -116,7 +116,38 @@ if [ "$LENTS" = "1" ]; then
   PIDS=""
   trap 'kill $PIDS 2>/dev/null || true' EXIT
   for PORT in 8123 8124; do
-    python3 -m http.server "$PORT" > /dev/null 2>&1 &
+    # LA FILE D'ACCEPTATION, PAS LE THREADING. Mesure du 23/08/2026 sur
+    # 40 requêtes concurrentes — la charge que Playwright produit avec ses
+    # contextes parallèles :
+    #   `python3 -m http.server`         :  6 OK / 34 ÉCHECS
+    #   ThreadingHTTPServer seul         : 12 OK / 28 ÉCHECS
+    #   l'un OU l'autre + backlog à 128  : 40 OK /  0 ÉCHEC
+    #
+    # `request_queue_size` est le backlog de listen() : la file des
+    # connexions EN ATTENTE d'accept(). Elle n'en retient que 5 par défaut
+    # (TCPServer) ; au-delà le noyau refuse en ECONNREFUSED tant que la
+    # boucle n'a pas repris la main. Les refus arrivent en 0,0 s — ce sont
+    # bien des refus immédiats, jamais des expirations.
+    #
+    # LE THREADING N'EST PAS CE QUI CORRIGE, et la mesure le dit : mono
+    # + backlog 128 rend déjà 40/0. Il est gardé par prudence pour ne pas
+    # sérialiser les requêtes une fois acceptées — **non mesuré, aucun gain
+    # observé sur les 40 requêtes du protocole**.
+    #
+    # CE QUE ÇA EXPLIQUE (n°38) : les faux rouges « juste après un rendu
+    # Playwright lourd » étaient le serveur qui refusait, pas l'app qui
+    # tardait. Relever les bornes au premier lot masquait un défaut
+    # d'INSTRUMENT.
+    #
+    # Le port passe par argv et non par interpolation dans le corps Python :
+    # une interpolation ratée donnerait une SyntaxError, donc un processus
+    # mort, donc le message « le port est déjà pris » — un diagnostic FAUX.
+    python3 -c '
+import sys
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+ThreadingHTTPServer.request_queue_size = 128
+ThreadingHTTPServer(("127.0.0.1", int(sys.argv[1])), SimpleHTTPRequestHandler).serve_forever()
+' "$PORT" > /dev/null 2>&1 &
     PIDS="$PIDS $!"
     sleep 1
     if ! kill -0 ${PIDS##* } 2>/dev/null; then
