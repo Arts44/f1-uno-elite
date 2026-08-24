@@ -45,6 +45,36 @@ ROOT = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
 CONTROLE = '--controle' in sys.argv
+# ══ BORNE DE SÉCURITÉ, PAS SEUIL DE MESURE ═════════════════════════
+# `wait_for_selector` EST DÉJÀ une attente sur signal : elle interroge
+# le DOM jusqu à ce que l élément paraisse. Le `timeout=` n est donc pas
+# le mécanisme d attente, c est la BORNE qui empêche un blocage
+# définitif quand l élément ne viendra jamais.
+#
+# CE QUE VALAIENT CES BORNES AVANT, ET POURQUOI C ÉTAIT FAUX : 5, 6, 8,
+# 15, 20 et 40 s, chacune calibrée sur une machine AU REPOS — donc lue,
+# de fait, comme « le temps que ça devrait prendre ». Cinq expirations
+# le 22-23/08/2026, toutes juste après un rendu Playwright lourd, aucune
+# au repos, sur trois attentes différentes dans deux filets. Le produit
+# n était en cause dans aucune.
+#
+# ⑲ dit ce que ça coûte : un faux rouge est plus cher qu un rouge tardif,
+# parce qu il apprend à ne pas croire le filet. La borne passe donc à
+# 60 s — assez pour qu une machine chargée ne la touche jamais, assez
+# peu pour qu un élément qui ne viendra JAMAIS soit signalé en une
+# minute au lieu de bloquer la livraison.
+#
+# ⚠️ CE NOMBRE N EST PAS UNE MESURE. Personne n a mesuré que l app se
+# charge en moins de 60 s : on a mesuré qu elle se charge en 2 à 4 s au
+# repos, et on borne 15 à 30 fois au-dessus. Le lire comme une
+# performance attendue serait une erreur, et c est pour ça qu il porte
+# ce nom-là plutôt qu un littéral.
+#
+# CE QUE CETTE BORNE N EXERCE PAS (㉔) : la LENTEUR. Une app dont le
+# chargement passerait de 2 s à 45 s rendrait ce filet VERT. Rien dans
+# ce dépôt ne mesure le temps de chargement de l app — voir n°38.
+BORNE_SECURITE_MS = 60_000
+
 # capture_seed lit sys.argv[1] comme une SAISON : on lui retire nos
 # propres drapeaux AVANT l'import, sinon il tombe sur « --controle ».
 sys.argv = [a for a in sys.argv if not a.startswith('--')]
@@ -199,7 +229,7 @@ def main():
             pg = c.new_page()
             pg.goto(URL)
             pg.wait_for_load_state('networkidle')
-            pg.wait_for_selector('.card', timeout=20000)
+            pg.wait_for_selector('.card', timeout=BORNE_SECURITE_MS)
             if CONTROLE and nom == '375':
                 # CONTRÔLE NÉGATIF ① : on rend son bottom en dur à une
                 # surface. Le filet DOIT alors voir le chevauchement.
@@ -235,7 +265,7 @@ def main():
         pg = c.new_page()
         pg.goto(URL)
         pg.wait_for_load_state('networkidle')
-        pg.wait_for_selector('.card', timeout=20000)
+        pg.wait_for_selector('.card', timeout=BORNE_SECURITE_MS)
         scene(pg, 'nl')
         pg.evaluate("""() => {
             const o = document.createElement('div'); o.className = 'tut-overlay';
@@ -277,7 +307,7 @@ def main():
         pg = c.new_page()
         pg.goto(URL)
         pg.wait_for_load_state('networkidle')
-        pg.wait_for_selector('.card', timeout=20000)
+        pg.wait_for_selector('.card', timeout=BORNE_SECURITE_MS)
         # La scène du clic est INERTE. Le premier filet cliquait sur le
         # vrai bandeau « Nouveautés » de l'app : son gestionnaire ouvre
         # le changelog, qui recouvre tout — les sept clics suivants

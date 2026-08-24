@@ -2816,11 +2816,11 @@ Ce qui EST mesuré, c'est que **ce moteur-ci ne peut pas la rendre**.
 
 ---
 
-## 38. Les filets navigateur rougissent à tort sous `livrer.sh` — attentes à durée fixe
+## 38. Les filets navigateur rougissaient à tort sous `livrer.sh` — PREMIER LOT FAIT, second ouvert
 
 <!-- état: ouvert · type: défaut -->
 
-**Chantier ouvert, non corrigé.** Ce n'est pas un défaut du produit : le
+**Premier lot corrigé le 23/08/2026 ; le second reste ouvert.** Ce n'est pas un défaut du produit : le
 geste tactile fonctionne, le filet le prouve, et il l'a prouvé encore
 le jour où il a rougi.
 
@@ -2859,7 +2859,7 @@ vingt-quatre autres sont plus dangereuses **dans l'autre sens** — un
 sommeil trop court ne rougit pas, il mesure trop tôt et rend un vert
 qui ne prouve rien.
 
-### Le remède, chiffré
+### Le remède, chiffré (établi avant le premier lot)
 
 **Le principe : attendre un signal, pas une durée.** Le signal existe
 déjà dans chaque cas ; c'est le plafond qui est arbitraire.
@@ -2872,7 +2872,9 @@ déjà dans chaque cas ; c'est le plafond qui est arbitraire.
 **Le premier lot est le vrai chantier** : dix lignes, zéro changement de
 sémantique, et il éteint le symptôme qui apprend à ignorer le filet.
 Le second est plus long et n'a aucun défaut constaté à son actif — il
-se décide séparément.
+se décide séparément. **Le premier lot est fait (voir plus bas) ; le
+second — les 24 `wait_for_timeout`, 50 à 70 lignes — reste ouvert et
+n'était pas dans ce chantier.**
 
 ### Ce que ce remède N'EXERCERAIT PAS (㉔)
 
@@ -2888,6 +2890,78 @@ de mentir sous charge. En particulier :
 - il **n'exercerait rien** des vingt-quatre sommeils secs, qui restent
   le trou le plus large ;
 - il **ne dirait rien** de la cause : voir ci-dessous.
+
+### ✅ PREMIER LOT — FAIT le 23/08/2026 : les 10 attentes plafonnées
+
+`wait_for_selector` **est déjà** une attente sur signal — elle interroge
+le DOM jusqu'à ce que l'élément paraisse. Le `timeout=` n'est pas le
+mécanisme d'attente, **c'est la borne qui empêche un blocage définitif**.
+Le défaut n'était donc pas le mécanisme, c'était la valeur de la borne :
+5, 6, 8, 15, 20 et 40 s, chacune calibrée sur une machine au repos et
+lue, de fait, comme « le temps que ça devrait prendre ».
+
+Les dix sites portent maintenant `BORNE_SECURITE_MS = 60_000`, **une
+constante nommée par site plutôt qu'un littéral**, précisément pour que
+personne ne la relise dans six mois comme une mesure :
+
+| filet | sites |
+|---|---|
+| `verify_qr.py` | 2 |
+| `verify_zone.py` | 3 |
+| `verify_tutorial.py` | 3 |
+| `verify_touch.py` | 1 |
+| `verify_trade_inbox.py` | 1 |
+| `verify_vitrine.py` | 0 — il n'en avait aucun |
+
+Aucun littéral ne subsiste en `timeout=` sur un `wait_for_selector`.
+
+**L'ÉCART EST CHIFFRÉ, ET C'EST LUI QUI JUSTIFIE LE NOMBRE.** Temps
+mesuré jusqu'à la première carte, machine au repos, n=5 :
+**0,23 s de médiane** (0,23 · 0,23 · 0,23 · 0,24 · 0,40 à froid). La
+borne de 60 s est donc **260 fois la médiane** — assez pour qu'une
+machine chargée ne la touche jamais, assez peu pour qu'un élément qui ne
+viendra jamais soit signalé en une minute.
+
+**CONTRÔLE NÉGATIF, VU ROUGE.** Dans un clone jetable, l'attente de
+`verify_touch.py` a été pointée sur `.jamais-cette-classe` :
+
+    CODE = 1 · durée = 62 s
+    TimeoutError: Page.wait_for_selector: Timeout 60000ms exceeded.
+    waiting for locator(".jamais-cette-classe")
+
+**Une borne à 60 s ne transforme donc pas un vrai échec en attente qui
+finit par passer** : elle le rend en une minute, avec le sélecteur en
+clair. C'était la question posée, et c'est la réponse mesurée.
+
+### ⚠️ CE QUE CE PREMIER LOT N'EXERCE TOUJOURS PAS (㉔)
+
+**LA LENTEUR.** Une app dont le chargement passerait de 0,23 s à 45 s
+rendrait ces dix filets **verts**. La borne protège contre un blocage,
+pas contre une régression de performance — et **rien dans ce dépôt ne
+mesure le temps de chargement de l'app**. Ce n'est pas un effet de bord
+du correctif : c'était déjà vrai avant, à 20 s près.
+
+**CHIFFRAGE D'UN GARDE DE TEMPS DE CHARGEMENT — et pourquoi il ne coûte
+PAS peu.** La mesure est triviale : deux `time.monotonic()` autour du
+`goto` + `wait_for_selector`, un `print`, **~6 lignes** dans un filet
+existant. **C'est le SEUIL qui n'est pas chiffrable ici**, et c'est la
+même impasse que celle qu'on vient de sortir :
+
+| seuil | ce qu'il attrape | ce qu'il coûte |
+|---|---|---|
+| 1 s | une régression 0,23 → 1 s | **rougit à chaque charge machine** — on recrée exactement ⑲ |
+| 20 s | une panne franche | **rate un facteur 80** (0,23 → 18 s passe au vert) |
+
+L'étendue au repos est déjà de **71 %** (0,23 → 0,40 sur cinq mesures,
+à cause du premier lancement à froid) ; sous charge, les cinq
+expirations montrent des dépassements de 5 à 40 s. **Aucun seuil en
+temps mural ne sépare « l'app a ralenti » de « la machine est
+occupée ».** Un garde honnête demanderait soit une machine dédiée, soit
+une métrique insensible à l'hôte — et ce n'est plus 6 lignes.
+
+**Ce qui coûterait peu et vaudrait quelque chose : MESURER SANS
+ASSERTER.** ~6 lignes qui impriment le temps à chaque livraison, sans
+seuil, pour qu'une dérive se voie à la lecture. Non fait, non décidé.
 
 ### Ce qui n'est PAS établi
 
@@ -3304,7 +3378,77 @@ Ici le mal a été nul — leur travail venait d'être commité — mais
 **c'est un coup de chance, pas une précaution** : rien n'avait été
 vérifié avant de lancer la commande.
 
-**LE POINT COMMUN DES TROIS CAS (contenu, push, stash) : une opération
+### CHIFFRAGE D'UN GARDE `pre-push` — et pourquoi l'évident ne marche pas
+
+Question posée : le hook `pre-push` peut-il comparer les **auteurs** ou
+les **horodatages** des commits qu'il s'apprête à pousser ?
+
+**Mesuré, et la réponse est non pour les deux.** Les deux sessions
+commitent sous des identités **rigoureusement identiques** :
+
+    Arts44 <amestdagt@proximus.be>   en auteur ET en committer
+
+Et leurs horodatages sont **entrelacés à la minute** :
+
+    0d7bcc4  09:25  (cette session)
+    b390e7c  09:25  (l'autre)
+    ec0a088  09:27  (l'autre)
+
+**Ni `%an`, ni `%ae`, ni `%cn`, ni `%ce`, ni `%ad` ne discriminent quoi
+que ce soit.** Deux sessions du même agent, sur la même machine, avec la
+même configuration git, sont indistinguables **par construction** : il
+n'existe aucun champ intrinsèque à porter la différence.
+
+**LA SEULE CHOSE QUI PEUT DISCRIMINER EST CE QUE LA SESSION ENREGISTRE
+ELLE-MÊME.** ~12 lignes :
+
+| pièce | coût |
+|---|---|
+| après chaque commit, ajouter `HEAD` à `.git/session-<id>` | 2 lignes, hook `post-commit` |
+| dans `pre-push`, comparer `git log origin/main..HEAD` à cette liste | ~8 lignes |
+| refuser, en nommant les commits étrangers | ~2 lignes |
+
+**CE QUE CE GARDE N'EXERCERAIT PAS (㉔)**, et il faut le dire avant de
+l'écrire : il **ne protège pas** la session qui n'a pas le hook — une
+session sans `post-commit` n'enregistre rien, donc tous ses commits
+paraissent étrangers à l'autre, et le garde devient un refus permanent.
+Il suppose donc que **les deux** sessions l'ont installé, ce qu'aucune
+des deux ne peut vérifier. Et **les hooks git ne sont pas versionnés** :
+après un clone, il n'existe plus.
+
+**NON ÉCRIT.** Un garde qui ne tient que si les deux côtés coopèrent, et
+qui disparaît au clone, ne vaut pas mieux que la règle de lecture écrite
+dans CONVENTIONS — laquelle, au moins, ne prétend pas être mécanique.
+
+### QUATRIÈME FORME, observée en direct le 23/08/2026 : `livrer.sh` ne peut pas tourner deux fois
+
+`scripts/livrer.sh` monte ses serveurs sur les ports **8123 et 8124**,
+codés en dur (le script refuse même de partir si l'un est pris — c'est
+une parade voulue, contre un serveur d'une autre session qui servirait
+un autre arbre).
+
+**Conséquence non anticipée : deux sessions ne peuvent pas livrer en
+même temps**, et la seconde ne le découvre pas proprement. Trois
+symptômes vus dans la même demi-heure, tous les trois trompeurs :
+
+- `Page.goto: net::ERR_CONNECTION_REFUSED` — l'autre livraison venait de
+  démonter ses serveurs entre mon `kill` et mon `goto` ;
+- une livraison qui s'arrête sans verdict, à mi-parcours ;
+- `LIVRAISON REFUSÉE — le port 8123 est déjà pris`, le seul des trois
+  qui dise la vérité.
+
+**Et le réflexe dangereux qu'il induit** : « le port est pris, je tue le
+processus ». J'ai failli tuer la livraison de l'autre session en cours —
+elle a duré **219 s** — pour lancer la mienne. Le bon geste est
+d'attendre : `until ! pgrep -f "scripts/livrer.sh"; do sleep 20; done`.
+
+**Ce n'est pas un défaut de `livrer.sh`** : les ports fixes protègent
+d'un défaut pire (mesurer un autre arbre). C'est le même motif que les
+trois autres — **une ressource qu'on croit à soi est partagée** — et il
+n'a pas de correctif évident : des ports dynamiques rendraient le filet
+vulnérable à ce contre quoi les ports fixes le protègent.
+
+**LE POINT COMMUN DES QUATRE CAS (contenu, push, stash, ports) : une opération
 qu'on croit LOCALE a un effet CHEZ QUELQU'UN D'AUTRE.** `stash`, `push`,
 `checkout --`, `reset --hard`, `clean` : aucune ne demande confirmation,
 aucune ne mentionne l'autre session, et toutes agissent sur un arbre

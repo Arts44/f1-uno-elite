@@ -63,6 +63,36 @@ from playwright.sync_api import sync_playwright
 from capture_seed import init_script
 
 URL = 'http://localhost:8124/app/index.html'
+# ══ BORNE DE SÉCURITÉ, PAS SEUIL DE MESURE ═════════════════════════
+# `wait_for_selector` EST DÉJÀ une attente sur signal : elle interroge
+# le DOM jusqu à ce que l élément paraisse. Le `timeout=` n est donc pas
+# le mécanisme d attente, c est la BORNE qui empêche un blocage
+# définitif quand l élément ne viendra jamais.
+#
+# CE QUE VALAIENT CES BORNES AVANT, ET POURQUOI C ÉTAIT FAUX : 5, 6, 8,
+# 15, 20 et 40 s, chacune calibrée sur une machine AU REPOS — donc lue,
+# de fait, comme « le temps que ça devrait prendre ». Cinq expirations
+# le 22-23/08/2026, toutes juste après un rendu Playwright lourd, aucune
+# au repos, sur trois attentes différentes dans deux filets. Le produit
+# n était en cause dans aucune.
+#
+# ⑲ dit ce que ça coûte : un faux rouge est plus cher qu un rouge tardif,
+# parce qu il apprend à ne pas croire le filet. La borne passe donc à
+# 60 s — assez pour qu une machine chargée ne la touche jamais, assez
+# peu pour qu un élément qui ne viendra JAMAIS soit signalé en une
+# minute au lieu de bloquer la livraison.
+#
+# ⚠️ CE NOMBRE N EST PAS UNE MESURE. Personne n a mesuré que l app se
+# charge en moins de 60 s : on a mesuré qu elle se charge en 2 à 4 s au
+# repos, et on borne 15 à 30 fois au-dessus. Le lire comme une
+# performance attendue serait une erreur, et c est pour ça qu il porte
+# ce nom-là plutôt qu un littéral.
+#
+# CE QUE CETTE BORNE N EXERCE PAS (㉔) : la LENTEUR. Une app dont le
+# chargement passerait de 2 s à 45 s rendrait ce filet VERT. Rien dans
+# ce dépôt ne mesure le temps de chargement de l app — voir n°38.
+BORNE_SECURITE_MS = 60_000
+
 ECHECS = []
 
 # Les deux SEULES clés qu'un tutoriel terminé a le droit de laisser
@@ -376,7 +406,7 @@ with sync_playwright() as p:
     except Exception as e:
         print(f'ÉCHEC : {URL} injoignable — lance `python3 -m http.server 8124`\n{e}')
         sys.exit(1)
-    page.wait_for_selector('.card', timeout=15000)
+    page.wait_for_selector('.card', timeout=BORNE_SECURITE_MS)
     page.wait_for_timeout(600)
 
     avant_ls = instantane(page)
@@ -385,9 +415,9 @@ with sync_playwright() as p:
     # On entre par « Rejouer » des Réglages : c'est le chemin réel, et il
     # ne dépend pas de l'état « déjà vu ».
     page.evaluate('document.querySelector(".bn-tab[data-view=\\"settings\\"]").click()')
-    page.wait_for_selector('#replayTutBtn', timeout=8000)
+    page.wait_for_selector('#replayTutBtn', timeout=BORNE_SECURITE_MS)
     page.evaluate('document.getElementById("replayTutBtn").click()')
-    page.wait_for_selector('.tut-bubble', timeout=8000)
+    page.wait_for_selector('.tut-bubble', timeout=BORNE_SECURITE_MS)
     page.wait_for_timeout(1200)
 
     etapes, actions, sautees = parcourir(page)

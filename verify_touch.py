@@ -50,6 +50,37 @@ sys.path.insert(0, __file__.rsplit('/', 1)[0])
 from capture_seed import init_script
 
 URL = 'http://localhost:8123/app/index-dev.html'
+
+# ══ BORNE DE SÉCURITÉ, PAS SEUIL DE MESURE ═════════════════════════
+# `wait_for_selector` EST DÉJÀ une attente sur signal : elle interroge
+# le DOM jusqu à ce que l élément paraisse. Le `timeout=` n est donc pas
+# le mécanisme d attente, c est la BORNE qui empêche un blocage
+# définitif quand l élément ne viendra jamais.
+#
+# CE QUE VALAIENT CES BORNES AVANT, ET POURQUOI C ÉTAIT FAUX : 5, 6, 8,
+# 15, 20 et 40 s, chacune calibrée sur une machine AU REPOS — donc lue,
+# de fait, comme « le temps que ça devrait prendre ». Cinq expirations
+# le 22-23/08/2026, toutes juste après un rendu Playwright lourd, aucune
+# au repos, sur trois attentes différentes dans deux filets. Le produit
+# n était en cause dans aucune.
+#
+# ⑲ dit ce que ça coûte : un faux rouge est plus cher qu un rouge tardif,
+# parce qu il apprend à ne pas croire le filet. La borne passe donc à
+# 60 s — assez pour qu une machine chargée ne la touche jamais, assez
+# peu pour qu un élément qui ne viendra JAMAIS soit signalé en une
+# minute au lieu de bloquer la livraison.
+#
+# ⚠️ CE NOMBRE N EST PAS UNE MESURE. Personne n a mesuré que l app se
+# charge en moins de 60 s : on a mesuré qu elle se charge en 2 à 4 s au
+# repos, et on borne 15 à 30 fois au-dessus. Le lire comme une
+# performance attendue serait une erreur, et c est pour ça qu il porte
+# ce nom-là plutôt qu un littéral.
+#
+# CE QUE CETTE BORNE N EXERCE PAS (㉔) : la LENTEUR. Une app dont le
+# chargement passerait de 2 s à 45 s rendrait ce filet VERT. Rien dans
+# ce dépôt ne mesure le temps de chargement de l app — voir n°38.
+BORNE_SECURITE_MS = 60_000
+
 SEUIL_PRODUIT = 80          # app/app.js — `if(dy > 80) closeMo()`
 SOUS_LE_SEUIL = 60          # doit NE PAS fermer
 SUR_LE_SEUIL = 120          # doit fermer
@@ -94,7 +125,7 @@ def main():
             # filet. On attend donc d'abord que la carte soit ATTACHEE — le
             # rendu a eu lieu — puis qu'elle ait une boite. Deux conditions
             # franches valent mieux qu'un plafond genereux (registre ⑲).
-            pg.wait_for_selector('.card', state='attached', timeout=40000)
+            pg.wait_for_selector('.card', state='attached', timeout=BORNE_SECURITE_MS)
             pg.wait_for_function(
                 "() => { const c = document.querySelector('.card');"
                 " if (!c) return false; const b = c.getBoundingClientRect();"
