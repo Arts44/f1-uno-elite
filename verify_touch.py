@@ -42,7 +42,7 @@ filet cesse de discriminer sans rougir.
     python3 -m http.server 8123        # a la racine du depot
     python3 verify_touch.py
 """
-import sys
+import sys, os, time, datetime
 
 from playwright.sync_api import sync_playwright
 
@@ -108,6 +108,53 @@ def glisser(cdp, pg, dy, pas=6):
     pg.wait_for_timeout(450)
 
 
+SERIE = 'docs/mesures/chargement.tsv'
+
+
+def relever(secondes):
+    """INSTRUMENT DE COLLECTE — PAS UN GARDE.
+
+    ⚠️ CECI NE ROUGIT JAMAIS. Aucun seuil, aucune assertion, aucun code
+    de sortie. Tant que personne ne lit la serie, ca ne protege de rien
+    — c'est dit ici pour que personne ne le prenne pour un filet.
+
+    POURQUOI SANS SEUIL : aucun seuil n'est chiffrable AUJOURD'HUI.
+    Mesure du 23/08/2026, machine au repos, n=5 : mediane 0,23 s, mais
+    etendue de 71 % (0,23 a 0,40 a froid). Sous charge, cinq expirations
+    ont depasse 5 a 40 s. A 1 s le seuil rougirait a chaque charge
+    machine — on recreerait ⑲ ; a 20 s il raterait un facteur 80. Aucun
+    seuil en temps mural ne separe « l'app a ralenti » de « la machine
+    est occupee ».
+
+    CE QUE TRENTE RELEVES DIRONT, et qu'aucune estimation ne peut dire :
+    la mediane REELLE sur des machines reellement chargees, l'etendue
+    REELLE, et donc s'il existe un seuil possible — ou s'il faut une
+    metrique insensible a l'hote.
+
+    OU EST ECRITE LA SERIE, ET POURQUOI LA : docs/mesures/chargement.tsv,
+    un fichier SUIVI PAR GIT. C'est la seule categorie d'emplacement qui
+    survive a un clone — .git/ ne se clone pas, /tmp non plus, et un
+    fichier non suivi disparait au premier clone frais. Le prix est
+    assume : chaque livraison salit l'arbre de travail d'une ligne, et
+    cette ligne se commite avec le travail du jour.
+    """
+    try:
+        os.makedirs(os.path.dirname(SERIE), exist_ok=True)
+        neuf = not os.path.exists(SERIE)
+        with open(SERIE, 'a', encoding='utf-8') as f:
+            if neuf:
+                f.write('# horodatage\tsecondes\tcharge_1min\tcontexte\n')
+            charge = os.getloadavg()[0]
+            f.write('%s\t%.3f\t%.2f\tverify_touch/premiere-carte\n'
+                    % (datetime.datetime.now().isoformat(timespec='seconds'),
+                       secondes, charge))
+        print('  releve         premiere carte en %.2f s (charge %.2f) → %s'
+              % (secondes, charge, SERIE))
+    except OSError as e:
+        # UN INSTRUMENT DE COLLECTE NE FAIT JAMAIS ECHOUER CE QU'IL MESURE.
+        print('  releve         non ecrit (%s) — sans consequence' % e)
+
+
 def main():
     echecs = []
     with sync_playwright() as p:
@@ -117,6 +164,7 @@ def main():
             c.add_init_script(init_script('en', 'dark'))
             pg = c.new_page()
             cdp = c.new_cdp_session(pg)
+            depart = time.monotonic()
             pg.goto(URL, wait_until='load')
             # DEUX SIGNAUX, PAS UN SEUL — et surtout pas une duree. La
             # premiere version attendait `.card` VISIBLE en un seul appel :
@@ -130,6 +178,8 @@ def main():
                 "() => { const c = document.querySelector('.card');"
                 " if (!c) return false; const b = c.getBoundingClientRect();"
                 " return b.width > 0 && b.height > 0; }", timeout=20000)
+            if essai == 1:
+                relever(time.monotonic() - depart)
             pg.wait_for_timeout(600)
 
             if not ouvrir(pg):

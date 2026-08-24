@@ -2891,6 +2891,48 @@ de mentir sous charge. En particulier :
   le trou le plus large ;
 - il **ne dirait rien** de la cause : voir ci-dessous.
 
+### ⚠️ CORRECTION DU 24/08/2026 — LA CAUSE N'ÉTAIT PAS CELLE-CI
+
+**Tout ce qui suit sur « la machine chargée » était une hypothèse, et
+elle est fausse.** Une autre session a mesuré la vraie cause, sur
+40 requêtes concurrentes — la charge que Playwright produit avec ses
+contextes parallèles :
+
+| serveur | résultat |
+|---|---|
+| `python3 -m http.server` | **6 OK / 34 ÉCHECS** |
+| `ThreadingHTTPServer` seul | 12 OK / 28 ÉCHECS |
+| l'un ou l'autre + `request_queue_size = 128` | **40 OK / 0 ÉCHEC** |
+
+**La cause est `request_queue_size = 5`, le défaut de `TCPServer`**, qui
+déborde dès que Playwright ouvre plus de cinq connexions à la fois. Les
+refus arrivent **en 0,0 s** : ce sont des `ECONNREFUSED` immédiats, pas
+des expirations. **Ce n'était donc pas l'app qui tardait, c'était le
+serveur du filet qui refusait.**
+
+**CE QUE ÇA DIT DE MON DIAGNOSTIC** : j'ai conclu « machine chargée →
+l'app met plus longtemps → la borne trop serrée expire », et j'ai écrit
+noir sur blanc que l'hypothèse n'avait jamais été éprouvée en
+reproduisant la charge exprès. **Quelqu'un l'a fait, et la réponse est
+autre.** C'est l'ordre de suspicion du registre pris à l'envers : j'ai
+soupçonné l'environnement, pas l'instrument, alors que l'instrument
+comprend le serveur qu'il monte lui-même.
+
+**CE QUE DEVIENT LE PREMIER LOT.** Les bornes à 60 s restent justes **en
+tant que bornes** — 5 s calibrées au repos ne sont pas une limite de
+sécurité —, mais **elles n'ont pas corrigé les faux rouges observés, et
+elles ne pouvaient pas** : si une sous-ressource est refusée, la carte
+n'apparaît jamais, et attendre 60 s au lieu de 20 ne change rien.
+**Elles masquaient un défaut d'instrument.** Le correctif réel est le
+backlog à 128, écrit par l'autre session dans `scripts/livrer.sh`.
+
+**CE QUI RESTE VRAI DU PREMIER LOT** : le contrôle négatif (une attente
+impossible rend rouge en 62 s), et la distinction borne/seuil écrite à
+côté de chaque valeur. **Ce qui est faux** : la section « Ce qui n'est
+PAS établi » ci-dessous, qui présentait la charge machine comme la
+cause probable. Elle est conservée telle quelle, barrée par ce
+paragraphe — l'erreur de diagnostic vaut d'être lisible.
+
 ### ✅ PREMIER LOT — FAIT le 23/08/2026 : les 10 attentes plafonnées
 
 `wait_for_selector` **est déjà** une attente sur signal — elle interroge
@@ -3261,6 +3303,29 @@ coûterait plus que les 63.
 
 <!-- état: ouvert · type: défaut -->
 
+### ⚠️ LE POINT COMMUN, ET IL EST LE SUJET DE L'ENTRÉE
+
+**UNE OPÉRATION QU'ON CROIT LOCALE A UN EFFET CHEZ QUELQU'UN D'AUTRE.**
+Le dépôt est partagé, l'arbre de travail aussi, l'index aussi, et les
+ports aussi. Quatre formes se sont produites, toutes le 22-23/08/2026 :
+
+| | l'opération | l'effet chez l'autre |
+|---|---|---|
+| **le contenu** | éditer une doc | fusionne sans conflit, rend un fichier cohérent en apparence et faux |
+| **le push** | `git push` | publie ses commits locaux, qu'elle ne pouvait plus amender |
+| **le stash** | `git stash` | vide son arbre de travail, fichiers non suivis compris |
+| **le port** | lancer `livrer.sh` | refuse sa livraison, ou fait échouer la sienne en cours |
+
+Aucune des quatre ne demande confirmation. Aucune ne mentionne l'autre
+session. **Trois des quatre ne laissent aucune trace à chercher après
+coup** — seule la première est retrouvable, et le contrôle rétrospectif
+plus bas montre qu'elle ne l'est presque pas non plus.
+
+**PARADE COMMUNE : éprouver toute commande qui touche l'index, le stash,
+l'historique ou la publication dans un CLONE JETABLE** —
+`git clone --no-hardlinks . /tmp/bac` — jamais dans le dépôt vivant.
+Écrite dans CONVENTIONS, avec la règle de lecture avant push.
+
 **Vécu le 22/08/2026, pendant l'écriture même de ce document.**
 `docs/POINTS-SIGNALES.md` a été modifié par une autre session Claude
 Code pendant que celle-ci le réécrivait : le marqueur d'état que je
@@ -3442,20 +3507,102 @@ processus ». J'ai failli tuer la livraison de l'autre session en cours —
 elle a duré **219 s** — pour lancer la mienne. Le bon geste est
 d'attendre : `until ! pgrep -f "scripts/livrer.sh"; do sleep 20; done`.
 
+**⚠️ CORRECTION D'ATTRIBUTION, 24/08/2026.** J'ai imputé mes deux
+`ERR_CONNECTION_REFUSED` à la livraison de l'autre session. **Pour l'un
+des deux j'ai la preuve** (`pgrep` a montré son `livrer.sh` en cours,
+219 s, terminé vert). **Pour l'autre, non**, et deux mécanismes plus
+simples l'expliquent aussi bien :
+
+- **la file d'acceptation du serveur** (voir la correction en tête de
+  n°38) : `ECONNREFUSED` immédiat dès plus de cinq connexions
+  simultanées, sans aucune collision entre sessions ;
+- **ma propre mise en arrière-plan** : une exécution lancée en tâche de
+  fond et coupée par le délai de l'outil fait tomber les serveurs — le
+  `trap ... EXIT` de `livrer.sh` les tue — **pendant que des filets
+  tournent encore**. Symptôme identique, en milieu de campagne.
+
+**Je ne peux donc pas dire lequel des trois a causé quoi**, et la
+collision entre livraisons reste la moins probable des trois pour le
+cas non prouvé.
+
+**LE BON GESTE : ATTENDRE, NE JAMAIS TUER.** On attend **LE PORT**, pas
+un nom de processus :
+
+    until ! lsof -nP -iTCP:8123 -sTCP:LISTEN >/dev/null 2>&1; do sleep 20; done
+
+**⚠️ NE PAS ÉCRIRE `pgrep -f "scripts/livrer.sh"` — testé, ça ne se
+termine jamais.** `pgrep -f` compare la ligne de commande complète, et
+la ligne du shell qui exécute l'attente CONTIENT la chaîne cherchée : le
+garde se voit lui-même et attend indéfiniment. Vécu le 24/08/2026, dix
+minutes d'attente sur une livraison qui n'existait pas — les deux seuls
+processus trouvés étaient mes propres enveloppes `zsh`.
+
+C'est la même leçon que le premier lot du n°38, à l'envers : **on attend
+la CONDITION qui compte — ici « le port est libre » — pas un signe
+indirect qui peut désigner autre chose.** Le port est la ressource
+réellement en contention ; le nom du processus n'en est qu'un proxy, et
+un proxy qui s'auto-désigne.
+
+Le processus qui tient le port n'est pas un résidu : c'est une livraison
+en cours. Celle que j'ai failli tuer a duré **219 s** et s'est terminée
+verte. **Un `kill` sur ce port détruit un travail qui aboutissait, et ne
+laisse aucune trace de ce qu'il a détruit** — la victime voit une
+livraison interrompue sans cause visible.
+
 **Ce n'est pas un défaut de `livrer.sh`** : les ports fixes protègent
 d'un défaut pire (mesurer un autre arbre). C'est le même motif que les
-trois autres — **une ressource qu'on croit à soi est partagée** — et il
-n'a pas de correctif évident : des ports dynamiques rendraient le filet
-vulnérable à ce contre quoi les ports fixes le protègent.
+trois autres — **une ressource qu'on croit à soi est partagée** — et
+des ports dynamiques rendraient le filet vulnérable à ce contre quoi
+les ports fixes le protègent.
 
-**LE POINT COMMUN DES QUATRE CAS (contenu, push, stash, ports) : une opération
-qu'on croit LOCALE a un effet CHEZ QUELQU'UN D'AUTRE.** `stash`, `push`,
-`checkout --`, `reset --hard`, `clean` : aucune ne demande confirmation,
-aucune ne mentionne l'autre session, et toutes agissent sur un arbre
-partagé. **Parade immédiate : éprouver un hook ou une commande
-destructive dans un CLONE JETABLE** — `git clone --no-hardlinks . /tmp/bac`
-— jamais dans le dépôt vivant. C'est ce qui a été fait pour les huit cas
-du hook `pre-commit`, après l'incident.
+**CE QUE LE MULTI-THREAD NE CORRIGE PAS — confirmé par la mesure.** Le
+backlog à 128 traite les refus **sous charge Playwright**. La collision
+entre deux livraisons est autre chose : elle vient des **ports déjà
+liés**, et un `ThreadingHTTPServer` ne peut pas se lier deux fois au
+même port. Les deux symptômes se ressemblent (`ECONNREFUSED`) et n'ont
+pas la même cause.
+
+**CE QUI PROTÈGE DÉJÀ, ET QU'IL NE FAUT PAS PERDRE** : `livrer.sh` ne
+se contente pas de vérifier que son serveur est vivant, **il compare ce
+qui sort du port au fichier local, octet par octet**. C'est ce garde-là
+qui empêche le cas ⑯ — un serveur d'un autre dépôt qui répond à la
+place et fait mesurer un autre arbre. Toute évolution du montage des
+serveurs doit le conserver.
+
+**CHIFFRAGE — `livrer.sh` peut le dire lui-même, et ça coûte moins
+qu'une règle qu'on lit une fois.** Le script détecte DÉJÀ le port pris
+et refuse ; il lui manque de distinguer **« un serveur traîne »** de
+**« quelqu'un livre en ce moment »**, et de proposer le bon geste :
+
+| pièce | coût |
+|---|---|
+| `pgrep -f scripts/livrer.sh` avant le refus, pour savoir si c'est une livraison ou un résidu | 1 ligne |
+| deux messages distincts : « résidu, tue-le » / « livraison en cours, ATTENDS — ne tue pas » | ~6 lignes |
+| l'attente proposée en une commande copiable | 1 ligne |
+
+**~8 lignes**, et elles remplacent une règle que personne ne relit au
+moment où il voit « port déjà pris ». Le message actuel dit
+« Ferme-le : `lsof -ti:$PORT | xargs kill` » — **c'est exactement le
+réflexe dangereux, écrit dans le script.** Il est juste pour un résidu,
+destructeur pour une livraison en cours.
+
+**LA PISTE DES PORTS DYNAMIQUES, ET SON COÛT CACHÉ** : quatre filets
+codent le port en dur — `verify_vitrine.py` et `verify_zone.py` sur
+8124, `verify_qr.py` et `verify_touch.py` sur 8123. Un port variable
+demande de les toucher tous les quatre, plus le passage du numéro
+choisi. Ce n'est plus 8 lignes. **NON ÉCRIT ICI, ET DÉLIBÉRÉMENT :
+`scripts/livrer.sh` est en cours de modification par l'autre session**
+(passage de `http.server` en multi-thread). Y toucher en parallèle
+serait commettre la première forme de cette entrée dans l'entrée qui la
+décrit.
+
+**À VÉRIFIER APRÈS LEUR MODIFICATION, et ça ne va pas de soi** : le
+multi-thread corrige un symptôme VOISIN, pas celui-ci. La collision
+décrite ici porte sur des **ports fixes déjà liés**, pas sur la capacité
+du serveur à répondre à plusieurs requêtes. Un `ThreadingHTTPServer` ne
+peut pas se lier deux fois au même port. **Si le comportement change
+malgré tout, cette section décrit un état qui n'existe plus et doit être
+remesurée.**
 
 ### LE CONTRÔLE RÉTROSPECTIF — fait le 23/08/2026
 
