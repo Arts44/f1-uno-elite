@@ -13,7 +13,7 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **43 entrées : 42 défauts et 1 référence. QUATORZE défauts sont OUVERTS** —
+> **44 entrées : 43 défauts et 1 référence. QUINZE défauts sont OUVERTS** —
 > c'est ce qu'on vient chercher ici, donc c'est ce que cet en-tête liste :
 >
 > | № | Ouvert |
@@ -32,6 +32,7 @@
 > | 40 | La trace de livraison ne peut pas prouver ce qu'elle affirme |
 > | 42 | Les 63 variables inutilisées restent invisibles avant push |
 > | 43 | Deux sessions : la doc fusionne sans conflit, le push publie l'autre |
+> | 44 | Les assertions des filets n'ont jamais été éprouvées à vide |
 >
 > Les 28 autres défauts sont corrigés, mesurés ou tranchés, et conservés avec
 > leur diagnostic. Le n°19 n'est pas un défaut : c'est le mode d'emploi du SW
@@ -3180,15 +3181,70 @@ on vérifie que la parade marche, on ne la déduit pas de la cause.
 
 Corrigé dans `scripts/livrer.sh` par le commit `b49fbd6`.
 
+### LA LEÇON DE MÉTHODE : UN SEUL PASSAGE N'ATTRIBUE RIEN
+
+Ce chantier a produit **deux attributions successives et opposées, toutes
+deux fondées sur un échantillon unique, et toutes deux fausses.**
+
+1. **« C'est le serveur, pas mes conversions. »** Fondée sur : un filet qui
+   passait isolé, et une intuition sur `http.server`. Rien de mesuré à ce
+   moment-là sur la livraison complète.
+2. **« Non, ce sont mes conversions. »** Fondée sur : UN contrôle
+   d'attribution — code d'origine, `rc=0`. Une seule exécution, présentée
+   comme un démenti.
+
+**Les deux étaient fausses**, et la seconde l'était alors même qu'elle se
+donnait pour une rétractation rigoureuse. Se rétracter sur un échantillon
+unique n'est pas plus rigoureux qu'affirmer sur un échantillon unique :
+c'est la même faute, avec l'air de la prudence.
+
+**Ce qui a tranché est un PROTOCOLE, pas une exécution de plus.** Un test
+par rang — 1 filet, puis 3, puis 6, avec les conversions actives et le
+serveur corrigé — a rendu `rc=0` aux trois rangs. Il a fallu faire varier
+une grandeur, pas répéter la même mesure.
+
+**La règle :** devant deux hypothèses concurrentes, ne pas chercher
+l'exécution qui départage — chercher la GRANDEUR qui, en variant, sépare
+les deux. Un passage vert et un passage rouge sur la même configuration ne
+départagent rien, quel que soit l'ordre dans lequel ils arrivent.
+
+**Corollaire sur l'ordre des correctifs.** Les trois échecs attribués aux
+conversions sont tous survenus AVANT que le serveur ne soit corrigé. Tant
+qu'un défaut d'instrument est actif, aucune mesure faite avec cet
+instrument n'attribue quoi que ce soit — ni à charge, ni à décharge.
+
+### LES TROIS CONVERSIONS DE `verify_vitrine.py` — ATTRIBUÉES ET MESURÉES
+
+**Elles ne causaient rien.** Les trois échecs qui leur avaient été imputés
+sont tous survenus AVANT la correction du serveur. Une fois la file
+d'acceptation portée à 128 : **3 exécutions complètes, 3 verts.**
+
+**LE GAIN ANNONCÉ ÉTAIT FAUX, D'UN FACTEUR QUATRE.** L'argumentaire disait
+« jusqu'à 12 900 ms sur `verify_vitrine.py` », en additionnant naïvement les
+durées des attentes supprimées. Mesure réelle, trois exécutions par groupe,
+même serveur corrigé :
+
+| Groupe | Moyenne | Étendue intra-groupe |
+|---|---|---|
+| avec conversions | **214 465 ms** | 4 251 ms |
+| sans conversions | **217 534 ms** | 3 505 ms |
+| **écart** | **−3 069 ms** | |
+
+**Le gain réel est du même ordre que le bruit de mesure.** Additionner les
+durées d'attente supprimées surestime : une condition qui se libère à
+1 200 ms au lieu d'un `sleep` de 1 500 ms fait gagner 300 ms, pas 1 500. Et
+toutes ces attentes ne sont pas sur le chemin critique.
+
+**Les conversions restent valables — pour la fiabilité, pas pour la
+vitesse.** Une attente sur condition ne rougit pas quand la machine est
+chargée ; une durée fixe, si. C'est le motif de ce point. L'accélération
+était un argument d'appoint : il ne tient pas, et il est corrigé ici plutôt
+que laissé debout.
+
 ### CE QUI RESTE OUVERT ICI
 
-Les 24 attentes en durée fixe des six filets n'ont pas été traitées. Trois
-conversions sur `verify_vitrine.py` existent hors dépôt, **non commitées et
-non attribuées** : le filet passe seul mais la livraison complète a échoué
-trois fois sur quatre avec elles, et une fois sur une sans elles. Les
-échantillons sont trop petits pour conclure, et le point d'échec
-s'exécutait AVANT toute conversion. Rien n'est établi sur ce lien : il
-n'est donc pas écrit ici.
+Les 24 attentes en durée fixe des six filets n'ont pas toutes été traitées :
+trois l'ont été sur `verify_vitrine.py`, vingt-et-une restent.
 
 Trois bornes ont aussi échappé au premier lot : `verify_qr.py:227` (10 s),
 `verify_touch.py:132` (20 s), `verify_tutorial.py:405` (15 s).
@@ -3891,3 +3947,62 @@ enseignements : le garde du n°40 attrape **aussi** le commit partiel d'un
 arbre livré, ce qui n'était pas son but affiché ; et une livraison faite
 pendant qu'une autre session écrit mesure un arbre que personne ne
 commitera tel quel.
+
+---
+
+## 44. Les assertions des filets n'ont jamais été éprouvées sur une page qui ne montre rien
+
+<!-- état: ouvert · type: défaut -->
+
+**Piste ouverte le 24/08/2026, non chiffrée.** Elle est née d'une limite
+de l'expérience sur les sommeils secs (neuvième refus, V2-REFACTOR), mais
+**elle vaut indépendamment de ce refus et elle est plus grande que lui**
+— c'est pourquoi elle est ici et pas là-bas.
+
+### Ce qui l'a fait apparaître
+
+Supprimer les 18 sommeils secs des filets n'a changé aucun verdict, sauf
+un. Deux lectures expliquent ce résultat et **l'expérience ne peut pas
+les distinguer** :
+
+- **le sommeil était inutile** — la chose qu'il laissait se stabiliser
+  était déjà là ;
+- **l'assertion est trop faible pour voir** — elle passerait au vert que
+  la chose soit là ou non, donc retirer le sommeil ne change rien.
+
+Les deux produisent exactement le même `rc=0`.
+
+### Ce que la piste vaudrait
+
+**Reprendre les ASSERTIONS, pas les sommeils.** La question n'est plus
+« combien de temps attend-on ? » mais **« cette assertion sait-elle
+échouer ? »**. Le contrôle est le contrôle négatif appliqué à chaque
+assertion plutôt qu'au filet entier : **la faire tourner sur une page
+qui ne montre PAS ce qu'elle prétend vérifier**, et exiger qu'elle
+rougisse.
+
+**C'est ⑱ à l'échelle du filet entier** — un test qui rend vert sur un
+chemin jamais parcouru — et le n°29 en dit déjà une part : trois filets
+sur cinq n'ont jamais été vus rouges. **La différence, c'est la
+granularité** : n°29 parle du filet, celle-ci parle de chaque assertion
+prise une par une.
+
+### CE QUI LA DÉCLENCHERAIT
+
+- **une assertion prise en défaut** — un filet vert sur un produit
+  cassé, quelle qu'en soit la cause ;
+- **ou une reprise de n°29** : le jour où l'on donne un contrôle négatif
+  aux trois filets qui n'en ont pas, la même mécanique servira aux
+  assertions individuelles, et le coût marginal sera faible.
+
+**Ce qui ne la déclenche pas** : le seul fait qu'elle n'ait jamais été
+faite. Aucun défaut n'est constaté à ce jour, et ouvrir un chantier sur
+une inquiétude est précisément ce que le neuvième refus vient d'écarter.
+
+### CE QUI N'EST PAS ÉTABLI
+
+**Qu'il existe une seule assertion faible dans le dépôt.** C'est une
+possibilité ouverte par un raisonnement, pas une observation. Elle est
+notée parce qu'elle est **structurellement invisible** — une assertion
+qui ne sait pas échouer ne se signale jamais d'elle-même — et non parce
+qu'un indice la désigne.

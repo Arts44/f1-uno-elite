@@ -148,6 +148,47 @@ node --check render.js
 
 🇫🇷 Commits en Conventional Commits : `type(scope): sujet` en minuscules, à l'impératif, tiret cadratin `—` pour préciser. Types : `feat, fix, docs, style, refactor, test, chore, build`.
 
+### UN CHANTIER QUI SUPPOSE UNE CAUSE COMMENCE PAR L'ÉPROUVER
+
+**C'est une CONDITION D'ARRÊT, pas une précaution.** Si la cause ne
+tient pas, le chantier n'existe plus — il n'est pas « à revoir », il
+disparaît, et le remède déjà écrit devient un masque posé sur autre
+chose.
+
+**L'ORDRE EST : éprouver la cause → chiffrer le remède → écrire.**
+« Éprouver la cause » se place au même rang que le chiffrage, en tête,
+pas en réserve de bas de page. Un chantier dont la cause n'a pas été
+éprouvée ne se chiffre pas : on ne chiffre pas le remède d'un mal qu'on
+n'a pas montré.
+
+**POURQUOI C'EST UNE RÈGLE ET PAS UN CONSEIL — deux fois la même
+semaine, à quatre jours d'écart :**
+
+| | la cause supposée | ce qui a été prescrit avant de la mesurer | la vraie cause |
+|---|---|---|---|
+| correctif CLS (⑮) | l'échange de police décale le texte | `ascent-override` | les métriques de la face de repli, mesurées après |
+| faux rouges des filets (n°38) | « attente fixe sur machine chargée » | dix bornes portées à 60 s | **le serveur du filet refusait** — `request_queue_size = 5` |
+
+Dans le second cas, l'hypothèse était **écrite noir sur blanc comme non
+éprouvée** dans l'entrée qui servait de base au chantier. Elle a porté
+**trois tours et dix lignes de correctif** avant que quelqu'un mesure.
+
+**UNE RÉSERVE ÉCRITE NE PROTÈGE DE RIEN SI PERSONNE NE LA LIT COMME UNE
+CONDITION D'ARRÊT.** Placée en bas d'une entrée, entre des paragraphes
+qui affirment, elle finit par ressembler à une **prudence de style** —
+la formule d'humilité qu'on ajoute par habitude et que le lecteur saute.
+Celle-ci a été lue par les deux côtés, et n'a arrêté personne.
+
+**Ce qui la rendrait efficace : la formuler en question à répondre**
+avant d'ouvrir, et non en nuance à côté. « Quelle mesure montrerait que
+cette cause est la bonne ? » — si la réponse est « aucune n'a été
+faite », le chantier n'est pas prêt, quelle que soit la qualité du
+remède proposé.
+
+**COROLLAIRE POUR CELUI QUI DEMANDE LE TRAVAIL** : demander un remède
+sans demander qu'on éprouve d'abord la cause revient à valider
+l'hypothèse en silence. Les deux cas ci-dessus ont été validés ainsi.
+
 ### DEUX SESSIONS SUR LE MÊME DÉPÔT — ce qui n'est PAS local
 
 **Une opération git qu'on croit locale a un effet chez l'autre

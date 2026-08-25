@@ -826,3 +826,67 @@ depuis la même source et comparés à une référence qui n'est dans la
 lignée d'aucun. Un meilleur réglage de qualité n'est pas un gain : il
 déplace le curseur sur la même courbe. Ce qui rouvrirait le dossier,
 c'est un encodeur qui déplace **la courbe**.
+
+---
+
+## Neuvième chantier refusé : remplacer les 21 sommeils secs des filets
+
+**Refusé le 24/08/2026, sur mesure.** Les six filets navigateur
+contiennent 21 `wait_for_timeout(N)` — des durées fixes, sans condition.
+Le chantier proposé était de les remplacer par des attentes sur signal,
+50 à 70 lignes. Le motif annoncé : « un sommeil trop court ne rougit
+pas, il mesure trop tôt et rend un vert qui ne prouve rien ».
+
+### La mesure
+
+Dans un clone jetable, les 18 sommeils des cinq filets concernés
+(3 autres vivent dans `verify_vitrine.py`) ont été rendus paramétrables
+par un facteur, puis les filets rejoués :
+
+| facteur | résultat |
+|---|---|
+| 1,0 — témoin | 5 filets sur 5 verts |
+| **0,0 — tous les sommeils supprimés** | **4 filets sur 5 verts** |
+
+Un seul filet a bronché, `verify_tutorial.py`. **Isolation** : tous ses
+sommeils à zéro **sauf** celui du menu de variantes (400 ms) → vert,
+0 échec. **17 des 18 sommeils ne portent donc rien : les supprimer
+entièrement ne change aucun verdict.**
+
+**La marge du dix-huitième**, par bissection reproductible :
+
+| durée | 3 passes |
+|---|---|
+| 100 ms | **rouge 3/3** |
+| 120 ms · 160 ms · 200 ms | vert |
+| 400 ms — valeur en place | vert |
+
+Condition satisfaite en 100–120 ms, sommeil de 400 ms : **marge 3,3× à
+4×**. Et quand il est trop court, **le filet échoue BRUYAMMENT** — il
+nomme le défaut (« le halo ne suit pas le menu de variantes ») au lieu
+de passer au vert.
+
+### L'argument qui ferme le dossier
+
+**Le mode de défaillance redouté n'a aucun cas observé.** Ni au registre
+de CONVENTIONS, ni dans POINTS-SIGNALES : la seule entrée sur une
+attente fixe est ⑲, et c'est un faux **ROUGE**, pas un vert prématuré.
+La phrase « ils rendent un vert qui ne prouve rien » **était ma
+formulation d'un risque**, reprise trois tours de suite comme si elle
+décrivait un fait.
+
+50 à 70 lignes pour remplacer 17 sommeils qui ne protègent rien de
+mesurable et 1 qui a 3,3× de marge et rougit franchement : le rapport ne
+penche pas.
+
+### Ce qui rouvrirait le dossier
+
+**Un vert prématuré OBSERVÉ, pas supposé.** Un cas où un filet est passé
+au vert alors que ce qu'il prétendait vérifier n'était pas encore là, et
+où la cause est une durée fixe trop courte. Un seul suffit.
+
+**Ce qui ne rouvre PAS le dossier** : le fait que les sommeils soient
+inélégants, ni qu'une doctrine générale dise d'attendre un signal plutôt
+qu'une durée. Cette doctrine est juste — elle a produit ⑲ et le premier
+lot du n°38 — mais elle a déjà été appliquée là où elle avait un défaut
+constaté à corriger.
