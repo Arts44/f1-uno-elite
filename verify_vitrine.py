@@ -64,6 +64,7 @@ import sys
 import time
 
 from playwright.sync_api import sync_playwright
+from playwright.sync_api import TimeoutError as PWTimeout
 
 ROOT = pathlib.Path(__file__).resolve().parent
 import traceback
@@ -257,7 +258,34 @@ def charger_fond(br, controle):
     pg.route('**/index.html', lambda route: route.fulfill(
         status=200, content_type='text/html; charset=utf-8', body=html))
     pg.goto(URL, wait_until='load')
-    pg.wait_for_timeout(1500)
+    # Attendre que le canvas soit PEINT, pas 1500 ms. Le seuil `>= 1000`
+    # n'est pas invente : c'est CELUI DE L'ASSERTION plus bas (peints < 1000
+    # = echec). Premiere version fautive : `> 0`, vraie des le premier pixel
+    # peint — le filet mesurait alors un fond a peine commence et rougissait.
+    # Une condition plus FAIBLE que l'assertion qu'elle precede ne vaut rien.
+    # `polling=250` n'est pas cosmetique : par defaut Playwright reevalue a
+    # CHAQUE image, et ce predicat relit TOUT le canvas (getImageData sur la
+    # surface entiere). Reevalue 60 fois par seconde, il coute plus que
+    # l'attente fixe qu'il remplace. Pas de chiffre ici : les mesures faites
+    # pendant la mise au point l'ont ete avec un serveur qui saturait, donc
+    # avec un instrument fausse — elles ne sont pas citables. La condition rend
+    # `true` aussi quand #fond est ABSENT : c'est un etat legitime que la
+    # mesure ci-dessous rapporte (present: false), et l'attendre bloquerait.
+    # Le timeout est AVALE a dessein : sans ce garde, un fond durablement
+    # sous le seuil — la regression meme que ce filet surveille — leverait a
+    # 60 s, l'exception remonterait, et TOUT CE QUI SUIT serait abandonne.
+    # On perdrait le message precis « le canvas ne peint que N pixels » et
+    # les controles d'apres. L'assertion plus bas dit la verite, elle.
+    try:
+        pg.wait_for_function("""() => {
+            const cv = document.getElementById('fond');
+            if (!cv) return true;
+            if (!cv.width || !cv.height) return false;
+            const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+            let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++;
+            return n >= 1000; }""", timeout=60000, polling=250)
+    except PWTimeout:
+        pass
     r = pg.evaluate("""() => { const cv = document.getElementById('fond');
         if (!cv) return {present: false, peints: 0};
         const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
@@ -460,8 +488,20 @@ def main():
         c2 = br.new_context(viewport={'width': 390, 'height': 844})
         pg2 = c2.new_page()
         pg2.goto(URL, wait_until='load')
-        pg2.wait_for_timeout(1200)
+        # Attendre le SIGNAL (#voir cliquable), pas une duree. Le 1200 ms
+        # d'avant etait un pari sur la machine ; sous charge il ne suffisait
+        # pas, au repos il etait du temps perdu. Le 60 s est une BORNE de
+        # securite, pas un seuil de mesure : si #voir n'apparait jamais,
+        # echouer en une minute plutot que bloquer la livraison.
+        pg2.wait_for_selector('#voir', state='visible', timeout=60000)
         pg2.click('#voir')
+        # NE PAS CONVERTIR EN ATTENTE SUR CONDITION. Essaye le 23/08/2026,
+        # rejete par la relecture : hors du plan « mur », intro.js:960 ecrit
+        # `cnt.textContent = N` directement. Une condition « le compteur vaut
+        # N » est donc VRAIE des t=0, la rampe de 3,30 a 4,00 s n est plus
+        # jamais observee, et un compteur qui monterait vers le mauvais
+        # nombre rendrait le meme VERT. Le 4200 ci-dessous n est pas un pari
+        # sur la machine : c est l INSTANT DE MESURE declare au-dessus.
         pg2.wait_for_timeout(4200)
         cnt = pg2.evaluate("""() => { const e = document.getElementById('cnt');
             return e ? e.textContent.trim() : null; }""")
@@ -511,12 +551,35 @@ def main():
         pg.evaluate("() => { document.getElementById('voir').onclick = null;"
                     " import('./intro.js').then(m => m.ouvrir("
                     " document.getElementById('voir'), {forcerCoupure: true})); }")
-        pg.wait_for_timeout(2600)
+        # Attendre l'ETAT FINAL de la sequence, pas 2600 ms. `true` aussi
+        # quand .intro est absent : la mesure ci-dessous rend None dans ce
+        # cas, et l'attendre bloquerait sur un etat legitime.
+        try:
+            pg.wait_for_function("""() => {
+                const o = document.querySelector('.intro');
+                if (!o) return true;
+                const f = o.querySelector('.intro-fin');
+                // `coupe` OU `gele` : la fin NATURELLE de la sequence ecrit
+                // `gele` et jamais `coupe` (intro.js). N'attendre que `coupe`
+                // ferait perdre 60 s pleines sur le cas rouge — l'assertion
+                // plus bas distingue ensuite les deux.
+                return !!f && f.classList.contains('on')
+                       && (o.dataset.coupe === '1'
+                           || o.dataset.gele === '1'); }""",
+                timeout=60000,
+                # `polling=100` : ce predicat tourne PENDANT la sequence,
+                # elle-meme pilotee par requestAnimationFrame et chronometree
+                # au dixieme. L'evaluer a chaque image entrerait en
+                # concurrence avec la boucle qu'on mesure.
+                polling=100)
+        except PWTimeout:
+            pass
         etat = pg.evaluate("""() => { const o = document.querySelector('.intro');
             if (!o) return null;
             const f = o.querySelector('.intro-fin');
-            return {coupe: o.dataset.coupe || '0', final: f.classList.contains('on'),
-                    cta: !!f.querySelector('.cta'),
+            return {coupe: o.dataset.coupe || '0',
+                    final: !!f && f.classList.contains('on'),
+                    cta: !!f && !!f.querySelector('.cta'),
                     beats: o.querySelectorAll('.intro-beat.on').length}; }""")
         apres = len([u for u in req if 'intro.js' in u])
         c.close()
