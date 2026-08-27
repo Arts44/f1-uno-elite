@@ -224,7 +224,9 @@ with sync_playwright() as p:
     pg2.click('.bn-tab[data-view="stats"]')
     pg2.wait_for_selector('#svTradeSheet', timeout=BORNE_SECURITE_MS)
     try:
-        with pg2.expect_download(timeout=10000) as dl:
+        # Borne de securite, PAS seuil de mesure. Oubliee au premier lot.
+        # La valeur d'origine etait 10 s, sans calibration consignee.
+        with pg2.expect_download(timeout=BORNE_SECURITE_MS) as dl:
             pg2.click('#svTradeSheet')
         fiche = f'{TMP}/fiche.png'
         dl.value.save_as(fiche)

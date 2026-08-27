@@ -66,6 +66,10 @@ import time
 from playwright.sync_api import sync_playwright
 from playwright.sync_api import TimeoutError as PWTimeout
 
+# Borne de securite, PAS seuil de mesure — meme constante que les cinq
+# autres filets, qui la definissent chacun de leur cote.
+BORNE_SECURITE_MS = 60_000
+
 ROOT = pathlib.Path(__file__).resolve().parent
 import traceback
 
@@ -283,7 +287,7 @@ def charger_fond(br, controle):
             if (!cv.width || !cv.height) return false;
             const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
             let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++;
-            return n >= 1000; }""", timeout=60000, polling=250)
+            return n >= 1000; }""", timeout=BORNE_SECURITE_MS, polling=250)
     except PWTimeout:
         pass
     r = pg.evaluate("""() => { const cv = document.getElementById('fond');
@@ -493,7 +497,7 @@ def main():
         # pas, au repos il etait du temps perdu. Le 60 s est une BORNE de
         # securite, pas un seuil de mesure : si #voir n'apparait jamais,
         # echouer en une minute plutot que bloquer la livraison.
-        pg2.wait_for_selector('#voir', state='visible', timeout=60000)
+        pg2.wait_for_selector('#voir', state='visible', timeout=BORNE_SECURITE_MS)
         pg2.click('#voir')
         # NE PAS CONVERTIR EN ATTENTE SUR CONDITION. Essaye le 23/08/2026,
         # rejete par la relecture : hors du plan « mur », intro.js:960 ecrit
@@ -566,7 +570,7 @@ def main():
                 return !!f && f.classList.contains('on')
                        && (o.dataset.coupe === '1'
                            || o.dataset.gele === '1'); }""",
-                timeout=60000,
+                timeout=BORNE_SECURITE_MS,
                 # `polling=100` : ce predicat tourne PENDANT la sequence,
                 # elle-meme pilotee par requestAnimationFrame et chronometree
                 # au dixieme. L'evaluer a chaque image entrerait en

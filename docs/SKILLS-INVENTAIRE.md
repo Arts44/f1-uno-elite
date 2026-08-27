@@ -230,6 +230,40 @@ neuve**.
 qu'il se charge. S'il devient inatteignable, retirer son entrée : une configuration qui ment
 sur ce qui est disponible est pire qu'une suppression.
 
+### 7.3 — `name-only` vérifié en session neuve — 2026-08-23
+
+**Résultat : succès. Aucun échec.** Les 17 skills en `name-only` sont validés
+tels quels ; le gain de ~1 356 tokens par tour est acquis sans perte de capacité.
+
+**Ce test est valide, contrairement à celui du §7.2** : le listing de la session
+d'essai a été construit **après** l'écriture de `skillOverrides`, et non avant.
+C'est la parade du §7.2 appliquée.
+
+**Ce qui a été éprouvé**, sur `impeccable` :
+
+| Vérification | Résultat |
+|---|---|
+| Le skill se charge sur invocation explicite | ✅ SKILL.md complet, table des 23 sous-commandes |
+| Le contenu est intégral, pas tronqué | ✅ y compris la note de coexistence ajoutée localement |
+| Les **scripts** du skill fonctionnent | ✅ `context.mjs` et `detect.mjs` ont rendu leur sortie |
+
+Le troisième point est le moins évident et le plus utile : un skill en `name-only`
+n'est pas seulement *résolvable par son nom*, il est **pleinement opérationnel**,
+scripts compris. `skillOverrides` agit sur le listing envoyé au modèle, jamais sur
+la résolution ni sur le contenu chargé.
+
+**Portée de la preuve — `[mesuré]` sur 1 des 17.** Le mécanisme est commun aux
+dix-sept, donc la généralisation est solide, mais elle reste **une déduction pour
+les seize autres**. Un échec isolé sur l'un d'eux resterait possible et se verrait
+à l'usage : le skill dirait qu'il ne se trouve pas.
+
+**Défaut relevé au passage, non corrigé** : le SKILL.md d'`impeccable` indique
+`node .claude/skills/impeccable/scripts/context.mjs`, chemin relatif au projet, qui
+échoue puisque le skill est installé en global. Le bon chemin est
+`~/.claude/skills/impeccable/scripts/`. Le skill prévoit lui-même le cas — *« si le
+runtime montre le répertoire de base chargé, utilisez-le »* — mais la ligne
+d'exemple, elle, est fausse pour une installation globale.
+
 ---
 
 ## 8. L'archive de sauvegarde — où elle est, comment l'ouvrir

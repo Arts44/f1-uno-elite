@@ -110,8 +110,10 @@ MAX_TOURS = 80
 
 # Une étape attend parfois sa cible (défilement, rendu d'une vue). Six
 # secondes suffisaient à 28 étapes sur 33 — la marge manquante faisait
-# passer un simple retard pour un blocage.
-ATTENTE_MS = 15000
+# passer un simple retard pour un blocage. C'est le faux rouge du n°38,
+# décrit ici avant d'être nommé là-bas : ce plafond est de la MÊME famille
+# que les autres, il rejoint donc la borne commune.
+ATTENTE_MS = BORNE_SECURITE_MS
 
 
 def instantane(page):
@@ -402,9 +404,22 @@ with sync_playwright() as p:
     ctx.add_init_script(init_script('fr', 'dark'))
     page = ctx.new_page()
     try:
-        page.goto(URL, timeout=15000)
+        # Borne de securite, PAS seuil de mesure. Un serveur ABSENT ne
+        # consomme pas ce plafond : le refus est immediat (commit b49fbd6,
+        # « les refus arrivent en 0,0 s », n=40). Le plafond ne borne donc
+        # que le cas LENT — le faux rouge sous charge.
+        page.goto(URL, timeout=BORNE_SECURITE_MS)
     except Exception as e:
-        print(f'ÉCHEC : {URL} injoignable — lance `python3 -m http.server 8124`\n{e}')
+        # DEUX FAMILLES, DEUX MESSAGES. Le relevement 15 s -> 60 s rend le
+        # diagnostic quatre fois plus lent pour tout ce qui n'est PAS un
+        # refus de connexion : une page servie mais qui ne finit pas de
+        # charger, une sous-ressource qui cale, un autre service sur le
+        # port. Leur annoncer « injoignable » serait faux.
+        if 'ERR_CONNECTION_REFUSED' in str(e):
+            print(f'ÉCHEC : {URL} injoignable — lance `python3 -m http.server 8124`\n{e}')
+        else:
+            print(f'ÉCHEC : {URL} a repondu mais n a pas fini de charger dans la'
+                  f' borne de securite — ce n est PAS un serveur absent.\n{e}')
         sys.exit(1)
     page.wait_for_selector('.card', timeout=BORNE_SECURITE_MS)
     page.wait_for_timeout(600)

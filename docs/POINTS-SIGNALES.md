@@ -13,7 +13,7 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **44 entrées : 43 défauts et 1 référence. QUINZE défauts sont OUVERTS** —
+> **45 entrées : 44 défauts et 1 référence. QUINZE défauts sont OUVERTS** —
 > c'est ce qu'on vient chercher ici, donc c'est ce que cet en-tête liste :
 >
 > | № | Ouvert |
@@ -2275,6 +2275,7 @@ ne dit rien de précis sur aucun des points ci-dessous.
 | **⑥ l'haptique** | `navigator.vibrate(30)` dans `badge-toasts.js`, avec un `catch` pour iOS qui n'a pas l'API. Le chemin Android n'a jamais tourné sur un appareil | Garder la vibration ou la retirer. Un `catch` prouve qu'on a prévu l'absence, pas que la présence fonctionne |
 | **⑦ l'isolement du stockage en PWA iOS** | `cloud-auth.js` choisit le code à usage unique plutôt que le lien magique **parce que** « les PWA iOS ne partagent pas localStorage avec Safari ». C'est un comportement de plateforme **lu, pas observé ici** | Si le choix d'authentification repose sur un fait ou sur une croyance |
 | **⑧ la face de repli hors macOS** | `size-adjust: 105 %` est calibré avec `local('Helvetica Neue'), local('Arial')`. Sur Android, aucune des deux n'est une face installée | **instruit le 21/08/2026, voir la section ci-dessous.** Il reste UNE question, et elle est plus étroite qu'annoncé |
+| **⑨ le plancher de lisibilité du QR** | `QR_MIN_PX_PER_MODULE = 6` est une **décision, pas une mesure**. Il vient du défaut de 1.71.0 et a été posé comme marge de sécurité ; le seuil où la lecture bascule n'a jamais été relevé. Mesuré le 24/08/2026 : un QR rendu à **2,14 px/module se décode encore par OpenCV** sur une capture propre — mais un décodeur sur un PNG n'est pas un appareil photo sur un écran (luminance, moiré, angle, mise au point) | **Si 6 est trop, trop peu, ou juste.** La mesure est une lecture par appareil photo sur écran réel, en descendant par paliers jusqu'à l'échec. Enjeu concret : à 6, un v25 demande 750 px de large et force un défilement sur toute fenêtre mobile ; si le vrai seuil est 4, il tiendrait sans défiler |
 
 ### ⑧ instruit — ce qui est réparable, ce qui ne l'est pas
 
@@ -2817,7 +2818,7 @@ Ce qui EST mesuré, c'est que **ce moteur-ci ne peut pas la rendre**.
 
 ---
 
-## 38. Les filets navigateur rougissaient à tort sous `livrer.sh` — PREMIER LOT FAIT, second ouvert
+## 38. Les filets navigateur rougissaient à tort sous `livrer.sh` — SECOND LOT TRANCHÉ ET REFUSÉ, trois bornes du premier restent
 
 <!-- état: ouvert · type: défaut -->
 
@@ -3241,10 +3242,42 @@ chargée ; une durée fixe, si. C'est le motif de ce point. L'accélération
 était un argument d'appoint : il ne tient pas, et il est corrigé ici plutôt
 que laissé debout.
 
-### CE QUI RESTE OUVERT ICI
+### ⛔ LE SECOND LOT EST TRANCHÉ ET REFUSÉ — 24/08/2026
 
-Les 24 attentes en durée fixe des six filets n'ont pas toutes été traitées :
-trois l'ont été sur `verify_vitrine.py`, vingt-et-une restent.
+**Ne pas le rouvrir sans fait nouveau.** Trois raisons, chacune mesurée.
+
+**1. Un `wait_for_timeout` NE PEUT PAS produire un faux rouge — par
+construction, pas par absence de trace.** Sa signature rend `None` et sa
+documentation dit « Waits for the given timeout in milliseconds ». Il ne
+lève jamais. Les quatre faux rouges documentés plus haut portent tous sur
+`wait_for_selector`, dont le plafond expire — c'est-à-dire sur le **premier
+lot, déjà corrigé**. Aucun faux rouge n'est attribuable aux vingt-et-une
+attentes restantes, et aucun ne peut l'être.
+
+**2. Dix-sept sommeils sur dix-huit ne protègent rien de mesurable.**
+L'expérience du 24/08 est plus haut : le dix-huitième a 3,3× à 4× de marge
+et rougit franchement quand on le lui retire. Coût du lot : 50 à 70 lignes.
+Gain démontré : aucun.
+
+**3. Le risque de faux VERT était une formulation, jamais une
+observation.** La phrase « ils mesurent trop tôt et rendent un vert qui ne
+prouve rien » a été écrite comme une inquiétude de principe, puis reprise
+comme si elle constatait quelque chose. **Aucun cas observé.** C'est ⑦ dans
+sa forme la plus discrète : une hypothèse qui devient un fait à force
+d'être recopiée.
+
+**Ce qui rouvrirait légitimement ce lot :** un vert prématuré effectivement
+observé, ou une assertion prouvée trop faible pour voir ce que le sommeil
+laisse se stabiliser. Ce second cas est un **autre chantier** — il se
+mènerait assertion par assertion, jamais sommeil par sommeil, et
+l'expérience du 24/08 note explicitement qu'elle ne peut pas le
+départager.
+
+**Trois conversions existent malgré tout** sur `verify_vitrine.py`, commit
+`4f68808`. Elles ont été écrites avant ce verdict. Elles ne le contredisent
+pas : elles ont été validées 3/3, leur gain de vitesse a été **mesuré et
+démenti** (−3 069 ms, dans le bruit), et elles restent pour la fiabilité.
+Elles ne sont pas un argument pour convertir les vingt-et-une autres.
 
 Trois bornes ont aussi échappé au premier lot : `verify_qr.py:227` (10 s),
 `verify_touch.py:132` (20 s), `verify_tutorial.py:405` (15 s).
@@ -3950,6 +3983,42 @@ commitera tel quel.
 
 ---
 
+### UNE VARIANTE : L'INVESTIGATION EN DOUBLE, PAS L'ÉCRITURE
+
+**Le défaut ne se limite pas à deux écritures qui se superposent.** Il se
+manifeste aussi quand deux sessions **instruisent la même question**, et
+que la seconde ignore que la première a déjà répondu. Rien n'est écrasé,
+aucun conflit, aucune trace — mais le travail est fait deux fois et la
+seconde réponse peut diverger de la première sans que personne ne compare.
+
+**Cas du 24/08/2026.** Une campagne de mesure allait être lancée sur les
+21 attentes restantes du n°38 : reproduire la charge, chronométrer chaque
+sommeil, établir s'ils causent des faux rouges. **La réponse était déjà
+dans le n°38**, écrite par l'autre session : dix-sept sommeils sur dix-huit
+ne protègent rien de mesurable, et le risque de faux vert n'a jamais été
+observé. La campagne aurait consommé une heure de machine pour reproduire
+une conclusion existante — ou, pire, pour en produire une légèrement
+différente que rien n'aurait réconciliée.
+
+**Ce qui l'a évitée n'est pas une parade, c'est un réflexe** : relire le
+dossier avant de lancer le protocole. Il a tenu cette fois. Il ne tiendra
+pas toujours, et rien ne le rend obligatoire.
+
+**Pourquoi cette variante est plus discrète que celle de l'écriture.** Une
+écriture en double laisse une trace — un `git status` sale, un diff
+inattendu, un test qui tombe. Une **investigation** en double ne laisse
+rien : les deux sessions produisent du raisonnement, pas des octets, et
+seul le registre garde la première réponse. **Le seul garde possible est
+donc le registre lui-même** — ce qui suppose qu'il soit lu avant, et non
+rempli après.
+
+**Conséquence pour le périmètre du chantier.** Il ne s'agit pas seulement
+d'empêcher deux écritures concurrentes sur un même fichier : il s'agit de
+faire en sorte qu'une question déjà tranchée se voie **avant** qu'on la
+rouvre. Le verdict explicite ajouté au n°38 le 24/08 — « TRANCHÉ ET
+REFUSÉ, ne pas rouvrir sans fait nouveau » — est une réponse partielle à
+cette variante, pas seulement une mise à jour d'état.
+
 ## 44. Les assertions des filets n'ont jamais été éprouvées sur une page qui ne montre rien
 
 <!-- état: ouvert · type: défaut -->
@@ -3987,6 +4056,64 @@ sur cinq n'ont jamais été vus rouges. **La différence, c'est la
 granularité** : n°29 parle du filet, celle-ci parle de chaque assertion
 prise une par une.
 
+### ✅ SON PREMIER CAS — et il est plus fort que ce que la piste annonçait
+
+**24/08/2026, `verify_qr.py`.** La question a été posée à chacune de ses
+quatre familles d'assertions. L'une n'y a pas répondu :
+
+    densité = minPx / (modules + 8)   comparée à   QR_MIN_PX_PER_MODULE
+
+Les deux membres viennent du **même calcul du produit** :
+`minPx = qrRenderSize(modules) = (modules + 8) × QR_MIN_PX_PER_MODULE`.
+L'expression se simplifie en `QR_MIN_PX_PER_MODULE ≥
+QR_MIN_PX_PER_MODULE`. La sortie le montrait depuis toujours — **six
+versions de 41 à 117 modules, toutes à 6.00 exactement.**
+
+**MAIS LE RÉSULTAT N'EST PAS « UNE ASSERTION FAIBLE ». C'est une
+assertion faible QUI CACHAIT UN DÉFAUT RÉEL, en production, pendant
+plus d'un mois** — le QR de sauvegarde rendu à 2,14 px/module sur la
+largeur mobile principale de l'app, soit le défaut même que
+`verify_qr.py` avait été écrit pour surveiller (n°45).
+
+C'est plus que ce que cette piste annonçait. Elle disait : *une
+assertion qui ne sait pas échouer ne se signale jamais d'elle-même*.
+Le cas ajoute : **elle rend aussi invisible le défaut qu'elle était
+censée voir, et elle donne l'assurance inverse** — un filet vert
+« prouve » que le défaut de 1.71.0 ne s'est pas reproduit.
+
+**CE QUE ÇA CHANGE POUR LA PISTE** : elle n'attend plus de
+déclencheur. Elle en a un.
+
+### CHIFFRAGE DE LA PASSE SUR LES AUTRES FILETS
+
+**Après le chantier en cours, pas dedans.**
+
+| filet | assertions | tenu par |
+|---|---|---|
+| `verify_vitrine.py` | ~24 | l'autre session |
+| `verify_tutorial.py` | 12 | l'autre session |
+| `verify_zone.py` | ~8 | libre |
+| `verify_qr.py` | 4 | l'autre session |
+| `verify_trade_inbox.py` | 5 | **relu — les 5 passent** |
+| `verify_touch.py` | ~4 | l'autre session |
+| **total** | **~57** | |
+
+**Le coût n'est pas dans l'écriture, il est dans la lecture.** Poser la
+question à une assertion demande de remonter du filet au produit et de
+nommer la modification qui la rendrait rouge — c'est ce qui a pris le
+plus de temps sur `verify_qr.py`, et c'est ce qui a trouvé le défaut.
+
+**Estimation : ~57 assertions, une passe par filet.** Les trois déjà
+lus (`verify_qr`, `verify_tutorial`, `verify_trade_inbox` — étape 0 du
+n°29) ont demandé une lecture complète des trois fichiers pour 21
+assertions. Le reste est du même ordre.
+
+**Ce qui rendrait la passe moins chère** : la faire **au moment où on
+touche un filet**, comme pour les variables inutilisées du n°42 — pas
+en campagne. Une campagne sur 57 assertions est exactement le format
+que le neuvième refus vient d'écarter, sauf que celle-ci a déjà un
+défaut trouvé à son actif.
+
 ### CE QUI LA DÉCLENCHERAIT
 
 - **une assertion prise en défaut** — un filet vert sur un produit
@@ -4006,3 +4133,103 @@ possibilité ouverte par un raisonnement, pas une observation. Elle est
 notée parce qu'elle est **structurellement invisible** — une assertion
 qui ne sait pas échouer ne se signale jamais d'elle-même — et non parce
 qu'un indice la désigne.
+
+---
+
+## 45. ~~Le correctif du QR de 1.71.0 n'a jamais fonctionné~~ — CORRIGÉ le 24/08/2026 (1.77.4)
+
+<!-- état: fermé · type: défaut -->
+
+**Ce n'est pas un défaut neuf. C'est un correctif qui n'a jamais
+marché**, et qui a survécu plus d'un mois parce que **le filet écrit
+pour lui ne regardait pas là où il agissait**.
+
+### Le correctif de 1.71.0, et ce qui l'annulait
+
+`account.js` posait la bonne ligne :
+
+    qrBox.style.width = minPx + 'px';
+
+et son commentaire disait l'intention : *« Le QR garde sa taille
+PHYSIQUE (minPx) et son conteneur défile plutôt que de le réduire :
+réduire, c'est reproduire le défaut en silence. »*
+
+**Deux propriétés de `styles.css` l'annulaient**, indépendantes l'une
+de l'autre :
+
+| | cause | effet |
+|---|---|---|
+| ① | `box-sizing:border-box` (règle globale) + `padding:10px` | `minPx` devenait la largeur de BORDURE : le SVG recevait `minPx − 20` |
+| ② | `max-width:100%` | sous une fenêtre plus étroite que le QR, la boîte était écrasée — **le code rétrécissait au lieu que le conteneur défile** |
+
+### La mesure, avant
+
+Pas réel du QR en px/module, plancher du produit = 6 :
+
+| fenêtre | version | modules | recommandé | SVG rendu | pas |
+|---|---|---|---|---|---|
+| 390 | v14 | 73 | 486 | 268 | **3,31** |
+| 390 | v25 | 117 | 750 | 268 | **2,14** |
+| 420 | v14 | 73 | 486 | 298 | **3,68** |
+| 768 | v25 | 117 | 750 | 646 | **5,17** |
+| 1400 | v14 | 73 | 486 | 466 | **5,75** |
+
+**Le plancher n'était atteint nulle part**, et à 390 px — la largeur
+mobile principale de cette app — un code dense tombait à 2,14, c'est-à-
+dire dans la plage même du défaut de 1.71.0 (« de 4,49 à 1,76 »).
+
+**Et le produit disait le contraire à l'utilisateur** : il calculait
+`deborde` et affichait `bk.qr_scroll` — « le QR garde sa taille » —
+pendant que le CSS le réduisait. **Le message existait avant le
+comportement.**
+
+### Le correctif, et la mesure après
+
+`max-width:100%` retiré, `.bk-qr` passée en `content-box`, et
+`align-items:safe center` sur le conteneur — `center` seul rendait la
+moitié gauche d'un élément débordant **inatteignable au défilement**.
+
+| fenêtre | version | SVG rendu | pas | défile |
+|---|---|---|---|---|
+| 390 | v14 | 486 | **6,00** | oui |
+| 390 | v25 | 750 | **6,00** | oui |
+| 420 | v14 | 486 | **6,00** | oui |
+| 768 | v25 | 750 | **6,00** | oui |
+| 1400 | v14 | 486 | **6,00** | non (ça tient) |
+
+**`bk.qr_scroll` dit maintenant vrai** : à 390 px avec un v25, le
+conteneur défile réellement, et le message qui l'annonce est affiché.
+À 1400 px le QR tient, il n'y a pas de défilement, et c'est le message
+normal qui paraît.
+
+### Les deux contrôles négatifs, séparés parce que les causes le sont
+
+Dans un clone jetable, chaque cause remise **seule** :
+
+| état | 390 v14 | 390 v25 | 1400 v14 |
+|---|---|---|---|
+| corrigé (témoin) | 6,00 | 6,00 | 6,00 |
+| ① `max-width:100%` remis seul | **3,56** | **2,30** | 6,00 |
+| ② `border-box` remis seul | **5,75** | **5,84** | **5,75** |
+
+Les deux signatures diffèrent, et c'est ce qui prouve qu'elles sont
+indépendantes : **① ne rougit que quand ça déborde** (1400 px reste à
+6,00), **② rougit partout et de la même quantité** (−20 px de padding,
+constants).
+
+### POURQUOI ÇA A SURVÉCU UN MOIS
+
+**`verify_qr.py` existait pour ce défaut et ne pouvait pas le voir.**
+Il rendait le QR lui-même, dans son propre `<div style="width:{minPx}">`,
+puis vérifiait qu'il se décodait. **Il n'a jamais lu la largeur que
+l'app applique.** Le défaut vivait dans deux propriétés CSS que le
+filet ne consultait pas.
+
+Son assertion de densité, en plus, était une **identité algébrique** —
+voir n°44 : elle comparait `minPx / (modules+8)` à
+`QR_MIN_PX_PER_MODULE`, les deux membres venant du même calcul du
+produit, et rendait 6,00 sur les six versions balayées.
+
+**La reprise de cette assertion est le vrai correctif de fond**, et
+elle reste à écrire : `verify_qr.py` était tenu par une autre session
+au moment de ce chantier.

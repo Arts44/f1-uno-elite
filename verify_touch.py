@@ -131,6 +131,14 @@ def relever(secondes):
     REELLE, et donc s'il existe un seuil possible — ou s'il faut une
     metrique insensible a l'hote.
 
+    ⚠️ LE POINT DE CENSURE DE CETTE SERIE A BOUGE LE 24/08/2026. Avant
+    cette date, le plafond de l'attente ci-dessous etait de 20 s : tout
+    chargement plus lent faisait expirer le filet AVANT d'ecrire sa ligne,
+    donc la serie etait tronquee a 20 s. Depuis, la borne commune est a
+    60 s et ces chargements-la sont enregistres. Les releves d'avant et
+    d'apres ne sont PAS comparables dans la QUEUE de la distribution —
+    mediane et etendue lues sans le savoir seraient mal interpretees.
+
     OU EST ECRITE LA SERIE, ET POURQUOI LA : docs/mesures/chargement.tsv,
     un fichier SUIVI PAR GIT. C'est la seule categorie d'emplacement qui
     survive a un clone — .git/ ne se clone pas, /tmp non plus, et un
@@ -177,7 +185,11 @@ def main():
             pg.wait_for_function(
                 "() => { const c = document.querySelector('.card');"
                 " if (!c) return false; const b = c.getBoundingClientRect();"
-                " return b.width > 0 && b.height > 0; }", timeout=20000)
+                " return b.width > 0 && b.height > 0; }",
+                # Borne de securite, PAS seuil de mesure. Le
+                # wait_for_selector juste au-dessus a ete corrige au
+                # premier lot, celui-ci a ete oublie.
+                timeout=BORNE_SECURITE_MS)
             if essai == 1:
                 relever(time.monotonic() - depart)
             pg.wait_for_timeout(600)
