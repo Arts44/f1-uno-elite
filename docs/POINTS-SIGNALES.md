@@ -4150,6 +4150,76 @@ censée voir, et elle donne l'assurance inverse** — un filet vert
 **CE QUE ÇA CHANGE POUR LA PISTE** : elle n'attend plus de
 déclencheur. Elle en a un.
 
+### ✅ SON DEUXIÈME CAS — `verify_tutorial.py`, 27/08/2026
+
+**Trouvé en essayant de lui écrire un contrôle négatif, et le contrôle
+n'a pas été commité pour cette raison.**
+
+L'assertion visée : *« la cible de chaque étape existe »* — si le moteur
+bascule sur `t('tut.missing')`, le filet doit rougir. Le sabotage : rendre
+`document.querySelector('#collHead .ph')` null, ce qui simule exactement
+un refactor ayant perdu la cible de l'étape `coll_intro`
+(`tutorial.js:146`).
+
+**L'effet du sabotage est CONSTATÉ** — le filet vérifie lui-même que le
+sélecteur ne se résout plus avant de compter son contrôle comme joué.
+**Le tour se comporte différemment : 34 étapes atteintes au lieu de 32.**
+Et **le filet reste VERT, code 0.**
+
+**L'assertion ne sait donc pas échouer sur ce chemin.** Pourquoi
+exactement — la bulle de secours n'est pas affichée, ou `verifier_etape`
+ne passe pas sur cette étape, ou sa déduplication par titre l'écarte —
+**n'est pas établi**. Ce qui est établi, c'est que la cible a disparu,
+que le tour l'a senti (deux étapes de plus), et que rien n'a été
+rapporté.
+
+**POURQUOI LE CONTRÔLE N'EST PAS COMMITÉ** : il passerait au vert. Un
+contrôle négatif vert donne l'assurance que le filet a été éprouvé,
+alors qu'il prouverait le contraire. C'est la règle posée pour
+`verify_qr.py` — *écrire un contrôle sur une assertion qui ne regarde
+pas le bon endroit clôturerait l'entrée sur un mensonge* — et elle vaut
+ici à l'identique.
+
+**CE QUI RESTE À FAIRE** : instruire pourquoi l'assertion ne se
+déclenche pas, la reprendre, puis seulement écrire son contrôle. Le n°29
+reste donc ouvert sur `verify_tutorial.py`.
+
+### ⚠️ UN COMPTEUR DE CONTRÔLES COMPTE L'APPEL, PAS L'EFFET — corrigé
+
+**Défaut trouvé dans mon propre garde, et il est du même sang que ce
+que le n°44 traque.** Le compteur « CONTROLES NEGATIFS JOUES : n/n »
+enregistrait le contrôle **au point d'injection**. Or :
+
+- `ctx.add_init_script(SABOTAGE)` **réussit toujours** — elle enregistre
+  un script, elle ne l'exécute pas ;
+- le script injecté faisait `new MutationObserver(...).observe(
+  document.documentElement)`, et **`documentElement` vaut null dans un
+  script d'initialisation**. `observe` levait, le script mourait à sa
+  première ligne, **rien n'était saboté** ;
+- le filet restait vert, et le compteur annonçait **« 1/1 joué »**.
+
+**Un garde qui certifie qu'un contrôle a été joué alors qu'il n'a rien
+cassé est pire qu'un garde absent** : il transforme un vert vide en vert
+attesté. C'est ㉜ d'un cran plus profond — le garde ne plantait pas, il
+mentait.
+
+**Les trois filets vérifient désormais l'EFFET avant de compter** :
+
+| filet | ce qui est constaté avant de compter |
+|---|---|
+| `verify_qr.py` | `getComputedStyle('#backupQr').maxWidth === '100%'` |
+| `verify_trade_inbox.py` | une sonde écrite dans `INBOX_KEY` ne se relit pas |
+| `verify_tutorial.py` | le sélecteur saboté ne se résout plus |
+
+Et quand l'effet manque, le filet **rougit** avec le motif
+`SABOTAGE INEFFECTIF`, au lieu de compter un contrôle imaginaire.
+
+**Une seconde version du sabotage a aussi été démasquée par cette
+vérification** : différé à `DOMContentLoaded`, il retirait bien le nœud,
+mais `renderCollectionHead()` (`app/stats.js:67`) réécrit
+`#collHead.innerHTML` — la cible revenait. Sans la vérification d'effet,
+ce second sabotage aurait lui aussi été compté « joué ».
+
 ### CHIFFRAGE DE LA PASSE SUR LES AUTRES FILETS
 
 **Après le chantier en cours, pas dedans.**

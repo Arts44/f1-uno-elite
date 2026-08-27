@@ -234,14 +234,55 @@ exclude_paths:
 #     est un. La justification est écrite dans le workflow lui-même,
 #     juste au-dessus de la ligne.
 #
-#   · cloud-auth.js:34 — « Avoid Hardcoded Passwords » sur
-#     export const SESSION_KEY = 'f1uno_cloud_session';
-#     C'est le NOM d'une clé localStorage, pas un mot de passe.
-#     Le pattern reste ACTIF, pour la même raison.
-#     ⚠️ CETTE LIGNE VIVAIT EN cloud.js:25 et son marquage y était fait.
-#     Le découpage de cloud.js l'a déplacée, ce qui a ROUVERT l'issue —
-#     un marquage est attaché à un emplacement, pas à une décision.
-#     À reprendre après tout découpage qui déplace une ligne marquée.
+#   · cloud-auth.js:34 — export const SESSION_KEY = 'f1uno_cloud_session';
+#     C'est le NOM d'une clé localStorage, pas un mot de passe. Les
+#     patterns restent ACTIFS, pour la même raison que ci-dessus.
+#
+#     ⚠️ LA LIGNE N'A PAS BOUGÉ DEPUIS 1.62.0, ET L'ISSUE EST REVENUE
+#     QUAND MÊME — 27/08/2026. Ce n'est donc PAS un déplacement cette
+#     fois : c'est un SECOND DÉTECTEUR qui s'est mis à viser la même
+#     ligne.
+#       · « Avoid Hardcoded Passwords » (PMD) — instruit et marqué
+#         précédemment ;
+#       · Semgrep_codacy.javascript.security.hard-coded-password,
+#         outil OPENGREP, resultDataId 131532651800 — NOUVEAU, apparu
+#         au relevé du commit 8f568fe, sur un fichier que ce commit ne
+#         touchait pas.
+#
+#     ⚠️⚠️ TROISIÈME RÉOUVERTURE DE LA MÊME DÉCISION, PAR TROIS CHEMINS
+#     DIFFÉRENTS. C'est le vrai enseignement de cette entrée, et il vaut
+#     pour toutes les autres :
+#       ① la ligne se déplace (cloud.js:25 → cloud-auth.js:34) ;
+#       ② le marquage ne prend pas (voir cloud-config.js plus haut) ;
+#       ③ un AUTRE outil se met à viser la même ligne.
+#     UN MARQUAGE EST ATTACHÉ À UNE OCCURRENCE — un couple (emplacement,
+#     détecteur). LA DÉCISION, ELLE, PORTE SUR LA LIGNE. Les deux ne
+#     coïncident pas, et rien dans Codacy ne les relie.
+#
+#     LA DÉCISION, ÉCRITE ICI UNE FOIS POUR TOUTES, pour que le prochain
+#     qui la voit revenir n'ait pas à la reprendre :
+#     ┌──────────────────────────────────────────────────────────┐
+#     │ `SESSION_KEY = 'f1uno_cloud_session'` EST UN NOM DE CLÉ   │
+#     │ DE STOCKAGE. Ce n'est pas un secret, ça n'ouvre rien, et  │
+#     │ la valeur est visible dans le devtools de n'importe quel  │
+#     │ visiteur. TOUT détecteur qui la signale, présent ou       │
+#     │ futur, quel que soit son nom et quelle que soit la ligne  │
+#     │ où elle aura migré, se marque FalsePositive sans          │
+#     │ réinstruire le dossier.                                   │
+#     └──────────────────────────────────────────────────────────┘
+#
+#     MARQUAGE DE L'OCCURRENCE OPENGREP : À FAIRE, non fait le
+#     27/08/2026 — la session n'avait pas de jeton d'écriture (la CLI
+#     en exige un pour toute opération ; les relevés de cette journée
+#     passaient par l'API publique en lecture seule, qui n'en demande
+#     pas). La commande, pour qui a le jeton :
+#         codacy issue gh Arts44 f1-uno-elite dea4e7fe50a067bb3e90a6c8c480e0ad \
+#           --ignore --ignore-reason FalsePositive \
+#           --ignore-comment "nom de cle localStorage, voir .codacy.yml"
+#     ⚠️ NE PAS réutiliser le jeton qui apparaît en clair dans les
+#     transcriptions de sessions d'août : il a fuité en étant collé
+#     dans une ligne de commande, et il est à FAIRE TOURNER, pas à
+#     resservir.
 #
 #   · capture_seed.py:143 — « Possible hardcoded password:
 #     'demo.access.token' ». Jeton FICTIF d'une session cloud inventée,

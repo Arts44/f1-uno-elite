@@ -111,12 +111,26 @@ def parcours(nav, depart, nom):
     ctx = nav.new_context(viewport={'width': 390, 'height': 844})
     if CONTROLE:
         ctx.add_init_script(SABOTAGE)
-        JOUES.append(nom.split('(')[0].strip())
     pg = ctx.new_page()
     erreurs = []
     pg.on('pageerror', lambda e: erreurs.append(str(e)))
     pg.goto(f'{BASE}{depart}#trade={CODE}')
     pg.wait_for_timeout(2500)
+
+    # LE COMPTEUR COMPTE L'EFFET, PAS L'APPEL. Vécu sur
+    # verify_tutorial.py : un script injecté mort à sa première ligne,
+    # compté « joué », et un filet vert qui semblait avoir été éprouvé.
+    if CONTROLE:
+        _neutralise = pg.evaluate(
+            "(k) => { try { localStorage.setItem(k, 'sonde'); } catch(e) {}"
+            "  const vu = localStorage.getItem(k) === 'sonde';"
+            "  if (vu) localStorage.removeItem(k);"
+            "  return !vu; }", INBOX_KEY)
+        if not _neutralise:
+            ECHECS.append(f'{nom} : SABOTAGE INEFFECTIF — la cle {INBOX_KEY}'
+                          ' s ecrit encore, le controle n a rien casse')
+        else:
+            JOUES.append(nom.split('(')[0].strip())
 
     franchies = franchir_premier_lancement(pg)
     # LE PARCOURS DOIT AVOIR EU LIEU — sinon le test ne prouve rien.
