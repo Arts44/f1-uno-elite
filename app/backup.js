@@ -56,6 +56,19 @@ const MAX_QR_VERSION = 25;
    collection plus grosse monte la version et le fait tomber. Un
    QR de sauvegarde illisible, c'est une collection perdue.
    ══════════════════════════════════════════════════════════ */
+/* ⚠️ CE 6 EST UNE DÉCISION, PAS UNE MESURE (㉒). Il vient du défaut de
+   1.71.0 — un QR rendu à 220 px quelle que soit sa version, illisible
+   pour un lecteur réel — et il a été posé comme une marge de sécurité,
+   pas comme le seuil où la lecture bascule. CE SEUIL-LÀ N'A JAMAIS ÉTÉ
+   MESURÉ : le 24/08/2026, un QR rendu à 2,14 px/module se décodait
+   encore par OpenCV sur une capture propre. Mais un décodeur sur un PNG
+   n'est pas un appareil photo sur un écran — luminance, moiré, angle,
+   mise au point ne sont dans aucun de ces essais.
+   CE QUI LE VÉRIFIERAIT : une lecture par appareil photo sur écran
+   réel, en descendant par paliers jusqu'à l'échec. C'est le n°32 —
+   octobre, avec le reste de ce qui attend un appareil.
+   EN ATTENDANT ON GARDE 6 : une marge décidée qu'on n'a pas mesurée
+   vaut mieux qu'un seuil mesuré qu'on n'a pas. */
 export const QR_MIN_PX_PER_MODULE = 6;
 
 // Taille de rendu minimale d'un QR, quiet zone (4 modules de chaque
@@ -124,7 +137,7 @@ export async function decodeBackupCode(input){
       ? await _pipe(bytes, DecompressionStream, 'deflate-raw')
       : bytes;
     data = JSON.parse(new TextDecoder().decode(raw));
-  } catch(e){
+  } catch {
     throw new Error(t('bk.invalid'));
   }
   // Schema validation — must look like a collectionSnapshot()
@@ -172,12 +185,12 @@ export async function maybeHandleBackupHash(){
   const hash = location.hash || '';
   if(!/#backup=/.test(hash)) return false;
   // Clear the hash immediately (before await) so it can't fire twice
-  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+  try { history.replaceState(null, '', location.pathname + location.search); } catch {}
   try {
     const data = await decodeBackupCode(hash);
     _showImportDialog(data);
     return true;
-  } catch(e){
+  } catch {
     showToast(t('bk.invalid'));
     return false;
   }
@@ -222,7 +235,7 @@ export async function decodeTradeCode(input){
   try {
     const raw = await _pipe(b64urlToBytes(s.slice(5)), DecompressionStream, 'deflate-raw');
     data = JSON.parse(new TextDecoder().decode(raw));
-  } catch(e){
+  } catch {
     throw new Error(t('tr.invalid'));
   }
   if(!data || typeof data !== 'object' || data.v !== 1
@@ -312,7 +325,7 @@ export function _showIncomingTrade(data){
 export async function maybeHandleTradeHash(){
   const hash = location.hash || '';
   if(!/#trade=/.test(hash)) return false;
-  try { history.replaceState(null, '', location.pathname + location.search); } catch(e){}
+  try { history.replaceState(null, '', location.pathname + location.search); } catch {}
   try {
     const data = await decodeTradeCode(hash);
     /* ENREGISTRER D'ABORD, AFFICHER ENSUITE — dans cet ordre et jamais

@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.77.4',
+    date: '2026-08-24',
+    changes: {
+      en: ['The backup QR code is displayed at its full size again. On a narrow screen it was being shrunk instead of the box scrolling, and a dense code became hard to scan — if you saved a QR before this version, produce it again and check it scans.'],
+      fr: ['Le QR de sauvegarde s’affiche de nouveau à sa taille entière. Sur un écran étroit il était rétréci au lieu que le cadre défile, et un code dense devenait difficile à scanner — si vous avez enregistré un QR avant cette version, refaites-le et vérifiez qu’il se scanne.'],
+      es: ['El código QR de copia de seguridad vuelve a mostrarse a tamaño completo. En una pantalla estrecha se encogía en vez de desplazarse el marco, y un código denso costaba escanear — si guardaste un QR antes de esta versión, vuelve a generarlo y comprueba que se escanea.'],
+      zh: ['备份二维码恢复完整尺寸显示。在窄屏上它会被压缩而不是让边框滚动，密集的二维码因此难以扫描——如果你在此版本之前保存过二维码，请重新生成并确认可以扫描。'],
+      it: ['Il codice QR di backup viene mostrato di nuovo a dimensione piena. Su uno schermo stretto veniva rimpicciolito invece di far scorrere il riquadro, e un codice denso diventava difficile da scansionare — se hai salvato un QR prima di questa versione, rifallo e verifica che si scansioni.'],
+      nl: ['De back-up-QR-code wordt weer op volledige grootte getoond. Op een smal scherm werd hij verkleind in plaats van dat het kader schoof, waardoor een dichte code lastig te scannen was — heb je vóór deze versie een QR bewaard, maak hem opnieuw en controleer of hij scant.'],
+      de: ['Der Backup-QR-Code wird wieder in voller Größe angezeigt. Auf einem schmalen Bildschirm wurde er verkleinert, statt dass der Rahmen scrollt, und ein dichter Code ließ sich kaum scannen — wenn Sie vor dieser Version einen QR gespeichert haben, erzeugen Sie ihn neu und prüfen Sie, ob er sich scannen lässt.'],
+    },
+  },
+  {
     version: '1.77.3',
     date: '2026-08-22',
     changes: {

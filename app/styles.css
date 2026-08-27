@@ -1934,11 +1934,38 @@ body.viewer-mode .mo-type-rows .mqbtn { opacity:0.35;pointer-events:none; }
 .sv-note{font-size:11px;color:var(--tx3);margin:var(--space-6px) auto 0;max-width:800px;}
 
 /* BACKUP QR */
-.bk-qr-wrap{display:flex;overflow-x:auto;flex-direction:column;align-items:center;gap:var(--space-2);padding:var(--space-3);background:var(--surface2);border:1px solid var(--border);border-radius:12px;}
 /* La largeur est posée en INLINE par account.js (elle suit la version
    du QR — voir QR_MIN_PX_PER_MODULE). Ce 220 n'est qu'un plancher de
    secours si le style inline manque. */
-.bk-qr{width:220px;max-width:100%;background:#fff;padding:var(--space-10px);border-radius:var(--r-sm);box-shadow:var(--sh-sm);}
+/* ══ LE QR DE SAUVEGARDE GARDE SA TAILLE PHYSIQUE ══════════════════
+   LE CORRECTIF DE 1.71.0 ÉTAIT INCOMPLET, ET IL L'EST RESTÉ. Une ligne
+   de JS le posait (`qrBox.style.width = minPx + 'px'` dans account.js)
+   et DEUX propriétés d'ici l'annulaient. Mesuré le 24/08/2026, pas réel
+   du QR en px/module, plancher du produit = 6 :
+
+       fenêtre 390 · v25 :  2,14      fenêtre 768 · v25 : 5,17
+       fenêtre 390 · v14 :  3,31      fenêtre 1400 · v14 : 5,75
+   Le plancher n'était atteint NULLE PART. Deux causes indépendantes :
+
+   ① `box-sizing:border-box` (règle globale ligne 125) + `padding:10px`
+      faisaient de `minPx` la largeur de BORDURE : le SVG recevait
+      minPx − 20. Systématique, à toutes les fenêtres. → `content-box`,
+      pour que `minPx` soit la largeur du SVG, ce que account.js croit
+      poser.
+   ② `max-width:100%` écrasait la boîte dès que la fenêtre était plus
+      étroite que le QR : le code RÉTRÉCISSAIT au lieu que le conteneur
+      DÉFILE. C'est exactement le défaut de 1.71.0, et le produit
+      affichait pendant ce temps `bk.qr_scroll` — « le QR garde sa
+      taille » —, un message qui existait avant le comportement.
+      → retiré.
+
+   `align-items:safe center` et pas `center` : un élément plus large que
+   son conteneur, centré, déborde des DEUX côtés, et la moitié gauche
+   devient inatteignable au défilement. `safe` retombe sur `start` dans
+   ce cas précis — on garde le centrage quand ça tient, on garde
+   l'accès quand ça déborde. */
+.bk-qr-wrap{display:flex;overflow-x:auto;flex-direction:column;align-items:safe center;gap:var(--space-2);padding:var(--space-3);background:var(--surface2);border:1px solid var(--border);border-radius:12px;}
+.bk-qr{width:220px;box-sizing:content-box;background:#fff;padding:var(--space-10px);border-radius:var(--r-sm);box-shadow:var(--sh-sm);}
 .bk-qr svg{display:block;width:100%;height:auto;}
 .bk-qr-hint{font-size:11px;color:var(--tx3);text-align:center;line-height:1.4;}
 .bk-qr-hint.bk-qr-warn{color:var(--orange);font-weight:600;}

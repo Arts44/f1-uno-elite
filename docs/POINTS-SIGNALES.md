@@ -3503,6 +3503,32 @@ garde :**
 Contrôle négatif final, avec le drapeau : orphelin introduit → **code 1**
 et le nom cité cinq fois ; orphelin retiré → **code 0**.
 
+### CE QUE VOIE A FAIT VRAIMENT — elle lint le FICHIER, pas le DIFF
+
+**Constaté au premier cas réel, 24/08/2026.** Toucher `app/backup.js`
+pour y ajouter un commentaire a rendu la livraison rouge sur **cinq
+`catch(e)` préexistants** dont la liaison n'était pas lue. Le garde ne
+compare pas au commit précédent : il lint tout fichier que le diff
+mentionne.
+
+**C'est une propriété, pas un défaut — mais elle a un coût qu'il faut
+avoir vu** : toucher un fichier ancien peut bloquer une livraison pour
+des orphelins qu'on n'a pas introduits. Le risque est celui qu'on
+voulait éviter en refusant voie B : un garde rouge pour des raisons
+étrangères au travail en cours finit par se contourner.
+
+**CE QUI LE REND ACCEPTABLE**, et ce n'est pas un hasard : le remède
+est exactement la condition de réouverture de voie B — *fichier par
+fichier, à l'occasion d'un travail sur ce fichier*. Quand voie A rougit,
+on est par construction **dans** le fichier concerné, avec le contexte
+pour juger. Les cinq de `backup.js` étaient des liaisons de `catch`
+jamais lues ; elles sont devenues `catch {}` (liaison optionnelle,
+ES2019). Aucune n'était un résultat qu'on aurait dû utiliser.
+
+**À REPRENDRE si ça devient pénible** : la parade serait de ne signaler
+que les orphelins **ajoutés**, ce qui demande une base de comparaison —
+plus cher que ce que ça évite, tant que les cas restent de cet ordre.
+
 ### VOIE B — REFUSÉE : purger les 63 puis armer partout
 
 **L'argument, et il est le vrai motif du refus : une purge en masse de
@@ -3541,7 +3567,7 @@ coûterait plus que les 63.
 
 **UNE OPÉRATION QU'ON CROIT LOCALE A UN EFFET CHEZ QUELQU'UN D'AUTRE.**
 Le dépôt est partagé, l'arbre de travail aussi, l'index aussi, et les
-ports aussi. Quatre formes se sont produites, toutes le 22-23/08/2026 :
+ports aussi. Cinq formes se sont produites, du 22 au 27/08/2026 :
 
 | | l'opération | l'effet chez l'autre |
 |---|---|---|
@@ -3549,6 +3575,7 @@ ports aussi. Quatre formes se sont produites, toutes le 22-23/08/2026 :
 | **le push** | `git push` | publie ses commits locaux, qu'elle ne pouvait plus amender |
 | **le stash** | `git stash` | vide son arbre de travail, fichiers non suivis compris |
 | **le port** | lancer `livrer.sh` | refuse sa livraison, ou fait échouer la sienne en cours |
+| **le commit** | `git add mes-fichiers` | emporte son travail EN COURS sous mon message — le seul cas irréversible |
 
 Aucune des quatre ne demande confirmation. Aucune ne mentionne l'autre
 session. **Trois des quatre ne laissent aucune trace à chercher après
@@ -3718,6 +3745,45 @@ après un clone, il n'existe plus.
 **NON ÉCRIT.** Un garde qui ne tient que si les deux côtés coopèrent, et
 qui disparaît au clone, ne vaut pas mieux que la règle de lecture écrite
 dans CONVENTIONS — laquelle, au moins, ne prétend pas être mécanique.
+
+### CINQUIÈME FORME, 27/08/2026 : commiter le travail en cours de l'autre
+
+**La plus coûteuse des cinq, et la seule qui abîme quelque chose
+d'irréversible.** Le commit `8f568fe` — « fix(filets) : les quatre
+plafonds oubliés rejoignent la borne commune » — contient **l'entrée
+n°45 de ce document**, écrite par l'autre session et non commitée au
+moment du `git add`.
+
+Rien n'est perdu : le contenu est en ligne. **Ce qui est perdu, c'est
+le lien entre un changement et sa raison.** L'histoire dit maintenant
+qu'un correctif de plafonds de filets a introduit une entrée sur un
+défaut CSS du QR de sauvegarde. Personne ne le retrouvera par le
+message, et un `git log --follow` sur cette entrée mène au mauvais
+récit.
+
+**POURQUOI C'EST PIRE QUE LE PUSH (forme ②)** :
+
+| | le push | le commit |
+|---|---|---|
+| ce qui est publié | un commit COMPLET de l'autre, avec SON message | un fragment de travail EN COURS, sous le message de QUELQU'UN D'AUTRE |
+| réversible ? | le contenu est intact, seule la date de publication change | le message est faux et le restera — le réécrire demande de réécrire l'histoire publiée |
+| détectable ? | `git log origin/main..HEAD` avant de pousser | **rien** : `git add <mes fichiers>` ne dit pas que ces fichiers portent aussi le travail d'un autre |
+
+**LA CAUSE EST STRUCTURELLE, PAS UNE ÉTOURDERIE** : les deux sessions
+partagent UN arbre de travail. Un fichier n'appartient pas à une
+session — il porte la somme des éditions des deux. `git add fichier`
+prend **tout le fichier**, y compris ce que l'autre vient d'y écrire et
+n'a pas fini.
+
+**LA PARADE, ET ELLE EST INCOMPLÈTE** : `git add -p` permet de choisir
+les hunks, donc de ne prendre que les siens. C'est la seule mécanique
+disponible. Mais elle demande de RECONNAÎTRE ses propres hunks dans un
+fichier de 3 800 lignes, et rien ne les distingue.
+
+**Ce qui protégerait vraiment n'existe pas ici** : il faudrait que
+chaque session ait son arbre — `git worktree` —, ce qui coûte un
+répertoire par session et casse les chemins codés en dur (les ports des
+filets, `docs/mesures/`). Non chiffré.
 
 ### QUATRIÈME FORME, observée en direct le 23/08/2026 : `livrer.sh` ne peut pas tourner deux fois
 

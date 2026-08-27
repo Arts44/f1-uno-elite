@@ -57,6 +57,45 @@ BORNE_SECURITE_MS = 60_000
 CODE = ("F1T1.bc2xDsIwDIThd7nZg5PGDuRVogwdUrZWahEMiHdHPTEglOUfTv7kFx4oQXD0"
         "-dhWlKjRBM95vaNUaIoQaJrYxBrr7IW9njVlA0tlVEZlVEZlmaU1Wqd1Wqd1KqdyKqdyKqfK"
         "vMz8khOaYFuWvqPUCtUAqRW3vfcVEltrcq7-u4bvGnS4ptEah7fRRt-mMLqd8v_a3h8")
+CONTROLE = '--controle' in sys.argv
+
+# ══ LE CONTRÔLE NÉGATIF, ET LA VALEUR DU PRODUIT SUR LAQUELLE IL PORTE
+# CE FILET N'AVAIT JAMAIS ÉTÉ VU ROUGE (n°29). Il affirme qu'une fiche
+# reçue par lien SURVIT au premier lancement ; rien ne prouvait qu'il
+# saurait le dire si elle ne survivait pas.
+#
+# LE DÉFAUT SIMULÉ EST CELUI DU PRODUIT, PAS CELUI DU FILET : on empêche
+# l'app d'ÉCRIRE la clé `f1uno_trade_inbox` — la constante INBOX_KEY de
+# app/trade-inbox.js:42, c'est-à-dire exactement ce que le défaut de
+# 1.74.0 produisait : la fiche arrivait, le premier lancement passait
+# par-dessus, et elle n'était plus là. On ne touche à AUCUNE assertion.
+#
+# SEUIL DÉCLARÉ (㉒) : il n'y en a pas de numérique — l'assertion est
+# booléenne (`fiche.stockee`). Ce que le contrôle exige, c'est qu'AU
+# MOINS UN échec soit rapporté sur CHACUN des deux chemins, et que le
+# code de sortie soit 1. Un contrôle qui rendrait 0 ici voudrait dire
+# que le filet ne sait pas voir l'absence de la fiche.
+#
+# A REPRENDRE si INBOX_KEY change de nom : le contrôle viserait une clé
+# qui n'existe plus et rendrait un VERT — donc un faux « le filet sait
+# échouer ». C'est le piège que ce filet-ci est censé éviter.
+INBOX_KEY = 'f1uno_trade_inbox'
+SABOTAGE = """
+  const _si = Storage.prototype.setItem;
+  Storage.prototype.setItem = function(k, v){
+    if (k === '%s') return;          /* la fiche n'est jamais conservee */
+    return _si.apply(this, arguments);
+  };
+""" % INBOX_KEY
+
+# LE REGISTRE DES CONTRÔLES JOUÉS. Un contrôle qui cesse de s'exécuter
+# doit être aussi bruyant qu'un contrôle qui rougit (㉜) : le bilan est
+# rendu depuis un `finally`, donc même si une exception traverse le
+# parcours. Vécu ailleurs : un bilan écrit en fin de fonction ne
+# survivait pas à l'exception qu'il devait précisément rendre visible.
+CONTROLES = ['chemin DIRECT', 'chemin RACINE']
+JOUES = []
+
 ECHECS = []
 
 try:
@@ -70,6 +109,9 @@ except ImportError:
 def parcours(nav, depart, nom):
     """Profil JAMAIS lancé : contexte neuf, AUCUN init_script."""
     ctx = nav.new_context(viewport={'width': 390, 'height': 844})
+    if CONTROLE:
+        ctx.add_init_script(SABOTAGE)
+        JOUES.append(nom.split('(')[0].strip())
     pg = ctx.new_page()
     erreurs = []
     pg.on('pageerror', lambda e: erreurs.append(str(e)))
@@ -118,12 +160,43 @@ def parcours(nav, depart, nom):
 
 
 print('FILET DE LA FICHE REÇUE — profil JAMAIS lancé, les deux chemins')
+if CONTROLE:
+    print('  ⚠️ MODE CONTRÔLE : l\'écriture de la clé « %s » est sabotée.' % INBOX_KEY)
+    print('     Le filet DOIT rougir sur les deux chemins.')
 print(f'  étapes de mise en route attendues : {", ".join(n for n, _ in PREMIER_LANCEMENT)}')
-with sync_playwright() as p:
-    nav = p.chromium.launch()
-    parcours(nav, '/app/index.html', 'chemin DIRECT (ce que vise le QR)')
-    parcours(nav, '/index.html', 'chemin RACINE (lien copié-collé)')
-    nav.close()
+try:
+    with sync_playwright() as p:
+        nav = p.chromium.launch()
+        parcours(nav, '/app/index.html', 'chemin DIRECT (ce que vise le QR)')
+        parcours(nav, '/index.html', 'chemin RACINE (lien copié-collé)')
+        nav.close()
+finally:
+    # ── LE BILAN EST RENDU QUOI QU'IL ARRIVE ──────────────────────
+    # Dans un `finally`, donc même si une exception traverse le
+    # parcours. Un bilan écrit en fin de chemin nominal ne survit pas à
+    # l'exception qu'il est censé rendre visible (㉜).
+    if CONTROLE:
+        manquants = [c for c in CONTROLES if c not in JOUES]
+        print('\nCONTROLES NEGATIFS JOUES : %d/%d' % (len(JOUES), len(CONTROLES)))
+        for c in CONTROLES:
+            print('   %s %s' % ('joue  ' if c in JOUES else 'ABSENT', c))
+        if manquants:
+            print('\n' + '!' * 62)
+            print('CONTROLE(S) NON JOUE(S) : ' + ', '.join(manquants))
+            print('Le mode --controle n a pas exerce ce qu il pretend exercer.')
+            print('!' * 62)
+            ECHECS.append('CONTROLES NON JOUES (%d/%d) : %s — un controle qui ne'
+                          ' s execute pas est un controle qui ment'
+                          % (len(JOUES), len(CONTROLES), ', '.join(manquants)))
+
+# ══ CE QUE CE CONTRÔLE N'EXERCE PAS (㉔) ═══════════════════════════
+# Il prouve que ce filet voit LE défaut qu'on lui montre — une fiche qui
+# n'est pas conservée — et RIEN D'AUTRE. Il ne dit pas que le filet
+# verrait une fiche TRONQUÉE, une porte `#svFicheRecue` renommée, une
+# redirection de la vitrine cassée, ni une erreur de page. Ces quatre
+# assertions existent et n'ont jamais été vues rouges.
+# UN FILET VU ROUGE UNE FOIS N'EST PAS UN FILET VÉRIFIÉ : c'est UNE de
+# ses assertions éprouvée sur UNE branche.
 
 if ECHECS:
     print(f'\n{len(ECHECS)} ÉCHEC(S) :')
