@@ -13,7 +13,7 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **45 entrées : 44 défauts et 1 référence. QUINZE défauts sont OUVERTS** —
+> **45 entrées : 44 défauts et 1 référence. QUATORZE défauts sont OUVERTS** —
 > c'est ce qu'on vient chercher ici, donc c'est ce que cet en-tête liste :
 >
 > | № | Ouvert |
@@ -28,7 +28,6 @@
 > | 33 | La séquence d'intro complète (D) |
 > | 34 | La consigne d'installation iOS n'a jamais été vue fonctionner |
 > | 36 | L'AVIF servi est moins fidèle que le webp qu'il précède |
-> | 38 | Les filets navigateur rougissent à tort sous livrer.sh |
 > | 40 | La trace de livraison ne peut pas prouver ce qu'elle affirme |
 > | 42 | Les 63 variables inutilisées restent invisibles avant push |
 > | 43 | Deux sessions : la doc fusionne sans conflit, le push publie l'autre |
@@ -2818,11 +2817,13 @@ Ce qui EST mesuré, c'est que **ce moteur-ci ne peut pas la rendre**.
 
 ---
 
-## 38. Les filets navigateur rougissaient à tort sous `livrer.sh` — SECOND LOT TRANCHÉ ET REFUSÉ, trois bornes du premier restent
+## 38. ~~Les filets navigateur rougissaient à tort sous `livrer.sh`~~ — CLOS le 28/08/2026 : cause corrigée, second lot refusé, hypothèse de la charge NON ÉPROUVÉE
 
-<!-- état: ouvert · type: défaut -->
+<!-- état: fermé · type: défaut -->
 
-**Premier lot corrigé le 23/08/2026 ; le second reste ouvert.** Ce n'est pas un défaut du produit : le
+**Premier lot corrigé le 23/08/2026 ; le second a été tranché et REFUSÉ le
+24/08 (section ⛔ plus bas). Point clos le 28/08 — lire la clôture en fin
+d'entrée avant tout ce qui suit, qui a été écrit pendant l'instruction.** Ce n'est pas un défaut du produit : le
 geste tactile fonctionne, le filet le prouve, et il l'a prouvé encore
 le jour où il a rougi.
 
@@ -2875,8 +2876,8 @@ déjà dans chaque cas ; c'est le plafond qui est arbitraire.
 sémantique, et il éteint le symptôme qui apprend à ignorer le filet.
 Le second est plus long et n'a aucun défaut constaté à son actif — il
 se décide séparément. **Le premier lot est fait (voir plus bas) ; le
-second — les 24 `wait_for_timeout`, 50 à 70 lignes — reste ouvert et
-n'était pas dans ce chantier.**
+second — les 24 `wait_for_timeout`, 50 à 70 lignes — a été tranché et
+refusé plus bas, après mesure.**
 
 ### Ce que ce remède N'EXERCERAIT PAS (㉔)
 
@@ -3281,6 +3282,80 @@ Elles ne sont pas un argument pour convertir les vingt-et-une autres.
 
 Trois bornes ont aussi échappé au premier lot : `verify_qr.py:227` (10 s),
 `verify_touch.py:132` (20 s), `verify_tutorial.py:405` (15 s).
+
+> Ces trois bornes ont été corrigées depuis, avec une quatrième, au commit
+> `8f568fe` : toutes reprennent `BORNE_SECURITE_MS`. **Les numéros de ligne
+> ci-dessus sont caducs** — le commit note que les plafonds se trouvaient à
+> d'autres endroits que ceux relevés ici.
+
+### 🔒 CLÔTURE — 28/08/2026. CE QUI EST ÉTABLI, ET CE QUI NE LE SERA PAS
+
+**Le défaut est corrigé et le point se ferme.** La file d'acceptation du
+serveur est portée à 128 (`b49fbd6`), le premier lot d'attentes est
+converti, les quatre bornes oubliées sont reprises (`8f568fe`), et
+`livrer.sh` est vert 3/3. **Aucun faux rouge n'a été observé depuis.**
+
+**Mais l'hypothèse « la charge machine est la cause » reste NON
+ÉPROUVÉE — et elle se ferme dans cet état, délibérément.** Deux campagnes
+d'attribution ont été montées pour la trancher. Les deux ont échoué sur
+un défaut de l'INSTRUMENT, jamais sur le produit :
+
+| | ce qui a été mesuré | pourquoi c'était invalide |
+|---|---|---|
+| 1ʳᵉ, 25/08 | 8 essais, **8 expirations à 60 s dans les deux bras**, de charge 65,6 à 4,4 | `add_init_script` omis : `.card` ne s'attachait **jamais**, pas même sans charge. Instrument muet (㉞) |
+| 2ᵈᵉ, 28/08 | contrôle à vide **258 ms** ✅ · 3 essais bras B : **1 247 / 1 185 / 1 548 ms**, aucune expiration | le bras A n'était **pas le serveur d'origine** — voir ci-dessous |
+
+**Ce que la seconde campagne a tout de même acquis :** l'instrument est
+réparé et **validé** — le contrôle à vide, câblé en dur, attache `.card`
+en 258 ms et la campagne refuse de démarrer sinon. Trois essais du bras B
+(serveur corrigé) sous huit contextes concurrents rendent **1 185 à
+1 548 ms, zéro expiration**. C'est cohérent avec « le serveur corrigé
+tient la charge », mais **n=3 n'autorise aucune conclusion**. La règle de
+trois (zéro événement sur *n* → borne haute 3/*n* à 95 %) rendrait ici
+100 % — et elle est de toute façon hors de son domaine, l'approximation
+valant pour *n* grand ; la borne exacte à 95 % est ≈ 63 %. Autrement dit,
+**trois essais ne majorent rien d'utile**, et c'est tout ce qu'on peut en
+dire.
+
+**Pourquoi elle s'est arrêtée, et c'est le vrai enseignement.** Le bras A
+était censé reproduire le serveur d'AVANT `b49fbd6`, c'est-à-dire
+`python3 -m http.server`. Il en différait sur deux points, tous deux
+vérifiés dans la bibliothèque standard :
+
+- `python3 -m http.server` instancie un **`ThreadingHTTPServer`**, pas un
+  serveur mono-thread. Mon bras A montait un `socketserver.TCPServer` nu.
+  La campagne aurait donc comparé « mono-thread, backlog 5 » à
+  « threading, backlog 128 » : **deux changements confondus en un**, sur
+  une question qui porte précisément sur l'un des deux.
+- `HTTPServer.allow_reuse_address` vaut `1`, `TCPServer` vaut `False`.
+  C'est le mécanisme qui explique la chute au 4ᵉ essai — le premier du bras
+  A, l'ordre randomisé étant `BBBA…`. **Inférence, pas trace** : le journal
+  ne dit que `RuntimeError: serveur pas monte`. Ce qui est certain, c'est
+  que le script s'est **arrêté bruyamment** au lieu de mesurer.
+
+**Le crash a rendu service : il a démasqué une infidélité de protocole
+qu'aucun résultat n'aurait signalée.** Une campagne qui aurait démarré
+aurait rendu quarante nombres exploitables et **attribué au backlog un
+écart dû au threading**.
+
+**La règle arrêtée d'avance a été appliquée : pas de troisième
+réparation.** Elle existait pour empêcher exactement le raisonnement qui
+s'est présenté ici — « cette fois c'est différent, le correctif tient en
+une ligne ». Il tenait effectivement en une ligne. Ce n'est pas un
+argument : c'est ce que je me suis dit les deux fois précédentes.
+
+**Ce qui rouvrirait légitimement la question** — et ce serait un nouveau
+point, pas celui-ci : un faux rouge effectivement observé sous
+`livrer.sh` depuis `b49fbd6`. Tant qu'il n'y en a pas, l'attribution est
+une curiosité, pas un besoin. **Le remède est en place et il tient ; on
+ne sait toujours pas précisément ce qu'il soigne, et c'est écrit ici
+plutôt que sous-entendu.**
+
+**Registre :** ㉞ (le discriminant muet) et ㊱ (l'auteur d'un garde est le
+plus mal placé pour l'éprouver) viennent de ce point. ㉟ y est appliqué :
+la seconde campagne randomise l'ordre des bras au lieu de l'alterner.
+
+---
 
 ## 39. ~~L'adresse morte était imprimée sur la carte de profil partagée~~ — CORRIGÉ le 22/08/2026
 
