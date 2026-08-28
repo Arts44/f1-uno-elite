@@ -92,6 +92,7 @@ CONTROLE = '--controle' in sys.argv
 CONTROLES = [
     'repli retire', 'ligne 110 px', 'canvas dans le flux', 'sans JS masque',
     'actif lourd', 'local() faux', 'repli decale',
+    'media query du lien cassee',
 ]
 JOUES = []
 
@@ -141,6 +142,26 @@ FENETRES = [('mobile 320', 320, 568), ('mobile 360', 360, 560),
 FENETRES_LCP = [('390x844', 390, 844), ('375x667', 375, 667),
                 ('360x640', 360, 640), ('360x560', 360, 560),
                 ('320x568', 320, 568), ('320x844', 320, 844)]
+# ══ LE LIEN VERS LA SEQUENCE A DEUX EMPLACEMENTS (28/08/2026) ════
+# Au-dessus de 380 px il est A COTE du CTA, sur la meme ligne ; en
+# dessous il reste sous les captures. DEUX COPIES dans le HTML, une
+# seule visible — c'est le seul moyen sans JS de le deplacer d'un
+# conteneur a l'autre, et un deplacement par JS apres le premier rendu
+# serait un decalage de mise en page, donc du CLS.
+# Le filet ne peut donc plus cliquer `#voir` : il clique CELUI QUI EST
+# VISIBLE, quelle que soit la fenetre.
+LIEN_VISIBLE = '.voir:visible'
+# Point de bascule DECLARE ICI (㉒), et recopie du CSS a dessein : si
+# la media query bouge, ce filet rougit et la decision se reprend.
+BASCULE_PX = 380
+# Le rang exige CTA + ecart + libelle. Mesure du 28/08/2026, police
+# chargee (pire cas) : 205 + 20 + 98 = 323 px, plus 40 px de marges de
+# body, soit 363 px. 380 laisse 17 px, TROIS signes de libelle.
+RANG_EXIGE_PX = 323
+# Largeur du CTA, police chargee OU repli (mesure : 205 et 204 px ; le
+# rendu se stabilise a 205 apres l echange). DECLAREE ICI (㉒) : c'est
+# le temoin exterieur qui voit un bouton ecrase.
+CTA_LARGEUR_PX = 205
 KIN_MAX_PX = 44
 PHRASE = '101 cards, 998 variants to collect.'
 LCP_ATTENDU = 'shot-desktop'
@@ -157,14 +178,86 @@ new Promise(res => {
     const r = document.querySelector('.cta').getBoundingClientRect();
     const k = document.getElementById('kin');
     const s = document.querySelector('.shot-desktop');
+    const row = document.querySelector('.cta-row');
+    const vus = [...document.querySelectorAll('.voir')]
+                  .filter(e => e.offsetParent !== null)
+                  .map(e => e.classList.contains('voir-rang') ? 'rang' : 'pied');
     res({lcp: Math.round(lcp), cls: Math.round(cls * 10000) / 10000,
          cta_y: Math.round(r.y), cta_h: Math.round(r.height), el_lcp: el,
+         rang_h: row ? Math.round(row.getBoundingClientRect().height) : null,
+         cta_w: Math.round(r.width),
+         liens_vus: vus,
+         libelles: [...document.querySelectorAll('.voir')].map(e => e.textContent.trim()),
+         deborde: document.documentElement.scrollWidth
+                  > document.documentElement.clientWidth,
          kin_h: k ? Math.round(k.getBoundingClientRect().height) : null,
          lcp_src: s ? (s.currentSrc || '').split('/').pop() : null,
          lcp_prio: s ? (s.fetchPriority || s.getAttribute('fetchpriority') || '') : null});
   }, 3000);
 })
 """
+
+
+def defauts_du_lien(nom, w, v):
+    """Les trois assertions du lien vers la sequence, POUR UNE FENETRE.
+
+    ECRITE COMME FONCTION ET NON EN LIGNE, parce que le controle negatif
+    doit exercer EXACTEMENT ce que le parcours exerce. Un controle qui
+    reproduit la logique au lieu de l appeler valide sa propre copie
+    pendant que le filet en livre une autre — ㉘, la copie muette.
+
+    ⑳ : LE JEU DE FENETRES EST LUI-MEME UNE HYPOTHESE. On exige
+    l emplacement ATTENDU POUR CETTE FENETRE, pas « un lien quelque
+    part » — sans quoi le cas etroit pourrirait sans bruit, et c est lui
+    qui protege 320x568.
+    """
+    d = []
+    attendu = ['rang'] if w >= BASCULE_PX else ['pied']
+    if v['liens_vus'] != attendu:
+        d.append('%s : lien(s) visible(s) %r, attendu %r — la media query de %d px ne'
+                 ' place plus le lien ou elle le dit'
+                 % (nom, v['liens_vus'], attendu, BASCULE_PX))
+    # HAUTEUR AJOUTEE NULLE : le rang fait la hauteur du CTA SEUL. Un
+    # repli la porte a ~92 px et fait basculer l element LCP a 320x568
+    # (mesure du 28/08/2026, n=3).
+    # ⚠️ CETTE ASSERTION-CI N A JAMAIS ETE VUE ROUGE, ET NE PEUT PAS
+    # L ETRE AUJOURD HUI (㉔, ㊳) : sans `flex-wrap` sur .cta-row et
+    # avec `white-space:nowrap` sur .voir-rang, aucun repli n est
+    # possible — un rang trop large DEBORDE, et c est l assertion
+    # suivante qui le voit.
+    # ELLE GARDE CONTRE UN GESTE PRECIS, ET C EST ECRIT POUR QU ON NE LA
+    # RETIRE PAS EN LA TROUVANT MORTE : ajouter `flex-wrap:wrap` a
+    # .cta-row — le reflexe de qui verra un debordement a une fenetre
+    # etroite — la rend immediatement eprouvable, et ROUGE. Le repli
+    # porte le rang de 55 a 92 px et fait basculer l element LCP a
+    # 320x568. POUR L EPROUVER LE JOUR VENU : `css='.cta-row{flex-wrap:
+    # wrap}'` sur une fenetre sous BASCULE_PX, media query cassee.
+    if v['liens_vus'] == ['rang'] and v['rang_h'] != v['cta_h']:
+        d.append('%s : rang %s px pour un CTA de %s px — le lien est passe a la ligne,'
+                 ' la hauteur ajoutee n est plus nulle' % (nom, v['rang_h'], v['cta_h']))
+    # SANS `flex-wrap`, un rang trop large DEBORDE au lieu de se replier.
+    # Le debordement est la panne VISIBLE qui remplace la panne
+    # silencieuse ; encore faut-il la regarder.
+    if v['deborde']:
+        d.append('%s : la page deborde horizontalement — le rang CTA + lien ne tient pas'
+                 ' dans la fenetre' % nom)
+    # LE CTA NE SE FAIT PAS ECRASER. Mesure du 28/08/2026, media query
+    # cassee a 320 px : le rang ne debordait PAS, il RETRECISSAIT le CTA
+    # de 205 a 162 px et son libelle passait a la ligne. Le bouton
+    # principal payait pour le lien secondaire, en silence, et aucune
+    # des assertions ci-dessus ne le voyait — `flex:0 0 auto` l en
+    # empeche, celle-ci le verifie.
+    # DEUX COPIES DU LIEN DANS LE DOM = ㉘ EN GERME : qui change le
+    # libelle peut n en voir qu un, et la moitie des visiteurs lit
+    # l autre. Deux lignes contre un defaut qui ne se voit que sur la
+    # fenetre qu on n a pas ouverte.
+    if len(set(v['libelles'])) != 1:
+        d.append('%s : libelles divergents %r — une copie du lien a change, pas l autre'
+                 % (nom, v['libelles']))
+    if v['cta_w'] != CTA_LARGEUR_PX:
+        d.append('%s : CTA large de %s px, attendu %s — le bouton principal est ecrase par'
+                 ' le rang' % (nom, v['cta_w'], CTA_LARGEUR_PX))
+    return d
 
 
 def sans_js(br, remplace=None):
@@ -413,9 +506,55 @@ def main():
                 echecs.append('%s : l element LCP charge %r — Chromium sait lire l AVIF, la'
                               ' source doit etre choisie. Ordre des <source> ou fichier absent ?'
                               % (nom, v['lcp_src']))
+            echecs.extend(defauts_du_lien(nom, w, v))
             if v['lcp_prio'] != 'high':
                 echecs.append('%s : fetchpriority de l element LCP = %r, attendu "high" — l ajout'
                               ' d une source l a deplace ou efface' % (nom, v['lcp_prio']))
+
+        # ⑤ter LES DEUX COTES DE LA BASCULE, A UN PIXEL PRES.
+        # Le jeu de fenetres normal ne contient AUCUN point proche de
+        # 380 px : il pourrait rester vert avec une media query calee a
+        # 420 comme a 340. On regarde donc la ou la decision se prend.
+        print('  -- point de bascule declare : %d px --' % BASCULE_PX)
+        for w in (BASCULE_PX - 1, BASCULE_PX, BASCULE_PX + 1):
+            v = charger(br, w, 844, retard_police=RETARD_POLICE_MS)
+            print('     %-4d px : lien %r · rang %s px · CTA %s px'
+                  % (w, v['liens_vus'], v['rang_h'], v['cta_h']))
+            echecs.extend(defauts_du_lien('bascule %d' % w, w, v))
+
+        # CONTROLE NEGATIF DE LA MEDIA QUERY.
+        # ON CASSE LA BASCULE, pas le lien : la regle etroite est
+        # neutralisee, le lien du rang apparait SOUS le point de bascule,
+        # et c est exactement la panne que ces assertions existent pour
+        # voir — celle qui ferait basculer l element LCP a 320x568.
+        if CONTROLE:
+            casse = ('@media(max-width:%dpx){.voir-rang{display:inline}'
+                     '.voir-pied{display:none}}' % (BASCULE_PX - 1))
+            etroites = [f for f in FENETRES_LCP if f[1] < BASCULE_PX]
+            vus_rouges = 0
+            for nom, w, h in etroites:
+                v = charger(br, w, h, css=casse, retard_police=RETARD_POLICE_MS)
+                # ㊲ — L EFFET, PAS L APPEL. `css=` peut s injecter sans
+                # rien changer (regle ecrasee, selecteur renomme). On
+                # exige la preuve que le lien du rang est APPARU la ou il
+                # ne devait pas etre ; sans elle, le controle ne prouve
+                # rien et le dire est un ECHEC, pas un avertissement.
+                if 'rang' not in v['liens_vus']:
+                    echecs.append('SABOTAGE INEFFECTIF a %s : liens vus %r — la media query'
+                                  ' cassee n a rien change' % (nom, v['liens_vus']))
+                    continue
+                trouves = defauts_du_lien(nom, w, v)
+                if trouves:
+                    vus_rouges += 1
+                    print('     controle %s : %d defaut(s) vu(s)' % (nom, len(trouves)))
+                else:
+                    print('     controle %s : EFFET CONSTATE MAIS AUCUN DEFAUT VU' % nom)
+            if vus_rouges == len(etroites):
+                joue('media query du lien cassee')
+            else:
+                echecs.append('CONTROLE media query : %d fenetre(s) etroite(s) sur %d ont'
+                              ' rougi — les autres ont laisse passer le lien mal place'
+                              % (vus_rouges, len(etroites)))
 
         # ⑥ LE FOND ANIME — DEUX ASSERTIONS, PAS UNE.
         # Que l'element LCP n'ait pas bouge ne prouve RIEN sur le fond :
@@ -497,8 +636,8 @@ def main():
         # pas, au repos il etait du temps perdu. Le 60 s est une BORNE de
         # securite, pas un seuil de mesure : si #voir n'apparait jamais,
         # echouer en une minute plutot que bloquer la livraison.
-        pg2.wait_for_selector('#voir', state='visible', timeout=BORNE_SECURITE_MS)
-        pg2.click('#voir')
+        pg2.wait_for_selector(LIEN_VISIBLE, state='visible', timeout=BORNE_SECURITE_MS)
+        pg2.click(LIEN_VISIBLE)
         # NE PAS CONVERTIR EN ATTENTE SUR CONDITION. Essaye le 23/08/2026,
         # rejete par la relecture : hors du plan « mur », intro.js:960 ecrit
         # `cnt.textContent = N` directement. Une condition « le compteur vaut
@@ -552,9 +691,10 @@ def main():
         # verifie. SEUIL DECLARE (㉒) : la coupure reelle se decide sur
         # trois sauts consecutifs avant 2 s ; ici on court-circuite la
         # detection, ce qui eprouve le CHEMIN de coupure, pas le seuil.
-        pg.evaluate("() => { document.getElementById('voir').onclick = null;"
-                    " import('./intro.js').then(m => m.ouvrir("
-                    " document.getElementById('voir'), {forcerCoupure: true})); }")
+        pg.evaluate("() => { const v = [...document.querySelectorAll('.voir')]"
+                    "   .find(e => e.offsetParent !== null);"
+                    " v.onclick = null;"
+                    " import('./intro.js').then(m => m.ouvrir(v, {forcerCoupure: true})); }")
         # Attendre l'ETAT FINAL de la sequence, pas 2600 ms. `true` aussi
         # quand .intro est absent : la mesure ci-dessous rend None dans ce
         # cas, et l'attendre bloquerait sur un etat legitime.

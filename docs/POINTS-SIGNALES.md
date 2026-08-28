@@ -13,31 +13,59 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **47 entrées : 46 défauts et 1 référence. QUINZE défauts sont OUVERTS** —
-> c'est ce qu'on vient chercher ici, donc c'est ce que cet en-tête liste :
+> **48 entrées : 47 défauts et 1 référence. QUATORZE défauts sont OUVERTS.**
 >
-> | № | Ouvert |
-> |---|---|
-> | 18 | Les PWA installées depuis l'ancienne adresse sont GELÉES sans le dire |
-> | 21 | Le recoupement (piste 3c) |
-> | 24 | Deux bandeaux coexistent sur un profil qui saute plusieurs versions |
-> | 27 | Deux ✕ identiques, deux contrats opposés |
-> | 29 | Trois filets sur cinq n'ont jamais été vus rouges |
-> | 31 | Le vrai budget de la vitrine est dans les deux captures |
-> | 32 | Une PWA mobile développée sans appareil mobile |
-> | 33 | La séquence d'intro complète (D) |
-> | 34 | La consigne d'installation iOS n'a jamais été vue fonctionner |
-> | 36 | L'AVIF servi est moins fidèle que le webp qu'il précède |
-> | 40 | La trace de livraison ne peut pas prouver ce qu'elle affirme |
-> | 42 | Les 63 variables inutilisées restent invisibles avant push |
-> | 43 | Deux sessions : la doc fusionne sans conflit, le push publie l'autre |
-> | 44 | Les assertions des filets n'ont jamais été éprouvées à vide |
-> | 46 | Un jeton Codacy en clair dans les transcriptions — à faire tourner |
+> ### Où on en est, en trois lignes
 >
-> Les 28 autres défauts sont corrigés, mesurés ou tranchés, et conservés avec
-> leur diagnostic. Le n°19 n'est pas un défaut : c'est le mode d'emploi du SW
-> de démolition, hors décompte. Reste une hypothèse non mesurée notée au
-> n°12 §C : ce que voit l'utilisateur quand le quota Resend est atteint.
+> **En ligne** — l'app est en 1.77.5, la vitrine porte le lien vers la
+> séquence à côté du CTA au-dessus de 380 px de fenêtre, et les cinq
+> filets navigateur ont chacun un contrôle négatif joué.
+>
+> **Le registre des instruments menteurs compte 39 cas** (①–㊴, dans
+> `docs/CONVENTIONS.md`) : ce sont les manières dont une mesure, un
+> garde ou un contrôle a déjà menti dans ce dépôt, chacune payée une
+> fois.
+>
+> **Le résultat de la semaine est le n°29** : en vérifiant que trois
+> gardes savaient rougir, on a trouvé **deux défauts en production** —
+> le n°45 (QR écrasé, un mois en ligne) et le n°47 (le tutoriel
+> annonçant qu'une partie n'était pas à l'écran). Les deux étaient
+> couverts par une assertion écrite exprès contre eux ; les deux
+> assertions ne pouvaient pas s'exécuter. La suite est le n°44.
+>
+> ### Ce qui attend un APPAREIL — fin septembre / début octobre
+>
+> Bloqués : rien à décider, rien à écrire, l'appareil manque.
+>
+> | № | ouvert | ce qui le débloque |
+> |---|---|---|
+> | 32 | Une PWA mobile développée sans appareil mobile | l'iPhone 16 Pro Max ; neuf points à vérifier, dont le plancher de lisibilité du QR |
+> | 33 | La séquence d'intro complète (D) | le même appareil : quatorze plans à juger sur un vrai écran, pas sur un émulateur |
+> | 34 | La consigne d'installation iOS jamais vue fonctionner | un Safari réel — `beforeinstallprompt` n'y existe pas, la consigne n'a jamais été jouée |
+>
+> ### Ce qui attend une DÉCISION ou du TRAVAIL
+>
+> En file : rien ne les empêche de démarrer.
+>
+> | № | ouvert | ce qui le débloque |
+> |---|---|---|
+> | 18 | Les PWA installées depuis l'ancienne adresse sont GELÉES | une action, pas une décision : cocher les autres installs gelées éventuelles |
+> | 21 | Le recoupement (piste 3c) | chiffrer ce que la version calcul débloque, et pour quel besoin |
+> | 24 | Deux bandeaux coexistent sur un profil très en retard | du travail : décider lequel des deux cède, puis le coder |
+> | 27 | Deux ✕ identiques, deux contrats opposés | une décision éditoriale sur le sens des deux gestes, avant tout code |
+> | 31 | Le vrai budget de la vitrine est dans les deux captures | AVIF plus agressif puis `srcset` ; aucun appareil requis, mais un jugement à l'œil sur l'image |
+> | 36 | L'AVIF servi est moins fidèle que le webp qu'il précède | accepté et borné : à rouvrir à la régénération des captures, pas avant |
+> | 40 | La trace de livraison ne peut pas prouver ce qu'elle affirme | par construction ; il faut choisir entre déplacer l'écriture après le commit ou retirer la trace |
+> | 42 | Les 63 variables inutilisées | la voie A lint les fichiers touchés ; la passe groupée sur les 24 fichiers reste refusée |
+> | 43 | Deux sessions sur le même dépôt | six formes constatées ; la parade ③ est prise, ④ reste à écrire, et `livrer.sh` appartient à l'autre session |
+> | 44 | Les assertions des filets n'ont jamais été éprouvées à vide | la campagne : trois filets non lus, puis 36 assertions ; retenue, pas commencée |
+> | 46 | Un jeton Codacy en clair dans les transcriptions | une action de votre part : le faire tourner. Rien dans le dépôt |
+>
+> Les 33 autres défauts sont corrigés, mesurés ou tranchés, et conservés
+> avec leur diagnostic. Le n°19 n'est pas un défaut : c'est le mode
+> d'emploi du SW de démolition, hors décompte. Reste une hypothèse non
+> mesurée notée au n°12 §C : ce que voit l'utilisateur quand le quota
+> Resend est atteint.
 >
 > ### Le vocabulaire des marqueurs
 >
@@ -1955,9 +1983,27 @@ Refusé, et pas à rediscuter sans mesure nouvelle.
 
 ---
 
-## 29. Trois filets sur cinq n'ont jamais été vus rouges — chantier OUVERT, non écrit
+## 29. ~~Trois filets sur cinq n'ont jamais été vus rouges~~ — LES CINQ ONT UN CONTRÔLE NÉGATIF le 28/08/2026
 
-<!-- état: ouvert · type: défaut -->
+<!-- état: fermé · type: défaut -->
+
+> **CLOS.** Les trois filets nommés ci-dessous ont chacun reçu son
+> contrôle négatif, écrit APRÈS avoir mesuré ce qu'il devait provoquer,
+> comme le dernier paragraphe l'exigeait : `verify_qr.py` et
+> `verify_trade_inbox.py` le 24/08, `verify_tutorial.py` le 28/08. Les
+> cinq filets du dépôt ont désormais un mode `--controle`.
+>
+> **CE QUE CE CHANTIER A RÉELLEMENT RENDU, et ce n'était pas l'objet.**
+> Il devait vérifier que des gardes savent rougir. Il a déterré **deux
+> défauts en production** : le n°45 (le QR écrasé, un mois en ligne) et
+> le n°47 (le tutoriel annonçant qu'une partie n'était pas à l'écran).
+> Les deux étaient couverts par une assertion écrite exprès contre eux,
+> et les deux assertions ne pouvaient pas s'exécuter. C'est le n°44 qui
+> porte la suite — la campagne sur les 36 assertions restantes.
+>
+> **CE QU'IL NE FERME PAS (㉔)** : un filet vu rouge UNE fois n'est pas
+> un filet vérifié. C'est UNE de ses assertions éprouvée sur UNE
+> branche ; les autres restent supposées.
 
 **Le fait, relevé le 21/08/2026 en auditant les contrôles négatifs :**
 `verify_vitrine.py` et `verify_zone.py` ont un mode `--controle` ;
@@ -3643,7 +3689,7 @@ coûterait plus que les 63.
 
 **UNE OPÉRATION QU'ON CROIT LOCALE A UN EFFET CHEZ QUELQU'UN D'AUTRE.**
 Le dépôt est partagé, l'arbre de travail aussi, l'index aussi, et les
-ports aussi. Cinq formes se sont produites, du 22 au 27/08/2026 :
+ports aussi. Six formes se sont produites, du 22 au 28/08/2026 :
 
 | | l'opération | l'effet chez l'autre |
 |---|---|---|
@@ -3652,6 +3698,34 @@ ports aussi. Cinq formes se sont produites, du 22 au 27/08/2026 :
 | **le stash** | `git stash` | vide son arbre de travail, fichiers non suivis compris |
 | **le port** | lancer `livrer.sh` | refuse sa livraison, ou fait échouer la sienne en cours |
 | **le commit** | `git add mes-fichiers` | emporte son travail EN COURS sous mon message — le seul cas irréversible |
+| **le nettoyage** | `nettoyer-filets.sh` | tue un serveur EN SERVICE, et la mesure en cours avec lui |
+
+### ⚠️ LA SIXIÈME FORME EST D'UNE AUTRE NATURE — le défaut est dans la CONCEPTION
+
+**Les cinq premières sont des opérations qu'on croit locales.** On les
+fait pour soi, l'effet chez l'autre est une conséquence non voulue et
+non visible.
+
+**La sixième est un outil ÉCRIT POUR agir sur une ressource
+partagée** — `scripts/nettoyer-filets.sh` libère les ports 8123/8124.
+Il fait exactement ce pour quoi il a été écrit. **Il ne distingue
+simplement pas ce qui est RÉSIDUEL de ce qui est EN SERVICE.** Le
+défaut n'est pas dans l'usage, il est dans la conception : un outil de
+nettoyage qui ne sait pas reconnaître le travail en cours n'est pas un
+outil mal employé, c'est un outil incomplet.
+
+**Constaté deux fois le 28/08/2026** : deux serveurs tués en cours de
+mesure sur le chantier du n°47, chaque fois au milieu d'un tour de
+tutoriel (~90 s). La parade prise sur le moment — poser mes serveurs
+sur un port inhabituel — est un contournement, pas un correctif : elle
+protège celui qui y pense, jamais celui qui l'ignore.
+
+**LE PORT SEUL NE PEUT PAS TRANCHER.** Un socket en écoute ne dit ni
+depuis quand il écoute, ni si quelqu'un l'attend. **Un fichier de garde
+posé par `livrer.sh`, si** — il porte un PID et un horodatage, il
+disparaît avec la livraison, et son absence à côté d'un port occupé est
+précisément la définition d'un orphelin. C'est le seul discriminant
+disponible sans deviner.
 
 Aucune des quatre ne demande confirmation. Aucune ne mentionne l'autre
 session. **Trois des quatre ne laissent aucune trace à chercher après
@@ -3946,6 +4020,34 @@ place et fait mesurer un autre arbre. Toute évolution du montage des
 serveurs doit le conserver.
 
 ### 📮 À TRANSMETTRE À LA SESSION QUI TIENT `scripts/livrer.sh`
+
+**⓪ `nettoyer-filets.sh` DOIT DISTINGUER UN SERVEUR ORPHELIN D'UN
+SERVEUR EN SERVICE — 28/08/2026.** Il a tué deux serveurs en cours de
+mesure, chaque fois au milieu d'un tour de tutoriel (~90 s). C'est la
+sixième forme du n°43, décrite plus haut, et la seule dont le défaut
+soit dans la CONCEPTION.
+
+**Le port seul ne peut pas trancher** : un socket en écoute ne dit ni
+depuis quand il écoute, ni si quelqu'un l'attend. **Un fichier de garde
+posé par `livrer.sh`, si** — un PID et un horodatage, retiré à la fin
+de la livraison. Son absence à côté d'un port occupé est exactement la
+définition d'un orphelin, et c'est le seul discriminant disponible sans
+deviner. La parade prise sur le moment — poser ses serveurs sur un port
+inhabituel — protège celui qui y pense et personne d'autre.
+
+**⓪bis `docs/mesures/chargement.tsv` ATTEND VOTRE COMMIT.** Il porte
+trois relevés `verify_touch` non commités : `2026-08-27T15:15`,
+`2026-08-28T11:56` et `2026-08-28T13:23`. **Celui de 11:56 n'est pas de
+cette session**, donc il n'a été emporté dans aucun de nos commits — la
+cinquième forme du n°43 dit pourquoi. Le fichier est à vous.
+
+**⓪ter `verify_vitrine.py` A ÉTÉ MODIFIÉ PAR CETTE SESSION le
+28/08/2026**, l'arbre étant propre sur ce fichier au moment de la
+touche (`git status` vérifié — l'arbre de travail est partagé, donc un
+travail en cours y serait visible). `#voir` n'existe plus : le lien
+vers la séquence a deux emplacements selon une media query, et le filet
+clique `.voir:visible`. Nouvelle fonction `defauts_du_lien()`, trois
+fenêtres de bascule, huitième contrôle négatif. Voir le n°48.
 
 **Trois points, vérifiés sur le fichier au commit `b49fbd6`.**
 
@@ -4403,6 +4505,110 @@ réussit** — le filet a rougi sur le défaut montré — et 1 sinon. Celui de
 « le filet est cassé » se distinguent en LISANT la sortie (⑤). À
 reprendre dans la campagne, sur tous les filets, pour une seule
 convention.
+
+---
+
+## 48. ~~Le lien vers la séquence était invisible, sous les captures~~ — DEUX EMPLACEMENTS le 28/08/2026
+
+<!-- état: fermé · type: défaut -->
+
+**Le lien qui ouvre la séquence vivait dans le pied de page, sous les
+captures. Personne ne le voit.** Il y était pour une raison mesurée —
+les deux tentatives précédentes AJOUTAIENT de la hauteur au-dessus des
+captures et faisaient basculer l'élément LCP — mais la contrainte
+avait été traitée comme une fatalité.
+
+### La voie qui n'avait pas été essayée : ne rien ajouter
+
+Un bouton principal et un lien secondaire **sur la même ligne** occupent
+la hauteur d'un seul. Mesuré aux six fenêtres, police retardée de
+900 ms, n=3 :
+
+| | 390×844 | 375×667 | 360×640 | 360×560 | 320×568 | 320×844 |
+|---|---|---|---|---|---|---|
+| libellé actuel (25 signes) | replié | replié | replié | replié | replié | replié |
+| « Watch the film » (14) | **55 px** | **55** | **55** | **55** | replié 92 | replié 92 |
+
+55 px est la hauteur du CTA seul : **hauteur ajoutée nulle**. 92 px est
+un repli, et à 320×568 il fait basculer l'élément LCP de `shot-desktop`
+vers `pitch` — la fenêtre bascule entre 60 et 72 px de contenu inséré,
+le repli en apporte 37.
+
+### Le point de bascule est une mesure, pas un nombre rond
+
+Le rang exige `CTA + écart + libellé`. Mesuré sur les trois libellés
+candidats de 14 à 16 signes, **police chargée — le pire cas**, le repli
+rendant 3 à 4 px de moins :
+
+| libellé | texte | rang exigé | fenêtre minimale |
+|---|---|---|---|
+| « The app in 20 s » | 95 px | 320 px | 360 px |
+| « Watch it in 20 s » | 97 px | 322 px | 362 px |
+| « See it in motion » | 98 px | **323 px** | **363 px** |
+
+**380 px retenu, soit 17 px de marge — trois signes de libellé** (un
+signe ≈ 6,1 px à 13 px). **375 px tiendrait**, avec 12 px de marge :
+écarté délibérément, parce que deux signes de marge EST une bascule
+calée sur le libellé du jour. 375, 360 et 320 gardent le lien sous les
+captures, exactement comme avant, et le critère de l'élément LCP n'est
+pas sollicité chez eux.
+
+### DEUX COPIES DANS LE HTML, une seule visible
+
+Aucune règle CSS ne déplace un nœud d'un conteneur à l'autre, et un
+déplacement par JS après le premier rendu serait un décalage de mise en
+page — donc du CLS, donc le critère qu'on protège. Les deux copies
+coûtent ~70 octets et se câblent ensemble ; le clic rend **celle qui a
+été cliquée**, c'est elle qui reprend le focus à la fermeture.
+
+`footer .voir{flex-basis:100%}` **reste** : la copie du pied existe
+toujours sous 380 px, et la règle est déjà portée par `footer`, donc
+elle ne touche pas celle du rang.
+
+### CE QUE LA MESURE A CORRIGÉ EN CHEMIN — deux fois
+
+**① Mon premier indicateur de repli était faux.** Il comparait le HAUT
+du lien au HAUT du CTA : un lien de 13 px centré sur un bouton de 54 px
+commence forcément plus bas, donc l'indicateur disait « replié » même
+sur une ligne unique. Il aurait validé le libellé long. Remplacé par la
+hauteur du rang, puis par « le haut du lien est-il sous le BAS du
+CTA ».
+
+**② Le contrôle négatif a trouvé un défaut de dessin que je n'avais pas
+prévu.** Media query cassée à 320 px : la page **ne débordait pas**,
+elle **rétrécissait le CTA de 205 à 162 px** et son libellé passait à
+la ligne. Le bouton principal payait pour le lien secondaire, en
+silence, et aucune assertion ne le voyait. `flex:0 0 auto` sur le CTA
+l'en empêche, une assertion sur sa largeur le vérifie, et le
+débordement devient alors visible et mesurable.
+
+### Le filet, et ce qu'il n'exerce pas
+
+`defauts_du_lien()` est une FONCTION appelée par le parcours ET par le
+contrôle : un contrôle qui reproduirait la logique validerait sa propre
+copie pendant que le filet en livre une autre (㉘). Elle vérifie
+l'emplacement **attendu pour cette fenêtre** — ⑳, le cas étroit doit
+pourrir bruyamment —, la hauteur du rang, le débordement, et la largeur
+du CTA. Trois fenêtres de plus encadrent la bascule : 379, 380, 381.
+
+**Contrôle négatif** : la media query est neutralisée sous 380 px, avec
+vérification d'effet (le lien du rang doit être APPARU là où il ne
+devait pas). Résultat : 375, 360×640 et 360×560 rendent 1 défaut,
+320×568 et 320×844 en rendent 2. 8 contrôles sur 8 joués.
+
+**⚠️ CE QU'IL N'EXERCE PAS (㉔)** : l'assertion « hauteur du rang »
+n'a **jamais été vue rouge et ne peut pas l'être aujourd'hui** — sans
+`flex-wrap` et avec `white-space:nowrap`, aucun repli n'est possible,
+un rang trop large déborde. Elle reste comme garde contre l'ajout d'un
+`flex-wrap`, et ce statut est écrit dans le filet pour qu'on ne la
+croie pas éprouvée (㊳).
+
+### Le poids
+
+**+636 octets**, soit **+0,59 Ko transférés** — desktop 111,36 → 111,95 Ko,
+sous le plafond de 112. **Première version : +1,75 Ko, au-dessus du
+plafond**, et la cause n'était pas le dessin mais un commentaire de
+1,3 Ko que j'avais écrit dans `index.html`. Il est ici à la place.
 
 ---
 

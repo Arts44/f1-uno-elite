@@ -125,6 +125,12 @@ if(/^#(backup|trade|access_token|error)=/.test(location.hash)) location.replace(
    tout ce qui décide du LCP et du CLS est au-dessus de lui. La
    contrainte « la page d'accueil ne bouge pas d'un pixel » ne fléchit
    pas pour un lien ; c'est le lien qui déménage. */
+/* Bascule 380 px : le rang exige 363 px, 380 laisse trois signes de
+   marge. Pas de `flex-wrap` — un repli ferait basculer le LCP. n°48. */
+.cta-row{margin-top:34px;display:flex;align-items:center;justify-content:center;gap:20px}
+.cta-row .cta{margin-top:0;flex:0 0 auto}
+.voir-rang{display:none;white-space:nowrap}
+@media(min-width:380px){.voir-rang{display:inline}.voir-pied{display:none}}
 .voir{font-size:13px;color:var(--tx3);background:none;border:0;
   padding:0;cursor:pointer;font:inherit;font-size:13px;text-decoration:underline;
   text-underline-offset:3px;text-decoration-color:var(--border)}
@@ -280,7 +286,10 @@ footer .sep{opacity:.5}
   <span class="kin-seg"><b>998</b> variants</span>
   <span class="kin-seg">to collect.</span></span></p>
 
-  <a class="cta" href="app/">Open the app</a>
+  <div class="cta-row">
+    <a class="cta" href="app/">Open the app</a>
+    <button class="voir voir-rang" type="button">The app in 20 s</button>
+  </div>
   <div class="hint">Free · no account needed · works offline once loaded</div>
 
   <div class="shots">
@@ -321,7 +330,7 @@ footer .sep{opacity:.5}
   </div>
 
   <footer>
-    <button class="voir" id="voir" type="button">See the set in 20 seconds</button>
+    <button class="voir voir-pied" type="button">The app in 20 s</button>
     <a href="https://github.com/Arts44/f1-uno-elite">GitHub</a>
     <span class="sep">·</span>
     <a href="https://ko-fi.com/arts44">Support the developer</a>
@@ -524,12 +533,15 @@ footer .sep{opacity:.5}
      la page d'accueil ne paie ni octet ni requête pour un film que
      personne n'a demandé. Sous mouvement réduit, `direct` mène droit au
      plan final — pas une séquence accélérée, l'état de fin. */
-  const voir = document.getElementById('voir');
-  if (voir) voir.addEventListener('click', () => {
-    import('./intro.js').then(m => m.ouvrir(voir, {
-      direct: matchMedia('(prefers-reduced-motion: reduce)').matches,
-    })).catch(() => {});
-  });
+  /* Deux copies, une seule visible (n°48) : on rend celle qui a été
+     cliquée, c'est elle qui reprend le focus. */
+  for (const voir of document.querySelectorAll('.voir')) {
+    voir.addEventListener('click', () => {
+      import('./intro.js').then(m => m.ouvrir(voir, {
+        direct: matchMedia('(prefers-reduced-motion: reduce)').matches,
+      })).catch(() => {});
+    });
+  }
 })();
 </script>
 <script>
