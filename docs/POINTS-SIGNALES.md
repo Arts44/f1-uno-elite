@@ -13,7 +13,7 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **45 entrées : 44 défauts et 1 référence. QUATORZE défauts sont OUVERTS** —
+> **46 entrées : 45 défauts et 1 référence. QUINZE défauts sont OUVERTS** —
 > c'est ce qu'on vient chercher ici, donc c'est ce que cet en-tête liste :
 >
 > | № | Ouvert |
@@ -32,6 +32,7 @@
 > | 42 | Les 63 variables inutilisées restent invisibles avant push |
 > | 43 | Deux sessions : la doc fusionne sans conflit, le push publie l'autre |
 > | 44 | Les assertions des filets n'ont jamais été éprouvées à vide |
+> | 46 | Un jeton Codacy en clair dans les transcriptions — à faire tourner |
 >
 > Les 28 autres défauts sont corrigés, mesurés ou tranchés, et conservés avec
 > leur diagnostic. Le n°19 n'est pas un défaut : c'est le mode d'emploi du SW
@@ -4225,39 +4226,47 @@ censée voir, et elle donne l'assurance inverse** — un filet vert
 **CE QUE ÇA CHANGE POUR LA PISTE** : elle n'attend plus de
 déclencheur. Elle en a un.
 
-### ✅ SON DEUXIÈME CAS — `verify_tutorial.py`, 27/08/2026
+### ✅ SON DEUXIÈME CAS — `verify_tutorial.py`, INSTRUIT le 27/08/2026
 
-**Trouvé en essayant de lui écrire un contrôle négatif, et le contrôle
-n'a pas été commité pour cette raison.**
+**Le diagnostic est fait, et il tranche entre les trois lectures
+possibles. Ce n'est ni (b) seul ni (c) : c'est (a), avec une cause
+précise.**
 
-L'assertion visée : *« la cible de chaque étape existe »* — si le moteur
-bascule sur `t('tut.missing')`, le filet doit rougir. Le sabotage : rendre
-`document.querySelector('#collHead .ph')` null, ce qui simule exactement
-un refactor ayant perdu la cible de l'étape `coll_intro`
-(`tutorial.js:146`).
+**Ce que la sonde montre.** Sabotage à effet constaté — la résolution de
+`#collHead .ph` rendue null, ce qui simule un refactor ayant perdu la
+cible de l'étape `coll_intro`. Le parcours passe de 33 à 34 étapes, et
+le diff sur les bulles ne porte que sur la première :
 
-**L'effet du sabotage est CONSTATÉ** — le filet vérifie lui-même que le
-sélecteur ne se résout plus avant de compter son contrôle comme joué.
-**Le tour se comporte différemment : 34 étapes atteintes au lieu de 32.**
-Et **le filet reste VERT, code 0.**
+    témoin    1 / 8  Ta collection   next=True  spot=True   missing=False
+    saboté    1 / 8  Ta collection   next=True  spot=False  missing=False
+    saboté    1 / 8  Ta collection   next=True  spot=False  missing=True
 
-**L'assertion ne sait donc pas échouer sur ce chemin.** Pourquoi
-exactement — la bulle de secours n'est pas affichée, ou `verifier_etape`
-ne passe pas sur cette étape, ou sa déduplication par titre l'écarte —
-**n'est pas établi**. Ce qui est établi, c'est que la cible a disparu,
-que le tour l'a senti (deux étapes de plus), et que rien n'a été
-rapporté.
+**LE PRODUIT SE COMPORTE CORRECTEMENT** : il détecte la cible absente,
+n'affiche pas de projecteur (`spot=False`), et **affiche bien la bulle
+de secours** (`missing=True`). Le tour continue par un repli prévu. Les
+deux étapes de plus sont ce repli — une bulle ajoutée, pas une étape
+retirée. **Aucune sortie de secours n'est utilisée : 0 étape passée.**
 
-**POURQUOI LE CONTRÔLE N'EST PAS COMMITÉ** : il passerait au vert. Un
-contrôle négatif vert donne l'assurance que le filet a été éprouvé,
-alors qu'il prouverait le contraire. C'est la règle posée pour
-`verify_qr.py` — *écrire un contrôle sur une assertion qui ne regarde
-pas le bon endroit clôturerait l'entrée sur un mensonge* — et elle vaut
-ici à l'identique.
+**MAIS L'ASSERTION NE LA VOIT PAS, ET LA CAUSE EST SA CLÉ DE
+DÉDUPLICATION.** `verifier_etape()` construit
+`cle = compteur + ' · ' + titre` et fait `if cle in etat: return`. Les
+**deux** bulles portent `1 / 8` et `Ta collection` : la première (sans
+message de secours) enregistre la clé, la seconde — **celle qui porte
+`tut.missing`** — tombe sur le `return` et n'est jamais examinée.
 
-**CE QUI RESTE À FAIRE** : instruire pourquoi l'assertion ne se
-déclenche pas, la reprendre, puis seulement écrire son contrôle. Le n°29
-reste donc ouvert sur `verify_tutorial.py`.
+**L'assertion regarde le bon chemin. Elle est simplement muselée par une
+clé qui n'est pas unique.** C'est une variante plus vicieuse que celle
+de `verify_qr.py` : là l'assertion mesurait la mauvaise chose, ici elle
+mesure la bonne et ne s'exécute pas.
+
+**CE QUI N'EST PAS ÉTABLI** : si d'autres étapes du tour partagent
+`compteur · titre` avec une bulle voisine, et donc combien d'autres
+vérifications sont muselées par le même mécanisme. La sonde n'a examiné
+que le cas saboté.
+
+**CE QUI RESTE À FAIRE** — non fait, c'est un chantier : rendre la clé
+discriminante (le texte de la bulle en fait partie), puis seulement
+écrire le contrôle négatif. Le n°29 reste ouvert sur ce filet.
 
 ### ⚠️ UN COMPTEUR DE CONTRÔLES COMPTE L'APPEL, PAS L'EFFET — corrigé
 
@@ -4295,58 +4304,117 @@ mais `renderCollectionHead()` (`app/stats.js:67`) réécrit
 `#collHead.innerHTML` — la cible revenait. Sans la vérification d'effet,
 ce second sabotage aurait lui aussi été compté « joué ».
 
-### CHIFFRAGE DE LA PASSE SUR LES AUTRES FILETS
+### LE TAUX, ET CE QU'IL CHANGE
 
-**Après le chantier en cours, pas dedans.**
+**Ce n'est plus une piste. Trois filets ont été examinés ; DEUX portaient
+une assertion qui ne sait pas échouer.**
 
-| filet | assertions | tenu par |
+| filet | assertions | verdict |
 |---|---|---|
-| `verify_vitrine.py` | ~24 | l'autre session |
-| `verify_tutorial.py` | 12 | l'autre session |
-| `verify_zone.py` | ~8 | libre |
-| `verify_qr.py` | 4 | l'autre session |
-| `verify_trade_inbox.py` | 5 | **relu — les 5 passent** |
-| `verify_touch.py` | ~4 | l'autre session |
-| **total** | **~57** | |
+| `verify_qr.py` | 4 | **1 défaillante** — identité algébrique, et elle cachait un défaut réel un mois durant (n°45) |
+| `verify_tutorial.py` | 12 | **1 défaillante** — clé de déduplication non discriminante |
+| `verify_trade_inbox.py` | 5 | 5 tiennent |
 
-**Le coût n'est pas dans l'écriture, il est dans la lecture.** Poser la
-question à une assertion demande de remonter du filet au produit et de
-nommer la modification qui la rendrait rouge — c'est ce qui a pris le
-plus de temps sur `verify_qr.py`, et c'est ce qui a trouvé le défaut.
+**Deux sur trois filets, deux sur vingt-et-une assertions lues.** Et le
+taux n'est pas le vrai argument : **la première des deux masquait un
+défaut en production**, ce qu'aucune estimation de fréquence ne
+capture.
 
-**Estimation : ~57 assertions, une passe par filet.** Les trois déjà
-lus (`verify_qr`, `verify_tutorial`, `verify_trade_inbox` — étape 0 du
-n°29) ont demandé une lecture complète des trois fichiers pour 21
-assertions. Le reste est du même ordre.
+### CE QUE LA PASSE RENDRAIT PROBABLEMENT — chiffré au taux observé
 
-**Ce qui rendrait la passe moins chère** : la faire **au moment où on
-touche un filet**, comme pour les variables inutilisées du n°42 — pas
-en campagne. Une campagne sur 57 assertions est exactement le format
-que le neuvième refus vient d'écarter, sauf que celle-ci a déjà un
-défaut trouvé à son actif.
+Le coût était déjà donné : ~57 assertions, six filets, et la dépense est
+dans la LECTURE (remonter du filet au produit, nommer la modification
+qui ferait rougir).
 
-### CE QUI LA DÉCLENCHERAIT
+**Ce qu'elle rendrait, à taux constant :** 2/21 des assertions lues sont
+défaillantes, soit **~9 %**. Sur les 36 restantes, l'attente est de
+**3 assertions défaillantes** — avec un intervalle large, l'échantillon
+étant petit et les trois filets lus n'étant pas tirés au hasard (ce sont
+les trois que le n°29 désignait comme jamais vus rouges).
 
-- **une assertion prise en défaut** — un filet vert sur un produit
-  cassé, quelle qu'en soit la cause ;
-- **ou une reprise de n°29** : le jour où l'on donne un contrôle négatif
-  aux trois filets qui n'en ont pas, la même mécanique servira aux
-  assertions individuelles, et le coût marginal sera faible.
+**Et l'enjeu n'est pas le nombre.** Sur les deux trouvées, **une cachait
+un défaut réel**. Si cette proportion tient, la passe complète a une
+chance sérieuse de découvrir **un ou deux défauts en production** que
+rien d'autre ne cherche.
 
-**Ce qui ne la déclenche pas** : le seul fait qu'elle n'ait jamais été
-faite. Aucun défaut n'est constaté à ce jour, et ouvrir un chantier sur
-une inquiétude est précisément ce que le neuvième refus vient d'écarter.
+### LA RECOMMANDATION CHANGE
 
-### CE QUI N'EST PAS ÉTABLI
+**« Au moment où on touche un filet » tenait quand c'était une
+inquiétude. À deux sur trois, ça ne tient plus** : cette règle ne visite
+que les filets qu'on modifie, et un filet qu'on ne touche pas est
+précisément celui dont l'assertion pourrit sans bruit — c'est le cas de
+`verify_qr.py`, resté vert un mois sur un défaut visible.
 
-**Qu'il existe une seule assertion faible dans le dépôt.** C'est une
-possibilité ouverte par un raisonnement, pas une observation. Elle est
-notée parce qu'elle est **structurellement invisible** — une assertion
-qui ne sait pas échouer ne se signale jamais d'elle-même — et non parce
-qu'un indice la désigne.
+**Recommandation : une campagne, sur les trois filets restants**
+(`verify_vitrine.py` ~24, `verify_zone.py` ~8, `verify_touch.py` ~4).
+Ce n'est PAS le format que le neuvième refus a écarté : celui-là
+corrigeait 21 sommeils sans aucun défaut constaté, celle-ci cherche dans
+un espace où le taux constaté est de 9 % et où une trouvaille sur deux
+était un défaut en production.
+
+**CE QUI LA RETIENT AUJOURD'HUI** : `verify_vitrine.py` et
+`verify_touch.py` appartiennent à l'autre session, et le n°29 est encore
+ouvert sur `verify_tutorial.py` — dont l'assertion doit être reprise
+avant qu'on puisse lui écrire un contrôle. **La campagne vient après**,
+pas à la place.
 
 ---
 
+## 46. Un jeton Codacy en clair dans les transcriptions locales — à faire tourner
+
+<!-- état: ouvert · type: défaut -->
+
+**Constaté le 27/08/2026.** Un jeton d'API Codacy a été collé en clair
+dans une ligne de commande (`export CODACY_API_TOKEN=…`) lors de
+sessions d'août. Les lignes de commande sont enregistrées dans les
+transcriptions.
+
+### Le périmètre, VÉRIFIÉ
+
+**Le jeton n'est nulle part dans le dépôt.** Recherche faite sur :
+
+| où | résultat |
+|---|---|
+| arbre de travail, tous fichiers | **aucune occurrence** |
+| contenu de tous les commits (`git show` sur l'historique complet) | **aucune occurrence** |
+| messages de commit | **aucune occurrence** |
+| scripts, docs, workflows | **aucune occurrence** |
+
+Les seules mentions de jeton dans le dépôt sont
+`secrets.CODACY_PROJECT_TOKEN` dans `.github/workflows/tests.yml` —
+c'est la forme correcte, une référence à un secret GitHub, pas une
+valeur.
+
+**Ce n'est donc PAS un chantier immédiat sur le dépôt.** Il n'y a rien à
+purger, pas d'historique à réécrire, rien de publié.
+
+### Où il est réellement
+
+**Dans deux fichiers de transcription locaux**, sous
+`~/.claude/projects/…`, **71 occurrences**. Ces fichiers ne sont pas
+versionnés et ne quittent pas la machine, mais ils sont lisibles par
+tout ce qui lit le disque, et ils sont conservés.
+
+### L'ACTION À FAIRE
+
+**Faire tourner le jeton** — le révoquer dans Codacy (My Account →
+Access Management → Account API Tokens) et en créer un autre. C'est la
+seule action qui remette les choses en ordre : purger 71 occurrences
+dans des transcriptions ne garantit rien et ne rend pas le jeton
+inutilisable.
+
+**Ce jeton n'a pas été réutilisé pendant ce chantier**, alors qu'il
+aurait permis de marquer l'occurrence Codacy restée ouverte : un
+identifiant trouvé en relisant des transcriptions n'est pas un
+identifiant qu'on a le droit d'employer.
+
+### La règle qui aurait évité ça
+
+**Un secret ne se passe pas en argument de commande.** `export
+X=valeur` inscrit la valeur dans l'historique du shell et dans toute
+trace d'exécution. Les formes sûres : un fichier d'identifiants lu par
+l'outil (`~/.codacy/credentials`, ce que la CLI fait déjà), ou une
+variable posée hors de la ligne visible.
 ## 45. ~~Le correctif du QR de 1.71.0 n'a jamais fonctionné~~ — CORRIGÉ le 24/08/2026 (1.77.4)
 
 <!-- état: fermé · type: défaut -->
