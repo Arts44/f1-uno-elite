@@ -13,7 +13,7 @@
 > revenu. Un backlog court n'est pas un backlog sain — celui-ci se lit
 > autant pour ce qui est résolu que pour ce qui reste.
 >
-> **46 entrées : 45 défauts et 1 référence. QUINZE défauts sont OUVERTS** —
+> **47 entrées : 46 défauts et 1 référence. QUINZE défauts sont OUVERTS** —
 > c'est ce qu'on vient chercher ici, donc c'est ce que cet en-tête liste :
 >
 > | № | Ouvert |
@@ -4259,14 +4259,28 @@ clé qui n'est pas unique.** C'est une variante plus vicieuse que celle
 de `verify_qr.py` : là l'assertion mesurait la mauvaise chose, ici elle
 mesure la bonne et ne s'exécute pas.
 
-**CE QUI N'EST PAS ÉTABLI** : si d'autres étapes du tour partagent
-`compteur · titre` avec une bulle voisine, et donc combien d'autres
-vérifications sont muselées par le même mécanisme. La sonde n'a examiné
-que le cas saboté.
+**L'ÉTENDUE, MESURÉE LE 28/08/2026 AVANT DE CORRIGER.** La question
+— une étape, ou douze ? — a deux réponses, et il fallait les deux :
 
-**CE QUI RESTE À FAIRE** — non fait, c'est un chantier : rendre la clé
-discriminante (le texte de la bulle en fait partie), puis seulement
-écrire le contrôle négatif. Le n°29 reste ouvert sur ce filet.
+- **entre étapes différentes : 0 collision.** Les 28 clés du parcours
+  sont distinctes, y compris entre `account` et `settings` qui partagent
+  le dénominateur 5 ;
+- **entre les deux bulles d'une MÊME étape : 28 sur 28**, structurel
+  (`_showBubble()` ne fait varier que `.tut-text`), et les 28 étapes
+  portent une cible ;
+- **occurrences réelles dans un tour sain : 1**, mesurée par un
+  `MutationObserver` enregistrant chaque bulle rendue.
+
+**ET CETTE OCCURRENCE ÉTAIT UN DÉFAUT EN PRODUCTION** — l'étape 6/6 des
+stats affichait `tut.missing` à un utilisateur réel parce que sa cible
+avait été emportée par une refonte de la vue Stats. C'est le **n°47**.
+
+**CORRIGÉ le 28/08/2026, dans l'ordre établi pour `verify_qr.py`** : le
+produit d'abord (le sélecteur), l'assertion ensuite (la clé porte
+désormais le texte de la bulle), le contrôle négatif en dernier. Le
+filet est vert sur le produit corrigé, la sonde compte **0 collision**,
+et le contrôle `--controle` rend 0 sur deux cibles non résolues vues.
+Le n°29 est clos sur ce filet.
 
 ### ⚠️ UN COMPTEUR DE CONTRÔLES COMPTE L'APPEL, PAS L'EFFET — corrigé
 
@@ -4311,14 +4325,26 @@ une assertion qui ne sait pas échouer.**
 
 | filet | assertions | verdict |
 |---|---|---|
-| `verify_qr.py` | 4 | **1 défaillante** — identité algébrique, et elle cachait un défaut réel un mois durant (n°45) |
-| `verify_tutorial.py` | 12 | **1 défaillante** — clé de déduplication non discriminante |
+| `verify_qr.py` | 4 | **1 défaillante** — identité algébrique ; masquait le n°45, un mois en production |
+| `verify_tutorial.py` | 12 | **1 défaillante** — clé de déduplication ; masquait le n°47, en production |
 | `verify_trade_inbox.py` | 5 | 5 tiennent |
 
-**Deux sur trois filets, deux sur vingt-et-une assertions lues.** Et le
-taux n'est pas le vrai argument : **la première des deux masquait un
-défaut en production**, ce qu'aucune estimation de fréquence ne
-capture.
+**Deux sur trois filets, deux sur vingt-et-une assertions lues — et
+DEUX défauts en production sur deux assertions défaillantes.**
+
+**Ce n'est plus une hypothèse sur la qualité des assertions, c'est un
+taux de découverte.** Les deux fois, l'assertion existait, elle visait
+le bon défaut, et elle ne pouvait pas le voir. Les deux fois, le défaut
+était visible à l'écran d'un utilisateur pendant que le filet rendait 0.
+
+**LA FORMULE QUI TRAVERSE LES DEUX CAS**, et qui vaut bien au-delà du
+tutoriel : **la condition qui rend l'assertion utile est celle qui
+l'empêche de tourner.** Chez `verify_qr.py`, les deux membres venaient
+de la même source — l'assertion ne pouvait pas être fausse. Chez
+`verify_tutorial.py`, la clé n'était unique que tant que rien n'allait
+mal — l'assertion ne pouvait pas être atteinte. **Une assertion qui ne
+s'exécute que dans le cas nominal ne vérifie que le cas nominal**, et le
+cas nominal est celui où il n'y a rien à trouver. Consignée en ㊳.
 
 ### CE QUE LA PASSE RENDRAIT PROBABLEMENT — chiffré au taux observé
 
@@ -4337,26 +4363,152 @@ un défaut réel**. Si cette proportion tient, la passe complète a une
 chance sérieuse de découvrir **un ou deux défauts en production** que
 rien d'autre ne cherche.
 
-### LA RECOMMANDATION CHANGE
+### LA CAMPAGNE — RETENUE, ET PAS POUR LE TAUX
 
-**« Au moment où on touche un filet » tenait quand c'était une
-inquiétude. À deux sur trois, ça ne tient plus** : cette règle ne visite
-que les filets qu'on modifie, et un filet qu'on ne touche pas est
-précisément celui dont l'assertion pourrit sans bruit — c'est le cas de
-`verify_qr.py`, resté vert un mois sur un défaut visible.
+**L'argument n'est pas les 9 %. C'est que LE FILET QU'ON NE TOUCHE PAS
+EST CELUI DONT L'ASSERTION POURRIT SANS BRUIT.**
 
-**Recommandation : une campagne, sur les trois filets restants**
-(`verify_vitrine.py` ~24, `verify_zone.py` ~8, `verify_touch.py` ~4).
-Ce n'est PAS le format que le neuvième refus a écarté : celui-là
-corrigeait 21 sommeils sans aucun défaut constaté, celle-ci cherche dans
-un espace où le taux constaté est de 9 % et où une trouvaille sur deux
-était un défaut en production.
+« Au moment où on touche un filet » tenait quand c'était une inquiétude.
+La règle ne visite que les filets qu'on modifie — or les deux
+défaillances trouvées étaient dans des filets que personne n'avait
+touchés : `verify_qr.py` est resté vert un mois sur un défaut visible,
+`verify_tutorial.py` de même sur le n°47. **Une assertion ne se dégrade
+pas quand on l'édite ; elle se dégrade quand le PRODUIT bouge autour
+d'elle, et c'est justement le moment où personne ne la relit.** Le taux
+ne fait que dire qu'il y en a d'autres.
 
-**CE QUI LA RETIENT AUJOURD'HUI** : `verify_vitrine.py` et
-`verify_touch.py` appartiennent à l'autre session, et le n°29 est encore
-ouvert sur `verify_tutorial.py` — dont l'assertion doit être reprise
-avant qu'on puisse lui écrire un contrôle. **La campagne vient après**,
-pas à la place.
+**L'ORDRE** : d'abord les trois filets **non encore lus**
+(`verify_vitrine.py` ~24, `verify_zone.py` ~8, `verify_touch.py` ~4),
+puis les **36 assertions restantes** des trois déjà lus.
+
+**LA QUESTION POSÉE À CHAQUE ASSERTION**, une seule, et sa réponse
+s'écrit : **« qu'est-ce qui, dans le produit, la ferait rougir ? »**
+Puis on vérifie que cette modification l'ATTEINT — c'est-à-dire qu'on
+l'exerce, on ne la relit pas (㊳).
+
+**LA BORNE, ET ELLE EST ESSENTIELLE.** Une assertion dont la réponse est
+**« rien que je puisse nommer »** n'est PAS corrigée dans la campagne :
+elle est **CONSIGNÉE**, et sa reprise se chiffre séparément. Sans cette
+borne, la campagne devient une réécriture de filets sans fin — exactement
+ce que le neuvième refus a écarté.
+
+**CE QUI LA RETIENT ENCORE** : `verify_vitrine.py` et `verify_touch.py`
+appartiennent à l'autre session.
+
+### UNE DETTE OUVERTE PAR CE CHANTIER
+
+Le mode `--controle` de `verify_tutorial.py` rend **0 quand le contrôle
+réussit** — le filet a rougi sur le défaut montré — et 1 sinon. Celui de
+`verify_qr.py` rend **1 dans les deux cas** : « le contrôle a marché » et
+« le filet est cassé » se distinguent en LISANT la sortie (⑤). À
+reprendre dans la campagne, sur tous les filets, pour une seule
+convention.
+
+---
+
+## 47. ~~Le tutoriel annonçait qu'une partie n'était pas à l'écran alors qu'elle y était~~ — CORRIGÉ le 28/08/2026 (1.77.5)
+
+<!-- état: fermé · type: défaut -->
+
+**Défaut EN PRODUCTION, trouvé par la mesure du n°29 sur
+`verify_tutorial.py`, et invisible pour l'assertion écrite contre
+lui.** C'est le deuxième du genre après le n°45.
+
+### Ce que voyait un utilisateur
+
+À la **6ᵉ étape sur 6 du chapitre Stats** — « Outils du collectionneur »,
+la dernière avant le chapitre Compte — la visite guidée affichait :
+
+    Cette partie n'est pas à l'écran pour l'instant. Passe à l'étape suivante.
+
+C'est `tut.missing`, le repli du moteur quand la cible d'une étape ne se
+résout pas. **La section était pourtant là, à l'écran, sous la bulle.**
+Le tutoriel est le premier parcours qu'un nouvel utilisateur voit ; il
+lui disait qu'une partie de l'app était absente.
+
+### La cause
+
+`app/tutorial.js` visait `#statsView .sv-tools-tabs`, avec un repli sur
+`#statsView .sv-tools`. **Les deux noms ont disparu** quand la vue Stats
+a été refaite en « portes » — `.sv-doors` / `.sv-door` (`app/stats.js`).
+La chaîne `||` n'a rien rattrapé : elle offrait deux noms morts au lieu
+d'un.
+
+**Vérifié dans le DOM réel, pas déduit** : à 375×812, en `fr`,
+`.sv-tools-tabs` et `.sv-tools` rendent `null` tous les deux, tandis que
+`.sv-doors` (187 px), `.sv-share` (44 px) et `.sv-tools-body` (420 px)
+sont présents.
+
+### Le correctif, et pourquoi CE sélecteur
+
+    target: () => q('#statsView .sv-doors')
+
+- **`.sv-doors` et pas `#svTools`** : la section entière fait **693 px**
+  de haut sur une fenêtre de 812 — dont 420 px de panneau de résultats.
+  Le halo n'aurait rien désigné.
+- **`.sv-doors` et pas `.sv-share`** : le texte de l'étape dit
+  « Manquantes, doubles et liste d'échange ». Ce sont les trois portes,
+  et c'est le geste. La barre de partage décrit ce qu'elles produisent.
+- **Un seul sélecteur, plus de chaîne `||`** : une chaîne de deux noms
+  morts est exactement ce qui vient de survivre un mois sans que rien ne
+  le dise. Un nom qui disparaît doit faire rougir le filet.
+
+`SW_VERSION` v183 → v184 (`app.bundle.js` et `tutorial.js` sont
+précachés), entrée de changelog 1.77.5 dans les 7 langues.
+
+### POURQUOI ÇA A SURVÉCU, ET C'EST LE VRAI SUJET
+
+`verify_tutorial.py` a une assertion pour exactement ça — « la cible de
+l'étape existe », qui cherche le fragment de `tut.missing` dans la bulle.
+**Elle n'a jamais pu s'exécuter sur cette bulle.** Sa clé de
+déduplication valait `compteur · titre`, et `_showBubble()` construit ces
+deux champs à partir de l'étape : la bulle de secours porte la MÊME clé
+que la bulle normale, affichée une fraction de seconde plus tôt. Voir
+㊳ dans les conventions, et le n°44 pour le taux.
+
+Le filet rendait `TUTORIEL OK`, exit 0, pendant tout ce temps.
+
+**L'A/B QUI LE PROUVE — le même contrôle, les deux clés.** Le contrôle
+négatif rend deux cibles non résolues (`#collHead .ph` et
+`#statsView .sv-doors`) et exige que le filet les nomme. Effet du
+sabotage constaté dans les deux bras : 45 demandes, 45 qui auraient
+abouti, par sélecteur.
+
+| clé de déduplication | ce que le filet dit | code |
+|---|---|---|
+| `compteur · titre` (avant) | rien — « effet constaté, MAIS LE FILET N A RIEN DIT », 0/2 joués | **1** |
+| `compteur · titre · texte` (après) | les deux étapes nommées, 2/2 joués | **0** |
+
+**C'est le même filet, le même sabotage, le même produit corrigé. Seule
+la clé change.** Sans cet A/B, « le contrôle passe » n'aurait rien
+prouvé : un contrôle qui ne distingue pas les deux versions de ce qu'il
+contrôle n'est pas un contrôle.
+
+### L'ÉTENDUE, MESURÉE AVANT DE CORRIGER
+
+La question posée était : une étape, ou douze ? **Les deux réponses sont
+différentes et il fallait les deux.**
+
+- **Collisions entre étapes différentes : 0.** Les 28 clés
+  `compteur · titre` du parcours sont toutes distinctes, y compris entre
+  les chapitres `account` et `settings` qui partagent le dénominateur 5.
+- **Collisions entre les deux bulles d'une MÊME étape : 28 sur 28.**
+  C'est structurel, et les 28 étapes portent une cible.
+- **Occurrences réelles dans un tour sain : 1** — celle-ci. Mesurée par
+  un `MutationObserver` enregistrant chaque bulle rendue, deux
+  exécutions identiques, puis **0 après correctif**.
+
+**La reprise était donc locale (un sélecteur, une clé), mais ce qu'elle
+révélait ne l'était pas.**
+
+### ⚠️ CE QUE ÇA N'EXERCE PAS (㉔)
+
+La mesure a tourné en `fr`, thème sombre, 375×812, hors mode spectateur.
+Une cible qui ne se résoudrait que dans une autre langue, une autre
+largeur, ou avec le chapitre filtré par `VIEWER_SKIPPED_CHAPTER`, ne
+serait pas vue par cette passe. Le contrôle négatif prouve que le filet
+voit **une cible non résolue** ; il ne dit rien d'un halo qui désignerait
+la mauvaise chose tout en se résolvant.
 
 ---
 

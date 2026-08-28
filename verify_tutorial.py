@@ -94,6 +94,66 @@ URL = 'http://localhost:8124/app/index.html'
 BORNE_SECURITE_MS = 60_000
 
 ECHECS = []
+# Figé juste après le tour : ce que le FILET a dit, avant que le bilan
+# du contrôle n'y ajoute ses propres diagnostics. Initialisé ici pour
+# qu'une panne AVANT le parcours ne se transforme pas en NameError dans
+# le verdict — un garde qui plante est un garde qui autorise (㉜).
+ECHECS_PARCOURS = []
+
+CONTROLE = '--controle' in sys.argv
+
+# ══ LE CONTRÔLE NÉGATIF ════════════════════════════════════════════
+# CE QU'IL EXERCE : l'assertion 1 — « la cible de l'étape existe ». Le
+# sabotage rend un sélecteur non résolu, et le moteur bascule sur son
+# repli (`tut.missing` + Suivant forcé). C'est EXACTEMENT le défaut
+# qu'un refactor d'interface produit, et le seul que ce filet existe
+# pour voir.
+#
+# DEUX CIBLES, UN SEUL TOUR. Un tour coûte ~90 s ; les deux sabotages
+# tiennent dans la même exécution et le parcours continue par le repli.
+#
+# LA SECONDE N'EST PAS INVENTÉE, ET C'EST TOUT SON INTÉRÊT.
+# `#statsView .sv-doors` est la cible REPRISE de `set_tools` : avant
+# 1.77.5, l'étape visait `.sv-tools-tabs` puis `.sv-tools`, deux noms
+# emportés par la refonte de la vue Stats. L'étape 6/6 affichait donc
+# `tut.missing` à un utilisateur réel — et ce filet restait VERT.
+# Sabotage le nouveau nom, et on rejoue le défaut tel qu'il a vécu, à
+# l'étape où il a vécu. Un contrôle qui exerce un défaut ayant
+# réellement existé vaut mieux qu'un sabotage choisi pour sa commodité.
+CIBLES_SABOTEES = {
+    '#collHead .ph': '1 / 8',          # coll_intro, première étape du tour
+    '#statsView .sv-doors': '6 / 6',   # set_tools, le défaut réel du n°47
+}
+CONTROLES = [f'cible non resolue a l etape {c}' for c in CIBLES_SABOTEES.values()]
+JOUES = []
+
+# LE COMPTEUR COMPTE L'EFFET, PAS L'APPEL (㊲). `page.evaluate` peut
+# rendre sans erreur et ne rien saboter — sélecteur jamais demandé,
+# élément déjà absent, script mort à sa première ligne. Payé ici même :
+# une première version du sabotage remplaçait un nœud que
+# `renderCollectionHead()` recréait aussitôt, et le filet se déclarait
+# « 1/1 joué » sur un produit intact.
+# Le patch compte donc DEUX choses par sélecteur :
+#   demande        — le tutoriel a-t-il seulement demandé ce sélecteur ?
+#   aurait_resolu  — l'original l'aurait-il trouvé ? (sinon on n'a rien
+#                    retiré : le contrôle ne prouverait rien)
+# Les deux doivent être > 0. C'est la seule forme d'« effet constaté »
+# qui vaille quand la cible n'existe pas encore au moment de poser le
+# sabotage — la vue Stats n'est pas rendue quand le tour commence.
+SABOTAGE_JS = """(sels) => {
+  const _qs = Document.prototype.querySelector;
+  window.__sab = {};
+  sels.forEach(s => { window.__sab[s] = { demande: 0, aurait_resolu: 0 }; });
+  Document.prototype.querySelector = function (s) {
+    const c = window.__sab[s];
+    if (c) {
+      c.demande++;
+      if (_qs.call(this, s)) c.aurait_resolu++;
+      return null;
+    }
+    return _qs.call(this, s);
+  };
+}"""
 
 # Les deux SEULES clés qu'un tutoriel terminé a le droit de laisser
 # derrière lui. Elles ne sont pas dans tutorialKeys() et c'est voulu :
@@ -218,20 +278,50 @@ MSG_CIBLE_ABSENTE = 'écran pour l'
 def verifier_etape(page, etat):
     """Les trois assertions de robustesse, à CHAQUE étape.
 
-    `etat` retient les étapes déjà signalées : une étape au long cours
+    `etat` retient les BULLES déjà signalées : une étape au long cours
     (l'utilisateur simulé y passe plusieurs tours de boucle) ne doit
     produire qu'UN échec, pas un par tour.
+
+    ══ LA CLÉ PORTE LE TEXTE, ET C'EST TOUT LE SUJET (n°47) ══════════
+    Elle valait `compteur · titre`. Or `_showBubble()` construit ces
+    deux-là à partir de l'ÉTAPE (`ch.n / ch.of`, `tut.<id>_t`) et ne
+    change que `.tut-text` quand la cible manque : la bulle normale et
+    la bulle de secours de la même étape portaient donc une clé
+    IDENTIQUE. La normale s'affiche toujours en premier — elle prenait
+    la clé — et celle qui porte `tut.missing`, la seule que
+    l'assertion 1 existe pour voir, tombait sur ce `return`.
+    Sur les 28 étapes du parcours, toutes pourvues d'une cible.
+
+    LA FORMULE, qui vaut au-delà d'ici : LA CONDITION QUI REND
+    L'ASSERTION UTILE ÉTAIT CELLE QUI L'EMPÊCHAIT DE TOURNER. Tant que
+    rien n'allait mal, la clé était unique et l'assertion s'exécutait
+    pour ne rien trouver.
+
+    POURQUOI LE TEXTE DANS LA CLÉ, plutôt que sortir l'assertion 1 de
+    la déduplication. La déduplication n'a jamais voulu dire « une
+    fois par étape » : elle veut dire « une fois par BULLE MONTRÉE ».
+    C'est la clé qui nommait l'étape au lieu de nommer la bulle. Lui
+    ajouter le texte la rend conforme à son propre but, en une ligne,
+    sans second mécanisme à tenir. Sortir l'assertion de la
+    déduplication aurait demandé un deuxième registre pour ne pas
+    répéter le même échec à chaque tour — plus de code pour le même
+    effet.
+    CE QUE ÇA COÛTE (㉔) : si un jour un texte d'étape varie d'un tour
+    à l'autre — un compte qui s'incrémente dans la bulle — la même
+    étape produirait plusieurs entrées. Aucun `tut.*_d` n'est dans ce
+    cas aujourd'hui (le seul paramétré, `coll_intro`, reçoit
+    `CARDS_DB.length`, constant pendant le tour).
     """
     cle = compteur(page) + ' · ' + (page.locator('.tut-title').inner_text().strip()
                                     if page.locator('.tut-title').count() else '?')
-    if cle in etat:
+    texte = page.locator('.tut-text').inner_text() if page.locator('.tut-text').count() else ''
+    if (cle, texte) in etat:
         return
-    etat.add(cle)
+    etat.add((cle, texte))
 
     # 1. La cible existe. Le moteur a sa propre sortie de secours (texte
     #    tut.missing + Suivant forcé) : le tour CONTINUE, mais l'étape
     #    n'a rien montré — pour nous c'est un échec, pas une variante.
-    texte = page.locator('.tut-text').inner_text() if page.locator('.tut-text').count() else ''
     if MSG_CIBLE_ABSENTE in texte:
         ECHECS.append(f'cible ABSENTE à l’étape « {cle} » : la bulle affiche '
                       'le message de secours — un refactor a perdu cette cible')
@@ -397,78 +487,151 @@ def parcourir(page):
     return etapes, actions, sautees
 
 
-with sync_playwright() as p:
-    navigateur = p.chromium.launch()
-    ctx = navigateur.new_context(viewport={'width': 375, 'height': 812},
-                                 device_scale_factor=2)
-    ctx.add_init_script(init_script('fr', 'dark'))
-    page = ctx.new_page()
-    try:
-        # Borne de securite, PAS seuil de mesure. Un serveur ABSENT ne
-        # consomme pas ce plafond : le refus est immediat (commit b49fbd6,
-        # « les refus arrivent en 0,0 s », n=40). Le plafond ne borne donc
-        # que le cas LENT — le faux rouge sous charge.
-        page.goto(URL, timeout=BORNE_SECURITE_MS)
-    except Exception as e:
-        # DEUX FAMILLES, DEUX MESSAGES. Le relevement 15 s -> 60 s rend le
-        # diagnostic quatre fois plus lent pour tout ce qui n'est PAS un
-        # refus de connexion : une page servie mais qui ne finit pas de
-        # charger, une sous-ressource qui cale, un autre service sur le
-        # port. Leur annoncer « injoignable » serait faux.
-        if 'ERR_CONNECTION_REFUSED' in str(e):
-            print(f'ÉCHEC : {URL} injoignable — lance `python3 -m http.server 8124`\n{e}')
-        else:
-            print(f'ÉCHEC : {URL} a repondu mais n a pas fini de charger dans la'
-                  f' borne de securite — ce n est PAS un serveur absent.\n{e}')
+try:
+  with sync_playwright() as p:
+      navigateur = p.chromium.launch()
+      ctx = navigateur.new_context(viewport={'width': 375, 'height': 812},
+                                   device_scale_factor=2)
+      ctx.add_init_script(init_script('fr', 'dark'))
+      page = ctx.new_page()
+      try:
+          # Borne de securite, PAS seuil de mesure. Un serveur ABSENT ne
+          # consomme pas ce plafond : le refus est immediat (commit b49fbd6,
+          # « les refus arrivent en 0,0 s », n=40). Le plafond ne borne donc
+          # que le cas LENT — le faux rouge sous charge.
+          page.goto(URL, timeout=BORNE_SECURITE_MS)
+      except Exception as e:
+          # DEUX FAMILLES, DEUX MESSAGES. Le relevement 15 s -> 60 s rend le
+          # diagnostic quatre fois plus lent pour tout ce qui n'est PAS un
+          # refus de connexion : une page servie mais qui ne finit pas de
+          # charger, une sous-ressource qui cale, un autre service sur le
+          # port. Leur annoncer « injoignable » serait faux.
+          if 'ERR_CONNECTION_REFUSED' in str(e):
+              print(f'ÉCHEC : {URL} injoignable — lance `python3 -m http.server 8124`\n{e}')
+          else:
+              print(f'ÉCHEC : {URL} a repondu mais n a pas fini de charger dans la'
+                    f' borne de securite — ce n est PAS un serveur absent.\n{e}')
+          sys.exit(1)
+      page.wait_for_selector('.card', timeout=BORNE_SECURITE_MS)
+      page.wait_for_timeout(600)
+
+      # ── LE SABOTAGE, POSÉ AVANT TOUT INSTANTANÉ ────────────────
+      if CONTROLE:
+          page.evaluate(SABOTAGE_JS, list(CIBLES_SABOTEES))
+
+      avant_ls = instantane(page)
+      avant_vu = empreinte_affichee(page)
+
+      # On entre par « Rejouer » des Réglages : c'est le chemin réel, et il
+      # ne dépend pas de l'état « déjà vu ».
+      page.evaluate('document.querySelector(".bn-tab[data-view=\\"settings\\"]").click()')
+      page.wait_for_selector('#replayTutBtn', timeout=BORNE_SECURITE_MS)
+      page.evaluate('document.getElementById("replayTutBtn").click()')
+      page.wait_for_selector('.tut-bubble', timeout=BORNE_SECURITE_MS)
+      page.wait_for_timeout(1200)
+
+      etapes, actions, sautees = parcourir(page)
+      ECHECS_PARCOURS = list(ECHECS)
+
+      if CONTROLE:
+          # L'EFFET, RELU DEPUIS LE NAVIGATEUR — jamais ce qu'on croyait
+          # avoir posé. Un sélecteur jamais demandé (`demande` à 0) ou
+          # qui n'aurait rien trouvé de toute façon (`aurait_resolu` à
+          # 0) veut dire que le contrôle n'a rien retiré au produit.
+          for _sel, _cptr in CIBLES_SABOTEES.items():
+              _c = page.evaluate('s => window.__sab[s]', _sel)
+              if not _c or _c['demande'] == 0 or _c['aurait_resolu'] == 0:
+                  ECHECS.append(
+                      f'SABOTAGE INEFFECTIF sur {_sel} : {_c} — demande et '
+                      'aurait_resolu doivent être > 0, sinon rien n a été retiré')
+                  continue
+              # L'effet est constaté ; reste à savoir si le FILET l'a vu.
+              _vu = [e for e in ECHECS_PARCOURS
+                     if 'cible ABSENTE' in e and f'« {_cptr} ·' in e]
+              if _vu:
+                  JOUES.append(f'cible non resolue a l etape {_cptr}')
+                  print(f'  controle : {_sel} non résolu ({_c["demande"]} demandes, '
+                        f'{_c["aurait_resolu"]} auraient abouti) — et le filet l a vu')
+              else:
+                  print(f'  controle : {_sel} non résolu, effet constaté, '
+                        'MAIS LE FILET N A RIEN DIT')
+
+      # Le tour doit s'être TERMINÉ, pas avoir été quitté : seule la fin
+      # normale passe par _end(false) → restoreState().
+      if page.locator('.tut-overlay').count():
+          ECHECS.append('l’overlay du tutoriel est encore là après le parcours')
+      page.wait_for_timeout(1200)          # restoreState + re-rendus
+
+      apres_ls = instantane(page)
+      apres_vu = empreinte_affichee(page)
+
+      # ── 1. Le diff localStorage, clé par clé ──────────────────────
+      for k in sorted(set(avant_ls) | set(apres_ls)):
+          a, b = avant_ls.get(k), apres_ls.get(k)
+          if a == b:
+              continue
+          if k in CHANGEMENTS_ATTENDUS:
+              continue
+          etat = 'ajoutée' if a is None else ('supprimée' if b is None else 'modifiée')
+          ECHECS.append(f'clé {etat} par le tutoriel et NON restaurée : {k}\n'
+                        f'    avant : {str(a)[:110]}\n'
+                        f'    après : {str(b)[:110]}')
+
+      # ── 2. L'empreinte affichée ───────────────────────────────────
+      for champ in avant_vu:
+          if avant_vu[champ] != apres_vu[champ]:
+              ECHECS.append(
+                  f'l’écran ne montre plus l’état d’avant — {champ} : '
+                  f'{avant_vu[champ]!r} → {apres_vu[champ]!r}\n'
+                  '    (localStorage peut être correct : c’est la MÉMOIRE '
+                  'qui n’a pas été ré-hydratée)')
+
+      ctx.close()
+      navigateur.close()
+
+finally:
+    # ⚠️ LE BILAN DU CONTRÔLE EST DANS UN `finally`, ET SON ABSENCE A
+    # ÉTÉ VUE AILLEURS (verify_qr.py) : écrit après le bloc playwright,
+    # il disparaissait dès qu'une exception traversait — exactement le
+    # cas où l'on a le plus besoin de savoir ce qui a été exercé.
+    #
+    # ⚠️ ET LE VERDICT N'EST PAS ICI, DÉLIBÉRÉMENT. Un `sys.exit()` dans
+    # un `finally` REMPLACE l'exception en cours : le code serait juste
+    # et la trace disparaîtrait. Le `finally` ne porte que ce qui doit
+    # être DIT quoi qu'il arrive.
+    if CONTROLE:
+        _manquants = [c for c in CONTROLES if c not in JOUES]
+        print('\nCONTROLES NEGATIFS JOUES : %d/%d' % (len(JOUES), len(CONTROLES)))
+        for c in CONTROLES:
+            print('   %s %s' % ('joue  ' if c in JOUES else 'ABSENT', c))
+        if _manquants:
+            print('\n' + '!' * 62)
+            print('CONTROLE(S) NON JOUE(S) : ' + ', '.join(_manquants))
+            print('Le mode --controle n a pas exerce ce qu il pretend exercer.')
+            print('!' * 62)
+
+# ══ EN MODE CONTRÔLE, LE VERDICT EST INVERSÉ, ET IL EST LU SUR LE
+#    CODE DE SORTIE (⑤) ════════════════════════════
+# Un contrôle réussi, c'est un filet qui ROUGIT sur le défaut qu'on lui
+# montre. Rendre 1 dans ce cas obligerait à LIRE la sortie pour
+# distinguer « le contrôle a marché » de « le filet est cassé » — deux
+# situations opposées derrière le même code. Le mode --controle rend
+# donc 0 quand les deux cibles ont été refusées ET vues, 1 sinon.
+# (verify_qr.py rend encore 1 dans les deux cas : à reprendre, n°44.)
+if CONTROLE:
+    print()
+    if ECHECS_PARCOURS:
+        print(f'ce que le filet a dit pendant le tour ({len(ECHECS_PARCOURS)}) :')
+        for e in ECHECS_PARCOURS:
+            print('  ·', e)
+    _rates = [e for e in ECHECS if 'SABOTAGE INEFFECTIF' in e]
+    for e in _rates:
+        print('  ·', e)
+    if _rates or [c for c in CONTROLES if c not in JOUES]:
+        print('\nCONTROLE EN ECHEC — le filet ne voit pas le defaut qu il pretend voir')
         sys.exit(1)
-    page.wait_for_selector('.card', timeout=BORNE_SECURITE_MS)
-    page.wait_for_timeout(600)
-
-    avant_ls = instantane(page)
-    avant_vu = empreinte_affichee(page)
-
-    # On entre par « Rejouer » des Réglages : c'est le chemin réel, et il
-    # ne dépend pas de l'état « déjà vu ».
-    page.evaluate('document.querySelector(".bn-tab[data-view=\\"settings\\"]").click()')
-    page.wait_for_selector('#replayTutBtn', timeout=BORNE_SECURITE_MS)
-    page.evaluate('document.getElementById("replayTutBtn").click()')
-    page.wait_for_selector('.tut-bubble', timeout=BORNE_SECURITE_MS)
-    page.wait_for_timeout(1200)
-
-    etapes, actions, sautees = parcourir(page)
-
-    # Le tour doit s'être TERMINÉ, pas avoir été quitté : seule la fin
-    # normale passe par _end(false) → restoreState().
-    if page.locator('.tut-overlay').count():
-        ECHECS.append('l’overlay du tutoriel est encore là après le parcours')
-    page.wait_for_timeout(1200)          # restoreState + re-rendus
-
-    apres_ls = instantane(page)
-    apres_vu = empreinte_affichee(page)
-
-    # ── 1. Le diff localStorage, clé par clé ──────────────────────
-    for k in sorted(set(avant_ls) | set(apres_ls)):
-        a, b = avant_ls.get(k), apres_ls.get(k)
-        if a == b:
-            continue
-        if k in CHANGEMENTS_ATTENDUS:
-            continue
-        etat = 'ajoutée' if a is None else ('supprimée' if b is None else 'modifiée')
-        ECHECS.append(f'clé {etat} par le tutoriel et NON restaurée : {k}\n'
-                      f'    avant : {str(a)[:110]}\n'
-                      f'    après : {str(b)[:110]}')
-
-    # ── 2. L'empreinte affichée ───────────────────────────────────
-    for champ in avant_vu:
-        if avant_vu[champ] != apres_vu[champ]:
-            ECHECS.append(
-                f'l’écran ne montre plus l’état d’avant — {champ} : '
-                f'{avant_vu[champ]!r} → {apres_vu[champ]!r}\n'
-                '    (localStorage peut être correct : c’est la MÉMOIRE '
-                'qui n’a pas été ré-hydratée)')
-
-    ctx.close()
-    navigateur.close()
+    print('\nCONTROLE OK — les deux cibles non resolues ont ete VUES par le filet')
+    sys.exit(0)
 
 print(f'\nparcours : {etapes} étapes atteintes, {actions} gestes réels, '
       f'{len(sautees)} passée(s)')

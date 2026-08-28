@@ -53,7 +53,7 @@ function captureState(){
 // Restore everything the tour may have changed, then re-render.
 function restoreState(snap){
   if(!snap) return;
-  try { closeMo(); } catch(e){}
+  try { closeMo(); } catch{}
   applyLocalStorage(snap.ls);
   // Re-hydrate in-memory data from the restored localStorage
   try { loadData(); } catch(e){ log('tut restore loadData', e); }
@@ -68,12 +68,12 @@ function restoreState(snap){
   const theme = snap.ls['f1uno_theme'];
   if(theme) document.documentElement.setAttribute('data-theme', theme);
   else document.documentElement.removeAttribute('data-theme');
-  try { applySavedFont(); } catch(e){}
+  try { applySavedFont(); } catch{}
   // Re-render with the restored language + data, then go back to the origin view
   try { applyLanguage(); } catch(e){ log('tut restore applyLanguage', e); }
   setCurrentView(snap.view);
-  try { switchView(snap.view); } catch(e){}
-  try { renderCollection(); updateStats(); } catch(e){}
+  try { switchView(snap.view); } catch{}
+  try { renderCollection(); updateStats(); } catch{}
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -142,7 +142,7 @@ export const TUTORIAL_STEPS = [
      reste : c'est la seule chose sans laquelle rien d'autre n'a
      de sens. ── */
   { id: 'coll_intro', chapter: 'collection', observe: true,
-    ensure: async () => { switchView('collection'); try { closeMo(); } catch(e){} },
+    ensure: async () => { switchView('collection'); try { closeMo(); } catch{} },
     target: () => q('#collHead .ph') },
 
   { id: 'open_card', chapter: 'collection',
@@ -172,12 +172,12 @@ export const TUTORIAL_STEPS = [
   // Favori et souhait : même geste, deux significations — une seule
   // étape, l'une ou l'autre puce valide.
   { id: 'quick_status', chapter: 'collection',
-    ensure: async () => { try { closeMo(); } catch(e){} },
+    ensure: async () => { try { closeMo(); } catch{} },
     target: nthCardChip(0, 'favorite'),
     action: { type: 'dataAction', name: 'quickToggle' } },
 
   { id: 'quick_add', chapter: 'collection',
-    ensure: async () => { try { closeMo(); } catch(e){} },
+    ensure: async () => { try { closeMo(); } catch{} },
     target: () => q('.card .qbtn'),
     // Le second temps du geste : une fois le « + » pressé, le halo suit
     // le menu de variantes (voir « cible de suite de geste », plus bas).
@@ -222,8 +222,26 @@ export const TUTORIAL_STEPS = [
   { id: 'stats_goals', chapter: 'stats', observe: true,
     target: () => q('#statsView .sv-goals') },
 
+  // ⚠️ CIBLE REPRISE (1.77.5). Les deux sélecteurs précédents —
+  //    `.sv-tools-tabs` puis `.sv-tools` — ne résolvaient PLUS NI L'UN
+  //    NI L'AUTRE : la vue Stats a été refaite en « portes »
+  //    (`.sv-doors` / `.sv-door`) et les deux noms sont partis avec.
+  //    L'étape affichait donc `tut.missing` à un utilisateur réel, à la
+  //    6ᵉ étape sur 6 du chapitre Stats, et verify_tutorial.py restait
+  //    VERT — sa clé de déduplication l'empêchait d'examiner la bulle de
+  //    secours (n°47).
+  //    `.sv-doors` et pas `#svTools` : la section entière fait 693 px de
+  //    haut (dont 420 px de panneau de résultats) sur une fenêtre de
+  //    812 px — le halo n'aurait rien désigné. `.sv-doors` fait 187 px et
+  //    porte EXACTEMENT ce que le texte de l'étape nomme : manquantes,
+  //    doubles, liste d'échange. La barre `.sv-share` (44 px, « prêtes à
+  //    partager ») est juste dessous et reste hors halo : elle décrit ce
+  //    que les portes produisent, elle n'est pas le geste de l'étape.
+  //    UN SEUL sélecteur, pas de chaîne `||` : une chaîne de deux noms
+  //    morts est ce qui vient de survivre un mois sans que rien ne le
+  //    dise. Un nom qui disparaît doit faire rougir le filet.
   { id: 'set_tools', chapter: 'stats', observe: true,
-    target: () => q('#statsView .sv-tools-tabs') || q('#statsView .sv-tools') },
+    target: () => q('#statsView .sv-doors') },
 
   /* ── CHAPITRE 4 · COMPTE ── */
   { id: 'go_account', chapter: 'account',
@@ -349,7 +367,7 @@ function _end(skipped){
   try {
     if(skipped) localStorage.setItem('f1uno_tut_skipped', 'true');
     else localStorage.removeItem('f1uno_tut_skipped');
-  } catch(e){}
+  } catch{}
   restoreState(_snapshot);
   _snapshot = null;
   _teardown();
@@ -396,7 +414,7 @@ async function _bringIntoView(el){
   try {
     if(sc) sc.scrollBy({ top: delta, behavior });
     else window.scrollBy({ top: delta, behavior });
-  } catch(e){
+  } catch{
     if(sc) sc.scrollTop += delta; else window.scrollBy(0, delta);
   }
   await _settled(el);
@@ -602,13 +620,13 @@ function _showBubble(step, i, opts = {}, el = null){
     skipStep.addEventListener('click', () => { if(_active) _runStep(i + 1); });
     // Discrète d'abord, affirmée si le geste résiste : on n'invite pas
     // à sauter, mais on ne laisse jamais personne coincé.
-    setTimeout(() => { try { skipStep.classList.add('urge'); } catch(e){} }, SKIP_HINT_MS);
+    setTimeout(() => { try { skipStep.classList.add('urge'); } catch{} }, SKIP_HINT_MS);
   }
 
   _positionBubble(el);
   // Le focus suit l'étape : au clavier comme au lecteur d'écran, on est
   // toujours DANS la bulle qui vient de changer.
-  try { _bubble.focus({ preventScroll: true }); } catch(e){}
+  try { _bubble.focus({ preventScroll: true }); } catch{}
 }
 
 /* Placement : sous la cible si la place existe, sinon dessus, sinon à
@@ -695,7 +713,7 @@ function _bindAdvance(step, i, el, opts = {}){
         cleanups.push(() => target.removeEventListener('input', h));
       }
     } else if(a.type === 'condition'){
-      const iv = setInterval(() => { try { if(a.check()) finish(); } catch(e){} }, 150);
+      const iv = setInterval(() => { try { if(a.check()) finish(); } catch{} }, 150);
       cleanups.push(() => clearInterval(iv));
     } else {
       const match = e => {

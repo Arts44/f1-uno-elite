@@ -17,6 +17,19 @@
 
 export const CHANGELOG = [
   {
+    version: '1.77.5',
+    date: '2026-08-28',
+    changes: {
+      en: ['The guided tour shows the collector tools again. On its last stats step it said that part was not on screen — while it was right there. If you took the tour before this version, you never saw that step; replay it from Settings.'],
+      fr: ['La visite guidée montre de nouveau les outils du collectionneur. À sa dernière étape des stats, elle annonçait que cette partie n’était pas à l’écran — alors qu’elle y était. Si vous avez fait la visite avant cette version, vous n’avez jamais vu cette étape ; rejouez-la depuis les Réglages.'],
+      es: ['La visita guiada vuelve a mostrar las herramientas del coleccionista. En su último paso de estadísticas decía que esa parte no estaba en pantalla — cuando sí lo estaba. Si hiciste la visita antes de esta versión, nunca viste ese paso; repítela desde los Ajustes.'],
+      zh: ['引导教程重新展示收藏者工具。它在统计章节的最后一步会说这部分不在屏幕上——其实它就在那里。如果你在此版本之前看过教程，就从未见过这一步；可在设置中重新播放。'],
+      it: ['La visita guidata mostra di nuovo gli strumenti del collezionista. All’ultimo passo delle statistiche diceva che quella parte non era sullo schermo — mentre c’era. Se hai fatto la visita prima di questa versione, quel passo non l’hai mai visto; rigiocala dalle Impostazioni.'],
+      nl: ['De rondleiding toont de verzamelaarstools weer. Bij de laatste stap van de statistieken zei ze dat dat deel niet in beeld was — terwijl het er wel stond. Heb je de rondleiding vóór deze versie gedaan, dan heb je die stap nooit gezien; speel hem opnieuw af via Instellingen.'],
+      de: ['Die geführte Tour zeigt die Sammler-Werkzeuge wieder. Im letzten Statistik-Schritt hieß es, dieser Teil sei nicht auf dem Bildschirm — dabei war er da. Wenn Sie die Tour vor dieser Version gemacht haben, haben Sie diesen Schritt nie gesehen; spielen Sie sie in den Einstellungen erneut ab.'],
+    },
+  },
+  {
     version: '1.77.4',
     date: '2026-08-24',
     changes: {

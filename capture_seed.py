@@ -24,7 +24,23 @@ URL = 'http://localhost:8124/index.html'
 # ══════════════════════════════════════════════════════════
 # La saison est un PARAMÈTRE : elle était écrite en dur à six endroits.
 #   python3 capture_screenshots.py [année]      (défaut : 2025)
-SEASON = int(sys.argv[1]) if len(sys.argv) > 1 else 2025
+#
+# ⚠️ ON NE LIT QUE CE QUI RESSEMBLE À UNE ANNÉE. Ce module est AUSSI
+# importé par les filets, qui ont leurs propres arguments — et un
+# module importé hérite de l'argv de celui qui l'importe. Écrit
+# `int(sys.argv[1])`, il levait un ValueError dès qu'un filet était
+# lancé avec `--controle`, AU CHARGEMENT, donc avant la moindre
+# vérification. Trois filets sont tombés dessus (verify_vitrine.py le
+# 22/08, verify_trade_inbox.py le 24/08), et dans le premier cas ça a
+# laissé le mode --controle CASSÉ sans que rien ne le signale : quatre
+# contrôles négatifs sur sept ne s'exécutaient plus.
+# La parade a d'abord été écrite CHEZ L'APPELANT (neutraliser argv le
+# temps de l'import). C'était une copie à faire N fois — ㉘. Elle est
+# ici, une fois : UN MODULE IMPORTÉ NE DOIT PAS LIRE LES ARGUMENTS DE
+# CELUI QUI L'IMPORTE, et s'il le fait, il ne prend que ce qu'il
+# reconnaît.
+_arg = sys.argv[1] if len(sys.argv) > 1 else ''
+SEASON = int(_arg) if _arg.isdigit() and len(_arg) == 4 else 2025
 CARDS = json.loads((ROOT / 'app' / 'data' / f'cards-{SEASON}.json').read_text())
 CARDS = CARDS['cards'] if isinstance(CARDS, dict) else CARDS
 BY_ID = {c['id']: c for c in CARDS}
