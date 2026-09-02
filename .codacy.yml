@@ -178,16 +178,35 @@ exclude_paths:
 #     │ sorties faciles n'est bonne — ne la reprenez pas à zéro. │
 #     └──────────────────────────────────────────────────────────┘
 #
-#     CE QUI A ÉTÉ ÉTABLI. Le marquage « faux positif » de cette
-#     ligne a été refait deux fois sans prendre. Mais les TROIS
-#     détecteurs ci-dessus visent la MÊME ligne, et Codacy n'en
-#     rapporte qu'UN : les deux marquages Semgrep ont pris et
-#     TIENNENT. Seul Trivy_secret revient, avec un resultDataId
-#     STABLE d'un relevé à l'autre (131529630764) — donc ce n'est
-#     pas non plus la réouverture-par-déplacement décrite plus bas
-#     pour cloud-auth.js:34. L'anomalie est LOCALE à cette
-#     occurrence Trivy, elle n'est ni du dépôt ni de la ligne.
-#     C'est le marquage de CETTE occurrence qu'il faut reprendre.
+#     ⚠️ CE PARAGRAPHE A ÉTÉ FAUX PENDANT UNE SEMAINE — corrigé le
+#     02/09/2026. Il disait : « les deux marquages Semgrep ont pris
+#     et TIENNENT ; seul Trivy_secret revient ; l'anomalie est
+#     LOCALE à cette occurrence Trivy ». Relevé sur 1220597, un
+#     commit qui ne touche NI cloud-config.js NI aucun fichier de
+#     l'app : le compte passe de 2 à 4, et les deux nouvelles sont
+#     Semgrep_generic.secrets.security.detected-jwt-token et
+#     Semgrep_generic.secrets.gitleaks.jwt.jwt — SUR LA MÊME LIGNE.
+#     LES DEUX MARQUAGES SEMGREP ONT ROUVERT.
+#
+#     CE QUE ÇA CHANGE. « Les Semgrep tiennent » était une lecture
+#     unique érigée en propriété (⑰) : quatre relevés consécutifs à
+#     1 puis 2 issues ne prouvaient pas la persistance du marquage,
+#     ils prouvaient qu'il n'avait pas encore rouvert. La conclusion
+#     « l'anomalie est locale à Trivy » tombe avec elle : les trois
+#     détecteurs rouvrent, à des rythmes différents.
+#
+#     CE QUI RESTE VRAI : la ligne est la clé « anon public » de
+#     Supabase, publique par conception, et les trois détections
+#     sont des faux positifs. La décision ci-dessous ne bouge pas —
+#     c'est le MÉCANISME de marquage qui n'est pas fiable, pas le
+#     jugement sur la ligne.
+#
+#     CE QUI N'EST PAS ÉTABLI, et qu'il ne faut pas supposer : la
+#     PÉRIODE de réouverture, la cause (réanalyse complète ? mise à
+#     jour d'un détecteur ? expiration côté Codacy ?), et si un
+#     re-marquage tiendrait plus longtemps cette fois. Trois
+#     questions, aucune mesurée — il faudrait relever le compte à
+#     intervalle régulier, ce qu'aucun outil ne fait ici.
 #
 #     LES TROIS SORTIES FACILES, ET POURQUOI AUCUNE N'EST PRISE.
 #
