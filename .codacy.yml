@@ -208,6 +208,35 @@ exclude_paths:
 #     questions, aucune mesurée — il faudrait relever le compte à
 #     intervalle régulier, ce qu'aucun outil ne fait ici.
 #
+#     ══ CE QUE QUATRE CHEMINS ÉTABLISSENT ENSEMBLE ═════════════
+#     Quatre réouvertures, par quatre chemins différents :
+#       ① cloud.js:25 → cloud-auth.js:34, la ligne se DÉPLACE et
+#         l'occurrence est neuve ;
+#       ② cloud-config.js:23, Trivy_secret revient avec un
+#         resultDataId STABLE — même occurrence, marquage défait ;
+#       ③ cloud-auth.js:34, un SECOND détecteur (Opengrep) arrive
+#         sur une ligne inchangée ;
+#       ④ cloud-config.js:23, les deux marquages Semgrep rouvrent
+#         sur une ligne inchangée, un mois après avoir « tenu ».
+#
+#     LA CONCLUSION N'EST PLUS SUR UNE LIGNE, ELLE EST SUR LE
+#     MÉCANISME : **le marquage Codacy n'est pas un état stable,
+#     c'est un état qui se défait.** Toute phrase de la forme « ce
+#     marquage tient » est un ⑰ — une observation répétée prise
+#     pour une propriété. Quatre relevés verts ne prouvent pas la
+#     persistance ; ils prouvent qu'elle n'a pas encore cessé.
+#
+#     CE QU'IL FAUT ÉCRIRE À LA PLACE : la date du dernier
+#     marquage, le compte au dernier relevé, et rien sur la suite.
+#
+#     ⚠️ ACTION À FAIRE, PAS DETTE À PORTER : re-marquer les trois
+#     occurrences de cloud-config.js:23 et celle de
+#     cloud-auth.js:34 demande un JETON D'ÉCRITURE Codacy, qu'aucune
+#     session n'a eu jusqu'ici (et le jeton qui traînait en clair
+#     est à faire tourner, n°46). La commande est plus bas. Tant
+#     que le jeton n'existe pas, le compte reste à 4 et c'est
+#     NORMAL — un relevé qui trouve 4 ne signale rien de neuf.
+#
 #     LES TROIS SORTIES FACILES, ET POURQUOI AUCUNE N'EST PRISE.
 #
 #       A · exclure 'app/cloud-config.js' via exclude_paths.

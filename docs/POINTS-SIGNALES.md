@@ -2247,6 +2247,34 @@ Ce qui a été payé une fois ici : **le plafond compte le HTML GZIPPÉ**.
 Une mesure prise sur un `http.server` local, qui ne compresse pas,
 rend 32,9 Ko au lieu de 13,9 et n'est comparable à rien.
 
+### L'INSTRUMENT QUI MANQUAIT — posé le 02/09/2026
+
+**Un plafond surveille un niveau, pas une pente**, et c'est la pente
+qui est arrivée : le plafond a été vérifié à chaque livraison, il n'a
+jamais rougi, et la marge est partie quand même. Chaque chantier avait
+mesuré son propre delta — +33 o, +53 o, +115 o, tous honnêtes et tous
+petits ; **aucun n'avait mesuré le cumul.**
+
+`verify_vitrine.py` écrit désormais **une ligne par livraison** dans
+`docs/mesures/poids-vitrine.tsv` — fichier **suivi**, le seul
+emplacement qui survive à un clone frais :
+
+    horodatage · html_gzip_o · html_brut_o · transfere_ko · head_avant_commit
+
+**Pas de seuil, pas de verdict, il ne rougit jamais.** C'est le motif de
+`docs/mesures/chargement.tsv` : la SÉRIE dira la pente, et la colonne
+brute sert de témoin à côté de la gzippée pour qu'on ne recompare plus
+deux grandeurs différentes. `head_avant_commit` porte son vrai nom :
+`livrer.sh` tourne AVANT le commit, donc ce SHA est celui d'avant (n°40).
+
+Rien n'est écrit en mode `--controle` : les pages y sont délibérément
+déformées, leurs octets ne sont pas ceux du produit.
+
+**⚠️ CE QUE CET INSTRUMENT NE FAIT PAS** : il ne protège de rien tant
+que personne ne lit la série, et il ne dira rien avant une dizaine de
+livraisons. Le dire ici évite qu'on le prenne pour un garde. Le registre
+en a fait ㊵.
+
 **Ce qui n'est PAS su, et qu'il faudra mesurer avant de toucher quoi
 que ce soit :**
 
@@ -4834,6 +4862,18 @@ purger, pas d'historique à réécrire, rien de publié.
 `~/.claude/projects/…`, **71 occurrences**. Ces fichiers ne sont pas
 versionnés et ne quittent pas la machine, mais ils sont lisibles par
 tout ce qui lit le disque, et ils sont conservés.
+
+### UNE SECONDE ACTION, DU MÊME JETON — ajoutée le 02/09/2026
+
+Le re-marquage des faux positifs Codacy demande **le même jeton
+d'écriture**. Quatre réouvertures par quatre chemins différents ont
+établi que **le marquage Codacy n'est pas un état stable, c'est un état
+qui se défait** ; les commandes sont dans `.codacy.yml`. Tant qu'aucune
+session n'a de jeton d'écriture, le compte reste à 4 et **c'est normal**
+— un relevé qui trouve 4 ne signale rien de neuf.
+
+C'est une **action à faire**, pas une dette à porter : elle ne demande
+ni chantier ni décision, seulement un jeton.
 
 ### L'ACTION À FAIRE
 

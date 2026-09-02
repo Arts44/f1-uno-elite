@@ -59,7 +59,11 @@ CONTROLES NEGATIFS (--controle), tous vus rouges :
     python3 -m http.server 8124        # a la racine du depot
     python3 verify_vitrine.py [--controle]
 """
+import datetime
+import gzip
+import os
 import pathlib
+import subprocess
 import sys
 import time
 
@@ -211,6 +215,60 @@ new Promise(res => {
   }, 3000);
 })
 """
+
+
+SERIE_POIDS = 'docs/mesures/poids-vitrine.tsv'
+
+
+def relever_poids(transfere_ko):
+    """INSTRUMENT DE COLLECTE — PAS UN GARDE. Il ne rougit jamais.
+
+    ══ POURQUOI IL EXISTE : UN PLAFOND NE SURVEILLE PAS UNE PENTE ══
+    Le plafond de 112 Ko (n°31) a ete surveille a chaque livraison et
+    n'a jamais rougi. Pendant ce temps, du 21/08 au 02/09/2026, le HTML
+    gzippe est passe de 10,0 a 13,9 Ko : la marge de 4,4 Ko est partie
+    aux neuf dixiemes, et RIEN NE L'A DIT. Chaque chantier avait mesure
+    son propre delta — +33 o, +115 o, +53 o — et aucun n'avait mesure
+    le CUMUL. Un plafond repond « suis-je dedans ? » ; il ne repond pas
+    « depuis quand est-ce que je monte, et de combien par semaine ? ».
+
+    CE QU'IL ECRIT : une ligne par livraison, dans un fichier SUIVI —
+    le seul emplacement qui survive a un clone frais. Pas de seuil, pas
+    de verdict : la SERIE dira la pente. Meme motif que
+    docs/mesures/chargement.tsv, et il vient de prouver son utilite en
+    creux — la ou il n'existait pas.
+
+    ⚠️ `head` N'EST PAS LE COMMIT LIVRE. `livrer.sh` tourne AVANT le
+    commit : le SHA releve ici est celui d'avant. C'est le n°40, et on
+    ecrit la colonne sous son vrai nom plutot que de la faire mentir.
+
+    ⚠️ LE CHIFFRE QUI COMPTE EST LE GZIPPE. Le plafond du n°31 compte
+    un HTML servi compresse ; une mesure prise sur `http.server`, qui
+    ne compresse pas, rend 33 Ko au lieu de 14 et n'est comparable a
+    rien. Payé une fois — c'est la colonne brute qui sert de temoin.
+    """
+    try:
+        html = pathlib.Path('index.html').read_bytes()
+        brut, gzippe = len(html), len(gzip.compress(html, 9))
+        try:
+            head = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
+                                  capture_output=True, text=True, timeout=10).stdout.strip()
+        except (OSError, subprocess.SubprocessError):
+            head = '?'
+        os.makedirs(os.path.dirname(SERIE_POIDS), exist_ok=True)
+        neuf = not os.path.exists(SERIE_POIDS)
+        with open(SERIE_POIDS, 'a', encoding='utf-8') as f:
+            if neuf:
+                f.write('# horodatage\thtml_gzip_o\thtml_brut_o\ttransfere_ko'
+                        '\thead_avant_commit\tcontexte\n')
+            f.write('%s\t%d\t%d\t%.1f\t%s\tverify_vitrine/index.html\n'
+                    % (datetime.datetime.now().isoformat(timespec='seconds'),
+                       gzippe, brut, transfere_ko, head))
+        print('  releve poids   HTML %d o gzippes (%d bruts), %.1f Ko transferes → %s'
+              % (gzippe, brut, transfere_ko, SERIE_POIDS))
+    except OSError as e:
+        # UN INSTRUMENT DE COLLECTE NE FAIT JAMAIS ECHOUER CE QU IL MESURE.
+        print('  releve poids   non ecrit (%s) — sans consequence' % e)
 
 
 def defauts_du_lien(nom, w, v):
@@ -521,6 +579,13 @@ def main():
                 echecs.append('%s : CLS %.4f, plafond %.2f' % (nom, plein['cls'], CLS_MAX))
             if plein['ko'] > PLAFOND_KO:
                 echecs.append('%s : %.1f Ko transferes, plafond %d Ko' % (nom, plein['ko'], PLAFOND_KO))
+            # LA SERIE, sur la fenetre la plus lourde — celle qui charge
+            # les deux captures. Une ligne par livraison, jamais un
+            # verdict. En mode --controle on n'ecrit PAS : les pages y
+            # sont deliberement deformees, leurs octets ne sont pas ceux
+            # du produit et pollueraient la serie.
+            if nom == FENETRES[-1][0] and not CONTROLE:
+                relever_poids(plein['ko'])
         if CONTROLE:
             joue('repli retire')
 
