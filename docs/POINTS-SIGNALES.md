@@ -2228,6 +2228,25 @@ budget.** Deux blocs de commentaire pèsent 2 Ko ; une capture en pèse
 vingt fois plus. Le jour où la vitrine doit vraiment maigrir, c'est là
 qu'il faut aller, et nulle part ailleurs.
 
+### ⚠️ MISE À JOUR DU 28/08/2026 — la marge de 4,4 Ko est presque mangée
+
+Le HTML gzippé mesuré ici valait **10,0 Ko**. Il vaut aujourd'hui
+**13,9 Ko** : **+3,9 Ko en une semaine**, sur une marge annoncée à
+4,4 Ko. Ce n'est pas un chantier qui l'a consommée, c'est leur somme —
+chaque commentaire de décision ajouté à `index.html` y contribue, et le
+dépôt en écrit beaucoup par convention.
+
+**Deux conséquences, aucune tranchée ici :**
+- la phrase ci-dessus (« discuter du HTML, c'est 9 % du budget ») était
+  vraie à 10 Ko ; à 13,9 elle l'est moins, et à 18 elle sera fausse ;
+- **le plafond de 112 Ko n'est plus une contrainte lointaine.** Le
+  chantier des captures (AVIF plus agressif, `srcset`) rendrait dix fois
+  ce que le HTML peut rendre, et il reste non fait.
+
+Ce qui a été payé une fois ici : **le plafond compte le HTML GZIPPÉ**.
+Une mesure prise sur un `http.server` local, qui ne compresse pas,
+rend 32,9 Ko au lieu de 13,9 et n'est comparable à rien.
+
 **Ce qui n'est PAS su, et qu'il faudra mesurer avant de toucher quoi
 que ce soit :**
 
@@ -4603,12 +4622,75 @@ un rang trop large déborde. Elle reste comme garde contre l'ajout d'un
 `flex-wrap`, et ce statut est écrit dans le filet pour qu'on ne la
 croie pas éprouvée (㊳).
 
+### LE TRAITEMENT DU LIEN — repris le 28/08/2026, il était illisible
+
+Placé à côté du CTA, le lien restait un souligné de 13 px : il se lisait
+comme une note de bas de page, pas comme une commande. Trois traitements
+mesurés, police chargée, six fenêtres :
+
+| traitement | lien | rang exigé | fenêtre mini | tient à 390 ? | CSS |
+|---|---|---|---|---|---|
+| témoin (souligné 13 px) | 95 px | 320 | 360 | oui | — |
+| a) bouton à contour | 137 px | 362 | **402** | **non, +12 px** | 229 o |
+| b) contour + glyphe | 153 px | 378 | **418** | **non, +28 px** | 301 o |
+| **c) texte appuyé** (15 px, 600, sans souligné, `--tx2`) | 110 px | **335** | **375** | **oui** | 112 o |
+
+Le contour coûte 42 px de gabarit avant que le texte compte — 2×20 px de
+rembourrage et 2×1 px de bordure. **Deux critères posés séparément — la
+largeur à 390 px et le plafond d'octets — désignent le même traitement.**
+
+**La bascule passe de 380 à 390** : à 380 il ne resterait que 5 px de
+marge. À 390, il en reste **15, soit deux signes**, et cette marge est
+déclarée dans le CSS à côté du point de bascule — un nombre qui ne se
+déclare pas se recalibre en silence.
+
+### CE QUE LA MESURE A ENCORE CORRIGÉ — un vert pour la mauvaise raison
+
+**La règle `.voir-rang` était écrite AVANT `.voir`. Même spécificité
+(0,1,0), donc l'ordre tranche : le `font-size:13px` de `.voir` gagnait,
+et le lien rendait 95 px au lieu de 110.** Le traitement (c) n'était pas
+appliqué — et le filet rendait `VITRINE OK`, puisque 320 px exigés
+tiennent dans 350 disponibles. **Un vert sur un chemin jamais emprunté
+(⑱), trouvé en mesurant la largeur rendue, pas en relisant le CSS.**
+
+### L'ASSERTION QUI MANQUAIT : tenir, ce n'est pas ne pas se replier
+
+Sans `flex-wrap`, un rang trop large **ne se replie pas** — il écrase ce
+qui peut céder. Deux assertions le disent maintenant :
+
+- le rang exige-t-il plus que les **350 px disponibles à 390** ? C'est
+  l'invariant de dessin, mesurable à n'importe quelle fenêtre ;
+- tient-il dans **la fenêtre où il est montré** ? À 320 px il n'y a que
+  280 px pour 335 exigés.
+
+La largeur est lue en `scrollWidth`, la largeur **exigée** — la largeur
+rendue ment dès que le flex serre.
+
+**Effet sur le contrôle négatif, rejoué sur le nouveau dessin** : 375
+rend 1 défaut, 360 en rend **2**, 320 en rend **3** — contre 1, 1 et 2
+avant. Le voisin ayant grossi de 15 px, la pression sur le CTA a
+augmenté, et c'est exactement le cas où un contrôle non rejoué se périme
+sans devenir rouge (㉒).
+
 ### Le poids
 
-**+636 octets**, soit **+0,59 Ko transférés** — desktop 111,36 → 111,95 Ko,
-sous le plafond de 112. **Première version : +1,75 Ko, au-dessus du
-plafond**, et la cause n'était pas le dessin mais un commentaire de
-1,3 Ko que j'avais écrit dans `index.html`. Il est ici à la place.
+**+279 octets bruts, +115 octets gzippés.**
+
+**⚠️ CORRECTION D'UN CHIFFRE QUE J'AVAIS DONNÉ FAUX.** J'ai annoncé
+« 111,99 Ko, il reste 0,18 Ko de marge » : 112 − 111,99 fait 0,01, pas
+0,18. Et surtout, **je mesurais la mauvaise grandeur** — un HTML servi
+NON compressé par `http.server` (32,9 Ko), alors que le plafond de
+112 Ko du n°31 compte le **HTML gzippé** (10,0 Ko à la mesure du
+21/08). Les deux totaux ne sont pas comparables.
+
+**Ce qui compte pour le plafond est donc +115 octets**, et la première
+version du traitement en coûtait 187 — un commentaire de cinq lignes,
+déplacé ici.
+
+**LA VRAIE ALERTE EST AILLEURS, et elle appartient au n°31** : le HTML
+gzippé est passé de **10,0 Ko (21/08) à 13,9 Ko**. La marge de 4,4 Ko
+que le n°31 annonçait est consommée aux neuf dixièmes, et pas par ce
+chantier.
 
 ---
 

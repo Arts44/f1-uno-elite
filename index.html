@@ -125,16 +125,19 @@ if(/^#(backup|trade|access_token|error)=/.test(location.hash)) location.replace(
    tout ce qui décide du LCP et du CLS est au-dessus de lui. La
    contrainte « la page d'accueil ne bouge pas d'un pixel » ne fléchit
    pas pour un lien ; c'est le lien qui déménage. */
-/* Bascule 380 px : le rang exige 363 px, 380 laisse trois signes de
-   marge. Pas de `flex-wrap` — un repli ferait basculer le LCP. n°48. */
+/* Bascule 390 : le rang exige 335 px, 390 en laisse 350. ⚠️ 15 px de
+   marge, SOIT DEUX SIGNES — tout libellé plus long fait tomber la
+   bande 390-395. Ni `flex-wrap` ni repli possible : n°48. */
 .cta-row{margin-top:34px;display:flex;align-items:center;justify-content:center;gap:20px}
 .cta-row .cta{margin-top:0;flex:0 0 auto}
-.voir-rang{display:none;white-space:nowrap}
-@media(min-width:380px){.voir-rang{display:inline}.voir-pied{display:none}}
 .voir{font-size:13px;color:var(--tx3);background:none;border:0;
   padding:0;cursor:pointer;font:inherit;font-size:13px;text-decoration:underline;
   text-underline-offset:3px;text-decoration-color:var(--border)}
 .voir:hover,.voir:focus-visible{color:var(--tx1);text-decoration-color:var(--red)}
+/* ⚠️ APRÈS `.voir` : même spécificité, l'ordre tranche. Écrit avant,
+   son `font-size:13px` gagnait et le lien rendait 95 px (n°48). */
+.voir-rang{display:none;white-space:nowrap;text-decoration:none;color:var(--tx2);font-size:15px;font-weight:600}
+@media(min-width:390px){.voir-rang{display:inline}.voir-pied{display:none}}
 /* ── FOND ANIMÉ — la forme B, choisie parce qu'elle est la seule
    MESURÉE à ne pas déplacer l'élément LCP. Un canvas inséré DANS LE
    FLUX fait basculer le LCP de shot-desktop vers pitch sur cinq

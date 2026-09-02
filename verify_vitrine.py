@@ -153,11 +153,19 @@ FENETRES_LCP = [('390x844', 390, 844), ('375x667', 375, 667),
 LIEN_VISIBLE = '.voir:visible'
 # Point de bascule DECLARE ICI (㉒), et recopie du CSS a dessein : si
 # la media query bouge, ce filet rougit et la decision se reprend.
-BASCULE_PX = 380
+BASCULE_PX = 390
 # Le rang exige CTA + ecart + libelle. Mesure du 28/08/2026, police
-# chargee (pire cas) : 205 + 20 + 98 = 323 px, plus 40 px de marges de
-# body, soit 363 px. 380 laisse 17 px, TROIS signes de libelle.
-RANG_EXIGE_PX = 323
+# chargee (pire cas), lien en traitement (c) — 15 px, graisse 600 :
+# 205 + 20 + 110 = 335 px, plus 40 px de marges de body, soit 375 px.
+# 390 en laisse 350 : QUINZE PIXELS DE MARGE, SOIT DEUX SIGNES.
+RANG_EXIGE_PX = 335
+# La largeur DISPONIBLE a la fenetre de reference : 390 moins les
+# 2 x 20 px de `padding` de body. C'est contre elle que le rang se
+# juge, et pas contre la fenetre courante — un rang qui tient a 1280
+# et deborde a 390 est un rang casse, meme mesure a 1280.
+DISPO_390_PX = 350
+# Les marges de `body` : 20 px de chaque cote (`padding: … 20px …`).
+MARGES_BODY_PX = 40
 # Largeur du CTA, police chargee OU repli (mesure : 205 et 204 px ; le
 # rendu se stabilise a 205 apres l echange). DECLAREE ICI (㉒) : c'est
 # le temoin exterieur qui voit un bouton ecrase.
@@ -186,6 +194,13 @@ new Promise(res => {
          cta_y: Math.round(r.y), cta_h: Math.round(r.height), el_lcp: el,
          rang_h: row ? Math.round(row.getBoundingClientRect().height) : null,
          cta_w: Math.round(r.width),
+         /* EXIGEE, pas rendue. `scrollWidth` du lien donne sa largeur
+            de contenu meme s'il a ete comprime ; la largeur rendue,
+            elle, ment des que le flex serre. C'est la difference entre
+            « ca tient » et « ca a ete force a tenir ». */
+         rang_exige: row ? Math.round(
+             r.width + parseFloat(getComputedStyle(row).columnGap || 0)
+             + (row.querySelector('.voir-rang') || {scrollWidth: 0}).scrollWidth) : null,
          liens_vus: vus,
          libelles: [...document.querySelectorAll('.voir')].map(e => e.textContent.trim()),
          deborde: document.documentElement.scrollWidth
@@ -241,12 +256,41 @@ def defauts_du_lien(nom, w, v):
     if v['deborde']:
         d.append('%s : la page deborde horizontalement — le rang CTA + lien ne tient pas'
                  ' dans la fenetre' % nom)
-    # LE CTA NE SE FAIT PAS ECRASER. Mesure du 28/08/2026, media query
-    # cassee a 320 px : le rang ne debordait PAS, il RETRECISSAIT le CTA
-    # de 205 a 162 px et son libelle passait a la ligne. Le bouton
-    # principal payait pour le lien secondaire, en silence, et aucune
-    # des assertions ci-dessus ne le voyait — `flex:0 0 auto` l en
-    # empeche, celle-ci le verifie.
+    # ══ LE RANG TIENT A 390 PX, ET C EST LA VRAIE QUESTION ═══════
+    # Un rang trop large NE SE REPLIE PAS — il n y a pas de `flex-wrap`.
+    # Il ecrase ce qui peut ceder, et ce qui cede est le CTA. Verifier
+    # le repli ne suffisait donc pas : on compare la largeur EXIGEE a
+    # la largeur DISPONIBLE a la fenetre de reference.
+    # 15 px de marge seulement (335 exiges, 350 disponibles) : deux
+    # signes de libelle. Cette assertion est ce qui rend cette marge
+    # tenable — sans elle, un libelle rallonge d un mot passerait, et
+    # la bande 390-395 tomberait sans bruit.
+    if v['liens_vus'] == ['rang'] and v['rang_exige'] > DISPO_390_PX:
+        d.append('%s : le rang exige %s px, disponible a 390 px = %s — le libelle a'
+                 ' grandi et la bande 390-395 tombe'
+                 % (nom, v['rang_exige'], DISPO_390_PX))
+    # ET IL TIENT DANS LA FENETRE OU IL EST MONTRE. L invariant a 390
+    # ci-dessus ne dit rien d une media query qui montrerait le rang
+    # trop tot : a 320 px il n y a que 280 px, le rang en exige 335, et
+    # rien ne se replie — le CTA encaisse. MESURE : c'est exactement ce
+    # que le controle de la media query cassee produit, et sans cette
+    # ligne il ne rendait qu UN defaut la ou il y en a deux.
+    if v['liens_vus'] == ['rang'] and v['rang_exige'] > w - MARGES_BODY_PX:
+        d.append('%s : le rang exige %s px pour %s disponibles a cette fenetre — rien ne se'
+                 ' replie, donc quelque chose est ecrase'
+                 % (nom, v['rang_exige'], w - MARGES_BODY_PX))
+    # LE CTA NE SE FAIT PAS ECRASER — ET LE VOISIN A CHANGE DEPUIS.
+    # Mesure du 28/08/2026, media query cassee a 320 px, quand le voisin
+    # etait un lien nu de 13 px : le rang ne debordait PAS, il
+    # RETRECISSAIT le CTA de 205 a 162 px et son libelle passait a la
+    # ligne. Le bouton principal payait pour le lien secondaire, en
+    # silence, et aucune autre assertion ne le voyait.
+    # DEPUIS, LE VOISIN A GROSSI DE 15 PX (traitement (c) : 15 px,
+    # graisse 600, 95 -> 110 px), donc la pression sur le CTA a
+    # AUGMENTE. `flex:0 0 auto` l en protege, celle-ci le verifie, et le
+    # controle negatif a ete rejoue sur le nouveau dessin — un controle
+    # qui n est pas rejoue quand la piece qu il eprouve change se perime
+    # sans jamais devenir rouge (㉒).
     # DEUX COPIES DU LIEN DANS LE DOM = ㉘ EN GERME : qui change le
     # libelle peut n en voir qu un, et la moitie des visiteurs lit
     # l autre. Deux lignes contre un defaut qui ne se voit que sur la
