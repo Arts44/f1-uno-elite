@@ -63,7 +63,6 @@ import datetime
 import gzip
 import os
 import pathlib
-import subprocess
 import sys
 import time
 
@@ -218,6 +217,14 @@ new Promise(res => {
 
 
 SERIE_POIDS = 'docs/mesures/poids-vitrine.tsv'
+# SEUIL DECLARE (㉒) : longueur du SHA court ecrit dans la serie.
+# Ce n'est PAS une propriete de git — c'est la longueur qu'on CHOISIT,
+# celle de `git log --oneline` dans ce depot, pour que la colonne se
+# compare a l'oeil au journal. La changer ne casse rien : elle rend
+# seulement la serie moins lisible a cote des messages de commit. Elle
+# sert aussi de plancher de validite — en dessous, ce qu'on a lu dans
+# .git/HEAD n'est pas un SHA et la colonne rend '?'.
+SHA_COURT = 7
 
 
 def relever_poids(transfere_ko):
@@ -250,10 +257,25 @@ def relever_poids(transfere_ko):
     try:
         html = pathlib.Path('index.html').read_bytes()
         brut, gzippe = len(html), len(gzip.compress(html, 9))
+        # ON LIT .git, ON N'APPELLE PAS `git`. Deux raisons, et la
+        # seconde vaut plus que la premiere : ① un sous-processus dans un
+        # instrument de collecte est une dependance de plus au PATH, pour
+        # quarante octets de SHA ; ② `subprocess` fait rougir Bandit
+        # (B404 + B603) des l'import, meme avec une liste d'arguments
+        # litterale — deux issues ajoutees a Codacy par une ligne de
+        # confort. Le refus n'est pas cosmetique : un instrument qui
+        # degrade le compte du depot pour se decrire lui-meme n'est pas
+        # gratuit. Depot pack-e ou HEAD detache : on rend '?', et la
+        # colonne le dit.
+        head = '?'
         try:
-            head = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'],
-                                  capture_output=True, text=True, timeout=10).stdout.strip()
-        except (OSError, subprocess.SubprocessError):
+            tete = pathlib.Path('.git/HEAD').read_text(encoding='utf-8').strip()
+            if tete.startswith('ref: '):
+                ref = pathlib.Path('.git') / tete[5:]
+                head = ref.read_text(encoding='utf-8').strip()[:SHA_COURT] if ref.exists() else '?'
+            elif len(tete) >= SHA_COURT:
+                head = tete[:SHA_COURT]
+        except OSError:
             head = '?'
         os.makedirs(os.path.dirname(SERIE_POIDS), exist_ok=True)
         neuf = not os.path.exists(SERIE_POIDS)
