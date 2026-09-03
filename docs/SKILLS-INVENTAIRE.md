@@ -6,6 +6,7 @@
 > hébergé ici faute de dépôt dédié.
 
 **Dernier audit : 2026-08-22** · 42 → **33 skills** · 641 → 429 fichiers · 44 Mo → 12 Mo
+**Depuis :** +1 ajout inspecté le 2026-09-03 → **34 skills** (voir §6 et §9)
 **Archive de sécurité : `~/skills-backup-20260822.tar.gz`** (36 Mo, 769 entrées, les 42 d'avant)
 
 ---
@@ -121,9 +122,14 @@ précédentes — lire, supposer, conclure — appliqué cette fois par l'outil 
 mainteneur. D'où la règle : **soupçonner l'instrument avant le produit**, et exiger
 `[mesuré]` / `[déduit]` sur chaque verdict, y compris ceux de l'assistant.
 
+**Le cas symétrique est arrivé le 2026-09-03, et il vient d'une source qu'on croit
+neutre : la `description:` du dépôt lui-même.** Voir §9 — elle annonçait six frameworks,
+dont un absent de tout le corpus, et elle allait décider d'un classement. Registre
+CONVENTIONS.md ㊷.
+
 ---
 
-## 6. Les 33 skills actifs
+## 6. Les 34 skills actifs
 
 **Méthode (13)** — `systematic-debugging` · `test-driven-development` ·
 `verification-before-completion` · `writing-plans` · `executing-plans` ·
@@ -141,6 +147,9 @@ mainteneur. D'où la règle : **soupçonner l'instrument avant le produit**, et 
 
 **Autres (4)** — `soft-skill` *(garde-fous)* · `brand` · `banner-design` *(gardé pour
 montage TikTok à venir)* · `image-to-code-skill`
+
+**Audit — hors chaîne design (1)** — `apple-design-skill` *(ajouté le 2026-09-03,
+§9 · **ne couvre PAS SwiftUI**)*
 
 ---
 
@@ -289,3 +298,78 @@ Recréer une archive après toute modification du dossier — **avec le `-h` du 
 ```bash
 tar -czhf ~/skills-backup-$(date +%Y%m%d).tar.gz -C ~/.claude skills
 ```
+
+---
+
+## 9. `apple-design-skill` — ajouté le 2026-09-03
+
+**Source :** `github.com/dickwu/apple-design-skill` · 608 Ko installés, 59 fichiers.
+**Installé** dans `~/.claude/skills/apple-design-skill/`, **`name-only`** dans
+`settings.json` — 18ᵉ skill de cette liste.
+
+### Ce qu'il est
+
+Un **auditeur** de conformité aux Human Interface Guidelines pour applications natives et
+cross-platform. 53 documents de référence en prose, routés par `references/hig-lookup.md`.
+Il rend des constats citables, classés par sévérité.
+
+**Hors de la chaîne de priorité design.** Les autres skills design *créent* ; celui-ci
+*audite*. Ce ne sont pas les mêmes gestes, et les mettre en concurrence les ferait se
+disputer des tâches disjointes.
+
+### ⚠️ IL NE COUVRE PAS SwiftUI — ET SA DESCRIPTION DIT LE CONTRAIRE
+
+**C'est la raison d'être de cette entrée.** La `description:` de son frontmatter énumère
+« Flutter, Tauri, Electron, React Native, **SwiftUI**, and AppKit/UIKit ».
+
+Mesure du contenu, à refaire si l'on en doute :
+
+```bash
+grep -ric swiftui ~/.claude/skills/apple-design-skill/references/hig/*.md | awk -F: '{s+=$2} END{print s}'
+# → 0
+```
+
+`SwiftUI` apparaît **3 fois dans le dépôt, 0 fois dans les 53 fichiers de référence** :
+dans cette description, dans le `README.md` qui répète la même promesse, et dans une
+ligne de table de traduction (`| UIKit / SwiftUI | Framework UI layer | ... |`).
+**Aucun code, aucune API, aucun pattern d'implémentation.** C'est un corpus de principes délibérément
+framework-agnostique — sa table de terminologie sert précisément à *traduire* le
+vocabulaire Apple vers Flutter ou Electron.
+
+**Une session future qui lira la description en conclura le contraire.** C'est déjà
+arrivé le jour de l'installation : le classement « premier choix pour tout projet
+SwiftUI » avait été décidé sur cette ligne, et seule la mesure du corpus l'a défait.
+
+### Coût mesuré
+
+**Comptes de mots mesurés AVANT l'ajout de la note locale** (264 mots). Le plancher réel
+est donc aujourd'hui de 10 423 mots ≈ 13 900 tokens — refaire la mesure rend ce
+nombre-là, et non celui du tableau.
+
+| | mots | |
+|---|---|---|
+| `SKILL.md` + `hig-lookup.md` | 2 183 | au déclenchement |
+| `accessibility` + `color` + `layout` + `typography` | 7 976 | **imposés à chaque revue** |
+| **plancher** | **10 159** | **≈ 13 500 tokens** |
+| en pratique (+ 3 à 8 fichiers) | | **18 000 à 25 000 tokens** |
+| corpus de référence (`references/hig/`) | 74 609 | ≈ 99 000 — **jamais chargé d'un bloc** |
+
+Le plancher n'est pas annoncé par le README : il vient de la section « Always load for
+any review » du `SKILL.md`. La divulgation progressive est réelle, mais elle a un
+plancher, et c'est le plancher qui se paie à chaque invocation.
+
+### Innocuité — cinq contrôles, tous à zéro
+
+Scripts exécutables : **0** · fichiers de code (`.sh`/`.py`/`.js`) : **0** · appels
+réseau (`curl`, `fetch`, `subprocess`, `eval`, `npx`) : **0** · clés ou identifiants :
+**0** · écritures hors de son dossier (`~/`, `/Users/`, `settings.json`, `.claude`) :
+**0**.
+
+Le skill est **intégralement du Markdown**. Les 109 URL citent `developer.apple.com` ;
+les 3 URL GitHub sont dans le README, pour l'installation. `.git` retiré à la copie.
+
+### Note locale posée en tête de son `SKILL.md`
+
+Elle reprend la formulation ci-dessus, le plancher de tokens, et la mesure du
+« ne couvre pas SwiftUI ». **Elle est placée APRÈS le frontmatter YAML** — le déplacer en
+première ligne casserait le chargement du skill.
